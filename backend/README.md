@@ -10,10 +10,26 @@
 pip install -r requirements.txt
 ```
 
-### 2. 서버 실행
+### 2. 환경 변수 설정
+
+```bash
+# .env 파일 생성 (선택사항)
+SECRET_KEY=your-secret-key-here  # JWT 토큰 서명용
+DATABASE_URL=postgresql://user:pass@host:5432/db  # PostgreSQL 연결
+```
+
+**기본값**: SQLite (`salary_calculator.db`) 사용
+
+### 3. 데이터베이스 마이그레이션
 
 ```bash
 cd backend
+alembic upgrade head
+```
+
+### 4. 서버 실행
+
+```bash
 uvicorn app.api.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
@@ -23,6 +39,115 @@ uvicorn app.api.main:app --reload --host 0.0.0.0 --port 8000
 - **ReDoc**: http://localhost:8000/redoc
 
 ## 📡 API 엔드포인트
+
+### Authentication (인증) 🔐
+
+모든 CRUD API는 JWT 토큰 인증이 필요합니다. 회원가입 후 로그인하여 토큰을 받으세요.
+
+#### POST `/api/v1/auth/register`
+회원가입
+
+**요청 예제:**
+```json
+{
+  "email": "user@example.com",
+  "password": "secure-password",
+  "full_name": "홍길동"
+}
+```
+
+#### POST `/api/v1/auth/login`
+로그인 (JWT 토큰 획득)
+
+**요청 예제:**
+```json
+{
+  "email": "user@example.com",
+  "password": "secure-password"
+}
+```
+
+**응답 예제:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5...",
+  "token_type": "bearer"
+}
+```
+
+#### GET `/api/v1/auth/me`
+현재 로그인 사용자 정보 조회
+
+**헤더:**
+```
+Authorization: Bearer {access_token}
+```
+
+### Employees (직원 관리) 🔒
+
+**인증 필수**: 모든 엔드포인트는 JWT 토큰이 필요하며, 본인이 생성한 직원만 조회/수정/삭제 가능합니다.
+
+#### GET `/api/v1/employees`
+직원 목록 조회
+
+#### POST `/api/v1/employees`
+직원 생성
+
+**요청 예제:**
+```json
+{
+  "name": "홍길동",
+  "dependents_count": 2,
+  "children_under_20": 1,
+  "employment_type": "FULL_TIME",
+  "company_size": "OVER_5",
+  "scheduled_work_days": 5
+}
+```
+
+#### GET `/api/v1/employees/{employee_id}`
+직원 상세 조회
+
+#### PUT `/api/v1/employees/{employee_id}`
+직원 정보 수정
+
+#### DELETE `/api/v1/employees/{employee_id}`
+직원 삭제
+
+### Records (급여 이력) 🔒
+
+**인증 필수**: 모든 엔드포인트는 JWT 토큰이 필요하며, 본인의 급여 이력만 접근 가능합니다.
+
+#### GET `/api/v1/records`
+급여 이력 목록 조회
+
+**쿼리 파라미터:**
+- `employee_id` (optional): 특정 직원의 이력만 필터링
+- `skip` (default: 0): 페이지네이션 오프셋
+- `limit` (default: 100): 페이지 크기
+
+#### POST `/api/v1/records`
+급여 이력 저장
+
+**요청 예제:**
+```json
+{
+  "employee_id": 1,
+  "base_salary": 3000000,
+  "allowances_json": [],
+  "total_gross": 3000000,
+  "total_deductions": 500000,
+  "net_pay": 2500000,
+  "calculation_detail": {"note": "2026년 1월"},
+  "note": "정상 지급"
+}
+```
+
+#### GET `/api/v1/records/{record_id}`
+급여 이력 상세 조회
+
+#### DELETE `/api/v1/records/{record_id}`
+급여 이력 삭제
 
 ### Salary (급여 계산)
 
@@ -151,10 +276,18 @@ pytest app/tests/ -v
 
 ```
 backend/
+├── alembic/                     # 데이터베이스 마이그레이션
+│   ├── versions/
+│   │   └── 4233dc320fd0_initial_migration_with_user_model.py
+│   ├── env.py
+│   └── alembic.ini
 ├── app/
 │   ├── api/
 │   │   ├── main.py              # FastAPI 앱
 │   │   ├── routers/             # API 엔드포인트
+│   │   │   ├── auth.py          # 인증 (회원가입/로그인)
+│   │   │   ├── employees.py     # 직원 CRUD (인증 필요)
+│   │   │   ├── records.py       # 급여 이력 CRUD (인증 필요)
 │   │   │   ├── salary.py
 │   │   │   ├── insurance.py
 │   │   │   └── tax.py
@@ -163,6 +296,13 @@ backend/
 │   │       ├── salary.py
 │   │       ├── insurance.py
 │   │       └── tax.py
+│   ├── core/                    # 인증 및 보안
+│   │   ├── config.py            # JWT 설정
+│   │   ├── security.py          # 비밀번호 해싱, 토큰 생성
+│   │   └── deps.py              # 인증 의존성
+│   ├── db/                      # 데이터베이스 모델
+│   │   ├── database.py          # DB 연결
+│   │   └── models.py            # SQLAlchemy 모델 (User, Employee, SalaryRecord)
 │   ├── domain/                  # DDD 도메인 로직
 │   │   ├── entities/
 │   │   ├── value_objects/
@@ -170,6 +310,8 @@ backend/
 │   └── tests/
 │       ├── unit/                # 165개 단위 테스트
 │       └── integration/         # 14개 통합 테스트
+├── test_auth.py                 # 인증 테스트
+├── test_secured_api.py          # 보안 적용 통합 테스트
 ├── requirements.txt
 └── README.md
 ```
@@ -179,10 +321,23 @@ backend/
 - **FastAPI 0.128.0** - 웹 프레임워크
 - **Uvicorn 0.40.0** - ASGI 서버
 - **Pydantic 2.12.5** - 데이터 검증
+- **SQLAlchemy 2.0+** - ORM
+- **Alembic** - 데이터베이스 마이그레이션
+- **PostgreSQL / SQLite** - 데이터베이스
+- **python-jose** - JWT 토큰 생성/검증
+- **passlib[argon2]** - Argon2 비밀번호 해싱
 - **Pytest 9.0.2** - 테스트 프레임워크
+
+## 🔐 보안 고지
+
+- **JWT 토큰**: 30일 만료 (프로덕션 환경에서는 더 짧게 설정 권장)
+- **비밀번호 해싱**: Argon2 알고리즘 사용
+- **데이터 격리**: 사용자는 본인이 생성한 데이터만 접근 가능
+- **환경 변수**: `SECRET_KEY`는 반드시 안전한 랜덤 문자열로 설정
+- **프로덕션 배포 시**: HTTPS 필수, CORS 설정 확인
 
 ## 📝 버전 정보
 
-- **API Version**: 1.0.0
+- **API Version**: 1.1.0 (인증 시스템 추가)
 - **적용 연도**: 2026년
-- **최종 업데이트**: 2026-01-13
+- **최종 업데이트**: 2026-01-20
