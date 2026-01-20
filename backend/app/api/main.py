@@ -38,7 +38,7 @@ app = FastAPI(
 # 예: ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com,http://localhost:5175
 ALLOWED_ORIGINS = os.getenv(
     "ALLOWED_ORIGINS",
-    "http://localhost:5175,http://localhost:5173,https://calcul-1b9.pages.dev"
+    "http://localhost:5175,http://localhost:5173,https://calcul-1b9.pages.dev,https://paytools.work"
 ).split(",")
 
 app.add_middleware(
