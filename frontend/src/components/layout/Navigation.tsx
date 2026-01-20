@@ -4,10 +4,12 @@
 
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Navigation = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, user, logout } = useAuth();
 
   const navItems = [
     { path: '/', label: '계산기' },
@@ -19,6 +21,11 @@ const Navigation = () => {
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    logout();
+    setIsMenuOpen(false);
+  };
 
   return (
     <nav className="bg-white shadow-md">
@@ -46,6 +53,34 @@ const Navigation = () => {
                 {item.label}
               </Link>
             ))}
+
+            {/* 인증 상태에 따른 버튼 */}
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-2 ml-2 pl-2 border-l border-gray-300">
+                <span className="text-sm text-gray-700">{user?.full_name || user?.email}</span>
+                <button
+                  onClick={handleLogout}
+                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+                >
+                  로그아웃
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-1 ml-2 pl-2 border-l border-gray-300">
+                <Link
+                  to="/login"
+                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+                >
+                  로그인
+                </Link>
+                <Link
+                  to="/register"
+                  className="px-3 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700"
+                >
+                  회원가입
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* 모바일 메뉴 버튼 */}
@@ -100,6 +135,40 @@ const Navigation = () => {
                 {item.label}
               </Link>
             ))}
+
+            {/* 모바일 인증 버튼 */}
+            <div className="border-t border-gray-200 pt-2 mt-2">
+              {isAuthenticated ? (
+                <>
+                  <div className="px-3 py-2 text-sm text-gray-700">
+                    {user?.full_name || user?.email}
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100"
+                  >
+                    로그아웃
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100"
+                  >
+                    로그인
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block px-3 py-2 rounded-md text-base font-medium bg-blue-600 text-white hover:bg-blue-700"
+                  >
+                    회원가입
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}

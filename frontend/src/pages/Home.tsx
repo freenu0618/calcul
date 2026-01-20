@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
@@ -69,16 +70,22 @@ function Home() {
   };
 
   return (
-    <MainLayout>
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            실수령액 계산
-          </h2>
-          <p className="text-gray-600">
-            근로자 정보와 급여 내역을 입력하면 4대 보험, 세금을 제외한 실수령액을 계산합니다.
-          </p>
-        </div>
+    <>
+      <Helmet>
+        <title>한국 근로기준법 급여 계산기 | 2026년 4대보험 실수령액 계산</title>
+        <meta name="description" content="기본급, 수당, 4대보험, 소득세를 자동 계산하여 실수령액을 정확히 확인하세요. 연장·야간·휴일 수당, 주휴수당 계산 포함. 2026년 최신 세율 적용." />
+      </Helmet>
+
+      <MainLayout>
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              한국 근로기준법 급여 계산기
+            </h1>
+            <p className="text-gray-600">
+              근로자 정보와 급여 내역을 입력하면 4대 보험, 세금을 제외한 실수령액을 계산합니다.
+            </p>
+          </div>
 
         <form onSubmit={handleSubmit}>
           <div className="space-y-6">
@@ -141,6 +148,7 @@ function Home() {
         </div>
       </div>
     </MainLayout>
+    </>
   );
 }
 

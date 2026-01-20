@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
 
@@ -185,17 +186,40 @@ const FAQ = () => {
     ? faqData
     : faqData.filter(item => item.category === selectedCategory);
 
+  // FAQPage 구조화된 데이터 (schema.org)
+  const faqSchemaData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqData.map(item => ({
+      "@type": "Question",
+      "name": item.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.answer
+      }
+    }))
+  };
+
   return (
-    <MainLayout>
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            자주 묻는 질문 (FAQ)
-          </h1>
-          <p className="text-lg text-gray-600">
-            급여 계산과 관련하여 자주 묻는 질문들을 확인하세요.
-          </p>
-        </div>
+    <>
+      <Helmet>
+        <title>자주 묻는 질문 (FAQ) | 급여 계산기</title>
+        <meta name="description" content="급여 계산, 4대 보험, 소득세, 연장수당, 최저임금, 법적 권리에 대한 30개의 자주 묻는 질문과 답변을 확인하세요." />
+        <script type="application/ld+json">
+          {JSON.stringify(faqSchemaData)}
+        </script>
+      </Helmet>
+
+      <MainLayout>
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              자주 묻는 질문 (FAQ)
+            </h1>
+            <p className="text-lg text-gray-600">
+              급여 계산과 관련하여 자주 묻는 질문들을 확인하세요.
+            </p>
+          </div>
 
         {/* 카테고리 필터 */}
         <div className="mb-6 flex flex-wrap gap-2">
@@ -258,6 +282,7 @@ const FAQ = () => {
         </div>
       </div>
     </MainLayout>
+    </>
   );
 };
 

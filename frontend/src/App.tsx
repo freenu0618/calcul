@@ -4,9 +4,13 @@
 
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+import { AuthProvider } from './contexts/AuthContext';
 import Navigation from './components/layout/Navigation';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
+import Login from './pages/Auth/Login';
+import Register from './pages/Auth/Register';
 import GuidePage from './pages/Guide/GuidePage';
 import InsuranceGuide from './pages/Guide/InsuranceGuide';
 import TaxGuide from './pages/Guide/TaxGuide';
@@ -45,43 +49,51 @@ function PageViewTracker() {
 
 function App() {
   return (
-    <Router>
-      <PageViewTracker />
-      <div className="flex flex-col min-h-screen">
-        <Navigation />
-        <main className="flex-1">
-          <Routes>
-            {/* 메인 페이지 */}
-            <Route path="/" element={<Home />} />
+    <HelmetProvider>
+      <AuthProvider>
+        <Router>
+          <PageViewTracker />
+          <div className="flex flex-col min-h-screen">
+            <Navigation />
+            <main className="flex-1">
+              <Routes>
+                {/* 인증 페이지 */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
-            {/* 가이드 페이지 */}
-            <Route path="/guide" element={<GuidePage />} />
-            <Route path="/guide/insurance" element={<InsuranceGuide />} />
-            <Route path="/guide/tax" element={<TaxGuide />} />
-            <Route path="/guide/overtime" element={<OvertimeGuide />} />
+                {/* 메인 페이지 */}
+                <Route path="/" element={<Home />} />
 
-            {/* FAQ */}
-            <Route path="/faq" element={<FAQ />} />
+                {/* 가이드 페이지 */}
+                <Route path="/guide" element={<GuidePage />} />
+                <Route path="/guide/insurance" element={<InsuranceGuide />} />
+                <Route path="/guide/tax" element={<TaxGuide />} />
+                <Route path="/guide/overtime" element={<OvertimeGuide />} />
 
-            {/* 계산 사례 */}
-            <Route path="/examples" element={<ExamplesPage />} />
+                {/* FAQ */}
+                <Route path="/faq" element={<FAQ />} />
 
-            {/* 법률 정보 */}
-            <Route path="/legal" element={<Legal />} />
+                {/* 계산 사례 */}
+                <Route path="/examples" element={<ExamplesPage />} />
 
-            {/* 블로그 */}
-            <Route path="/blog" element={<BlogPage />} />
+                {/* 법률 정보 */}
+                <Route path="/legal" element={<Legal />} />
 
-            {/* 기타 페이지 */}
-            <Route path="/about" element={<About />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/contact" element={<Contact />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+                {/* 블로그 */}
+                <Route path="/blog" element={<BlogPage />} />
+
+                {/* 기타 페이지 */}
+                <Route path="/about" element={<About />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/contact" element={<Contact />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </Router>
+      </AuthProvider>
+    </HelmetProvider>
   );
 }
 

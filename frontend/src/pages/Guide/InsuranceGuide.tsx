@@ -3,27 +3,34 @@
  */
 
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
 
 const InsuranceGuide = () => {
   return (
-    <MainLayout>
-      <div className="max-w-4xl mx-auto">
-        {/* 헤더 */}
-        <div className="mb-8">
-          <nav className="text-sm text-gray-500 mb-4">
-            <Link to="/guide" className="hover:text-blue-600">가이드</Link>
-            <span className="mx-2">/</span>
-            <span>4대 보험 이해하기</span>
-          </nav>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            4대 보험 이해하기
-          </h1>
-          <p className="text-lg text-gray-600">
-            국민연금, 건강보험, 장기요양보험, 고용보험의 개념과 2026년 요율 기준 계산 방법을 알아봅니다.
-          </p>
-        </div>
+    <>
+      <Helmet>
+        <title>4대 보험 이해하기 | 2026년 요율 및 계산 방법 | 급여 계산기</title>
+        <meta name="description" content="국민연금, 건강보험, 장기요양보험, 고용보험의 2026년 요율과 계산 방법을 상세히 안내합니다. 상·하한 기준소득월액, 공제 계산 예시 포함." />
+      </Helmet>
+
+      <MainLayout>
+        <div className="max-w-4xl mx-auto">
+          {/* 헤더 */}
+          <div className="mb-8">
+            <nav className="text-sm text-gray-500 mb-4">
+              <Link to="/guide" className="hover:text-blue-600">가이드</Link>
+              <span className="mx-2">/</span>
+              <span>4대 보험 이해하기</span>
+            </nav>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              4대 보험 이해하기
+            </h1>
+            <p className="text-lg text-gray-600">
+              국민연금, 건강보험, 장기요양보험, 고용보험의 개념과 2026년 요율 기준 계산 방법을 알아봅니다.
+            </p>
+          </div>
 
         {/* 4대 보험 개요 */}
         <Card title="4대 보험이란?">
@@ -337,6 +344,7 @@ const InsuranceGuide = () => {
         </div>
       </div>
     </MainLayout>
+    </>
   );
 };
 
