@@ -5,7 +5,7 @@ User-agent: *
 Allow: /
 
 # Sitemap 위치
-Sitemap: https://calcul-1b9.pages.dev/sitemap.xml
+Sitemap: https://paytools.work/sitemap.xml
 
 # 크롤링 속도 제한 (선택사항)
 # Crawl-delay: 1
