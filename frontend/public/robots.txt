@@ -1,9 +1,15 @@
+# 급여 계산기 robots.txt
+# 모든 검색 엔진 크롤러 허용
+
 User-agent: *
 Allow: /
 
-# 크롤링 제외 (API 엔드포인트)
-Disallow: /api/
-
 # Sitemap 위치
-# TODO: 도메인 구매 후 yourdomain.com을 실제 도메인으로 교체하세요
-Sitemap: https://yourdomain.com/sitemap.xml
+Sitemap: https://calcul-1b9.pages.dev/sitemap.xml
+
+# 크롤링 속도 제한 (선택사항)
+# Crawl-delay: 1
+
+# 특정 경로 차단 (필요시)
+# Disallow: /api/
+# Disallow: /private/

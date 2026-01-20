@@ -36,7 +36,10 @@ app = FastAPI(
 # CORS 설정
 # 환경 변수에서 허용할 도메인 목록을 읽어옴 (쉼표로 구분)
 # 예: ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com,http://localhost:5175
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5175,http://localhost:5173").split(",")
+ALLOWED_ORIGINS = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:5175,http://localhost:5173,https://calcul-1b9.pages.dev"
+).split(",")
 
 app.add_middleware(
     CORSMiddleware,

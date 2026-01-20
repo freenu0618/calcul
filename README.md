@@ -2,6 +2,9 @@
 
 한국 근로기준법 기반 실수령액 계산기
 
+🌐 **라이브 데모**: https://calcul-1b9.pages.dev/
+📦 **GitHub**: https://github.com/freenu0618/calcul
+
 ## 🚀 빠른 시작 (Docker)
 
 ### 사전 요구사항
@@ -30,6 +33,58 @@ docker-compose down
 - ✅ 주휴수당 계산 (개근 조건 체크)
 - ✅ FullCalendar 캘린더 UI
 - ✅ 시급 기반 역산 로직
+
+---
+
+## 🌐 배포 가이드
+
+### 프론트엔드 (Cloudflare Pages)
+
+1. **환경 변수 설정**
+   ```bash
+   # Cloudflare Pages 대시보드 → Settings → Environment variables
+   VITE_API_BASE_URL=https://your-backend-url.railway.app
+   ```
+
+2. **빌드 설정**
+   - Build command: `cd frontend && npm install && npm run build`
+   - Build output directory: `frontend/dist`
+   - Root directory: `/`
+
+3. **배포**
+   ```bash
+   git push origin main  # GitHub에 푸시하면 자동 배포
+   ```
+
+### 백엔드 (Railway)
+
+1. **환경 변수 설정**
+   ```bash
+   # Railway 대시보드 → Variables
+   ALLOWED_ORIGINS=https://calcul-1b9.pages.dev
+   DATABASE_URL=postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}
+   PORT=8000
+   ```
+
+2. **배포**
+   ```bash
+   git push origin main  # GitHub에 푸시하면 자동 배포
+   ```
+
+3. **헬스 체크**
+   ```bash
+   curl https://your-backend-url.railway.app/health
+   ```
+
+### 문제 해결
+
+#### 405 에러 (Method Not Allowed)
+- **원인**: 프론트엔드가 백엔드 URL을 모름
+- **해결**: Cloudflare Pages 환경 변수에 `VITE_API_BASE_URL` 추가
+
+#### CORS 에러
+- **원인**: 백엔드가 프론트엔드 도메인을 허용 목록에 추가하지 않음
+- **해결**: Railway 환경 변수 `ALLOWED_ORIGINS`에 프론트엔드 URL 추가
 
 ---
 
