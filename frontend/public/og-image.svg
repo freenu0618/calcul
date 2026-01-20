@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <!-- 배경 그라데이션 -->
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg-gradient)"/>
+
+  <!-- 장식적인 원 패턴 (배경) -->
+  <circle cx="100" cy="100" r="80" fill="white" opacity="0.05"/>
+  <circle cx="1100" cy="530" r="100" fill="white" opacity="0.05"/>
+  <circle cx="900" cy="150" r="60" fill="white" opacity="0.08"/>
+
+  <!-- 중앙 아이콘 영역 -->
+  <g transform="translate(300, 200)">
+    <!-- 계산기 프레임 -->
+    <rect x="0" y="0" width="200" height="250" rx="20" fill="white" opacity="0.15"/>
+
+    <!-- 원화 기호 (₩) -->
+    <path d="M30 40L70 140L110 40M150 40L110 140L190 40"
+          stroke="white"
+          stroke-width="12"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+    <line x1="20" y1="85" x2="200" y2="85" stroke="white" stroke-width="10"/>
+    <line x1="20" y1="105" x2="200" y2="105" stroke="white" stroke-width="10"/>
+
+    <!-- 계산기 버튼들 -->
+    <rect x="25" y="170" width="40" height="30" rx="5" fill="white" opacity="0.3"/>
+    <rect x="80" y="170" width="40" height="30" rx="5" fill="white" opacity="0.3"/>
+    <rect x="135" y="170" width="40" height="30" rx="5" fill="white" opacity="0.3"/>
+    <rect x="25" y="210" width="40" height="30" rx="5" fill="white" opacity="0.3"/>
+    <rect x="80" y="210" width="40" height="30" rx="5" fill="white" opacity="0.3"/>
+    <rect x="135" y="210" width="40" height="30" rx="5" fill="white" opacity="0.3"/>
+  </g>
+
+  <!-- 텍스트 콘텐츠 -->
+  <text x="600" y="250" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white" text-anchor="middle">
+    한국 근로기준법
+  </text>
+  <text x="600" y="330" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white" text-anchor="middle">
+    급여 계산기
+  </text>
+
+  <!-- 서브 텍스트 -->
+  <text x="600" y="400" font-family="Arial, sans-serif" font-size="28" fill="white" text-anchor="middle" opacity="0.9">
+    4대보험 · 소득세 · 실수령액을 정확히 계산
+  </text>
+  <text x="600" y="450" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" opacity="0.8">
+    연장·야간·휴일 수당 | 주휴수당 | 2026년 최신 세율 적용
+  </text>
+
+  <!-- 하단 뱃지 -->
+  <rect x="480" y="520" width="240" height="50" rx="25" fill="white" opacity="0.2"/>
+  <text x="600" y="555" font-family="Arial, sans-serif" font-size="24" font-weight="600" fill="white" text-anchor="middle">
+    무료 · 정확 · 간편
+  </text>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- 배경 -->
+  <rect width="32" height="32" rx="6" fill="#4F46E5"/>
+
+  <!-- 원화 기호 (₩) -->
+  <path d="M8 9L12 20L16 9M20 9L16 20L24 9M7 15H25M7 17H25"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- 계산기 버튼 (하단) -->
+  <circle cx="11" cy="25" r="1.5" fill="white" opacity="0.8"/>
+  <circle cx="16" cy="25" r="1.5" fill="white" opacity="0.8"/>
+  <circle cx="21" cy="25" r="1.5" fill="white" opacity="0.8"/>
+</svg>

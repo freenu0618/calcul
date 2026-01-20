@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <!-- 배경 -->
+  <rect width="180" height="180" rx="40" fill="#4F46E5"/>
+
+  <!-- 원화 기호 (₩) - 크게 -->
+  <g transform="translate(90, 70)">
+    <path d="M-40 -30L-10 40L20 -30M50 -30L20 40L80 -30"
+          stroke="white"
+          stroke-width="10"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+    <line x1="-45" y1="0" x2="85" y2="0" stroke="white" stroke-width="8"/>
+    <line x1="-45" y1="12" x2="85" y2="12" stroke="white" stroke-width="8"/>
+  </g>
+
+  <!-- 계산기 버튼 (하단) -->
+  <circle cx="60" cy="145" r="8" fill="white" opacity="0.9"/>
+  <circle cx="90" cy="145" r="8" fill="white" opacity="0.9"/>
+  <circle cx="120" cy="145" r="8" fill="white" opacity="0.9"/>
+
+  <!-- 텍스트 -->
+  <text x="90" y="165" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle" opacity="0.8">
+    급여계산
+  </text>
+</svg>
