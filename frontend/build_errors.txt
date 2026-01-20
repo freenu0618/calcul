@@ -1,0 +1,15 @@
+﻿src/components/forms/EmployeeInfoForm.tsx(5,1): error TS6133: 'React' is declared but its value is never read.
+src/components/forms/SalaryForm.tsx(5,1): error TS6133: 'React' is declared but its value is never read.
+src/components/layout/Header.tsx(5,1): error TS6133: 'React' is declared but its value is never read.
+src/components/ShiftInput/ShiftInput.example.tsx(9,10): error TS1484: 'WorkShiftRequest' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ShiftInput/ShiftInput.tsx(2,10): error TS1484: 'WorkShiftRequest' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ShiftInput/ShiftRow.tsx(2,10): error TS1484: 'WorkShiftRequest' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ShiftInput/ShiftRowDesktop.tsx(2,10): error TS1484: 'WorkShiftRequest' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ShiftInput/ShiftRowMobile.tsx(2,10): error TS1484: 'WorkShiftRequest' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ShiftInput/ShiftSummary.tsx(2,10): error TS1484: 'WorkShiftRequest' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/services/api.ts(6,17): error TS1484: 'AxiosInstance' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/types/api.ts(6,10): error TS1484: 'Employee' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/types/api.ts(6,20): error TS1484: 'WorkShift' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/types/api.ts(6,31): error TS1484: 'Allowance' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/types/api.ts(6,42): error TS1484: 'MoneyResponse' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/types/api.ts(6,57): error TS1484: 'WorkingHoursResponse' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.

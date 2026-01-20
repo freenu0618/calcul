@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# 크롤링 제외 (API 엔드포인트)
+Disallow: /api/
+
+# Sitemap 위치
+# TODO: 도메인 구매 후 yourdomain.com을 실제 도메인으로 교체하세요
+Sitemap: https://yourdomain.com/sitemap.xml
