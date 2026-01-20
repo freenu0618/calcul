@@ -79,8 +79,16 @@ async def startup_event():
 
 
 # 라우터 등록
-from app.api.routers import salary, insurance, tax, employees, records
+from app.api.routers import salary, insurance, tax, employees, records, auth
 
+# 인증 라우터 (인증 불필요)
+app.include_router(
+    auth.router,
+    prefix="/api/v1/auth",
+    tags=["Authentication"],
+)
+
+# 급여 계산 라우터 (공개)
 app.include_router(
     salary.router,
     prefix="/api/v1/salary",
@@ -99,6 +107,7 @@ app.include_router(
     tags=["Tax"],
 )
 
+# 직원/이력 라우터 (인증 필요 - 나중에 보안 적용)
 app.include_router(
     employees.router,
     prefix="/api/v1/employees",
