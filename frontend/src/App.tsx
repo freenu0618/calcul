@@ -34,7 +34,7 @@ function PageViewTracker() {
   useEffect(() => {
     // 페이지 변경 시 GA4에 페이지뷰 전송
     if (typeof window.gtag !== 'undefined') {
-      window.gtag('config', 'G-XXXXXXXXXX', {
+      window.gtag('config', 'G-26QRZ1CK71', {
         page_path: location.pathname + location.search,
       });
     }
