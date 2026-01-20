@@ -5,23 +5,30 @@
 🌐 **라이브 데모**: https://calcul-1b9.pages.dev/
 📦 **GitHub**: https://github.com/freenu0618/calcul
 
-## 🚀 빠른 시작 (Docker)
+## 🚀 로컬 개발 환경 설정
 
 ### 사전 요구사항
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) 설치
+- Python 3.11+ (백엔드)
+- Node.js 18+ (프론트엔드)
 
-### 실행
+### 백엔드 실행
 ```bash
-docker-compose up -d
+cd backend
+pip install -r requirements.txt
+uvicorn app.api.main:app --reload --port 8000
+```
+
+### 프론트엔드 실행
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
 ### 접속
-http://localhost:3000
-
-### 종료
-```bash
-docker-compose down
-```
+- 프론트엔드: http://localhost:5175
+- 백엔드 API: http://localhost:8000
+- API 문서: http://localhost:8000/docs
 
 ---
 
