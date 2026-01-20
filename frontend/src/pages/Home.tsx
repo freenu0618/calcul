@@ -60,6 +60,16 @@ function Home() {
         work_shifts: workShifts,
       });
       setResult(response);
+
+      // GA4 이벤트 전송: 급여 계산 완료
+      if (typeof window.gtag !== 'undefined') {
+        window.gtag('event', 'calculate_salary', {
+          event_category: 'engagement',
+          event_label: 'salary_calculator',
+          employment_type: employee.employment_type,
+          company_size: employee.company_size,
+        });
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : '계산 중 오류가 발생했습니다.';
       setError(message);
