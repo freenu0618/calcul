@@ -44,8 +44,9 @@ const Register = () => {
     try {
       await register(email, password, fullName);
       navigate('/', { replace: true });
-    } catch (err: any) {
-      setError(err.message || '회원가입에 실패했습니다.');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '회원가입에 실패했습니다.';
+      setError(message);
     } finally {
       setIsLoading(false);
     }

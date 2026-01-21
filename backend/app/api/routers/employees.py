@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.db import get_db, EmployeeModel, UserModel
 from app.core.deps import get_current_user
@@ -19,10 +19,9 @@ class EmployeeCreate(BaseModel):
 
 
 class EmployeeResponse(EmployeeCreate):
-    id: int
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        from_attributes = True
+    id: int
 
 
 router = APIRouter()

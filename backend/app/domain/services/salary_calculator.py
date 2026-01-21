@@ -103,10 +103,17 @@ class SalaryCalculator:
     8. 실수령액 계산
     """
 
-    # 월 소정근로시간 기준 (고용노동부 최저임금 월 환산 기준)
-    # 209시간 = (주 40시간 + 주휴 8시간) × 365일 ÷ 7일 ÷ 12개월
-    # 이 기준을 사용하면 통상시급이 최저시급과 일치하게 됨
-    MONTHLY_REGULAR_HOURS = Decimal('209')
+    # 월 소정근로시간 (주휴수당 제외)
+    # 주 40시간 × (365일/7일) / 12개월 = 약 174시간
+    #
+    # ⚠️ 주의: 209시간은 최저임금 월 환산 기준 (주휴 포함)
+    # 본 시스템은 주휴수당을 WeeklyHolidayPayCalculator에서 별도 계산하므로
+    # 통상시급 계산 시 174시간(실제 근로시간)을 사용해야 함
+    #
+    # 참고:
+    # - 209시간 사용 시: 통상시급 17.6% 낮아짐 (법적 오류)
+    # - 주휴수당 이중 계산 방지를 위해 174시간 필수
+    MONTHLY_REGULAR_HOURS = Decimal('174')
 
     def __init__(self):
         """초기화"""
@@ -244,11 +251,21 @@ class SalaryCalculator:
 
         통상시급 = 월 통상임금 ÷ 월 소정근로시간 (174시간)
 
+        ⚠️ 중요: 174시간은 실제 근로시간 기준입니다.
+        209시간(주휴 포함)을 사용하면 통상시급이 17.6% 낮아져
+        모든 가산수당이 과소 계산됩니다.
+
+        본 시스템은 주휴수당을 별도로 계산하므로 174시간이 정확합니다.
+
         Args:
             regular_wage: 통상임금
 
         Returns:
             통상시급
+
+        Examples:
+            >>> calculator._calculate_hourly_wage(Money(2800000))
+            Money(16092)  # 2,800,000 ÷ 174 = 16,092원
         """
         return (regular_wage / self.MONTHLY_REGULAR_HOURS).round_to_won()
 

@@ -2,7 +2,7 @@
  * 급여 계산기 메인 페이지
  */
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
@@ -38,8 +38,8 @@ function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 폼 제출 핸들러
-  const handleSubmit = async (e: React.FormEvent) => {
+  // 폼 제출 핸들러 (메모이제이션)
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
@@ -77,7 +77,7 @@ function Home() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [employee, baseSalary, allowances, workShifts]);
 
   return (
     <>

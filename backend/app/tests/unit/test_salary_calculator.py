@@ -428,3 +428,66 @@ class TestSalaryCalculationResultMethods:
         # 공제 상세
         assert "insurance" in result_dict["deductions_breakdown"]
         assert "tax" in result_dict["deductions_breakdown"]
+
+
+class TestHourlyWageCalculation:
+    """통상시급 계산 정확성 테스트"""
+
+    def test_174_hours_basis_validation(self):
+        """174시간 기준 검증 (209시간과 비교)"""
+        employee = Employee(
+            name="시급검증",
+            dependents_count=0,
+            children_under_20=0,
+            employment_type=EmploymentType.FULL_TIME,
+            company_size=CompanySize.OVER_5
+        )
+
+        base_salary = Money(2800000)
+        calculator = SalaryCalculator()
+        result = calculator.calculate(employee, base_salary, [], [])
+
+        # 174시간 기준: 2,800,000 ÷ 174 = 16,092원
+        expected_174 = 16092
+        assert result.hourly_wage.to_int() == expected_174
+
+        # 만약 209시간 사용 시: 2,800,000 ÷ 209 = 13,397원
+        wrong_209 = int(2800000 / 209)
+        assert result.hourly_wage.to_int() > wrong_209  # 16,092 > 13,397
+
+        # 차이: 약 2,695원 (17.6%)
+        difference = expected_174 - wrong_209
+        assert difference == 2695
+
+    def test_weekly_holiday_separate_no_double_counting(self):
+        """주휴수당 별도 계산 검증 (이중 계산 방지)"""
+        employee = Employee(
+            name="주휴검증",
+            dependents_count=0,
+            children_under_20=0,
+            employment_type=EmploymentType.FULL_TIME,
+            company_size=CompanySize.OVER_5
+        )
+
+        base_salary = Money(2800000)
+
+        # 주 5일 근무 (1월 전체)
+        shifts = []
+        for day in range(5, 31):
+            d = date(2026, 1, day)
+            if d.weekday() < 5:  # 월~금
+                shifts.append(WorkShift(d, time(9, 0), time(18, 0), 60))
+
+        calculator = SalaryCalculator()
+        result = calculator.calculate(employee, base_salary, [], shifts)
+
+        # 통상시급 = 2,800,000 ÷ 174 = 16,092원
+        assert result.hourly_wage.to_int() == 16092
+
+        # 주휴수당 = 16,092 × 8 × 4.345 = 559,184원 (별도 지급)
+        expected_weekly = int(16092 * 8 * 4.345)
+        assert abs(result.weekly_holiday_result.weekly_holiday_pay.to_int() - expected_weekly) <= 10
+
+        # 총 지급액 = 기본급 + 주휴수당 (이중 계산 아님)
+        expected_total = 2800000 + expected_weekly
+        assert abs(result.total_gross.to_int() - expected_total) <= 10

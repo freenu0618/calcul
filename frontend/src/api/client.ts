@@ -2,15 +2,14 @@
  * API 클라이언트 설정
  */
 import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+import { API_CONFIG } from '../config/api.config';
 
 export const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: `${API_CONFIG.BASE_URL}${API_CONFIG.API_VERSION}`,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
+  timeout: API_CONFIG.TIMEOUT,
 });
 
 // 요청 인터셉터 (JWT 토큰 자동 추가)

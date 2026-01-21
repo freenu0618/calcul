@@ -3,7 +3,7 @@ import json
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 from app.db import get_db, SalaryRecordModel, UserModel
@@ -23,6 +23,8 @@ class SalaryRecordCreate(BaseModel):
 
 
 class SalaryRecordResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     employee_id: Optional[int]
     base_salary: int
@@ -33,9 +35,6 @@ class SalaryRecordResponse(BaseModel):
     calculation_detail: dict
     calculated_at: datetime
     note: Optional[str]
-
-    class Config:
-        from_attributes = True
 
     @classmethod
     def model_validate(cls, obj):

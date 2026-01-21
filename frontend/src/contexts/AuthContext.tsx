@@ -4,9 +4,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-
-// API 기본 URL (환경 변수 또는 로컬호스트)
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+import { API_CONFIG } from '../config/api.config';
 
 interface User {
   id: number;
@@ -50,7 +48,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // 현재 사용자 정보 가져오기
   const fetchCurrentUser = async (authToken: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
+      const response = await fetch(API_CONFIG.getApiUrl('/auth/me'), {
         headers: {
           'Authorization': `Bearer ${authToken}`,
         },
@@ -75,7 +73,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // 로그인
   const login = async (email: string, password: string) => {
-    const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+    const response = await fetch(API_CONFIG.getApiUrl('/auth/login'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -100,7 +98,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // 회원가입
   const register = async (email: string, password: string, fullName: string) => {
-    const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
+    const response = await fetch(API_CONFIG.getApiUrl('/auth/register'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

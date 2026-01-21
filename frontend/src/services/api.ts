@@ -5,6 +5,7 @@
 
 import axios from 'axios';
 import type { AxiosInstance } from 'axios';
+import { API_CONFIG } from '../config/api.config';
 import type {
   SalaryCalculationRequest,
   SalaryCalculationResponse,
@@ -19,11 +20,11 @@ import type {
 
 // axios 인스턴스 생성
 const apiClient: AxiosInstance = axios.create({
-  baseURL: 'http://localhost:8000/api/v1',
+  baseURL: `${API_CONFIG.BASE_URL}${API_CONFIG.API_VERSION}`,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10초 타임아웃
+  timeout: API_CONFIG.TIMEOUT,
 });
 
 // 요청 인터셉터 (로깅용)

@@ -1,7 +1,7 @@
 """인증 API 라우터 (회원가입, 로그인)"""
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import Optional
 
 from app.db import get_db, UserModel
@@ -29,13 +29,12 @@ class Token(BaseModel):
 
 
 class UserResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     email: str
     full_name: Optional[str]
     is_active: bool
-
-    class Config:
-        from_attributes = True
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)

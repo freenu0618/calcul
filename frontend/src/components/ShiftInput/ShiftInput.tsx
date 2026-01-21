@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { WorkShiftRequest } from '../../types/salary';
 import ShiftRow from './ShiftRow';
 import ShiftSummary from './ShiftSummary';
@@ -29,8 +29,8 @@ const ShiftInput: React.FC<ShiftInputProps> = ({ onChange, initialShifts = [] })
     onChange(shifts);
   }, [shifts, onChange]);
 
-  // 새 시프트 추가
-  const handleAddShift = () => {
+  // 새 시프트 추가 (메모이제이션)
+  const handleAddShift = useCallback(() => {
     const today = new Date().toISOString().split('T')[0];
     const newShift: WorkShiftRequest = {
       date: today,
@@ -39,11 +39,11 @@ const ShiftInput: React.FC<ShiftInputProps> = ({ onChange, initialShifts = [] })
       break_minutes: 60,
       is_holiday_work: false,
     };
-    setShifts([...shifts, newShift]);
-  };
+    setShifts(prev => [...prev, newShift]);
+  }, []);
 
-  // 프리셋으로 시프트 생성
-  const handleApplyPreset = (presetKey: keyof typeof SHIFT_PRESETS) => {
+  // 프리셋으로 시프트 생성 (메모이제이션)
+  const handleApplyPreset = useCallback((presetKey: keyof typeof SHIFT_PRESETS) => {
     const preset = SHIFT_PRESETS[presetKey];
     const today = new Date();
     const newShifts: WorkShiftRequest[] = [];
@@ -76,21 +76,23 @@ const ShiftInput: React.FC<ShiftInputProps> = ({ onChange, initialShifts = [] })
     }
 
     setShifts(newShifts);
-  };
+  }, []);
 
-  const handleUpdateShift = (index: number, updatedShift: WorkShiftRequest) => {
-    const newShifts = [...shifts];
-    newShifts[index] = updatedShift;
-    setShifts(newShifts);
-  };
+  const handleUpdateShift = useCallback((index: number, updatedShift: WorkShiftRequest) => {
+    setShifts(prev => {
+      const newShifts = [...prev];
+      newShifts[index] = updatedShift;
+      return newShifts;
+    });
+  }, []);
 
-  const handleDeleteShift = (index: number) => {
-    setShifts(shifts.filter((_, i) => i !== index));
-  };
+  const handleDeleteShift = useCallback((index: number) => {
+    setShifts(prev => prev.filter((_, i) => i !== index));
+  }, []);
 
-  const handleClearAll = () => {
+  const handleClearAll = useCallback(() => {
     setShifts([]);
-  };
+  }, []);
 
   return (
     <div className="space-y-4">

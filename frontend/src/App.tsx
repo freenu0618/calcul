@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './contexts/AuthContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import Navigation from './components/layout/Navigation';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
@@ -29,9 +30,12 @@ import Terms from './pages/Terms';
 import Contact from './pages/Contact';
 
 // GA 타입 선언
+type GtagCommand = 'config' | 'event' | 'set';
+type GtagParams = Record<string, string | number | boolean>;
+
 declare global {
   interface Window {
-    gtag: (command: string, ...args: any[]) => void;
+    gtag: (command: GtagCommand, targetId: string, params?: GtagParams) => void;
   }
 }
 
@@ -53,11 +57,12 @@ function PageViewTracker() {
 
 function App() {
   return (
-    <HelmetProvider>
-      <AuthProvider>
-        <Router>
-          <PageViewTracker />
-          <div className="flex flex-col min-h-screen">
+    <ErrorBoundary>
+      <HelmetProvider>
+        <AuthProvider>
+          <Router>
+            <PageViewTracker />
+            <div className="flex flex-col min-h-screen">
             <Navigation />
             <main className="flex-1">
               <Routes>
@@ -102,6 +107,7 @@ function App() {
         </Router>
       </AuthProvider>
     </HelmetProvider>
+    </ErrorBoundary>
   );
 }
 

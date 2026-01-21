@@ -103,14 +103,18 @@ class WeeklyHolidayPayCalculator:
         """
         # 1. 주별 평균 근로시간 계산
         avg_weekly_hours = self._calculate_average_weekly_hours(work_shifts)
+        weekly_hours_decimal = avg_weekly_hours.to_decimal_hours()
+
+        # 비례 지급 여부는 근로시간 기준 (개근 여부와 무관)
+        is_proportional = weekly_hours_decimal < self.WEEKLY_REGULAR_HOURS
 
         # 2. 주 15시간 미만: 주휴수당 없음
-        if avg_weekly_hours.to_decimal_hours() < self.MINIMUM_WEEKLY_HOURS:
+        if weekly_hours_decimal < self.MINIMUM_WEEKLY_HOURS:
             return WeeklyHolidayPayResult(
                 weekly_holiday_pay=Money.zero(),
                 weekly_hours=avg_weekly_hours,
                 hourly_wage=hourly_wage,
-                is_proportional=False
+                is_proportional=is_proportional
             )
 
         # 3. 개근 조건 체크 (주별 실제 근무일 vs 소정근로일)
@@ -119,12 +123,10 @@ class WeeklyHolidayPayCalculator:
                 weekly_holiday_pay=Money.zero(),
                 weekly_hours=avg_weekly_hours,
                 hourly_wage=hourly_wage,
-                is_proportional=False
+                is_proportional=is_proportional
             )
 
         # 4. 주휴수당 계산
-        weekly_hours_decimal = avg_weekly_hours.to_decimal_hours()
-        is_proportional = weekly_hours_decimal < self.WEEKLY_REGULAR_HOURS
 
         if is_proportional:
             # 비례 지급: (주 소정근로시간 ÷ 40) × 8 × 통상시급
@@ -154,7 +156,8 @@ class WeeklyHolidayPayCalculator:
         """개근 여부 체크
 
         주별로 실제 근무일 수가 소정근로일 이상인지 확인합니다.
-        
+        scheduled_work_days가 실제 근무 패턴과 맞지 않으면 자동으로 추정합니다.
+
         Args:
             work_shifts: 근무 시프트 리스트
             scheduled_work_days: 주 소정근로일
@@ -167,21 +170,31 @@ class WeeklyHolidayPayCalculator:
 
         # 평일 근무만 집계 (휴일근로 제외)
         regular_shifts = [s for s in work_shifts if not s.is_holiday_work]
-        
+
         if not regular_shifts:
             return False
 
         # 주별로 그룹화
-        from collections import defaultdict
+        from collections import defaultdict, Counter
         weeks = defaultdict(set)
         for shift in regular_shifts:
             # ISO week number 사용
             week_key = shift.date.isocalendar()[:2]  # (year, week)
             weeks[week_key].add(shift.date)
 
+        # 주별 근무일 수 집계
+        work_days_per_week = [len(dates) for dates in weeks.values()]
+
+        # 최빈값(mode)을 소정근로일로 추정 (파트타임 대응)
+        if work_days_per_week:
+            most_common_days = Counter(work_days_per_week).most_common(1)[0][0]
+            # 기본값 5보다 실제 근무 패턴이 적으면 자동 조정
+            if most_common_days < scheduled_work_days:
+                scheduled_work_days = most_common_days
+
         # 최소 1주 이상 개근 확인
         full_attendance_weeks = sum(
-            1 for dates in weeks.values() 
+            1 for dates in weeks.values()
             if len(dates) >= scheduled_work_days
         )
 
