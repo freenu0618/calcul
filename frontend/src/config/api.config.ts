@@ -5,10 +5,21 @@
  */
 
 const getBaseUrl = (): string => {
-  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  let envUrl = import.meta.env.VITE_API_BASE_URL;
 
   // 환경변수가 명시적으로 설정된 경우
   if (envUrl && envUrl.trim() !== '') {
+    // ⚠️ 콤마 포함 여부 확인 (잘못된 환경변수 설정)
+    if (envUrl.includes(',')) {
+      console.warn(
+        '⚠️ VITE_API_BASE_URL에 콤마(,)가 포함되어 있습니다.\n' +
+        '첫 번째 URL만 사용합니다: ' + envUrl.split(',')[0] + '\n' +
+        'Cloudflare Pages에서 환경변수를 수정하세요.'
+      );
+      // 첫 번째 URL만 추출
+      envUrl = envUrl.split(',')[0].trim();
+    }
+
     // 끝의 슬래시 제거하여 중복 슬래시 방지
     return envUrl.replace(/\/$/, '');
   }

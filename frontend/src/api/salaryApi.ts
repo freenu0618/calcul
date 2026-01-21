@@ -12,7 +12,7 @@ export const salaryApi = {
     request: SalaryCalculationRequest
   ): Promise<SalaryCalculationResponse> => {
     const response = await apiClient.post<SalaryCalculationResponse>(
-      '/api/v1/salary/calculate',
+      '/salary/calculate',
       request
     );
     return response.data;
