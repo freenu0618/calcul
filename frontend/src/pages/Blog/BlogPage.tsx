@@ -5,46 +5,10 @@
 import { Link } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
+import { blogPostPreviews } from '../../data/blogPosts';
 
 const BlogPage = () => {
-  const posts = [
-    {
-      id: '2026-minimum-wage',
-      title: '2026년 최저임금 변경사항',
-      excerpt: '2026년 최저임금이 시급 10,030원으로 인상되었습니다. 월 환산액과 적용 기준을 알아봅니다.',
-      date: '2026-01-15',
-      category: '법률 업데이트',
-    },
-    {
-      id: 'insurance-rate-2026',
-      title: '2026년 4대 보험 요율 업데이트',
-      excerpt: '2026년 적용되는 4대 보험 요율이 변경되었습니다. 국민연금, 건강보험, 장기요양보험, 고용보험의 새로운 요율을 확인하세요.',
-      date: '2026-01-10',
-      category: '법률 업데이트',
-    },
-    {
-      id: 'overtime-calculation-tips',
-      title: '연장수당 계산 꿀팁',
-      excerpt: '연장근로 수당을 정확히 계산하는 방법과 주의사항을 알아봅니다. 주 40시간 기준과 통상시급 계산법을 이해하세요.',
-      date: '2026-01-05',
-      category: '계산 가이드',
-    },
-    {
-      id: 'weekly-holiday-pay-guide',
-      title: '주휴수당 완벽 가이드',
-      excerpt: '주휴수당의 개념, 지급 요건, 계산 방법을 상세히 설명합니다. 5인 미만 사업장도 의무 적용됩니다.',
-      date: '2025-12-28',
-      category: '계산 가이드',
-    },
-    {
-      id: 'year-end-tax-settlement-2026',
-      title: '2026년 연말정산 준비하기',
-      excerpt: '연말정산 시기가 다가왔습니다. 공제 항목과 절세 팁을 미리 준비하세요.',
-      date: '2025-12-20',
-      category: '세금',
-    },
-  ];
-
+  const posts = blogPostPreviews;
   const categories = Array.from(new Set(posts.map(post => post.category)));
 
   return (

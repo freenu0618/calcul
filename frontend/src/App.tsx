@@ -17,8 +17,12 @@ import TaxGuide from './pages/Guide/TaxGuide';
 import OvertimeGuide from './pages/Guide/OvertimeGuide';
 import FAQ from './pages/FAQ';
 import ExamplesPage from './pages/Examples/ExamplesPage';
+import FulltimeExample from './pages/Examples/FulltimeExample';
+import ParttimeExample from './pages/Examples/ParttimeExample';
+import ShiftWorkExample from './pages/Examples/ShiftWorkExample';
 import Legal from './pages/Legal';
 import BlogPage from './pages/Blog/BlogPage';
+import BlogPost from './pages/Blog/BlogPost';
 import About from './pages/About';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
@@ -75,12 +79,16 @@ function App() {
 
                 {/* 계산 사례 */}
                 <Route path="/examples" element={<ExamplesPage />} />
+                <Route path="/examples/fulltime" element={<FulltimeExample />} />
+                <Route path="/examples/parttime" element={<ParttimeExample />} />
+                <Route path="/examples/shift-work" element={<ShiftWorkExample />} />
 
                 {/* 법률 정보 */}
                 <Route path="/legal" element={<Legal />} />
 
                 {/* 블로그 */}
                 <Route path="/blog" element={<BlogPage />} />
+                <Route path="/blog/:postId" element={<BlogPost />} />
 
                 {/* 기타 페이지 */}
                 <Route path="/about" element={<About />} />
