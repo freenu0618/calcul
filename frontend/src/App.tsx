@@ -29,15 +29,7 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Contact from './pages/Contact';
 
-// GA 타입 선언
-type GtagCommand = 'config' | 'event' | 'set';
-type GtagParams = Record<string, string | number | boolean>;
-
-declare global {
-  interface Window {
-    gtag: (command: GtagCommand, targetId: string, params?: GtagParams) => void;
-  }
-}
+// GA 타입은 index.html의 전역 스크립트에서 정의됨
 
 // GA4 페이지뷰 추적 컴포넌트
 function PageViewTracker() {

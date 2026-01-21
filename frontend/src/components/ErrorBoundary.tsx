@@ -3,7 +3,8 @@
  * React 에러를 캐치하여 사용자 친화적인 에러 페이지를 표시합니다.
  */
 
-import { Component, ErrorInfo, ReactNode } from 'react';
+import { Component } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 import Card from './common/Card';
 import Button from './common/Button';
 
@@ -85,7 +86,7 @@ class ErrorBoundary extends Component<Props, State> {
                 예상치 못한 오류가 발생했습니다. 불편을 드려 죄송합니다.
               </p>
 
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+              {import.meta.env.DEV && this.state.error && (
                 <details className="mb-6 text-left">
                   <summary className="cursor-pointer text-sm font-semibold text-gray-700 hover:text-gray-900">
                     개발자 정보 (프로덕션에서는 표시되지 않음)
