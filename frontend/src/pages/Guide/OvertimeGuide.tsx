@@ -2,11 +2,30 @@
  * 연장·야간·휴일 수당 가이드 페이지
  */
 
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
 
+// GA 타입 선언
+declare global {
+  interface Window {
+    gtag: (command: string, ...args: any[]) => void;
+  }
+}
+
 const OvertimeGuide = () => {
+  // GA4 이벤트 전송
+  useEffect(() => {
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'guide_view', {
+        event_category: 'engagement',
+        event_label: '연장·야간·휴일 수당',
+        page_path: '/guide/overtime',
+      });
+    }
+  }, []);
+
   return (
     <MainLayout>
       <div className="max-w-4xl mx-auto">

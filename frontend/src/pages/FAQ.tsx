@@ -2,11 +2,18 @@
  * FAQ 페이지
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
+
+// GA 타입 선언
+declare global {
+  interface Window {
+    gtag: (command: string, ...args: any[]) => void;
+  }
+}
 
 interface FAQItem {
   category: string;
@@ -16,6 +23,22 @@ interface FAQItem {
 
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+  // FAQ 아코디언 토글 핸들러
+  const handleToggle = (index: number, question: string) => {
+    const newExpandedIndex = expandedIndex === index ? null : index;
+    setExpandedIndex(newExpandedIndex);
+
+    // GA4 이벤트 전송 (확장 시에만)
+    if (newExpandedIndex === index && typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'faq_expand', {
+        event_category: 'engagement',
+        event_label: question,
+        value: 1,
+      });
+    }
+  };
 
   const faqData: FAQItem[] = [
     // 기본급 및 수당
@@ -238,23 +261,44 @@ const FAQ = () => {
           ))}
         </div>
 
-        {/* FAQ 목록 */}
+        {/* FAQ 목록 (아코디언) */}
         <div className="space-y-4">
           {filteredFAQ.map((item, index) => (
             <Card key={index}>
-              <div className="space-y-3">
-                <div className="flex items-start">
-                  <span className="inline-block px-2 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded mr-3">
-                    {item.category}
-                  </span>
-                  <h3 className="text-lg font-semibold text-gray-900 flex-1">
-                    Q. {item.question}
-                  </h3>
+              <button
+                onClick={() => handleToggle(index, item.question)}
+                className="w-full text-left"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-start mb-2">
+                      <span className="inline-block px-2 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded mr-3">
+                        {item.category}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Q. {item.question}
+                    </h3>
+                  </div>
+                  <svg
+                    className={`w-6 h-6 text-gray-500 transition-transform ml-4 flex-shrink-0 ${
+                      expandedIndex === index ? 'transform rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </div>
-                <p className="text-gray-700 pl-0">
-                  A. {item.answer}
-                </p>
-              </div>
+              </button>
+              {expandedIndex === index && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <p className="text-gray-700">
+                    A. {item.answer}
+                  </p>
+                </div>
+              )}
             </Card>
           ))}
         </div>

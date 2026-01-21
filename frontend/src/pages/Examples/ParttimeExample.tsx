@@ -2,12 +2,31 @@
  * 파트타임 근로자 계산 사례
  */
 
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
 
+// GA 타입 선언
+declare global {
+  interface Window {
+    gtag: (command: string, ...args: any[]) => void;
+  }
+}
+
 const ParttimeExample = () => {
+  // GA4 이벤트 전송
+  useEffect(() => {
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'example_view', {
+        event_category: 'engagement',
+        event_label: '파트타임 근로자',
+        page_path: '/examples/parttime',
+      });
+    }
+  }, []);
+
   return (
     <MainLayout>
       <Helmet>

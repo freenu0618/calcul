@@ -2,11 +2,30 @@
  * 소득세 가이드 페이지
  */
 
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
 
+// GA 타입 선언
+declare global {
+  interface Window {
+    gtag: (command: string, ...args: any[]) => void;
+  }
+}
+
 const TaxGuide = () => {
+  // GA4 이벤트 전송
+  useEffect(() => {
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'guide_view', {
+        event_category: 'engagement',
+        event_label: '소득세 계산법',
+        page_path: '/guide/tax',
+      });
+    }
+  }, []);
+
   return (
     <MainLayout>
       <div className="max-w-4xl mx-auto">

@@ -2,17 +2,36 @@
  * 개별 블로그 포스트 페이지
  */
 
+import { useEffect } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
 import { blogPosts } from '../../data/blogPosts';
 
+// GA 타입 선언
+declare global {
+  interface Window {
+    gtag: (command: string, ...args: any[]) => void;
+  }
+}
+
 const BlogPost = () => {
   const { postId } = useParams<{ postId: string }>();
 
   // 포스트 데이터 가져오기
   const post = postId ? blogPosts[postId] : null;
+
+  // GA4 이벤트 전송 (포스트가 있을 때만)
+  useEffect(() => {
+    if (post && typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'blog_read', {
+        event_category: 'engagement',
+        event_label: post.title,
+        page_path: `/blog/${postId}`,
+      });
+    }
+  }, [post, postId]);
 
   // 포스트가 없으면 블로그 목록으로 리다이렉트
   if (!post) {

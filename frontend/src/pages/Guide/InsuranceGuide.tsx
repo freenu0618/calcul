@@ -2,12 +2,31 @@
  * 4대 보험 가이드 페이지
  */
 
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
 
+// GA 타입 선언
+declare global {
+  interface Window {
+    gtag: (command: string, ...args: any[]) => void;
+  }
+}
+
 const InsuranceGuide = () => {
+  // GA4 이벤트 전송
+  useEffect(() => {
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'guide_view', {
+        event_category: 'engagement',
+        event_label: '4대 보험 이해하기',
+        page_path: '/guide/insurance',
+      });
+    }
+  }, []);
+
   return (
     <>
       <Helmet>
