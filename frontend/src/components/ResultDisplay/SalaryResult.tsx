@@ -6,6 +6,7 @@ import type { SalaryCalculationResponse } from '../../types/salary';
 import WarningAlert from './WarningAlert';
 import GrossBreakdown from './GrossBreakdown';
 import DeductionsBreakdown from './DeductionsBreakdown';
+import { ShareButtons } from '../common/ShareButtons';
 
 interface SalaryResultProps {
     result: SalaryCalculationResponse;
@@ -45,6 +46,13 @@ export default function SalaryResult({ result }: SalaryResultProps) {
                     적용 기준: {result.calculation_metadata.tax_year}년 세법, {result.calculation_metadata.insurance_year}년 보험요율
                 </p>
             </div>
+
+            {/* SNS 공유 버튼 */}
+            <ShareButtons
+                url={typeof window !== 'undefined' ? window.location.href : 'https://paytools.work'}
+                title={`${result.employee_name}님의 실수령액: ${result.net_pay.formatted}`}
+                description="한국 근로기준법 급여 계산기로 정확한 실수령액을 확인하세요"
+            />
         </div>
     );
 }
