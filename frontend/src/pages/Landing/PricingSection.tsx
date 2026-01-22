@@ -3,6 +3,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const plans = [
   {
@@ -72,6 +73,8 @@ const plans = [
 ];
 
 export default function PricingSection() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <section id="pricing" className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -132,14 +135,14 @@ export default function PricingSection() {
               </ul>
 
               <Link
-                to="/register"
+                to={isAuthenticated ? '/dashboard' : '/register'}
                 className={`block w-full text-center py-3 rounded-lg font-medium transition-colors ${
                   plan.highlighted
                     ? 'bg-blue-600 hover:bg-blue-700 text-white'
                     : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
                 }`}
               >
-                {plan.cta}
+                {isAuthenticated ? '대시보드' : plan.cta}
               </Link>
             </div>
           ))}

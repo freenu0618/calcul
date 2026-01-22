@@ -3,8 +3,10 @@
  */
 
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function HeroSection() {
+  const { isAuthenticated } = useAuth();
   return (
     <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white overflow-hidden">
       {/* 배경 패턴 */}
@@ -37,10 +39,10 @@ export default function HeroSection() {
           {/* CTA 버튼 */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Link
-              to="/register"
+              to={isAuthenticated ? '/dashboard' : '/register'}
               className="inline-flex items-center justify-center px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50"
             >
-              지금 무료로 시작하기
+              {isAuthenticated ? '대시보드로 이동' : '지금 무료로 시작하기'}
               <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
