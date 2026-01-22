@@ -185,20 +185,19 @@ class WeeklyHolidayPayCalculator:
         # 주별 근무일 수 집계
         work_days_per_week = [len(dates) for dates in weeks.values()]
 
-        # 최빈값(mode)을 소정근로일로 추정 (파트타임 대응)
-        if work_days_per_week:
-            most_common_days = Counter(work_days_per_week).most_common(1)[0][0]
-            # 기본값 5보다 실제 근무 패턴이 적으면 자동 조정
-            if most_common_days < scheduled_work_days:
-                scheduled_work_days = most_common_days
+        if not work_days_per_week:
+            return False
 
-        # 최소 1주 이상 개근 확인
+        # 개근 여부: 모든 주에서 소정근로일 이상 근무해야 함
+        # (자동 조정 삭제 - 계약상 소정근로일 기준으로 엄격하게 판단)
         full_attendance_weeks = sum(
             1 for dates in weeks.values()
             if len(dates) >= scheduled_work_days
         )
+        total_weeks = len(weeks)
 
-        return full_attendance_weeks > 0
+        # 모든 주 개근해야 주휴수당 지급 (1주라도 결근하면 해당 월 주휴수당 없음)
+        return full_attendance_weeks == total_weeks
 
     def _calculate_average_weekly_hours(
         self,

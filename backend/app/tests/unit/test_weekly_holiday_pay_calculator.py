@@ -48,8 +48,8 @@ class TestWeeklyHolidayPayPartTime:
     """단시간 근로 주휴수당 계산 테스트 (비례 지급)"""
 
     def test_part_time_24_hours(self):
-        """주 24시간 근무 (비례 지급)"""
-        # 주 3일, 하루 8시간
+        """주 24시간 근무 (비례 지급) - 주 3일 계약, 3일 개근"""
+        # 주 3일, 하루 8시간 (소정근로일 3일)
         shifts = []
         for week in range(4):
             base_day = 5 + (week * 7)
@@ -60,7 +60,8 @@ class TestWeeklyHolidayPayPartTime:
                     shifts.append(WorkShift(d, time(9, 0), time(18, 0), 60))
 
         calculator = WeeklyHolidayPayCalculator()
-        result = calculator.calculate(shifts, Money(10000))
+        # scheduled_work_days=3: 주 3일 계약
+        result = calculator.calculate(shifts, Money(10000), scheduled_work_days=3)
 
         # 주 평균 근로시간은 총 일수를 기준으로 계산됨
         # 주휴수당이 비례 지급되는지 확인
@@ -109,7 +110,7 @@ class TestWeeklyHolidayPayMinimum:
         assert result.weekly_holiday_pay.is_zero()
 
     def test_exactly_minimum_hours(self):
-        """정확히 주 15시간 (주휴수당 지급)"""
+        """정확히 주 15시간 (주휴수당 지급) - 주 3일 계약, 3일 개근"""
         # 주 15시간 (주 3일, 하루 5시간)
         shifts = []
         for week in range(4):
@@ -120,11 +121,54 @@ class TestWeeklyHolidayPayMinimum:
                     shifts.append(WorkShift(d, time(9, 0), time(14, 0), 0))  # 5시간
 
         calculator = WeeklyHolidayPayCalculator()
-        result = calculator.calculate(shifts, Money(10000))
+        # scheduled_work_days=3: 주 3일 계약
+        result = calculator.calculate(shifts, Money(10000), scheduled_work_days=3)
 
         # 주 15시간: (15 ÷ 40) × 8 = 3시간
         assert not result.weekly_holiday_pay.is_zero()
         assert result.is_proportional
+
+
+class TestWeeklyHolidayPayAttendance:
+    """개근 조건 테스트"""
+
+    def test_not_full_attendance(self):
+        """주 5일 계약인데 4일만 근무 → 주휴수당 없음"""
+        # 주 4일 근무 (월~목)
+        shifts = []
+        for day in range(5, 31):
+            d = date(2026, 1, day)
+            if d.weekday() < 4:  # 월~목 (금요일 결근)
+                shifts.append(WorkShift(d, time(9, 0), time(18, 0), 60))
+
+        calculator = WeeklyHolidayPayCalculator()
+        # scheduled_work_days=5: 주 5일 계약이지만 4일만 근무
+        result = calculator.calculate(shifts, Money(10000), scheduled_work_days=5)
+
+        # 개근 미달 → 주휴수당 0원
+        assert result.weekly_holiday_pay.is_zero()
+
+    def test_partial_week_not_full(self):
+        """일부 주에서 결근 → 주휴수당 없음"""
+        shifts = []
+        # 1주차: 5일 근무 (개근)
+        for day in [5, 6, 7, 8, 9]:
+            shifts.append(WorkShift(date(2026, 1, day), time(9, 0), time(18, 0), 60))
+        # 2주차: 4일 근무 (결근)
+        for day in [12, 13, 14, 15]:  # 금요일 결근
+            shifts.append(WorkShift(date(2026, 1, day), time(9, 0), time(18, 0), 60))
+        # 3주차: 5일 근무 (개근)
+        for day in [19, 20, 21, 22, 23]:
+            shifts.append(WorkShift(date(2026, 1, day), time(9, 0), time(18, 0), 60))
+        # 4주차: 5일 근무 (개근)
+        for day in [26, 27, 28, 29, 30]:
+            shifts.append(WorkShift(date(2026, 1, day), time(9, 0), time(18, 0), 60))
+
+        calculator = WeeklyHolidayPayCalculator()
+        result = calculator.calculate(shifts, Money(10000), scheduled_work_days=5)
+
+        # 2주차 결근으로 전체 월 주휴수당 0원
+        assert result.weekly_holiday_pay.is_zero()
 
 
 class TestWeeklyHolidayPayEdgeCases:

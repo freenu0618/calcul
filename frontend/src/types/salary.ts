@@ -24,6 +24,7 @@ export interface EmployeeRequest {
   children_under_20: number;
   employment_type: EmploymentType;
   company_size: CompanySize;
+  scheduled_work_days: number; // 주 소정근로일 (계약상 주당 근무일 수)
 }
 
 export interface AllowanceRequest {
