@@ -1,9 +1,10 @@
 /**
  * 지급 내역 상세 컴포넌트
- * 기본급, 수당, 연장/야간/휴일수당, 주휴수당 표시
+ * 기본급, 수당, 연장/야간/휴일수당, 주휴수당 + 계산식 Accordion
  */
 
 import type { GrossBreakdown as GrossBreakdownType } from '../../types/salary';
+import Accordion from '../common/Accordion';
 
 interface GrossBreakdownProps {
     breakdown: GrossBreakdownType;
@@ -11,6 +12,7 @@ interface GrossBreakdownProps {
 
 export default function GrossBreakdown({ breakdown }: GrossBreakdownProps) {
     const { overtime_allowances, weekly_holiday_pay } = breakdown;
+    const hourlyWage = breakdown.hourly_wage.amount;
 
     return (
         <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -47,49 +49,82 @@ export default function GrossBreakdown({ breakdown }: GrossBreakdownProps) {
                     </div>
                 )}
 
-                {/* 연장근로수당 */}
-                {overtime_allowances.overtime_hours.total_minutes > 0 && (
-                    <div className="flex justify-between">
-                        <span className="text-gray-600">
-                            연장근로수당 ({overtime_allowances.overtime_hours.formatted})
-                        </span>
-                        <span className="font-medium">{overtime_allowances.overtime_pay.formatted}</span>
-                    </div>
+                {/* 가산수당 Accordion */}
+                {overtime_allowances.total.amount > 0 && (
+                    <Accordion
+                        title="가산수당 상세"
+                        badge={overtime_allowances.total.formatted}
+                        icon={<span>⏰</span>}
+                    >
+                        <div className="space-y-3 text-sm">
+                            {/* 연장근로수당 */}
+                            {overtime_allowances.overtime_hours.total_minutes > 0 && (
+                                <div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">
+                                            연장근로수당 ({overtime_allowances.overtime_hours.formatted})
+                                        </span>
+                                        <span className="font-medium">{overtime_allowances.overtime_pay.formatted}</span>
+                                    </div>
+                                    <div className="text-xs text-gray-400 mt-1 bg-gray-50 p-2 rounded">
+                                        계산식: {hourlyWage.toLocaleString()}원 × 1.5 × {(overtime_allowances.overtime_hours.total_minutes / 60).toFixed(1)}시간
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 야간근로수당 */}
+                            {overtime_allowances.night_hours.total_minutes > 0 && (
+                                <div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">
+                                            야간근로수당 ({overtime_allowances.night_hours.formatted})
+                                        </span>
+                                        <span className="font-medium">{overtime_allowances.night_pay.formatted}</span>
+                                    </div>
+                                    <div className="text-xs text-gray-400 mt-1 bg-gray-50 p-2 rounded">
+                                        계산식: {hourlyWage.toLocaleString()}원 × 0.5 × {(overtime_allowances.night_hours.total_minutes / 60).toFixed(1)}시간 (22:00~06:00 가산분)
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 휴일근로수당 */}
+                            {overtime_allowances.holiday_hours.total_minutes > 0 && (
+                                <div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">
+                                            휴일근로수당 ({overtime_allowances.holiday_hours.formatted})
+                                        </span>
+                                        <span className="font-medium">{overtime_allowances.holiday_pay.formatted}</span>
+                                    </div>
+                                    <div className="text-xs text-gray-400 mt-1 bg-gray-50 p-2 rounded">
+                                        계산식: {hourlyWage.toLocaleString()}원 × 1.5 × {(overtime_allowances.holiday_hours.total_minutes / 60).toFixed(1)}시간
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </Accordion>
                 )}
 
-                {/* 야간근로수당 */}
-                {overtime_allowances.night_hours.total_minutes > 0 && (
-                    <div className="flex justify-between">
-                        <span className="text-gray-600">
-                            야간근로수당 ({overtime_allowances.night_hours.formatted})
-                        </span>
-                        <span className="font-medium">{overtime_allowances.night_pay.formatted}</span>
-                    </div>
-                )}
-
-                {/* 휴일근로수당 */}
-                {overtime_allowances.holiday_hours.total_minutes > 0 && (
-                    <div className="flex justify-between">
-                        <span className="text-gray-600">
-                            휴일근로수당 ({overtime_allowances.holiday_hours.formatted})
-                        </span>
-                        <span className="font-medium">{overtime_allowances.holiday_pay.formatted}</span>
-                    </div>
-                )}
-
-                {/* 주휴수당 */}
+                {/* 주휴수당 Accordion */}
                 {weekly_holiday_pay.amount.amount > 0 && (
-                    <>
-                        <div className="flex justify-between">
-                            <span className="text-gray-600">
-                                주휴수당 {weekly_holiday_pay.is_proportional && '(비례)'}
-                            </span>
-                            <span className="font-medium">{weekly_holiday_pay.amount.formatted}</span>
+                    <Accordion
+                        title={`주휴수당 ${weekly_holiday_pay.is_proportional ? '(비례)' : ''}`}
+                        badge={weekly_holiday_pay.amount.formatted}
+                        icon={<span>🗓️</span>}
+                    >
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-600">주휴수당</span>
+                                <span className="font-medium">{weekly_holiday_pay.amount.formatted}</span>
+                            </div>
+                            <div className="text-xs text-gray-400 bg-gray-50 p-2 rounded">
+                                {weekly_holiday_pay.calculation}
+                            </div>
+                            <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                                ℹ️ 주 15시간 이상 근무 + 소정근로일 개근 시 지급
+                            </div>
                         </div>
-                        <div className="text-gray-500 text-xs pl-3">
-                            {weekly_holiday_pay.calculation}
-                        </div>
-                    </>
+                    </Accordion>
                 )}
 
                 {/* 총 지급액 */}
