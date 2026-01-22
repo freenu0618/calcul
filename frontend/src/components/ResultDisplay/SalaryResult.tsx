@@ -71,6 +71,7 @@ export default function SalaryResult({ result }: SalaryResultProps) {
                             centerLabel="실수령"
                             centerValue={`${((net_pay.amount / gross_breakdown.total.amount) * 100).toFixed(1)}%`}
                             size="sm"
+                            darkMode
                         />
                     </div>
                 </div>
@@ -86,6 +87,17 @@ export default function SalaryResult({ result }: SalaryResultProps) {
                         centerValue={gross_breakdown.total.formatted}
                         size="md"
                     />
+                </div>
+                {/* 지급액 안내 */}
+                <div className="mt-4 text-xs text-gray-500 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                    <p className="font-medium text-amber-700 mb-1">💡 지급총액 안내</p>
+                    <p>
+                        지급총액 = 기본급 + 주휴수당 + 가산수당(연장/야간/휴일) + 기타수당
+                    </p>
+                    <p className="mt-1">
+                        입력한 기본급에 법정 수당이 별도로 가산되어 계약금액보다 높을 수 있습니다.
+                        포괄임금제 적용 시 실제 지급액이 다를 수 있으니 근로계약서를 확인하세요.
+                    </p>
                 </div>
             </div>
 

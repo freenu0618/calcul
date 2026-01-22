@@ -16,6 +16,7 @@ interface DonutChartProps {
   centerLabel?: string;
   centerValue?: string;
   size?: 'sm' | 'md' | 'lg';
+  darkMode?: boolean; // 어두운 배경용
 }
 
 const SIZE_CONFIG = {
@@ -32,9 +33,15 @@ export default function DonutChart({
   centerLabel,
   centerValue,
   size = 'md',
+  darkMode = false,
 }: DonutChartProps) {
   const config = SIZE_CONFIG[size];
   const total = data.reduce((sum, item) => sum + item.value, 0);
+
+  // 다크모드/라이트모드 텍스트 색상
+  const textColors = darkMode
+    ? { label: 'text-white/80', value: 'text-white', name: 'text-white/90', amount: 'text-white', percent: 'text-white/60' }
+    : { label: 'text-gray-500', value: 'text-gray-900', name: 'text-gray-600', amount: 'text-gray-900', percent: 'text-gray-400' };
 
   return (
     <div className="flex flex-col items-center">
@@ -70,10 +77,10 @@ export default function DonutChart({
         {(centerLabel || centerValue) && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             {centerLabel && (
-              <span className="text-xs text-gray-500">{centerLabel}</span>
+              <span className={`text-xs ${textColors.label}`}>{centerLabel}</span>
             )}
             {centerValue && (
-              <span className="text-sm font-bold text-gray-900">{centerValue}</span>
+              <span className={`text-sm font-bold ${textColors.value}`}>{centerValue}</span>
             )}
           </div>
         )}
@@ -88,11 +95,11 @@ export default function DonutChart({
                 className="w-3 h-3 rounded-sm"
                 style={{ backgroundColor: item.color }}
               />
-              <span className="text-gray-600">{item.name}</span>
+              <span className={textColors.name}>{item.name}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-medium">{formatMoney(item.value)}</span>
-              <span className="text-gray-400 text-xs">
+              <span className={`font-medium ${textColors.amount}`}>{formatMoney(item.value)}</span>
+              <span className={`text-xs ${textColors.percent}`}>
                 ({((item.value / total) * 100).toFixed(1)}%)
               </span>
             </div>
