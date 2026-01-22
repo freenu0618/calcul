@@ -10,11 +10,11 @@ interface DeductionsBreakdownProps {
     breakdown: DeductionsType;
 }
 
-// 2026년 4대 보험 요율
+// 2026년 4대 보험 요율 (연금개혁 반영)
 const RATES = {
-    pension: 4.5,
+    pension: 4.75,      // 2026년 인상 (기존 4.5%)
     health: 3.595,
-    care: 12.95,
+    care: 13.14,        // 2026년 인상 (기존 12.95%)
     employment: 0.9,
 };
 

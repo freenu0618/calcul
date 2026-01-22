@@ -13,34 +13,34 @@ class TestInsuranceCalculatorBasic:
         calculator = InsuranceCalculator()
         result = calculator.calculate(Money(2800000))
 
-        # 국민연금: 2,800,000 × 4.5% = 126,000
-        assert result.national_pension.to_int() == 126000
+        # 국민연금: 2,800,000 × 4.75% = 133,000
+        assert result.national_pension.to_int() == 133000
 
         # 건강보험: 2,800,000 × 3.595% = 100,660
         assert result.health_insurance.to_int() == 100660
 
-        # 장기요양: 100,660 × 12.95% = 13,035
-        assert result.long_term_care.to_int() == 13035
+        # 장기요양: 100,660 × 13.14% = 13,227
+        assert result.long_term_care.to_int() == 13227
 
         # 고용보험: 2,800,000 × 0.9% = 25,200
         assert result.employment_insurance.to_int() == 25200
 
-        # 총합: 264,895
-        assert result.total().to_int() == 264895
+        # 총합: 272,087
+        assert result.total().to_int() == 272087
 
     def test_calculate_high_income(self):
         """고소득 (700만원, 국민연금 상한 적용)"""
         calculator = InsuranceCalculator()
         result = calculator.calculate(Money(7000000))
 
-        # 국민연금: 5,900,000 × 4.5% = 265,500 (상한 적용)
-        assert result.national_pension.to_int() == 265500
+        # 국민연금: 5,900,000 × 4.75% = 280,250 (상한 적용)
+        assert result.national_pension.to_int() == 280250
 
         # 건강보험: 7,000,000 × 3.595% = 251,650
         assert result.health_insurance.to_int() == 251650
 
-        # 장기요양: 251,650 × 12.95% = 32,589
-        assert result.long_term_care.to_int() == 32589
+        # 장기요양: 251,650 × 13.14% = 33,067
+        assert result.long_term_care.to_int() == 33067
 
         # 고용보험: 7,000,000 × 0.9% = 63,000
         assert result.employment_insurance.to_int() == 63000
@@ -50,14 +50,14 @@ class TestInsuranceCalculatorBasic:
         calculator = InsuranceCalculator()
         result = calculator.calculate(Money(300000))
 
-        # 국민연금: 390,000 × 4.5% = 17,550 (하한 적용)
-        assert result.national_pension.to_int() == 17550
+        # 국민연금: 390,000 × 4.75% = 18,525 (하한 적용)
+        assert result.national_pension.to_int() == 18525
 
         # 건강보험: 300,000 × 3.595% = 10,785
         assert result.health_insurance.to_int() == 10785
 
-        # 장기요양: 10,785 × 12.95% = 1,397
-        assert result.long_term_care.to_int() == 1397
+        # 장기요양: 10,785 × 13.14% = 1,417
+        assert result.long_term_care.to_int() == 1417
 
         # 고용보험: 300,000 × 0.9% = 2,700
         assert result.employment_insurance.to_int() == 2700
@@ -67,14 +67,14 @@ class TestInsuranceCalculatorBasic:
         calculator = InsuranceCalculator()
         result = calculator.calculate(Money(20000000))
 
-        # 국민연금: 5,900,000 × 4.5% = 265,500 (상한)
-        assert result.national_pension.to_int() == 265500
+        # 국민연금: 5,900,000 × 4.75% = 280,250 (상한)
+        assert result.national_pension.to_int() == 280250
 
         # 건강보험: 20,000,000 × 3.595% = 719,000
         assert result.health_insurance.to_int() == 719000
 
-        # 장기요양: 719,000 × 12.95% = 93,111
-        assert result.long_term_care.to_int() == 93111
+        # 장기요양: 719,000 × 13.14% = 94,477
+        assert result.long_term_care.to_int() == 94477
 
         # 고용보험: 13,500,000 × 0.9% = 121,500 (상한 적용)
         assert result.employment_insurance.to_int() == 121500
@@ -88,24 +88,24 @@ class TestNationalPensionLimits:
         calculator = InsuranceCalculator()
         result = calculator.calculate(Money(10000000))
 
-        # 590만원 × 4.5% = 265,500
-        assert result.national_pension.to_int() == 265500
+        # 590만원 × 4.75% = 280,250
+        assert result.national_pension.to_int() == 280250
 
     def test_national_pension_min_limit(self):
         """국민연금 하한 적용 (39만원)"""
         calculator = InsuranceCalculator()
         result = calculator.calculate(Money(100000))
 
-        # 39만원 × 4.5% = 17,550
-        assert result.national_pension.to_int() == 17550
+        # 39만원 × 4.75% = 18,525
+        assert result.national_pension.to_int() == 18525
 
     def test_national_pension_within_limits(self):
         """국민연금 정상 범위 (상한/하한 미적용)"""
         calculator = InsuranceCalculator()
         result = calculator.calculate(Money(3000000))
 
-        # 300만원 × 4.5% = 135,000
-        assert result.national_pension.to_int() == 135000
+        # 300만원 × 4.75% = 142,500
+        assert result.national_pension.to_int() == 142500
 
 
 class TestEmploymentInsuranceLimit:
@@ -139,11 +139,11 @@ class TestLongTermCareCalculation:
         # 건강보험: 3,000,000 × 3.595% = 107,850
         health = result.health_insurance.to_int()
 
-        # 장기요양: 107,850 × 12.95% = 13,967
+        # 장기요양: 107,850 × 13.14% = 14,171
         long_term = result.long_term_care.to_int()
 
-        # 검증: long_term ≈ health × 0.1295
-        expected = int(health * 0.1295)
+        # 검증: long_term ≈ health × 0.1314
+        expected = int(health * 0.1314)
         assert abs(long_term - expected) <= 1  # 반올림 오차 허용
 
 
@@ -177,7 +177,7 @@ class TestInsuranceResultMethods:
         assert "employment_insurance" in result_dict
         assert "total" in result_dict
 
-        assert result_dict["national_pension"]["rate"] == 0.045
+        assert result_dict["national_pension"]["rate"] == 0.0475
         assert result_dict["health_insurance"]["rate"] == 0.03595
         assert result_dict["employment_insurance"]["rate"] == 0.009
         assert result_dict["total"] == result.total().to_int()
@@ -191,11 +191,11 @@ class TestInsuranceRatesInfo:
         rates = InsuranceCalculator.get_rates_info(2026)
 
         assert rates["year"] == 2026
-        assert rates["national_pension"]["rate"] == 0.045
+        assert rates["national_pension"]["rate"] == 0.0475
         assert rates["national_pension"]["max_base"] == 5900000
         assert rates["national_pension"]["min_base"] == 390000
         assert rates["health_insurance"]["rate"] == 0.03595
-        assert rates["long_term_care"]["rate"] == 0.1295
+        assert rates["long_term_care"]["rate"] == 0.1314
         assert rates["employment_insurance"]["rate"] == 0.009
         assert rates["employment_insurance"]["max_base"] == 13500000
 
@@ -213,8 +213,8 @@ class TestInsuranceEdgeCases:
         calculator = InsuranceCalculator()
         result = calculator.calculate(Money.zero())
 
-        # 국민연금은 하한 적용: 39만원 × 4.5% = 17,550
-        assert result.national_pension.to_int() == 17550
+        # 국민연금은 하한 적용: 39만원 × 4.75% = 18,525
+        assert result.national_pension.to_int() == 18525
 
         # 나머지는 0
         assert result.health_insurance.to_int() == 0
@@ -226,16 +226,16 @@ class TestInsuranceEdgeCases:
         calculator = InsuranceCalculator()
         result = calculator.calculate(Money(5900000))
 
-        # 590만원 × 4.5% = 265,500
-        assert result.national_pension.to_int() == 265500
+        # 590만원 × 4.75% = 280,250
+        assert result.national_pension.to_int() == 280250
 
     def test_exact_pension_min(self):
         """국민연금 정확히 하한선 (39만원)"""
         calculator = InsuranceCalculator()
         result = calculator.calculate(Money(390000))
 
-        # 39만원 × 4.5% = 17,550
-        assert result.national_pension.to_int() == 17550
+        # 39만원 × 4.75% = 18,525
+        assert result.national_pension.to_int() == 18525
 
     def test_exact_employment_max(self):
         """고용보험 정확히 상한선 (1350만원)"""

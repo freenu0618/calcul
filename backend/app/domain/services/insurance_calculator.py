@@ -14,9 +14,9 @@ class InsuranceResult:
     """보험료 계산 결과
 
     Attributes:
-        national_pension: 국민연금 (4.5%, 근로자 부담분)
+        national_pension: 국민연금 (4.75%, 근로자 부담분) - 2026년 연금개혁 반영
         health_insurance: 건강보험 (3.595%, 근로자 부담분)
-        long_term_care: 장기요양보험 (건강보험료 × 12.95%)
+        long_term_care: 장기요양보험 (건강보험료 × 13.14%)
         employment_insurance: 고용보험 (0.9%, 근로자 부담분)
         base_amount: 보험료 산정 기준 금액
     """
@@ -48,7 +48,7 @@ class InsuranceResult:
         return {
             "national_pension": {
                 "amount": self.national_pension.to_int(),
-                "rate": 0.045,
+                "rate": 0.0475,
                 "base": self.base_amount.to_int()
             },
             "health_insurance": {
@@ -58,7 +58,7 @@ class InsuranceResult:
             },
             "long_term_care": {
                 "amount": self.long_term_care.to_int(),
-                "calculation": f"건강보험료 × 12.95%"
+                "calculation": f"건강보험료 × 13.14%"
             },
             "employment_insurance": {
                 "amount": self.employment_insurance.to_int(),
@@ -72,17 +72,17 @@ class InsuranceResult:
 class InsuranceCalculator:
     """4대 보험 계산기
 
-    2026년 기준:
-    - 국민연금: 4.5% (상한 590만원, 하한 39만원)
+    2026년 기준 (연금개혁 반영):
+    - 국민연금: 4.75% (상한 590만원, 하한 39만원) - 전체 9.5%
     - 건강보험: 3.595%
-    - 장기요양보험: 건강보험료 × 12.95%
+    - 장기요양보험: 건강보험료 × 13.14%
     - 고용보험: 0.9% (상한 1350만원)
     """
 
-    # 2026년 기준 요율
-    NATIONAL_PENSION_RATE = Decimal('0.045')          # 4.5%
+    # 2026년 기준 요율 (연금개혁 반영)
+    NATIONAL_PENSION_RATE = Decimal('0.0475')         # 4.75% (2026년 인상)
     HEALTH_INSURANCE_RATE = Decimal('0.03595')        # 3.595%
-    LONG_TERM_CARE_RATE = Decimal('0.1295')           # 12.95%
+    LONG_TERM_CARE_RATE = Decimal('0.1314')           # 13.14% (2026년 인상)
     EMPLOYMENT_INSURANCE_RATE = Decimal('0.009')      # 0.9%
 
     # 국민연금 기준소득월액 상한/하한 (2026년)
@@ -105,9 +105,9 @@ class InsuranceCalculator:
             >>> calculator = InsuranceCalculator()
             >>> result = calculator.calculate(Money(2800000))
             >>> result.national_pension.to_int()
-            126000  # 2,800,000 × 4.5%
+            133000  # 2,800,000 × 4.75%
             >>> result.total().to_int()
-            264895  # 4대 보험 합계
+            271959  # 4대 보험 합계
         """
         # 1. 국민연금 (상한/하한 적용)
         pension_base = self._apply_national_pension_limits(gross_income)

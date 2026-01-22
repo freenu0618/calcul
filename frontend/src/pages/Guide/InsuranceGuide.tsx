@@ -73,13 +73,13 @@ const InsuranceGuide = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-3">개념</h3>
             <p className="text-gray-700 mb-4">
               국민연금은 노후 소득 보장을 위한 사회보험으로, 만 18세 이상 60세 미만 국민이 의무 가입 대상입니다.
-              근로자와 사업주가 각각 기준소득월액의 4.5%씩 부담합니다.
+              근로자와 사업주가 각각 기준소득월액의 4.75%씩 부담합니다.
             </p>
 
             <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">2026년 요율</h3>
             <div className="bg-gray-50 p-4 rounded-lg mb-4">
               <ul className="space-y-2 text-sm">
-                <li>보험료율: <strong>9% (근로자 4.5% + 사업주 4.5%)</strong></li>
+                <li>보험료율: <strong>9.5% (근로자 4.75% + 사업주 4.75%)</strong></li>
                 <li>기준소득월액 상한: <strong>590만원</strong></li>
                 <li>기준소득월액 하한: <strong>39만원</strong></li>
               </ul>
@@ -94,7 +94,7 @@ const InsuranceGuide = () => {
                 월 급여 300만원인 경우:
               </code>
               <code className="text-sm block">
-                국민연금 = 3,000,000원 × 4.5% = 135,000원
+                국민연금 = 3,000,000원 × 4.75% = 142,500원
               </code>
             </div>
 
@@ -103,7 +103,7 @@ const InsuranceGuide = () => {
                 월 급여 600만원인 경우 (상한 적용):
               </code>
               <code className="text-sm block">
-                국민연금 = 5,900,000원 × 4.5% = 265,500원
+                국민연금 = 5,900,000원 × 4.75% = 280,250원
               </code>
             </div>
 
@@ -166,7 +166,7 @@ const InsuranceGuide = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">2026년 요율</h3>
             <div className="bg-gray-50 p-4 rounded-lg mb-4">
               <ul className="space-y-2 text-sm">
-                <li>보험료율: <strong>건강보험료 × 12.95%</strong></li>
+                <li>보험료율: <strong>건강보험료 × 13.14%</strong></li>
                 <li>건강보험료에 비례하여 자동 산정</li>
               </ul>
             </div>
@@ -180,7 +180,7 @@ const InsuranceGuide = () => {
                 건강보험 = 3,000,000원 × 3.595% = 107,850원
               </code>
               <code className="text-sm block">
-                장기요양보험 = 107,850원 × 12.95% = 13,966원
+                장기요양보험 = 107,850원 × 13.14% = 14,171원
               </code>
             </div>
 
@@ -261,8 +261,8 @@ const InsuranceGuide = () => {
                 <tbody>
                   <tr className="border-b">
                     <td className="py-2">국민연금</td>
-                    <td className="text-right">4.5%</td>
-                    <td className="text-right">135,000원</td>
+                    <td className="text-right">4.75%</td>
+                    <td className="text-right">142,500원</td>
                   </tr>
                   <tr className="border-b">
                     <td className="py-2">건강보험</td>
@@ -271,8 +271,8 @@ const InsuranceGuide = () => {
                   </tr>
                   <tr className="border-b">
                     <td className="py-2">장기요양보험</td>
-                    <td className="text-right">12.95% (건보)</td>
-                    <td className="text-right">13,966원</td>
+                    <td className="text-right">13.14% (건보)</td>
+                    <td className="text-right">14,171원</td>
                   </tr>
                   <tr className="border-b">
                     <td className="py-2">고용보험</td>
@@ -282,7 +282,7 @@ const InsuranceGuide = () => {
                   <tr className="font-bold">
                     <td className="py-2">합계</td>
                     <td className="text-right">-</td>
-                    <td className="text-right">283,816원</td>
+                    <td className="text-right">291,521원</td>
                   </tr>
                 </tbody>
               </table>
