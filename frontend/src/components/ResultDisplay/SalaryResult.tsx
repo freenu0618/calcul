@@ -47,11 +47,15 @@ export default function SalaryResult({ result }: SalaryResultProps) {
         { name: '공제합계', value: deductions_breakdown.total.amount, color: CHART_COLORS.deduction },
     ];
 
+    const CAPTURE_ID = 'salary-result-capture';
+
     return (
         <div className="space-y-4">
             {/* 경고 메시지 */}
             <WarningAlert warnings={result.warnings} />
 
+            {/* 캡처 대상 영역 */}
+            <div id={CAPTURE_ID} className="space-y-4 bg-white p-4 rounded-lg">
             {/* 실수령액 강조 + 도넛 차트 */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-6 text-white">
                 <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
@@ -119,11 +123,18 @@ export default function SalaryResult({ result }: SalaryResultProps) {
                 </p>
             </div>
 
+            {/* 사이트 워터마크 (캡처용) */}
+            <div className="text-center text-xs text-gray-400 py-2">
+                paytools.work - 한국 근로기준법 급여 계산기
+            </div>
+            </div>{/* 캡처 영역 끝 */}
+
             {/* SNS 공유 버튼 */}
             <ShareButtons
                 url={typeof window !== 'undefined' ? window.location.href : 'https://paytools.work'}
                 title={`${result.employee_name}님의 실수령액: ${net_pay.formatted}`}
                 description="한국 근로기준법 급여 계산기로 정확한 실수령액을 확인하세요"
+                captureTargetId={CAPTURE_ID}
             />
         </div>
     );

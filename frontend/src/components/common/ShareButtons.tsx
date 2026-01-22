@@ -2,16 +2,78 @@
  * SNS 공유 버튼 컴포넌트
  */
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { captureAndDownload, shareImage } from '../../utils/captureImage';
 
 interface ShareButtonsProps {
   url: string;
   title: string;
   description?: string;
+  captureTargetId?: string; // 캡처할 요소의 ID
 }
 
-export function ShareButtons({ url, title, description }: ShareButtonsProps) {
+export function ShareButtons({ url, title, description, captureTargetId }: ShareButtonsProps) {
   const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [isCapturing, setIsCapturing] = useState(false);
+
+  const showToastMessage = (message: string) => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
+  // 이미지 다운로드
+  const handleDownloadImage = useCallback(async () => {
+    if (!captureTargetId) return;
+    const element = document.getElementById(captureTargetId);
+    if (!element) return;
+
+    setIsCapturing(true);
+    try {
+      await captureAndDownload(element, { filename: '급여계산결과' });
+      showToastMessage('이미지가 저장되었습니다');
+
+      if (typeof window.gtag !== 'undefined') {
+        window.gtag('event', 'share', {
+          method: 'image_download',
+          content_type: 'salary_result',
+        });
+      }
+    } catch (err) {
+      showToastMessage('이미지 저장에 실패했습니다');
+    } finally {
+      setIsCapturing(false);
+    }
+  }, [captureTargetId]);
+
+  // 이미지 공유 (모바일)
+  const handleShareImage = useCallback(async () => {
+    if (!captureTargetId) return;
+    const element = document.getElementById(captureTargetId);
+    if (!element) return;
+
+    setIsCapturing(true);
+    try {
+      const shared = await shareImage(element, title, description || '');
+      if (shared) {
+        if (typeof window.gtag !== 'undefined') {
+          window.gtag('event', 'share', {
+            method: 'native_share',
+            content_type: 'salary_result',
+          });
+        }
+      } else {
+        // Web Share API 미지원 시 다운로드로 대체
+        await captureAndDownload(element, { filename: '급여계산결과' });
+        showToastMessage('이미지가 저장되었습니다');
+      }
+    } catch {
+      showToastMessage('공유에 실패했습니다');
+    } finally {
+      setIsCapturing(false);
+    }
+  }, [captureTargetId, title, description]);
 
   const handleKakaoShare = () => {
     // KakaoTalk 공유 (Kakao SDK 필요)
@@ -74,10 +136,8 @@ export function ShareButtons({ url, title, description }: ShareButtonsProps) {
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(url);
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      showToastMessage('링크가 복사되었습니다');
 
-      // GA4 이벤트 추적
       if (typeof window.gtag !== 'undefined') {
         window.gtag('event', 'share', {
           method: 'copy',
@@ -85,15 +145,46 @@ export function ShareButtons({ url, title, description }: ShareButtonsProps) {
           item_id: url,
         });
       }
-    } catch (err) {
-      console.error('Failed to copy link:', err);
+    } catch {
+      showToastMessage('복사에 실패했습니다');
     }
   };
 
   return (
     <div className="mt-6 pt-6 border-t border-gray-200">
       <h3 className="text-sm font-medium text-gray-700 mb-3">이 결과 공유하기</h3>
-      <div className="flex gap-2">
+
+      {/* 이미지 저장/공유 (최상단, 강조) */}
+      {captureTargetId && (
+        <div className="flex gap-2 mb-3">
+          <button
+            onClick={handleDownloadImage}
+            disabled={isCapturing}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg transition-colors disabled:opacity-50"
+            aria-label="이미지로 저장"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span>{isCapturing ? '처리 중...' : '이미지로 저장'}</span>
+          </button>
+
+          <button
+            onClick={handleShareImage}
+            disabled={isCapturing}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50"
+            aria-label="이미지로 공유"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+            <span>{isCapturing ? '처리 중...' : '이미지로 공유'}</span>
+          </button>
+        </div>
+      )}
+
+      {/* SNS 공유 버튼 */}
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={handleKakaoShare}
           className="flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 rounded-lg transition-colors"
@@ -142,7 +233,7 @@ export function ShareButtons({ url, title, description }: ShareButtonsProps) {
       {/* Toast 알림 */}
       {showToast && (
         <div className="fixed bottom-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in">
-          링크가 복사되었습니다
+          {toastMessage}
         </div>
       )}
     </div>
