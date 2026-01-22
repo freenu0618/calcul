@@ -106,7 +106,8 @@ class OvertimeCalculator:
         self,
         work_shifts: List[WorkShift],
         hourly_wage: Money,
-        company_size: CompanySize
+        company_size: CompanySize,
+        scheduled_work_days: int = 5
     ) -> OvertimeResult:
         """가산수당 계산
 
@@ -114,6 +115,7 @@ class OvertimeCalculator:
             work_shifts: 근무 시프트 리스트 (1개월치)
             hourly_wage: 통상시급
             company_size: 사업장 규모
+            scheduled_work_days: 주 소정근로일 (계약상 근무일 수)
 
         Returns:
             가산수당 계산 결과
@@ -124,11 +126,11 @@ class OvertimeCalculator:
             ...     WorkShift(date(2026, 1, 12), time(9, 0), time(18, 0), 60, True),  # 휴일 8시간
             ... ]
             >>> calculator = OvertimeCalculator()
-            >>> result = calculator.calculate(shifts, Money(16092), CompanySize.OVER_5)
+            >>> result = calculator.calculate(shifts, Money(16092), CompanySize.OVER_5, 5)
         """
-        # 1. 연장근로 계산 (주 단위)
+        # 1. 연장근로 계산 (주 단위 + 소정근로일 초과분)
         overtime_hours, overtime_pay = self._calculate_overtime(
-            work_shifts, hourly_wage
+            work_shifts, hourly_wage, scheduled_work_days
         )
 
         # 2. 야간근로 계산
@@ -154,13 +156,19 @@ class OvertimeCalculator:
     def _calculate_overtime(
         self,
         work_shifts: List[WorkShift],
-        hourly_wage: Money
+        hourly_wage: Money,
+        scheduled_work_days: int = 5
     ) -> tuple[WorkingHours, Money]:
-        """연장근로 계산 (주 40시간 초과분)
+        """연장근로 계산
+
+        연장근로는 두 가지 기준으로 계산:
+        1. 주 40시간 초과분 (시간 기준)
+        2. 소정근로일 초과 근무분 (일수 기준)
 
         Args:
             work_shifts: 근무 시프트 리스트
             hourly_wage: 통상시급
+            scheduled_work_days: 주 소정근로일
 
         Returns:
             (연장근로시간, 연장근로수당)
@@ -169,20 +177,42 @@ class OvertimeCalculator:
         weekly_groups = self._group_by_week(work_shifts)
         total_overtime_minutes = 0
 
+        # 주 소정근로시간 계산 (소정근로일 × 8시간)
+        scheduled_weekly_hours = scheduled_work_days * self.DAILY_REGULAR_HOURS
+        # 실제 적용할 기준: 소정근로시간과 40시간 중 작은 값
+        weekly_limit_minutes = min(scheduled_weekly_hours, self.WEEKLY_REGULAR_HOURS) * 60
+
         for week_shifts in weekly_groups:
             # 평일 근무만 집계 (휴일근로는 별도 계산)
             regular_shifts = [s for s in week_shifts if not s.is_holiday_work]
 
-            # 주간 총 근로시간 계산
-            weekly_minutes = sum(
-                s.calculate_working_hours().to_minutes()
-                for s in regular_shifts
-            )
+            # 날짜순 정렬
+            sorted_shifts = sorted(regular_shifts, key=lambda s: s.date)
 
-            # 주 40시간(2400분) 초과분
-            if weekly_minutes > self.WEEKLY_REGULAR_HOURS * 60:
-                overtime_minutes = weekly_minutes - (self.WEEKLY_REGULAR_HOURS * 60)
-                total_overtime_minutes += overtime_minutes
+            # 소정근로일 내 근무시간과 초과 근무시간 분리
+            scheduled_minutes = 0  # 소정근로일 내 근무시간
+            excess_minutes = 0     # 소정근로일 초과 근무시간
+
+            for i, shift in enumerate(sorted_shifts):
+                shift_minutes = shift.calculate_working_hours().to_minutes()
+
+                if i < scheduled_work_days:
+                    # 소정근로일 내: 8시간 초과분은 연장근로
+                    daily_limit = self.DAILY_REGULAR_HOURS * 60
+                    if shift_minutes > daily_limit:
+                        scheduled_minutes += daily_limit
+                        excess_minutes += shift_minutes - daily_limit
+                    else:
+                        scheduled_minutes += shift_minutes
+                else:
+                    # 소정근로일 초과: 전체가 연장근로
+                    excess_minutes += shift_minutes
+
+            # 소정근로일 내에서도 주 기준 초과분 계산
+            if scheduled_minutes > weekly_limit_minutes:
+                excess_minutes += scheduled_minutes - weekly_limit_minutes
+
+            total_overtime_minutes += excess_minutes
 
         overtime_hours = WorkingHours.from_minutes(total_overtime_minutes)
 

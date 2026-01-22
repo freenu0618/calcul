@@ -168,7 +168,8 @@ class SalaryCalculator:
         overtime_result = self.overtime_calculator.calculate(
             work_shifts=work_shifts,
             hourly_wage=hourly_wage,
-            company_size=employee.company_size
+            company_size=employee.company_size,
+            scheduled_work_days=employee.scheduled_work_days
         )
 
         # 4. 주휴수당 계산 (통상시급 기준, 개근 조건 체크)

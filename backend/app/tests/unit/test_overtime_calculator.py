@@ -154,8 +154,9 @@ class TestCombinedCalculation:
         calculator = OvertimeCalculator()
         result = calculator.calculate(shifts, Money(10000), CompanySize.OVER_5)
 
-        # 연장: 39시간 (40시간 미만이므로 0)
-        assert result.overtime_hours.is_zero()
+        # 연장: 일 8시간 초과분 5시간 × 3일 = 15시간
+        assert result.overtime_hours.hours == 15
+        assert result.overtime_pay.to_int() == 225000  # 10,000 × 15 × 1.5
 
         # 야간: 3시간 (각 1시간씩)
         assert result.night_hours.hours == 3
@@ -186,6 +187,76 @@ class TestCombinedCalculation:
         # 총합 확인
         total = result.total().to_int()
         assert total > 0
+
+
+class TestScheduledWorkDaysOvertime:
+    """소정근로일 기반 연장근로 계산 테스트"""
+
+    def test_4day_contract_5day_work(self):
+        """소정근로 4일 계약인데 5일 근무 → 1일 연장근로"""
+        shifts = [
+            WorkShift(date(2026, 1, 5), time(9, 0), time(18, 0), 60),  # 월 8h
+            WorkShift(date(2026, 1, 6), time(9, 0), time(18, 0), 60),  # 화 8h
+            WorkShift(date(2026, 1, 7), time(9, 0), time(18, 0), 60),  # 수 8h
+            WorkShift(date(2026, 1, 8), time(9, 0), time(18, 0), 60),  # 목 8h
+            WorkShift(date(2026, 1, 9), time(9, 0), time(18, 0), 60),  # 금 8h (초과)
+        ]
+        calculator = OvertimeCalculator()
+        # 소정근로일 4일로 설정
+        result = calculator.calculate(shifts, Money(10000), CompanySize.OVER_5, scheduled_work_days=4)
+
+        # 5번째 날 8시간 전체가 연장근로
+        assert result.overtime_hours.hours == 8
+        # 10,000 × 8 × 1.5 = 120,000
+        assert result.overtime_pay.to_int() == 120000
+
+    def test_4day_contract_4day_work(self):
+        """소정근로 4일 계약, 4일 근무 → 연장근로 없음"""
+        shifts = [
+            WorkShift(date(2026, 1, 5), time(9, 0), time(18, 0), 60),  # 월 8h
+            WorkShift(date(2026, 1, 6), time(9, 0), time(18, 0), 60),  # 화 8h
+            WorkShift(date(2026, 1, 7), time(9, 0), time(18, 0), 60),  # 수 8h
+            WorkShift(date(2026, 1, 8), time(9, 0), time(18, 0), 60),  # 목 8h
+        ]
+        calculator = OvertimeCalculator()
+        result = calculator.calculate(shifts, Money(10000), CompanySize.OVER_5, scheduled_work_days=4)
+
+        # 연장근로 없음
+        assert result.overtime_hours.is_zero()
+        assert result.overtime_pay.is_zero()
+
+    def test_5day_contract_6day_work(self):
+        """소정근로 5일 계약, 6일 근무 → 1일 연장근로"""
+        shifts = [
+            WorkShift(date(2026, 1, 5), time(9, 0), time(18, 0), 60),  # 월 8h
+            WorkShift(date(2026, 1, 6), time(9, 0), time(18, 0), 60),  # 화 8h
+            WorkShift(date(2026, 1, 7), time(9, 0), time(18, 0), 60),  # 수 8h
+            WorkShift(date(2026, 1, 8), time(9, 0), time(18, 0), 60),  # 목 8h
+            WorkShift(date(2026, 1, 9), time(9, 0), time(18, 0), 60),  # 금 8h
+            WorkShift(date(2026, 1, 10), time(9, 0), time(18, 0), 60), # 토 8h (초과)
+        ]
+        calculator = OvertimeCalculator()
+        result = calculator.calculate(shifts, Money(10000), CompanySize.OVER_5, scheduled_work_days=5)
+
+        # 6번째 날 8시간 전체가 연장근로
+        assert result.overtime_hours.hours == 8
+        # 10,000 × 8 × 1.5 = 120,000
+        assert result.overtime_pay.to_int() == 120000
+
+    def test_4day_contract_daily_overtime(self):
+        """소정근로 4일 계약, 일 10시간 근무 → 일별 초과분 연장"""
+        shifts = [
+            WorkShift(date(2026, 1, 5), time(9, 0), time(20, 0), 60),  # 월 10h
+            WorkShift(date(2026, 1, 6), time(9, 0), time(20, 0), 60),  # 화 10h
+            WorkShift(date(2026, 1, 7), time(9, 0), time(20, 0), 60),  # 수 10h
+            WorkShift(date(2026, 1, 8), time(9, 0), time(20, 0), 60),  # 목 10h
+        ]
+        calculator = OvertimeCalculator()
+        result = calculator.calculate(shifts, Money(10000), CompanySize.OVER_5, scheduled_work_days=4)
+
+        # 매일 2시간씩 × 4일 = 8시간 연장
+        assert result.overtime_hours.hours == 8
+        assert result.overtime_pay.to_int() == 120000
 
 
 class TestOvertimeResultMethods:
