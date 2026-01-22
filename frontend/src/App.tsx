@@ -9,7 +9,9 @@ import { AuthProvider } from './contexts/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navigation from './components/layout/Navigation';
 import Footer from './components/layout/Footer';
-import Home from './pages/Home';
+import LandingPage from './pages/Landing';
+import CalculatorPage from './pages/Calculator';
+import DashboardPage from './pages/Dashboard';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import GuidePage from './pages/Guide/GuidePage';
@@ -63,7 +65,9 @@ function App() {
                 <Route path="/register" element={<Register />} />
 
                 {/* 메인 페이지 */}
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/calculator" element={<CalculatorPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
 
                 {/* 가이드 페이지 */}
                 <Route path="/guide" element={<GuidePage />} />

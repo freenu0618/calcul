@@ -11,14 +11,22 @@ const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
 
-  const navItems = [
-    { path: '/', label: '계산기' },
-    { path: '/guide', label: '가이드' },
-    { path: '/faq', label: 'FAQ' },
-    { path: '/examples', label: '계산 사례' },
-    { path: '/legal', label: '법률 정보' },
-    { path: '/blog', label: '블로그' },
-  ];
+  // 랜딩페이지 여부 확인 (투명 네비게이션용)
+  const isLandingPage = location.pathname === '/';
+
+  // 로그인 상태에 따른 메뉴 분기
+  const navItems = isAuthenticated
+    ? [
+        { path: '/dashboard', label: '대시보드' },
+        { path: '/calculator', label: '급여 계산' },
+        { path: '/guide', label: '가이드' },
+      ]
+    : [
+        { path: '/calculator', label: '급여 계산' },
+        { path: '/#pricing', label: '요금제' },
+        { path: '/guide', label: '가이드' },
+        { path: '/examples', label: '사례' },
+      ];
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -28,13 +36,15 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className={`${isLandingPage ? 'bg-transparent absolute top-0 left-0 right-0 z-50' : 'bg-white shadow-md'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* 로고 */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <span className="text-2xl font-bold text-blue-600">급여계산기</span>
+              <span className={`text-2xl font-bold ${isLandingPage ? 'text-white' : 'text-blue-600'}`}>
+                paytools
+              </span>
             </Link>
           </div>
 
@@ -46,8 +56,12 @@ const Navigation = () => {
                 to={item.path}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive(item.path)
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? isLandingPage
+                      ? 'bg-white/20 text-white'
+                      : 'bg-blue-50 text-blue-600'
+                    : isLandingPage
+                      ? 'text-white/80 hover:text-white hover:bg-white/10'
+                      : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
                 {item.label}
@@ -56,28 +70,38 @@ const Navigation = () => {
 
             {/* 인증 상태에 따른 버튼 */}
             {isAuthenticated ? (
-              <div className="flex items-center space-x-2 ml-2 pl-2 border-l border-gray-300">
-                <span className="text-sm text-gray-700">{user?.full_name || user?.email}</span>
+              <div className={`flex items-center space-x-2 ml-2 pl-2 border-l ${isLandingPage ? 'border-white/30' : 'border-gray-300'}`}>
+                <span className={`text-sm ${isLandingPage ? 'text-white/80' : 'text-gray-700'}`}>
+                  {user?.full_name || user?.email}
+                </span>
                 <button
                   onClick={handleLogout}
-                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    isLandingPage ? 'text-white/80 hover:bg-white/10' : 'text-gray-700 hover:bg-gray-100'
+                  }`}
                 >
                   로그아웃
                 </button>
               </div>
             ) : (
-              <div className="flex items-center space-x-1 ml-2 pl-2 border-l border-gray-300">
+              <div className={`flex items-center space-x-2 ml-2 pl-2 border-l ${isLandingPage ? 'border-white/30' : 'border-gray-300'}`}>
                 <Link
                   to="/login"
-                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    isLandingPage ? 'text-white/80 hover:text-white' : 'text-gray-700 hover:bg-gray-100'
+                  }`}
                 >
                   로그인
                 </Link>
                 <Link
                   to="/register"
-                  className="px-3 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700"
+                  className={`px-4 py-2 rounded-md text-sm font-medium ${
+                    isLandingPage
+                      ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  }`}
                 >
-                  회원가입
+                  무료 시작
                 </Link>
               </div>
             )}
@@ -87,7 +111,9 @@ const Navigation = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
+              className={`inline-flex items-center justify-center p-2 rounded-md focus:outline-none ${
+                isLandingPage ? 'text-white hover:bg-white/10' : 'text-gray-700 hover:bg-gray-100'
+              }`}
               aria-label="메뉴"
             >
               <svg
