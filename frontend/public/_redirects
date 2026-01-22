@@ -1,5 +1,2 @@
-# Redirect calcul-1b9.pages.dev to paytools.work
-https://calcul-1b9.pages.dev/*  https://paytools.work/:splat  301
-
-# SPA fallback
+# SPA fallback (도메인 리다이렉트는 functions/_middleware.ts에서 처리)
 /*    /index.html   200
