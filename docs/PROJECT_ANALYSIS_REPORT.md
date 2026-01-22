@@ -1,8 +1,8 @@
 # 급여 계산기 프로젝트 종합 분석 보고서
 
 **작성일**: 2026-01-21
-**분석 버전**: v1.0.0
-**프로젝트 상태**: 개발 완료 (배포 대기)
+**분석 버전**: v1.1.0
+**프로젝트 상태**: 배포 완료 (정상 운영 중)
 
 ---
 
@@ -250,72 +250,68 @@ frontend/src/
 | **플랫폼** | ✅ 배포됨 | Cloudflare Pages |
 | **도메인** | ✅ 연결됨 | https://paytools.work |
 | **빌드** | ✅ 성공 | Vite 빌드 |
-| **환경변수** | ❌ **미설정** | `VITE_API_BASE_URL` 더미값 |
-| **기능** | ⚠️ 부분 작동 | 정적 페이지만 작동 |
-
-**문제점:**
-- 환경변수 `VITE_API_BASE_URL`이 `https://your-backend-url.railway.app` (더미값)으로 설정됨
-- 백엔드가 배포되지 않아 **405 Method Not Allowed 에러** 발생
-- 회원가입, 급여 계산 등 모든 API 기능 작동 불가
+| **환경변수** | ✅ **설정 완료** | `VITE_API_BASE_URL=https://calcul-production.up.railway.app` |
+| **기능** | ✅ **정상 작동** | 모든 API 기능 작동 |
 
 ### 4.2 백엔드 배포 상태
 
 | 항목 | 상태 | 세부 정보 |
 |------|------|-----------|
-| **플랫폼** | ❌ **미배포** | Railway 설정만 존재 |
-| **데이터베이스** | ❌ **미설정** | PostgreSQL 미연결 |
-| **환경변수** | ❌ **미설정** | ALLOWED_ORIGINS 등 |
-| **API 서버** | ❌ **없음** | 접근 불가 |
+| **플랫폼** | ✅ **배포 완료** | Railway |
+| **데이터베이스** | ✅ **연결됨** | PostgreSQL (Railway) |
+| **환경변수** | ✅ **설정 완료** | ALLOWED_ORIGINS, DATABASE_URL, PORT |
+| **API 서버** | ✅ **정상** | https://calcul-production.up.railway.app |
 
-**문제점:**
-- Railway에 실제 배포가 되지 않음
-- `backend/railway.json` 설정 파일만 존재
-- PostgreSQL 데이터베이스 미설정
-- 모든 API 엔드포인트 접근 불가
-
-### 4.3 배포 구조 문제
+### 4.3 배포 구조 (정상)
 
 ```
-현재 구조 (잘못됨):
-┌──────────────────────────┐
-│   paytools.work          │
-│   (Cloudflare Pages)     │
-│   - 정적 사이트          │
-│   - POST 요청 불가 ❌    │
-└──────────────────────────┘
-           ↓ (405 에러)
-    API 요청 실패
-
-올바른 구조 (필요):
+현재 구조 (정상 작동):
 ┌──────────────────────────┐     ┌──────────────────────────┐
-│   paytools.work          │────▶│  api.paytools.work       │
-│   (Cloudflare Pages)     │     │  (Railway)               │
-│   - 프론트엔드            │     │  - FastAPI 서버          │
+│   paytools.work          │────▶│  calcul-production       │
+│   (Cloudflare Pages)     │     │  .up.railway.app         │
+│   - 프론트엔드            │     │  (Railway)               │
+│   - React + Vite         │     │  - FastAPI 서버          │
 └──────────────────────────┘     │  - PostgreSQL            │
                                   └──────────────────────────┘
 ```
+
+### 4.4 해결된 문제 (2026-01-21)
+
+1. **405 에러 해결**: `VITE_API_BASE_URL`에 `https://` 프로토콜 추가
+2. **CORS 에러 해결**: 올바른 Railway 도메인(`calcul-production.up.railway.app`)으로 수정
+3. **재배포 필요**: Vite 빌드 특성상 환경변수 변경 후 재배포 필수
 
 ---
 
 ## 5. 미구현 기능 및 우선순위
 
-### 5.1 긴급 (P0) - 서비스 작동을 위한 필수
+### 5.1 긴급 (P0) - 서비스 작동을 위한 필수 ✅ 완료
 
-1. **백엔드 배포** 🚨
-   - Railway에 백엔드 배포
-   - PostgreSQL 데이터베이스 연결
-   - 환경변수 설정 (ALLOWED_ORIGINS)
-   - 도메인 연결 (api.paytools.work 또는 서브도메인)
+1. ~~**백엔드 배포**~~ ✅ 완료 (2026-01-21)
+   - Railway에 백엔드 배포 완료
+   - PostgreSQL 데이터베이스 연결 완료
+   - 환경변수 설정 완료
 
-2. **프론트엔드 환경변수 수정** 🚨
-   - `VITE_API_BASE_URL` 실제 백엔드 URL로 변경
-   - Cloudflare Pages 재배포
+2. ~~**프론트엔드 환경변수 수정**~~ ✅ 완료 (2026-01-21)
+   - `VITE_API_BASE_URL=https://calcul-production.up.railway.app` 설정
+   - Cloudflare Pages 재배포 완료
 
-3. **CORS 설정 확인** 🚨
+3. ~~**CORS 설정 확인**~~ ✅ 완료 (2026-01-21)
    - paytools.work 허용
    - calcul-1b9.pages.dev 허용
 
-### 5.2 높음 (P1) - 핵심 기능 완성
+### 5.2 완료된 추가 기능 (2026-01-21)
+
+1. **급여 구성 방식 선택 옵션** ✅ 완료
+   - 209시간 방식 (주휴수당 포함): 최저임금 계산기 방식
+   - 174시간 방식 (주휴수당 분리): 급여명세서 작성 방식
+   - 사용자가 두 가지 방식 중 선택 가능
+
+2. **금액 입력 콤마 포맷팅** ✅ 완료
+   - 시급, 월급, 수당 등 모든 금액 필드에 천 단위 콤마 적용
+   - 예: 2800000 → 2,800,000
+
+### 5.3 높음 (P1) - 핵심 기능 완성
 
 1. **FullCalendar 통합** (진행 중)
    - ShiftCalendar.tsx 구현 (현재 TODO)
@@ -337,7 +333,7 @@ frontend/src/
    - 오전/오후/야간조 프리셋
    - 사용자 정의 템플릿 저장
 
-### 5.3 중간 (P2) - 사용성 개선
+### 5.4 중간 (P2) - 사용성 개선
 
 1. **역산 기능** (Net → Gross)
    - 실수령액 입력 시 세전 금액 계산
@@ -381,60 +377,46 @@ frontend/src/
 
 ---
 
-## 6. 긴급 해결 필요 사항
+## 6. 해결 완료된 문제
 
-### 6.1 배포 문제 (최우선)
+### 6.1 배포 문제 ✅ 해결됨 (2026-01-21)
 
-**현재 상황:**
-- ❌ 프론트엔드만 배포됨 (paytools.work)
-- ❌ 백엔드 미배포 (Railway)
-- ❌ 모든 API 기능 작동 불가 (405 에러)
-- ❌ 회원가입, 급여 계산 불가
+**해결된 문제:**
+- ✅ 프론트엔드 + 백엔드 배포 완료
+- ✅ Railway 백엔드 정상 작동
+- ✅ 모든 API 기능 작동 (급여 계산, 회원가입)
+- ✅ CORS 에러 해결
 
-**해결 방안:**
+**해결 과정:**
 
-#### 1단계: Railway에 백엔드 배포 (30분)
+#### 문제 1: 405 Method Not Allowed 에러
+- **원인**: `VITE_API_BASE_URL`에 `https://` 프로토콜 누락
+- **해결**: `https://calcul-production.up.railway.app`으로 수정
 
-```bash
-# 1. Railway 프로젝트 생성
-# 2. GitHub 레포지토리 연결
-# 3. Root Directory: backend 설정
-# 4. PostgreSQL 추가
-# 5. 환경변수 설정
-ALLOWED_ORIGINS=https://paytools.work,https://calcul-1b9.pages.dev
-DATABASE_URL=(자동 설정됨)
-PORT=8000
-```
+#### 문제 2: CORS 에러
+- **원인**: 잘못된 Railway 도메인 사용 (`paytools-api` → `calcul-production`)
+- **해결**: 올바른 도메인으로 환경변수 수정
 
-#### 2단계: 프론트엔드 환경변수 수정 (5분)
+#### 문제 3: 변경사항 미반영
+- **원인**: Vite는 빌드 시점에 환경변수 번들링
+- **해결**: Cloudflare Pages 재배포 (Retry deployment)
 
-```bash
-# Cloudflare Pages → Settings → Environment variables
-VITE_API_BASE_URL=https://paytools-api.up.railway.app
-```
+### 6.2 통상시급 계산 문제 ✅ 해결됨 (2026-01-21)
 
-#### 3단계: 배포 후 검증 (10분)
+**문제**: 시급 10,320원 입력 시 통상시급이 12,396원으로 계산됨
 
-```bash
-# 1. 백엔드 Health Check
-curl https://paytools-api.up.railway.app/health
+**원인**: 209시간(주휴포함) vs 174시간(주휴별도) 계산 방식 혼동
 
-# 2. 프론트엔드 API 연동 확인
-# → 브라우저에서 회원가입 테스트
+**해결**: 사용자가 두 가지 방식 중 선택 가능하도록 구현
+- **209시간 방식**: 기본급에 주휴수당 포함 (최저임금 계산기 방식)
+- **174시간 방식**: 기본급과 주휴수당 분리 (급여명세서 작성 방식)
 
-# 3. CORS 정상 작동 확인
-# → Network 탭에서 OPTIONS 요청 확인
-```
+### 6.3 미해결 (선택적)
 
-### 6.2 테스트 에러 수정 (선택)
-
-**현재 상황:**
-- 2개 테스트 에러 (UnicodeDecodeError, ConnectionError)
-- 나머지 181개 테스트 정상
-
-**해결 방안:**
-1. `test_output.txt` 인코딩 문제 수정
-2. `test_secured_api.py` 서버 실행 확인
+**테스트 에러 2건:**
+- 서비스 작동에 영향 없음
+- `test_output.txt` 인코딩 문제
+- `test_secured_api.py` 서버 실행 확인 필요
 
 ---
 
@@ -488,19 +470,19 @@ curl https://paytools-api.up.railway.app/health
 
 ## 8. 단계별 개발 로드맵
 
-### Phase 1: 긴급 배포 (1~2일) 🔥
+### Phase 1: 긴급 배포 ✅ 완료 (2026-01-21)
 
 **목표**: 서비스 정상 작동
 
-- [ ] Railway에 백엔드 배포
-- [ ] PostgreSQL 연결
-- [ ] 프론트엔드 환경변수 수정
-- [ ] CORS 설정 확인
-- [ ] 전체 기능 테스트
+- [x] Railway에 백엔드 배포
+- [x] PostgreSQL 연결
+- [x] 프론트엔드 환경변수 수정
+- [x] CORS 설정 확인
+- [x] 전체 기능 테스트
 
 **산출물**:
-- 작동하는 급여 계산기 (paytools.work)
-- API 문서 (docs URL)
+- 작동하는 급여 계산기: https://paytools.work
+- API 문서: https://calcul-production.up.railway.app/docs
 
 ### Phase 2: 핵심 기능 완성 (1주) 🚀
 
@@ -581,40 +563,26 @@ curl https://paytools-api.up.railway.app/health
 
 ### 9.2 현재 문제점 ⚠️
 
-1. **배포 미완료** (최우선 해결)
-   - 백엔드 미배포 → API 작동 불가
-   - 환경변수 미설정 → 405 에러
+1. ~~**배포 미완료**~~ ✅ **해결됨** (2026-01-21)
+   - ~~백엔드 미배포 → API 작동 불가~~ → 정상 작동
+   - ~~환경변수 미설정 → 405 에러~~ → 해결됨
 
-2. **일부 기능 미구현**
+2. **일부 기능 미구현** (향후 개발)
    - FullCalendar 통합 (TODO)
    - 역산 기능
    - PDF 출력
 
-3. **테스트 에러 2건**
+3. **테스트 에러 2건** (낮은 우선순위)
    - 서비스 작동에 영향 없음
    - 수정 권장
 
 ### 9.3 권장 조치 사항
 
-#### 즉시 실행 (오늘)
+#### ~~즉시 실행 (오늘)~~ ✅ 완료됨
 
-1. **Railway 백엔드 배포** (30분)
-   ```bash
-   # 1. railway.app 접속
-   # 2. GitHub 연동
-   # 3. PostgreSQL 추가
-   # 4. 환경변수 설정
-   ```
-
-2. **Cloudflare Pages 환경변수 수정** (5분)
-   ```bash
-   VITE_API_BASE_URL=https://[railway-domain].up.railway.app
-   ```
-
-3. **배포 검증** (10분)
-   - Health Check 확인
-   - 회원가입 테스트
-   - 급여 계산 테스트
+1. ~~**Railway 백엔드 배포**~~ ✅ 완료
+2. ~~**Cloudflare Pages 환경변수 수정**~~ ✅ 완료
+3. ~~**배포 검증**~~ ✅ 완료
 
 #### 1주 내 실행
 
@@ -657,13 +625,13 @@ Day 29-30: AdSense 신청 및 대기
 |------|------|------|
 | **코드 품질** | 95/100 | 우수 |
 | **기능 완성도** | 90/100 | 우수 |
-| **배포 상태** | 0/100 | ⚠️ 미배포 |
+| **배포 상태** | 100/100 | ✅ **정상 운영** |
 | **테스트 커버리지** | 95/100 | 우수 |
 | **문서화** | 100/100 | 우수 |
 | **법적 정확성** | 100/100 | 완벽 |
-| **전체** | **80/100** | 양호 |
+| **전체** | **97/100** | 우수 |
 
-**결론**: 코드 품질과 기능은 우수하나, **배포 문제로 인해 서비스 작동 불가**. 백엔드 배포만 완료하면 즉시 서비스 가능한 상태입니다.
+**결론**: 배포 완료 및 정상 운영 중. **https://paytools.work** 에서 모든 기능 사용 가능. 향후 FullCalendar 통합, 역산 기능, PDF 출력 등 추가 개발 예정.
 
 ---
 
@@ -722,4 +690,4 @@ calcul/
 
 **작성자**: Claude Code + sc:analyze 에이전트
 **마지막 업데이트**: 2026-01-21
-**다음 리뷰 예정**: 백엔드 배포 후
+**다음 리뷰 예정**: Phase 2 (핵심 기능 완성) 후

@@ -27,6 +27,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ onChange, initialData }) =>
     children_under_20: initialData?.children_under_20 || 0,
     employment_type: initialData?.employment_type || 'FULL_TIME',
     company_size: initialData?.company_size || 'OVER_5',
+    scheduled_work_days: initialData?.scheduled_work_days || 5,
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof EmployeeRequest, string>>>({});

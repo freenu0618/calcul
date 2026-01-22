@@ -41,6 +41,7 @@ const EmployeeFormExample: React.FC = () => {
               children_under_20: 2,
               employment_type: 'FULL_TIME',
               company_size: 'OVER_5',
+              scheduled_work_days: 5,
             }}
           />
         </section>
