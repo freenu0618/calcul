@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!-- Domain Redirect: calcul-1b9.pages.dev → paytools.work -->
+    <script>
+      if (window.location.hostname === 'calcul-1b9.pages.dev') {
+        window.location.replace('https://paytools.work' + window.location.pathname + window.location.search);
+      }
+    </script>
+
     <!-- Google AdSense Auto Ads -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4812271687474025"
          crossorigin="anonymous"></script>
