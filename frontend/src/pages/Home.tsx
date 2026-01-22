@@ -62,15 +62,37 @@ function Home() {
     }
   }, [employee, baseSalary, allowances, workShifts]);
 
+  // Step 1 검증: 이름 필수
+  const isStep1Valid = employee.name.trim().length > 0;
+
   const wizard = useWizard({
     steps: WIZARD_STEPS,
     onComplete: handleCalculate,
   });
 
+  // 단계별 검증
+  const canProceed = (): boolean => {
+    if (wizard.currentStep === 0) return isStep1Valid;
+    return true;
+  };
+
+  const handleNext = () => {
+    if (canProceed()) {
+      wizard.nextStep();
+    }
+  };
+
   const renderStepContent = () => {
     switch (wizard.currentStep) {
       case 0:
-        return <EmployeeInfoForm employee={employee} onChange={setEmployee} />;
+        return (
+          <>
+            <EmployeeInfoForm employee={employee} onChange={setEmployee} />
+            {!isStep1Valid && employee.name === '' && (
+              <p className="mt-2 text-sm text-red-500">* 이름을 입력해주세요</p>
+            )}
+          </>
+        );
       case 1:
         return (
           <SalaryForm
@@ -78,6 +100,7 @@ function Home() {
             allowances={allowances}
             onBaseSalaryChange={setBaseSalary}
             onAllowancesChange={setAllowances}
+            scheduledWorkDays={employee.scheduled_work_days}
           />
         );
       case 2:
@@ -118,11 +141,11 @@ function Home() {
               currentStep={wizard.currentStep}
               onStepClick={wizard.goToStep}
               onPrev={wizard.prevStep}
-              onNext={wizard.nextStep}
+              onNext={handleNext}
               isFirstStep={wizard.isFirstStep}
               isLastStep={wizard.isLastStep}
               completeLabel={isLoading ? '계산 중...' : '급여 계산하기'}
-              isNextDisabled={isLoading}
+              isNextDisabled={isLoading || !canProceed()}
             >
               {renderStepContent()}
             </StepWizard>

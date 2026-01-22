@@ -12,6 +12,7 @@ interface SalaryFormProps {
   allowances: Allowance[];
   onBaseSalaryChange: (value: number) => void;
   onAllowancesChange: (allowances: Allowance[]) => void;
+  scheduledWorkDays?: number; // 주 소정근로일 (1~7)
 }
 
 // 상수
@@ -35,6 +36,7 @@ export default function SalaryForm({
   allowances,
   onBaseSalaryChange,
   onAllowancesChange,
+  scheduledWorkDays = 5,
 }: SalaryFormProps) {
   // 입력 모드: 'direct' | 'hourly'
   const [inputMode, setInputMode] = useState<'direct' | 'hourly'>('direct');
@@ -44,8 +46,17 @@ export default function SalaryForm({
 
   // 시급 기반 입력
   const [hourlyWage, setHourlyWage] = useState(MIN_WAGE_2026);
-  const [weeklyHours, setWeeklyHours] = useState(40);
+  // 주 근무시간: 소정근로일 × 8시간 (기본값)
+  const defaultWeeklyHours = scheduledWorkDays * 8;
+  const [weeklyHours, setWeeklyHours] = useState(defaultWeeklyHours);
   const [contractSalary, setContractSalary] = useState(2800000);
+
+  // 소정근로일 변경 시 주 근무시간 자동 업데이트
+  useEffect(() => {
+    if (inputMode === 'hourly') {
+      setWeeklyHours(scheduledWorkDays * 8);
+    }
+  }, [scheduledWorkDays, inputMode]);
 
   // 자동 계산 결과
   const [autoCalc, setAutoCalc] = useState({
