@@ -1,1 +1,5 @@
+# Redirect calcul-1b9.pages.dev to paytools.work
+https://calcul-1b9.pages.dev/*  https://paytools.work/:splat  301
+
+# SPA fallback
 /*    /index.html   200
