@@ -164,8 +164,9 @@ const ShiftInput: React.FC<ShiftInputProps> = ({ onChange, initialShifts = [] })
       {viewMode === 'calendar' && (
         <ShiftCalendar
           shifts={shifts}
-          onShiftAdd={(shift) => setShifts([...shifts, shift])}
-          onShiftRemove={(index) => setShifts(shifts.filter((_, i) => i !== index))}
+          onShiftAdd={(shift) => setShifts((prev) => [...prev, shift])}
+          onShiftRemove={handleDeleteShift}
+          onShiftUpdate={handleUpdateShift}
         />
       )}
 

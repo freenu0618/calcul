@@ -9,5 +9,6 @@ export { default as ShiftRowMobile } from './ShiftRowMobile';
 export { default as ShiftRowDesktop } from './ShiftRowDesktop';
 export { default as ShiftSummary } from './ShiftSummary';
 export { default as ShiftCalendar } from './ShiftCalendar';
+export { default as ShiftModal } from './ShiftModal';
 export { default } from './ShiftInput';
 
