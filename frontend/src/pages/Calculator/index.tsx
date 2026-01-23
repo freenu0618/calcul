@@ -13,7 +13,7 @@ import { ShiftInput } from '../../components/ShiftInput';
 import { StepWizard, useWizard, type WizardStep } from '../../components/wizard';
 import { salaryApi } from '../../api';
 import type { Employee, Allowance } from '../../types/models';
-import type { SalaryCalculationResponse, WorkShiftRequest } from '../../types/salary';
+import type { SalaryCalculationResponse, WorkShiftRequest, WageType, AbsencePolicy } from '../../types/salary';
 
 const WIZARD_STEPS: WizardStep[] = [
   { id: 'employee', title: '근로자 정보', description: '고용형태, 사업장' },
@@ -33,6 +33,10 @@ export default function CalculatorPage() {
   const [baseSalary, setBaseSalary] = useState<number>(2500000);
   const [allowances, setAllowances] = useState<Allowance[]>([]);
   const [workShifts, setWorkShifts] = useState<WorkShiftRequest[]>([]);
+  const [wageType, setWageType] = useState<WageType>('MONTHLY');
+  const [hourlyWage, setHourlyWage] = useState<number>(0);
+  const [calculationMonth, setCalculationMonth] = useState<string>('');
+  const [absencePolicy, setAbsencePolicy] = useState<AbsencePolicy>('STRICT');
   const [result, setResult] = useState<SalaryCalculationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,9 +47,13 @@ export default function CalculatorPage() {
     try {
       const response = await salaryApi.calculateSalary({
         employee,
-        base_salary: baseSalary,
+        base_salary: wageType === 'MONTHLY' ? baseSalary : 0,
         allowances,
         work_shifts: workShifts,
+        wage_type: wageType,
+        hourly_wage: wageType === 'HOURLY' ? hourlyWage : 0,
+        calculation_month: calculationMonth,
+        absence_policy: absencePolicy,
       });
       setResult(response);
       if (typeof window.gtag !== 'undefined') {
@@ -60,7 +68,7 @@ export default function CalculatorPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [employee, baseSalary, allowances, workShifts]);
+  }, [employee, baseSalary, allowances, workShifts, wageType, hourlyWage, calculationMonth, absencePolicy]);
 
   const isStep1Valid = employee.name.trim().length > 0;
 
@@ -99,10 +107,23 @@ export default function CalculatorPage() {
             onBaseSalaryChange={setBaseSalary}
             onAllowancesChange={setAllowances}
             scheduledWorkDays={employee.scheduled_work_days}
+            wageType={wageType}
+            onWageTypeChange={setWageType}
+            hourlyWage={hourlyWage}
+            onHourlyWageChange={setHourlyWage}
+            absencePolicy={absencePolicy}
+            onAbsencePolicyChange={setAbsencePolicy}
           />
         );
       case 2:
-        return <ShiftInput onChange={setWorkShifts} initialShifts={workShifts} />;
+        return (
+          <ShiftInput
+            onChange={setWorkShifts}
+            initialShifts={workShifts}
+            calculationMonth={calculationMonth}
+            onCalculationMonthChange={setCalculationMonth}
+          />
+        );
       default:
         return null;
     }

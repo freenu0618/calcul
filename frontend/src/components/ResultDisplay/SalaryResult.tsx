@@ -7,6 +7,7 @@ import type { SalaryCalculationResponse } from '../../types/salary';
 import WarningAlert from './WarningAlert';
 import GrossBreakdown from './GrossBreakdown';
 import DeductionsBreakdown from './DeductionsBreakdown';
+import WorkSummary from './WorkSummary';
 import { ShareButtons } from '../common/ShareButtons';
 import { DonutChart, type DonutChartData } from '../charts';
 
@@ -104,6 +105,14 @@ export default function SalaryResult({ result }: SalaryResultProps) {
                     </p>
                 </div>
             </div>
+
+            {/* 근무 요약 */}
+            {result.work_summary && (
+                <WorkSummary
+                    summary={result.work_summary}
+                    absence={result.absence_breakdown}
+                />
+            )}
 
             {/* 지급/공제 breakdown */}
             <div className="grid md:grid-cols-2 gap-4">

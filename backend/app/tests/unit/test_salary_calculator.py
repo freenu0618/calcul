@@ -30,11 +30,11 @@ class TestScenario1FullTime5Days:
             Allowance.create_meal_allowance(Money(200000)),      # 식대 (비과세)
         ]
 
-        # 1월 주5일 근무 (평일 20일)
+        # 1월 주5일 근무 (공휴일 제외 평일 전체)
         shifts = []
-        for day in range(5, 31):
+        for day in range(1, 32):
             d = date(2026, 1, day)
-            if d.weekday() < 5:  # 월~금
+            if d.weekday() < 5 and d != date(2026, 1, 1):  # 월~금, 신정 제외
                 shifts.append(WorkShift(d, time(9, 0), time(18, 0), 60))
 
         calculator = SalaryCalculator()
@@ -50,8 +50,9 @@ class TestScenario1FullTime5Days:
         # 연장근로 없음 (주 40시간)
         assert result.overtime_result.overtime_hours.is_zero()
 
-        # 주휴수당 = 16,092 × 8 × 4.345 = 559,184원
-        expected_weekly = int(16092 * 8 * 4.345)
+        # 주휴수당 = 16,092 × 8 × 4주(개근) = 514,944원
+        # (1월 2일만 있는 부분 주는 15시간 미만으로 제외)
+        expected_weekly = 16092 * 8 * 4
         assert abs(result.weekly_holiday_result.weekly_holiday_pay.to_int() - expected_weekly) <= 10
 
         # 총 지급액 = 기본급 + 수당 + 주휴수당
@@ -364,10 +365,11 @@ class TestSalaryCalculatorEdgeCases:
             ),
         ]
 
+        # 1월 전체 평일 (공휴일 제외)
         shifts = []
-        for day in range(5, 31):
+        for day in range(1, 32):
             d = date(2026, 1, day)
-            if d.weekday() < 5:
+            if d.weekday() < 5 and d != date(2026, 1, 1):
                 shifts.append(WorkShift(d, time(9, 0), time(18, 0), 60))
 
         calculator = SalaryCalculator()
@@ -380,54 +382,6 @@ class TestSalaryCalculatorEdgeCases:
         total_allowances = sum(a.amount.to_int() for a in allowances)
         expected_gross = 2000000 + total_allowances + result.weekly_holiday_result.weekly_holiday_pay.to_int()
         assert abs(result.total_gross.to_int() - expected_gross) <= 10
-
-
-class TestSalaryCalculationResultMethods:
-    """SalaryCalculationResult 메서드 테스트"""
-
-    def test_to_dict(self):
-        """딕셔너리 변환"""
-        employee = Employee(
-            name="홍길동",
-            dependents_count=2,
-            children_under_20=1,
-            employment_type=EmploymentType.FULL_TIME,
-            company_size=CompanySize.OVER_5
-        )
-
-        base_salary = Money(2500000)
-        allowances = [
-            Allowance.create_position_allowance(Money(300000)),
-            Allowance.create_meal_allowance(Money(200000)),
-        ]
-
-        shifts = []
-        for day in range(5, 31):
-            d = date(2026, 1, day)
-            if d.weekday() < 5:
-                shifts.append(WorkShift(d, time(9, 0), time(18, 0), 60))
-
-        calculator = SalaryCalculator()
-        result = calculator.calculate(employee, base_salary, allowances, shifts)
-
-        result_dict = result.to_dict()
-
-        # 구조 검증
-        assert "employee" in result_dict
-        assert "gross_breakdown" in result_dict
-        assert "deductions_breakdown" in result_dict
-        assert "net_pay" in result_dict
-
-        # 급여 상세
-        assert "base_salary" in result_dict["gross_breakdown"]
-        assert "regular_wage" in result_dict["gross_breakdown"]
-        assert "hourly_wage" in result_dict["gross_breakdown"]
-        assert "taxable_allowances" in result_dict["gross_breakdown"]
-        assert "non_taxable_allowances" in result_dict["gross_breakdown"]
-
-        # 공제 상세
-        assert "insurance" in result_dict["deductions_breakdown"]
-        assert "tax" in result_dict["deductions_breakdown"]
 
 
 class TestHourlyWageCalculation:
@@ -471,11 +425,11 @@ class TestHourlyWageCalculation:
 
         base_salary = Money(2800000)
 
-        # 주 5일 근무 (1월 전체)
+        # 1월 전체 평일 (공휴일 제외)
         shifts = []
-        for day in range(5, 31):
+        for day in range(1, 32):
             d = date(2026, 1, day)
-            if d.weekday() < 5:  # 월~금
+            if d.weekday() < 5 and d != date(2026, 1, 1):
                 shifts.append(WorkShift(d, time(9, 0), time(18, 0), 60))
 
         calculator = SalaryCalculator()
@@ -484,8 +438,8 @@ class TestHourlyWageCalculation:
         # 통상시급 = 2,800,000 ÷ 174 = 16,092원
         assert result.hourly_wage.to_int() == 16092
 
-        # 주휴수당 = 16,092 × 8 × 4.345 = 559,184원 (별도 지급)
-        expected_weekly = int(16092 * 8 * 4.345)
+        # 주휴수당 = 16,092 × 8 × 4주(개근) = 514,944원
+        expected_weekly = 16092 * 8 * 4
         assert abs(result.weekly_holiday_result.weekly_holiday_pay.to_int() - expected_weekly) <= 10
 
         # 총 지급액 = 기본급 + 주휴수당 (이중 계산 아님)

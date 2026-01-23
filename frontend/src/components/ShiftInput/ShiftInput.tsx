@@ -19,11 +19,22 @@ const SHIFT_PRESETS = {
 interface ShiftInputProps {
   onChange: (shifts: WorkShiftRequest[]) => void;
   initialShifts?: WorkShiftRequest[];
+  calculationMonth?: string;
+  onCalculationMonthChange?: (month: string) => void;
 }
 
-const ShiftInput: React.FC<ShiftInputProps> = ({ onChange, initialShifts = [] }) => {
+const ShiftInput: React.FC<ShiftInputProps> = ({
+  onChange, initialShifts = [], calculationMonth = '', onCalculationMonthChange,
+}) => {
   const [shifts, setShifts] = useState<WorkShiftRequest[]>(initialShifts);
-  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('calendar');
+
+  // 기본 월: 현재 월
+  const currentMonth = calculationMonth || new Date().toISOString().slice(0, 7);
+
+  const handleMonthChange = useCallback((month: string) => {
+    onCalculationMonthChange?.(month);
+  }, [onCalculationMonthChange]);
 
   useEffect(() => {
     onChange(shifts);
@@ -42,41 +53,42 @@ const ShiftInput: React.FC<ShiftInputProps> = ({ onChange, initialShifts = [] })
     setShifts(prev => [...prev, newShift]);
   }, []);
 
-  // 프리셋으로 시프트 생성 (메모이제이션)
-  const handleApplyPreset = useCallback((presetKey: keyof typeof SHIFT_PRESETS) => {
+  // 월간 템플릿 채우기: 선택한 월의 평일에 프리셋 시프트 생성
+  const handleFillMonth = useCallback((presetKey: keyof typeof SHIFT_PRESETS) => {
     const preset = SHIFT_PRESETS[presetKey];
-    const today = new Date();
+    const [year, month] = currentMonth.split('-').map(Number);
+    const daysInMonth = new Date(year, month, 0).getDate();
     const newShifts: WorkShiftRequest[] = [];
 
-    // 이번 주 월요일 찾기
-    const dayOfWeek = today.getDay();
-    // 일요일(0)이면 -6, 그 외는 1-dayOfWeek
-    const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-    const monday = new Date(today);
-    monday.setDate(today.getDate() + daysToMonday);
-
-    // 로컬 날짜를 YYYY-MM-DD 포맷으로 변환 (시간대 문제 방지)
     const formatLocalDate = (d: Date): string => {
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
       const day = String(d.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
+      return `${y}-${m}-${day}`;
     };
 
-    for (let i = 0; i < preset.days; i++) {
-      const date = new Date(monday);
-      date.setDate(monday.getDate() + i);
-      newShifts.push({
-        date: formatLocalDate(date),
-        start_time: preset.start,
-        end_time: preset.end,
-        break_minutes: preset.break,
-        is_holiday_work: false,
-      });
+    // 주당 근무일수에 맞춰 평일만 채우기 (월~금 or 월~토)
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month - 1, day);
+      const dow = date.getDay(); // 0=일, 6=토
+      // preset.days: 4=월~목, 5=월~금, 6=월~토
+      const isWorkday = dow >= 1 && dow <= Math.min(preset.days, 6);
+      if (isWorkday) {
+        newShifts.push({
+          date: formatLocalDate(date),
+          start_time: preset.start,
+          end_time: preset.end,
+          break_minutes: preset.break,
+          is_holiday_work: false,
+        });
+      }
     }
 
     setShifts(newShifts);
-  }, []);
+    if (!calculationMonth) {
+      onCalculationMonthChange?.(currentMonth);
+    }
+  }, [currentMonth, calculationMonth, onCalculationMonthChange]);
 
   const handleUpdateShift = useCallback((index: number, updatedShift: WorkShiftRequest) => {
     setShifts(prev => {
@@ -96,6 +108,17 @@ const ShiftInput: React.FC<ShiftInputProps> = ({ onChange, initialShifts = [] })
 
   return (
     <div className="space-y-4">
+      {/* 월 선택 */}
+      <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
+        <label className="text-sm font-medium text-gray-700">계산 대상 월:</label>
+        <input
+          type="month"
+          value={currentMonth}
+          onChange={(e) => handleMonthChange(e.target.value)}
+          className="px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
       {/* 헤더 */}
       <div className="flex flex-wrap justify-between items-center gap-2">
         <h2 className="text-xl font-bold text-gray-800">근무 시프트 입력</h2>
@@ -138,27 +161,25 @@ const ShiftInput: React.FC<ShiftInputProps> = ({ onChange, initialShifts = [] })
         </div>
       </div>
 
-      {/* 프리셋 버튼 (리스트 모드에서만) */}
-      {viewMode === 'list' && (
-        <div className="bg-gray-50 p-3 rounded-lg">
-          <p className="text-sm text-gray-600 mb-2">빠른 입력 (프리셋):</p>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(SHIFT_PRESETS).map(([key, preset]) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => handleApplyPreset(key as keyof typeof SHIFT_PRESETS)}
-                className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:border-gray-400 transition-colors"
-              >
-                {preset.name}
-              </button>
-            ))}
-          </div>
-          <p className="text-xs text-gray-500 mt-2">
-            * 프리셋 클릭 시 이번 주 월요일부터 근무일이 자동 생성됩니다.
-          </p>
+      {/* 월간 템플릿 채우기 */}
+      <div className="bg-gray-50 p-3 rounded-lg">
+        <p className="text-sm text-gray-600 mb-2">월간 템플릿 채우기:</p>
+        <div className="flex flex-wrap gap-2">
+          {Object.entries(SHIFT_PRESETS).map(([key, preset]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => handleFillMonth(key as keyof typeof SHIFT_PRESETS)}
+              className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:border-gray-400 transition-colors"
+            >
+              {preset.name}
+            </button>
+          ))}
         </div>
-      )}
+        <p className="text-xs text-gray-500 mt-2">
+          * 선택한 월의 모든 근무일에 해당 프리셋이 자동 적용됩니다.
+        </p>
+      </div>
 
       {/* 캘린더 뷰 */}
       {viewMode === 'calendar' && (
@@ -167,6 +188,7 @@ const ShiftInput: React.FC<ShiftInputProps> = ({ onChange, initialShifts = [] })
           onShiftAdd={(shift) => setShifts((prev) => [...prev, shift])}
           onShiftRemove={handleDeleteShift}
           onShiftUpdate={handleUpdateShift}
+          initialMonth={currentMonth}
         />
       )}
 

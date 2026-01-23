@@ -1,5 +1,5 @@
 """급여 계산 스키마"""
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Literal, Optional
 from pydantic import BaseModel, Field, ConfigDict
 
 from .common import (
@@ -14,12 +14,24 @@ from .common import (
 class SalaryCalculationRequest(BaseModel):
     """급여 계산 요청"""
     employee: EmployeeRequest = Field(..., description="근로자 정보")
-    base_salary: int = Field(..., ge=0, description="기본급 (원)")
+    base_salary: int = Field(0, ge=0, description="기본 월급 (월급제)")
     allowances: List[AllowanceRequest] = Field(
         default_factory=list, description="수당 목록"
     )
     work_shifts: List[WorkShiftRequest] = Field(
         default_factory=list, description="근무 시프트 목록"
+    )
+    wage_type: Literal["MONTHLY", "HOURLY"] = Field(
+        "MONTHLY", description="급여 형태 (MONTHLY=월급제, HOURLY=시급제)"
+    )
+    hourly_wage: int = Field(
+        0, ge=0, description="시급 (시급제일 때 사용)"
+    )
+    calculation_month: str = Field(
+        "", description="계산 대상 월 (YYYY-MM, 빈 값이면 시프트 날짜에서 추론)"
+    )
+    absence_policy: Literal["STRICT", "MODERATE", "LENIENT"] = Field(
+        "STRICT", description="결근 공제 정책 (월급제 전용)"
     )
 
     model_config = ConfigDict(json_schema_extra={
@@ -111,6 +123,34 @@ class DeductionsBreakdown(BaseModel):
     total: MoneyResponse = Field(..., description="총 공제액")
 
 
+class AbsenceBreakdown(BaseModel):
+    """결근 공제 상세 (월급제 전용)"""
+    scheduled_days: int = Field(..., description="소정근로일수")
+    actual_work_days: int = Field(..., description="실제 근무일수")
+    absent_days: int = Field(..., description="결근일수")
+    daily_wage: MoneyResponse = Field(..., description="일급")
+    wage_deduction: MoneyResponse = Field(..., description="일급 공제액")
+    holiday_pay_loss: MoneyResponse = Field(..., description="주휴수당 미지급액")
+    total_deduction: MoneyResponse = Field(..., description="총 결근 공제액")
+    absence_policy: str = Field(..., description="적용된 공제 정책")
+
+
+class WorkSummaryResponse(BaseModel):
+    """근무 요약"""
+    calculation_month: str = Field(..., description="계산 대상 월")
+    wage_type: str = Field(..., description="급여 형태")
+    scheduled_days: int = Field(..., description="소정근로일수")
+    actual_work_days: int = Field(..., description="실제 근무일수")
+    absent_days: int = Field(..., description="결근일수")
+    total_work_hours: WorkingHoursResponse = Field(..., description="총 근무시간")
+    regular_hours: WorkingHoursResponse = Field(..., description="소정근로시간")
+    overtime_hours: WorkingHoursResponse = Field(..., description="연장근로시간")
+    night_hours: WorkingHoursResponse = Field(..., description="야간근로시간")
+    holiday_hours: WorkingHoursResponse = Field(..., description="휴일근로시간")
+    weekly_holiday_weeks: int = Field(..., description="주휴수당 발생 주 수")
+    total_weeks: int = Field(..., description="해당 월 총 주 수")
+
+
 class WarningResponse(BaseModel):
     """경고 메시지"""
     level: str = Field(..., description="경고 수준 (critical, warning, info)")
@@ -124,6 +164,8 @@ class SalaryCalculationResponse(BaseModel):
     gross_breakdown: GrossBreakdown = Field(..., description="지급 내역")
     deductions_breakdown: DeductionsBreakdown = Field(..., description="공제 내역")
     net_pay: MoneyResponse = Field(..., description="실수령액")
+    work_summary: Optional[WorkSummaryResponse] = Field(None, description="근무 요약")
+    absence_breakdown: Optional[AbsenceBreakdown] = Field(None, description="결근 공제 상세")
     warnings: List[WarningResponse] = Field(
         default_factory=list, description="경고 메시지 목록"
     )

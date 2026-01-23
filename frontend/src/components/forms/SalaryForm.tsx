@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Allowance } from '../../types/models';
+import type { WageType, AbsencePolicy } from '../../types/salary';
 import Button from '../common/Button';
 
 interface SalaryFormProps {
@@ -12,7 +13,13 @@ interface SalaryFormProps {
   allowances: Allowance[];
   onBaseSalaryChange: (value: number) => void;
   onAllowancesChange: (allowances: Allowance[]) => void;
-  scheduledWorkDays?: number; // 주 소정근로일 (1~7)
+  scheduledWorkDays?: number;
+  wageType: WageType;
+  onWageTypeChange: (type: WageType) => void;
+  hourlyWage: number;
+  onHourlyWageChange: (wage: number) => void;
+  absencePolicy: AbsencePolicy;
+  onAbsencePolicyChange: (policy: AbsencePolicy) => void;
 }
 
 // 상수
@@ -37,6 +44,12 @@ export default function SalaryForm({
   onBaseSalaryChange,
   onAllowancesChange,
   scheduledWorkDays = 5,
+  wageType,
+  onWageTypeChange,
+  hourlyWage: hourlyWageProp,
+  onHourlyWageChange,
+  absencePolicy,
+  onAbsencePolicyChange,
 }: SalaryFormProps) {
   // 입력 모드: 'direct' | 'hourly'
   const [inputMode, setInputMode] = useState<'direct' | 'hourly'>('direct');
@@ -177,33 +190,76 @@ export default function SalaryForm({
     <div className="space-y-6">
       <h3 className="text-lg font-semibold text-gray-900">기본급 및 수당</h3>
 
-      {/* 입력 방식 선택 */}
+      {/* 급여 형태 선택 */}
       <div className="bg-gray-50 p-4 rounded-lg">
-        <p className="text-sm font-medium text-gray-700 mb-2">급여 입력 방식</p>
+        <p className="text-sm font-medium text-gray-700 mb-2">급여 형태</p>
         <div className="flex gap-4">
-          <label className="flex items-center">
+          <label className="flex items-center cursor-pointer">
             <input
               type="radio"
-              checked={inputMode === 'direct'}
-              onChange={() => setInputMode('direct')}
+              checked={wageType === 'MONTHLY'}
+              onChange={() => onWageTypeChange('MONTHLY')}
               className="mr-2"
             />
-            기본급 직접 입력
+            월급제
           </label>
-          <label className="flex items-center">
+          <label className="flex items-center cursor-pointer">
             <input
               type="radio"
-              checked={inputMode === 'hourly'}
-              onChange={() => setInputMode('hourly')}
+              checked={wageType === 'HOURLY'}
+              onChange={() => onWageTypeChange('HOURLY')}
               className="mr-2"
             />
-            시급 기반 자동 계산
+            시급제
           </label>
         </div>
       </div>
 
-      {/* 직접 입력 모드 */}
-      {inputMode === 'direct' && (
+      {/* 시급제: 시급 입력 */}
+      {wageType === 'HOURLY' && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">시급</label>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={formatWithComma(hourlyWageProp)}
+            onChange={(e) => onHourlyWageChange(parseNumber(e.target.value))}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="10,320"
+          />
+          <p className="mt-1 text-xs text-gray-500">2026년 최저시급: {formatWithComma(MIN_WAGE_2026)}원</p>
+        </div>
+      )}
+
+      {/* 월급제: 입력 방식 선택 */}
+      {wageType === 'MONTHLY' && (
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <p className="text-sm font-medium text-gray-700 mb-2">기본급 입력 방식</p>
+          <div className="flex gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                checked={inputMode === 'direct'}
+                onChange={() => setInputMode('direct')}
+                className="mr-2"
+              />
+              기본급 직접 입력
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                checked={inputMode === 'hourly'}
+                onChange={() => setInputMode('hourly')}
+                className="mr-2"
+              />
+              시급 기반 자동 계산
+            </label>
+          </div>
+        </div>
+      )}
+
+      {/* 직접 입력 모드 (월급제) */}
+      {wageType === 'MONTHLY' && inputMode === 'direct' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">기본급 (월)</label>
           <input
@@ -218,8 +274,8 @@ export default function SalaryForm({
         </div>
       )}
 
-      {/* 시급 기반 모드 */}
-      {inputMode === 'hourly' && (
+      {/* 시급 기반 모드 (월급제) */}
+      {wageType === 'MONTHLY' && inputMode === 'hourly' && (
         <div className="space-y-4">
           {/* 급여 구성 방식 선택 */}
           <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
@@ -357,6 +413,51 @@ export default function SalaryForm({
                 ✅ 직무수당 {formatMoney(autoCalc.otherAllowance)}을 자유롭게 배치할 수 있습니다.
               </p>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* 결근 공제 정책 (월급제 전용) */}
+      {wageType === 'MONTHLY' && (
+        <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+          <p className="text-sm font-semibold text-gray-800 mb-3">결근 공제 정책</p>
+          <div className="space-y-2">
+            <label className="flex items-start cursor-pointer">
+              <input
+                type="radio"
+                checked={absencePolicy === 'STRICT'}
+                onChange={() => onAbsencePolicyChange('STRICT')}
+                className="mt-1 mr-3"
+              />
+              <div>
+                <span className="font-medium text-sm">엄격 (STRICT)</span>
+                <p className="text-xs text-gray-500">결근일 일급 공제 + 해당 주 주휴수당 미지급</p>
+              </div>
+            </label>
+            <label className="flex items-start cursor-pointer">
+              <input
+                type="radio"
+                checked={absencePolicy === 'MODERATE'}
+                onChange={() => onAbsencePolicyChange('MODERATE')}
+                className="mt-1 mr-3"
+              />
+              <div>
+                <span className="font-medium text-sm">보통 (MODERATE)</span>
+                <p className="text-xs text-gray-500">해당 주 주휴수당만 미지급 (일급 미공제)</p>
+              </div>
+            </label>
+            <label className="flex items-start cursor-pointer">
+              <input
+                type="radio"
+                checked={absencePolicy === 'LENIENT'}
+                onChange={() => onAbsencePolicyChange('LENIENT')}
+                className="mt-1 mr-3"
+              />
+              <div>
+                <span className="font-medium text-sm">관대 (LENIENT)</span>
+                <p className="text-xs text-gray-500">공제 없음 (사정 참작)</p>
+              </div>
+            </label>
           </div>
         </div>
       )}

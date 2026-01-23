@@ -117,8 +117,10 @@ class WeeklyHolidayPayCalculator:
                 is_proportional=is_proportional
             )
 
-        # 3. 개근 조건 체크 (주별 실제 근무일 vs 소정근로일)
-        if not self._check_full_attendance(work_shifts, scheduled_work_days):
+        # 3. 개근한 주 수 계산 (주별 개근 → 해당 주 주휴수당 지급)
+        qualifying_weeks, _ = self._count_qualifying_weeks(work_shifts, scheduled_work_days)
+
+        if qualifying_weeks == 0:
             return WeeklyHolidayPayResult(
                 weekly_holiday_pay=Money.zero(),
                 weekly_hours=avg_weekly_hours,
@@ -127,19 +129,15 @@ class WeeklyHolidayPayCalculator:
             )
 
         # 4. 주휴수당 계산
-
         if is_proportional:
-            # 비례 지급: (주 소정근로시간 ÷ 40) × 8 × 통상시급
             ratio = weekly_hours_decimal / self.WEEKLY_REGULAR_HOURS
             holiday_hours = ratio * self.HOLIDAY_HOURS
         else:
-            # 전액 지급: 8시간
             holiday_hours = self.HOLIDAY_HOURS
 
-        # 월 주휴수당 = 주휴수당 × 주 수 (한 달 평균 4.345주)
+        # 월 주휴수당 = 1주 주휴수당 × 개근 주 수
         weekly_pay = hourly_wage * holiday_hours
-        monthly_weeks = Decimal('4.345')  # 1년 365일 ÷ 7일 ÷ 12개월
-        monthly_holiday_pay = (weekly_pay * monthly_weeks).round_to_won()
+        monthly_holiday_pay = (weekly_pay * Decimal(qualifying_weeks)).round_to_won()
 
         return WeeklyHolidayPayResult(
             weekly_holiday_pay=monthly_holiday_pay,
@@ -148,56 +146,82 @@ class WeeklyHolidayPayCalculator:
             is_proportional=is_proportional
         )
 
-    def _check_full_attendance(
+    def _count_qualifying_weeks(
         self,
         work_shifts: List[WorkShift],
         scheduled_work_days: int
-    ) -> bool:
-        """개근 여부 체크
+    ) -> tuple[int, int]:
+        """개근 주 수 계산
 
-        주별로 실제 근무일 수가 소정근로일 이상인지 확인합니다.
-        scheduled_work_days가 실제 근무 패턴과 맞지 않으면 자동으로 추정합니다.
+        주별로 실제 근무일 수가 소정근로일 이상인 주를 카운트합니다.
+        월 경계에 걸친 부분 주는 해당 주의 가능한 근무일 수로 판단합니다.
 
         Args:
             work_shifts: 근무 시프트 리스트
             scheduled_work_days: 주 소정근로일
 
         Returns:
-            개근이면 True (최소 1주 이상 개근해야 함)
+            (개근 주 수, 전체 주 수) 튜플
         """
         if not work_shifts:
-            return False
+            return (0, 0)
 
-        # 평일 근무만 집계 (휴일근로 제외)
         regular_shifts = [s for s in work_shifts if not s.is_holiday_work]
-
         if not regular_shifts:
-            return False
+            return (0, 0)
 
-        # 주별로 그룹화
-        from collections import defaultdict, Counter
-        weeks = defaultdict(set)
+        from collections import defaultdict
+        weeks: dict[tuple, set] = defaultdict(set)
         for shift in regular_shifts:
-            # ISO week number 사용
-            week_key = shift.date.isocalendar()[:2]  # (year, week)
+            week_key = shift.date.isocalendar()[:2]
             weeks[week_key].add(shift.date)
 
-        # 주별 근무일 수 집계
-        work_days_per_week = [len(dates) for dates in weeks.values()]
+        if not weeks:
+            return (0, 0)
 
-        if not work_days_per_week:
-            return False
+        # 월 범위 파악 (해당 월의 전체 범위로 확장)
+        import calendar
+        from collections import Counter as Ctr
+        month_counter = Ctr((s.date.year, s.date.month) for s in regular_shifts)
+        main_year, main_month = month_counter.most_common(1)[0][0]
+        from datetime import date, timedelta
+        min_date = date(main_year, main_month, 1)
+        max_date = date(main_year, main_month, calendar.monthrange(main_year, main_month)[1])
 
-        # 개근 여부: 모든 주에서 소정근로일 이상 근무해야 함
-        # (자동 조정 삭제 - 계약상 소정근로일 기준으로 엄격하게 판단)
-        full_attendance_weeks = sum(
-            1 for dates in weeks.values()
-            if len(dates) >= scheduled_work_days
-        )
-        total_weeks = len(weeks)
+        # 주별 근무 시간 집계
+        from collections import defaultdict as dd2
+        week_minutes: dict[tuple, int] = dd2(int)
+        for shift in regular_shifts:
+            wk = shift.date.isocalendar()[:2]
+            week_minutes[wk] += shift.calculate_working_hours().to_minutes()
 
-        # 모든 주 개근해야 주휴수당 지급 (1주라도 결근하면 해당 월 주휴수당 없음)
-        return full_attendance_weeks == total_weeks
+        qualifying = 0
+        total = 0
+        for week_key, dates in weeks.items():
+            # 해당 주의 실제 근무시간이 15시간(900분) 미만이면 미적용
+            if week_minutes.get(week_key, 0) < 900:
+                continue
+
+            # 해당 주에서 월 범위 내 가능한 평일 수 계산
+            iso_year, iso_week = week_key
+            jan4 = date(iso_year, 1, 4)
+            start_of_week = jan4 + timedelta(weeks=iso_week - 1, days=-jan4.weekday())
+            possible_days = 0
+            for i in range(7):
+                d = start_of_week + timedelta(days=i)
+                if d.weekday() < scheduled_work_days and min_date <= d <= max_date:
+                    possible_days += 1
+
+            if possible_days < scheduled_work_days:
+                required = possible_days
+            else:
+                required = scheduled_work_days
+
+            total += 1
+            if len(dates) >= required:
+                qualifying += 1
+
+        return (qualifying, total)
 
     def _calculate_average_weekly_hours(
         self,

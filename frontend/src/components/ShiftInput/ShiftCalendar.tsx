@@ -19,6 +19,7 @@ interface ShiftCalendarProps {
   onShiftAdd: (shift: WorkShiftRequest) => void;
   onShiftRemove: (index: number) => void;
   onShiftUpdate?: (index: number, shift: WorkShiftRequest) => void;
+  initialMonth?: string;
 }
 
 interface CalendarEvent {
@@ -38,6 +39,7 @@ export default function ShiftCalendar({
   onShiftAdd,
   onShiftRemove,
   onShiftUpdate,
+  initialMonth,
 }: ShiftCalendarProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
@@ -135,6 +137,7 @@ export default function ShiftCalendar({
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
+        initialDate={initialMonth ? `${initialMonth}-01` : undefined}
         locale="ko"
         headerToolbar={{
           left: 'prev,next today',

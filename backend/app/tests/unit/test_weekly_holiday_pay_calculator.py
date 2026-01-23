@@ -24,9 +24,9 @@ class TestWeeklyHolidayPayFullTime:
         result = calculator.calculate(shifts, Money(10000))
 
         # 주 40시간 이상: 8시간 × 통상시급
-        # 월 주휴수당 = 10,000 × 8 × 4.345주 = 347,600
+        # 월 주휴수당 = 10,000 × 8 × 4주(개근) = 320,000
         assert not result.is_proportional
-        assert result.weekly_holiday_pay.to_int() == 347600
+        assert result.weekly_holiday_pay.to_int() == 320000
 
     def test_full_time_6_days(self):
         """주 6일 근무 (주 48시간 - 전액 지급)"""
@@ -39,9 +39,9 @@ class TestWeeklyHolidayPayFullTime:
         calculator = WeeklyHolidayPayCalculator()
         result = calculator.calculate(shifts, Money(10000))
 
-        # 주 48시간 (40시간 초과): 8시간 × 통상시급
+        # 주 48시간 (40시간 초과): 8시간 × 통상시급 × 4주(개근)
         assert not result.is_proportional
-        assert result.weekly_holiday_pay.to_int() == 347600
+        assert result.weekly_holiday_pay.to_int() == 320000
 
 
 class TestWeeklyHolidayPayPartTime:
@@ -149,7 +149,7 @@ class TestWeeklyHolidayPayAttendance:
         assert result.weekly_holiday_pay.is_zero()
 
     def test_partial_week_not_full(self):
-        """일부 주에서 결근 → 주휴수당 없음"""
+        """일부 주에서 결근 → 개근한 주만 주휴수당 지급"""
         shifts = []
         # 1주차: 5일 근무 (개근)
         for day in [5, 6, 7, 8, 9]:
@@ -167,8 +167,8 @@ class TestWeeklyHolidayPayAttendance:
         calculator = WeeklyHolidayPayCalculator()
         result = calculator.calculate(shifts, Money(10000), scheduled_work_days=5)
 
-        # 2주차 결근으로 전체 월 주휴수당 0원
-        assert result.weekly_holiday_pay.is_zero()
+        # 주별 개근 판단: 1,3,4주차 개근 → 3주 × 80,000 = 240,000
+        assert result.weekly_holiday_pay.to_int() == 240000
 
 
 class TestWeeklyHolidayPayEdgeCases:

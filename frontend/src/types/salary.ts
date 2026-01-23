@@ -5,6 +5,8 @@
 
 export type EmploymentType = 'FULL_TIME' | 'PART_TIME';
 export type CompanySize = 'UNDER_5' | 'OVER_5';
+export type WageType = 'MONTHLY' | 'HOURLY';
+export type AbsencePolicy = 'STRICT' | 'MODERATE' | 'LENIENT';
 
 export interface MoneyResponse {
   amount: number;
@@ -97,6 +99,36 @@ export interface SalaryCalculationRequest {
   base_salary: number;
   allowances: AllowanceRequest[];
   work_shifts: WorkShiftRequest[];
+  wage_type: WageType;
+  hourly_wage: number;
+  calculation_month: string;
+  absence_policy: AbsencePolicy;
+}
+
+export interface WorkSummaryResponse {
+  calculation_month: string;
+  wage_type: string;
+  scheduled_days: number;
+  actual_work_days: number;
+  absent_days: number;
+  total_work_hours: WorkingHoursResponse;
+  regular_hours: WorkingHoursResponse;
+  overtime_hours: WorkingHoursResponse;
+  night_hours: WorkingHoursResponse;
+  holiday_hours: WorkingHoursResponse;
+  weekly_holiday_weeks: number;
+  total_weeks: number;
+}
+
+export interface AbsenceBreakdown {
+  scheduled_days: number;
+  actual_work_days: number;
+  absent_days: number;
+  daily_wage: MoneyResponse;
+  wage_deduction: MoneyResponse;
+  holiday_pay_loss: MoneyResponse;
+  total_deduction: MoneyResponse;
+  absence_policy: string;
 }
 
 export interface WarningItem {
@@ -110,11 +142,14 @@ export interface SalaryCalculationResponse {
   gross_breakdown: GrossBreakdown;
   deductions_breakdown: DeductionsBreakdown;
   net_pay: MoneyResponse;
+  work_summary?: WorkSummaryResponse;
+  absence_breakdown?: AbsenceBreakdown;
   warnings: WarningItem[];
   calculation_metadata: {
     calculation_date: string;
     tax_year: number;
     insurance_year: number;
+    wage_type?: string;
   };
 }
 

@@ -16,21 +16,16 @@ from app.domain.services import SalaryCalculator, WarningGenerator
 router = APIRouter()
 
 
-def _convert_to_money_response(money: Money) -> MoneyResponse:
-    """Money 객체를 MoneyResponse로 변환"""
-    return MoneyResponse(
-        amount=money.to_int(),
-        formatted=money.format()
-    )
+def _money(money: Money) -> MoneyResponse:
+    """Money → MoneyResponse"""
+    return MoneyResponse(amount=money.to_int(), formatted=money.format())
 
 
-def _convert_to_hours_response(hours) -> WorkingHoursResponse:
-    """WorkingHours 객체를 WorkingHoursResponse로 변환"""
+def _hours(hours) -> WorkingHoursResponse:
+    """WorkingHours → WorkingHoursResponse"""
     return WorkingHoursResponse(
-        hours=hours.hours,
-        minutes=hours.minutes,
-        total_minutes=hours.to_minutes(),
-        formatted=hours.format()
+        hours=hours.hours, minutes=hours.minutes,
+        total_minutes=hours.to_minutes(), formatted=hours.format()
     )
 
 
@@ -39,25 +34,14 @@ def _convert_to_hours_response(hours) -> WorkingHoursResponse:
     response_model=SalaryCalculationResponse,
     status_code=status.HTTP_200_OK,
     summary="급여 계산",
-    description="기본급, 수당, 근무 시프트를 기반으로 실수령액을 계산합니다.",
+    description="월급제/시급제 지원. 시프트 기반 급여 계산 및 결근 공제.",
     responses={
-        200: {"description": "급여 계산 성공"},
         400: {"model": ErrorResponse, "description": "잘못된 요청"},
         500: {"model": ErrorResponse, "description": "서버 오류"},
     },
 )
 async def calculate_salary(request: SalaryCalculationRequest):
-    """급여 계산
-
-    ## 계산 항목
-    - **4대 보험**: 국민연금, 건강보험, 장기요양보험, 고용보험
-    - **가산수당**: 연장/야간/휴일 근로 수당
-    - **주휴수당**: 주 근로시간 기준 비례 지급
-    - **소득세**: 2026년 간이세액표 적용
-
-    ## 법적 고지
-    ⚠️ 본 계산 결과는 참고용이며, 실제 급여 지급 시 전문가와 상담하시기 바랍니다.
-    """
+    """급여 계산 API"""
     try:
         # 1. 도메인 객체 생성
         employee = Employee(
@@ -70,11 +54,9 @@ async def calculate_salary(request: SalaryCalculationRequest):
         )
 
         base_salary = Money(request.base_salary)
-
         allowances = [
             Allowance(
-                name=a.name,
-                amount=Money(a.amount),
+                name=a.name, amount=Money(a.amount),
                 is_taxable=a.is_taxable,
                 is_includable_in_minimum_wage=a.is_includable_in_minimum_wage,
                 is_fixed=a.is_fixed,
@@ -82,21 +64,27 @@ async def calculate_salary(request: SalaryCalculationRequest):
             )
             for a in request.allowances
         ]
-
         work_shifts = [
             WorkShift(
-                date=ws.date,
-                start_time=ws.start_time,
-                end_time=ws.end_time,
-                break_minutes=ws.break_minutes,
+                date=ws.date, start_time=ws.start_time,
+                end_time=ws.end_time, break_minutes=ws.break_minutes,
                 is_holiday_work=ws.is_holiday_work,
             )
             for ws in request.work_shifts
         ]
 
-        # 2. 급여 계산
+        # 2. 급여 계산 (새 파라미터 전달)
         calculator = SalaryCalculator()
-        result = calculator.calculate(employee, base_salary, allowances, work_shifts)
+        result = calculator.calculate(
+            employee=employee,
+            base_salary=base_salary,
+            allowances=allowances,
+            work_shifts=work_shifts,
+            wage_type=request.wage_type,
+            hourly_wage_input=request.hourly_wage,
+            calculation_month=request.calculation_month,
+            absence_policy=request.absence_policy,
+        )
 
         # 3. 경고 생성
         warning_gen = WarningGenerator()
@@ -108,76 +96,137 @@ async def calculate_salary(request: SalaryCalculationRequest):
             total_gross=result.total_gross,
         )
 
-        # 4. 응답 생성
+        # 4. 응답 구성
         from app.api.schemas.salary import (
             GrossBreakdown, DeductionsBreakdown, InsuranceBreakdown,
             TaxBreakdown, OvertimeBreakdown, WeeklyHolidayPayBreakdown,
-            WarningResponse,
+            WarningResponse, WorkSummaryResponse, AbsenceBreakdown,
+        )
+        from app.domain.value_objects import WorkingHours
+
+        taxable_total = sum(
+            (a.amount for a in result.allowances if a.is_taxable), Money.zero()
+        )
+        non_taxable_total = sum(
+            (a.amount for a in result.allowances if not a.is_taxable), Money.zero()
         )
 
-        # 과세/비과세 수당 계산
-        taxable_allowances_total = sum(
-            (a.amount for a in result.allowances if a.is_taxable),
-            Money.zero()
-        )
-        non_taxable_allowances_total = sum(
-            (a.amount for a in result.allowances if not a.is_taxable),
-            Money.zero()
-        )
+        # 근무 요약 생성
+        work_summary = None
+        if result.calculation_month:
+            total_minutes = sum(
+                s.calculate_working_hours().to_minutes() for s in work_shifts
+            )
+            night_minutes = sum(
+                s.calculate_night_hours().to_minutes() for s in work_shifts
+            )
+            holiday_minutes = sum(
+                s.calculate_working_hours().to_minutes()
+                for s in work_shifts if s.is_holiday_work
+            )
+            regular_minutes = total_minutes - holiday_minutes
+            overtime_minutes = result.overtime_result.overtime_hours.to_minutes()
+
+            # 주 수 계산
+            scheduled_days = 0
+            absent_days = 0
+            actual_days = len({s.date for s in work_shifts if not s.is_holiday_work})
+            if result.absence_result:
+                scheduled_days = result.absence_result.scheduled_days
+                absent_days = result.absence_result.absent_days
+            else:
+                scheduled_days = actual_days
+
+            # 주휴수당 발생 주 계산
+            total_weeks = _count_weeks_in_month(result.calculation_month)
+            holiday_weeks = total_weeks - (
+                result.absence_result.absent_weeks if result.absence_result else 0
+            )
+
+            work_summary = WorkSummaryResponse(
+                calculation_month=result.calculation_month,
+                wage_type=result.wage_type,
+                scheduled_days=scheduled_days,
+                actual_work_days=actual_days,
+                absent_days=absent_days,
+                total_work_hours=_hours(WorkingHours.from_minutes(total_minutes)),
+                regular_hours=_hours(WorkingHours.from_minutes(regular_minutes)),
+                overtime_hours=_hours(result.overtime_result.overtime_hours),
+                night_hours=_hours(result.overtime_result.night_hours),
+                holiday_hours=_hours(result.overtime_result.holiday_hours),
+                weekly_holiday_weeks=max(0, holiday_weeks),
+                total_weeks=total_weeks,
+            )
+
+        # 결근 공제 상세
+        absence_breakdown = None
+        if result.absence_result and result.absence_result.absent_days > 0:
+            ar = result.absence_result
+            absence_breakdown = AbsenceBreakdown(
+                scheduled_days=ar.scheduled_days,
+                actual_work_days=ar.actual_work_days,
+                absent_days=ar.absent_days,
+                daily_wage=_money(ar.daily_wage),
+                wage_deduction=_money(ar.wage_deduction),
+                holiday_pay_loss=_money(ar.holiday_pay_loss),
+                total_deduction=_money(ar.total_deduction),
+                absence_policy=request.absence_policy,
+            )
 
         response = SalaryCalculationResponse(
             employee_name=employee.name,
             gross_breakdown=GrossBreakdown(
-                base_salary=_convert_to_money_response(base_salary),
-                regular_wage=_convert_to_money_response(result.regular_wage),
-                hourly_wage=_convert_to_money_response(result.hourly_wage),
-                taxable_allowances=_convert_to_money_response(taxable_allowances_total),
-                non_taxable_allowances=_convert_to_money_response(non_taxable_allowances_total),
+                base_salary=_money(result.base_salary),
+                regular_wage=_money(result.regular_wage),
+                hourly_wage=_money(result.hourly_wage),
+                taxable_allowances=_money(taxable_total),
+                non_taxable_allowances=_money(non_taxable_total),
                 overtime_allowances=OvertimeBreakdown(
-                    overtime_hours=_convert_to_hours_response(result.overtime_result.overtime_hours),
-                    overtime_pay=_convert_to_money_response(result.overtime_result.overtime_pay),
-                    night_hours=_convert_to_hours_response(result.overtime_result.night_hours),
-                    night_pay=_convert_to_money_response(result.overtime_result.night_pay),
-                    holiday_hours=_convert_to_hours_response(result.overtime_result.holiday_hours),
-                    holiday_pay=_convert_to_money_response(result.overtime_result.holiday_pay),
-                    total=_convert_to_money_response(result.overtime_result.total()),
+                    overtime_hours=_hours(result.overtime_result.overtime_hours),
+                    overtime_pay=_money(result.overtime_result.overtime_pay),
+                    night_hours=_hours(result.overtime_result.night_hours),
+                    night_pay=_money(result.overtime_result.night_pay),
+                    holiday_hours=_hours(result.overtime_result.holiday_hours),
+                    holiday_pay=_money(result.overtime_result.holiday_pay),
+                    total=_money(result.overtime_result.total()),
                 ),
                 weekly_holiday_pay=WeeklyHolidayPayBreakdown(
-                    amount=_convert_to_money_response(result.weekly_holiday_result.weekly_holiday_pay),
-                    weekly_hours=_convert_to_hours_response(result.weekly_holiday_result.weekly_hours),
+                    amount=_money(result.weekly_holiday_result.weekly_holiday_pay),
+                    weekly_hours=_hours(result.weekly_holiday_result.weekly_hours),
                     is_proportional=result.weekly_holiday_result.is_proportional,
                     calculation=result.weekly_holiday_result.to_dict()["calculation"],
                 ),
-                total=_convert_to_money_response(result.total_gross),
+                total=_money(result.total_gross),
             ),
             deductions_breakdown=DeductionsBreakdown(
                 insurance=InsuranceBreakdown(
-                    national_pension=_convert_to_money_response(result.insurance_result.national_pension),
-                    health_insurance=_convert_to_money_response(result.insurance_result.health_insurance),
-                    long_term_care=_convert_to_money_response(result.insurance_result.long_term_care),
-                    employment_insurance=_convert_to_money_response(result.insurance_result.employment_insurance),
-                    total=_convert_to_money_response(result.insurance_result.total()),
+                    national_pension=_money(result.insurance_result.national_pension),
+                    health_insurance=_money(result.insurance_result.health_insurance),
+                    long_term_care=_money(result.insurance_result.long_term_care),
+                    employment_insurance=_money(result.insurance_result.employment_insurance),
+                    total=_money(result.insurance_result.total()),
                 ),
                 tax=TaxBreakdown(
-                    income_tax=_convert_to_money_response(result.tax_result.income_tax),
-                    local_income_tax=_convert_to_money_response(result.tax_result.local_income_tax),
-                    total=_convert_to_money_response(result.tax_result.total()),
+                    income_tax=_money(result.tax_result.income_tax),
+                    local_income_tax=_money(result.tax_result.local_income_tax),
+                    total=_money(result.tax_result.total()),
                 ),
-                total=_convert_to_money_response(result.total_deductions),
+                total=_money(result.total_deductions),
             ),
-            net_pay=_convert_to_money_response(result.net_pay),
+            net_pay=_money(result.net_pay),
+            work_summary=work_summary,
+            absence_breakdown=absence_breakdown,
             warnings=[
-                WarningResponse(
-                    level=w.level, message=w.message, detail=w.detail
-                ) for w in warnings
+                WarningResponse(level=w.level, message=w.message, detail=w.detail)
+                for w in warnings
             ],
             calculation_metadata={
                 "calculation_date": datetime.now().isoformat(),
                 "tax_year": 2026,
                 "insurance_year": 2026,
+                "wage_type": result.wage_type,
             },
         )
-
         return response
 
     except ValueError as e:
@@ -190,3 +239,16 @@ async def calculate_salary(request: SalaryCalculationRequest):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"error": "Internal server error", "detail": str(e)},
         )
+
+
+def _count_weeks_in_month(calculation_month: str) -> int:
+    """해당 월의 주 수 계산 (ISO 주 기준)"""
+    import calendar
+    from datetime import date
+    year, month = map(int, calculation_month.split('-'))
+    _, days = calendar.monthrange(year, month)
+    weeks = set()
+    for day in range(1, days + 1):
+        d = date(year, month, day)
+        weeks.add(d.isocalendar()[:2])
+    return len(weeks)
