@@ -30,6 +30,7 @@ import About from './pages/About';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Contact from './pages/Contact';
+import ReverseCalculator from './pages/ReverseCalculator';
 
 // GA 타입은 index.html의 전역 스크립트에서 정의됨
 
@@ -67,6 +68,7 @@ function App() {
                 {/* 메인 페이지 */}
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/calculator" element={<CalculatorPage />} />
+                <Route path="/reverse-calculator" element={<ReverseCalculator />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
 
                 {/* 가이드 페이지 */}

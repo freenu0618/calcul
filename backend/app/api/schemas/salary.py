@@ -158,6 +158,42 @@ class WarningResponse(BaseModel):
     detail: str = Field(default="", description="상세 설명")
 
 
+class ReverseSalaryRequest(BaseModel):
+    """역산 계산 요청 (실수령액 → 필요 기본급)"""
+    target_net_pay: int = Field(..., gt=0, description="목표 실수령액")
+    employee: EmployeeRequest = Field(..., description="근로자 정보")
+    allowances: List[AllowanceRequest] = Field(
+        default_factory=list, description="수당 목록"
+    )
+    work_shifts: List[WorkShiftRequest] = Field(
+        default_factory=list, description="근무 시프트 목록"
+    )
+    wage_type: Literal["MONTHLY", "HOURLY"] = Field(
+        "MONTHLY", description="급여 형태"
+    )
+    calculation_month: str = Field(
+        "", description="계산 대상 월 (YYYY-MM)"
+    )
+    absence_policy: Literal["STRICT", "MODERATE", "LENIENT"] = Field(
+        "STRICT", description="결근 공제 정책"
+    )
+
+
+class ReverseSalaryResponse(BaseModel):
+    """역산 계산 응답"""
+    target_net_pay: MoneyResponse = Field(..., description="목표 실수령액")
+    required_base_salary: MoneyResponse = Field(..., description="필요 기본급")
+    actual_net_pay: MoneyResponse = Field(..., description="실제 계산된 실수령액")
+    difference: MoneyResponse = Field(..., description="오차 (±1,000원 이내)")
+    iterations: int = Field(..., description="탐색 반복 횟수")
+    calculation_result: 'SalaryCalculationResponse' = Field(
+        ..., description="상세 급여 계산 결과"
+    )
+    warnings: List[WarningResponse] = Field(
+        default_factory=list, description="경고 메시지"
+    )
+
+
 class SalaryCalculationResponse(BaseModel):
     """급여 계산 응답"""
     employee_name: str = Field(..., description="근로자 이름")

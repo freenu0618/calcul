@@ -12,6 +12,8 @@ from .common import (
 from .salary import (
     SalaryCalculationRequest,
     SalaryCalculationResponse,
+    ReverseSalaryRequest,
+    ReverseSalaryResponse,
 )
 from .insurance import (
     InsuranceRatesResponse,
@@ -38,6 +40,8 @@ __all__ = [
     # Salary
     "SalaryCalculationRequest",
     "SalaryCalculationResponse",
+    "ReverseSalaryRequest",
+    "ReverseSalaryResponse",
     # Insurance
     "InsuranceRatesResponse",
     "InsuranceCalculationRequest",

@@ -153,6 +153,26 @@ export interface SalaryCalculationResponse {
   };
 }
 
+export interface ReverseSalaryRequest {
+  target_net_pay: number;
+  employee: EmployeeRequest;
+  allowances: AllowanceRequest[];
+  work_shifts: WorkShiftRequest[];
+  wage_type: WageType;
+  calculation_month: string;
+  absence_policy: AbsencePolicy;
+}
+
+export interface ReverseSalaryResponse {
+  target_net_pay: MoneyResponse;
+  required_base_salary: MoneyResponse;
+  actual_net_pay: MoneyResponse;
+  difference: MoneyResponse;
+  iterations: number;
+  calculation_result: SalaryCalculationResponse;
+  warnings: WarningItem[];
+}
+
 export interface ErrorResponse {
   error: string;
   detail: string;
