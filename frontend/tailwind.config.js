@@ -17,6 +17,16 @@ export default {
           900: '#0c4a6e',
         },
       },
+      animation: {
+        'float': 'float 3s ease-in-out infinite',
+        'float-delayed': 'float 3s ease-in-out 1.5s infinite',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-8px)' },
+        },
+      },
     },
   },
   plugins: [],

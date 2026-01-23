@@ -5,6 +5,7 @@
 import { Link } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
+import { InsuranceIcon, TaxIcon, OvertimeIcon, GuideIcon } from '../../components/illustrations';
 
 const GuidePage = () => {
   const guides = [
@@ -12,32 +13,35 @@ const GuidePage = () => {
       title: '4대 보험 이해하기',
       path: '/guide/insurance',
       description: '국민연금, 건강보험, 장기요양보험, 고용보험의 개념과 계산 방법을 상세히 설명합니다.',
-      icon: '🏥',
+      icon: <InsuranceIcon size="sm" />,
     },
     {
       title: '소득세 계산법',
       path: '/guide/tax',
       description: '간이세액표를 활용한 소득세 계산 방법과 부양가족 공제에 대해 알아봅니다.',
-      icon: '💰',
+      icon: <TaxIcon size="sm" />,
     },
     {
       title: '연장·야간·휴일 수당',
       path: '/guide/overtime',
       description: '근로기준법에 따른 가산수당 계산 방법과 통상시급의 개념을 이해합니다.',
-      icon: '⏰',
+      icon: <OvertimeIcon size="sm" />,
     },
   ];
 
   return (
     <MainLayout>
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="mb-8 flex items-center gap-4">
+          <GuideIcon size="lg" />
+          <div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-1">
             급여 계산 완전 가이드
           </h1>
           <p className="text-lg text-gray-600">
             한국 근로기준법과 세법에 따른 급여 계산의 모든 것을 알아보세요.
           </p>
+          </div>
         </div>
 
         {/* 가이드 목록 */}
@@ -46,7 +50,7 @@ const GuidePage = () => {
             <Link key={guide.path} to={guide.path}>
               <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                 <div className="flex items-start space-x-4">
-                  <div className="text-4xl">{guide.icon}</div>
+                  <div className="flex-shrink-0">{guide.icon}</div>
                   <div className="flex-1">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
                       {guide.title}

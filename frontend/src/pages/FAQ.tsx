@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
+import { FAQIcon } from '../components/illustrations';
 
 // GA 타입 선언
 declare global {
@@ -235,13 +236,16 @@ const FAQ = () => {
 
       <MainLayout>
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              자주 묻는 질문 (FAQ)
-            </h1>
-            <p className="text-lg text-gray-600">
-              급여 계산과 관련하여 자주 묻는 질문들을 확인하세요.
-            </p>
+          <div className="mb-8 flex items-center gap-4">
+            <FAQIcon size="lg" />
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-1">
+                자주 묻는 질문 (FAQ)
+              </h1>
+              <p className="text-lg text-gray-600">
+                급여 계산과 관련하여 자주 묻는 질문들을 확인하세요.
+              </p>
+            </div>
           </div>
 
         {/* 카테고리 필터 */}

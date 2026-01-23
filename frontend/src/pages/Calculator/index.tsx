@@ -6,6 +6,7 @@ import { useState, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
+import { CalculatorIcon, EmptyState } from '../../components/illustrations';
 import EmployeeInfoForm from '../../components/forms/EmployeeInfoForm';
 import SalaryForm from '../../components/forms/SalaryForm';
 import { SalaryResult } from '../../components/ResultDisplay';
@@ -138,12 +139,15 @@ export default function CalculatorPage() {
 
       <MainLayout>
         <div className="max-w-4xl mx-auto">
-          {/* 간단한 헤더 */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">급여 계산기</h1>
-            <p className="text-gray-600">
-              4대 보험, 소득세, 가산수당을 자동 계산하여 정확한 실수령액을 확인하세요
-            </p>
+          {/* 헤더 */}
+          <div className="mb-8 flex items-center gap-4">
+            <CalculatorIcon size="lg" />
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-1">급여 계산기</h1>
+              <p className="text-gray-600">
+                4대 보험, 소득세, 가산수당을 자동 계산하여 정확한 실수령액을 확인하세요
+              </p>
+            </div>
           </div>
 
           {/* Step Wizard Form */}
@@ -172,10 +176,16 @@ export default function CalculatorPage() {
           )}
 
           {/* 계산 결과 */}
-          {result && (
+          {result ? (
             <div className="mt-8">
               <Card title="계산 결과">
                 <SalaryResult result={result} />
+              </Card>
+            </div>
+          ) : !error && !isLoading && (
+            <div className="mt-8">
+              <Card>
+                <EmptyState type="no-result" message="위 정보를 입력하고 계산하면 결과가 여기에 표시됩니다" />
               </Card>
             </div>
           )}

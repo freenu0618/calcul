@@ -5,6 +5,7 @@ import { useState, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
+import { ReverseIcon, EmptyState } from '../components/illustrations';
 import { salaryApi } from '../api';
 import type { ReverseSalaryResponse, EmploymentType, CompanySize } from '../types/salary';
 
@@ -57,10 +58,15 @@ function ReverseCalculator() {
       <MainLayout>
         <div className="max-w-2xl mx-auto">
           <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg shadow-lg p-8 mb-8">
-            <h1 className="text-3xl font-bold mb-2">실수령액 역산 계산기</h1>
-            <p className="text-purple-100">
-              원하는 실수령액을 입력하면 필요한 월 기본급을 계산합니다
-            </p>
+            <div className="flex items-center gap-4">
+              <ReverseIcon size="lg" />
+              <div>
+                <h1 className="text-3xl font-bold mb-1">실수령액 역산 계산기</h1>
+                <p className="text-purple-100">
+                  원하는 실수령액을 입력하면 필요한 월 기본급을 계산합니다
+                </p>
+              </div>
+            </div>
           </div>
 
           <Card>
@@ -157,7 +163,13 @@ function ReverseCalculator() {
             </div>
           )}
 
-          {result && <ReverseResult result={result} />}
+          {result ? (
+            <ReverseResult result={result} />
+          ) : !error && !isLoading && (
+            <Card>
+              <EmptyState type="no-result" message="목표 실수령액을 입력하고 계산하면 필요한 기본급이 여기에 표시됩니다" />
+            </Card>
+          )}
         </div>
       </MainLayout>
     </>
