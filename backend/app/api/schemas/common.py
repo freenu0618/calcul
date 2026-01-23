@@ -67,6 +67,9 @@ class EmployeeRequest(BaseModel):
     scheduled_work_days: int = Field(
         5, ge=1, le=7, description="주 소정근로일 (계약상 주당 근무일 수)"
     )
+    daily_work_hours: int = Field(
+        8, ge=1, le=24, description="1일 소정근로시간 (기본 8시간)"
+    )
 
     model_config = ConfigDict(json_schema_extra={
         "example": {
@@ -75,7 +78,8 @@ class EmployeeRequest(BaseModel):
             "children_under_20": 1,
             "employment_type": "FULL_TIME",
             "company_size": "OVER_5",
-            "scheduled_work_days": 5
+            "scheduled_work_days": 5,
+            "daily_work_hours": 8
         }
     })
 

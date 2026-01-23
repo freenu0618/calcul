@@ -7,6 +7,7 @@ export type EmploymentType = 'FULL_TIME' | 'PART_TIME';
 export type CompanySize = 'UNDER_5' | 'OVER_5';
 export type WageType = 'MONTHLY' | 'HOURLY';
 export type AbsencePolicy = 'STRICT' | 'MODERATE' | 'LENIENT';
+export type HoursMode = '174' | '209';
 
 export interface MoneyResponse {
   amount: number;
@@ -27,6 +28,7 @@ export interface EmployeeRequest {
   employment_type: EmploymentType;
   company_size: CompanySize;
   scheduled_work_days: number; // 주 소정근로일 (계약상 주당 근무일 수)
+  daily_work_hours: number; // 1일 소정근로시간 (기본 8)
 }
 
 export interface AllowanceRequest {
@@ -103,6 +105,7 @@ export interface SalaryCalculationRequest {
   hourly_wage: number;
   calculation_month: string;
   absence_policy: AbsencePolicy;
+  hours_mode: HoursMode;
 }
 
 export interface WorkSummaryResponse {

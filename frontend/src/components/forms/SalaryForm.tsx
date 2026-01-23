@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Allowance } from '../../types/models';
-import type { WageType, AbsencePolicy } from '../../types/salary';
+import type { WageType, AbsencePolicy, HoursMode } from '../../types/salary';
 import Button from '../common/Button';
 
 interface SalaryFormProps {
@@ -14,18 +14,19 @@ interface SalaryFormProps {
   onBaseSalaryChange: (value: number) => void;
   onAllowancesChange: (allowances: Allowance[]) => void;
   scheduledWorkDays?: number;
+  dailyWorkHours?: number;
   wageType: WageType;
   onWageTypeChange: (type: WageType) => void;
   hourlyWage: number;
   onHourlyWageChange: (wage: number) => void;
   absencePolicy: AbsencePolicy;
   onAbsencePolicyChange: (policy: AbsencePolicy) => void;
+  hoursMode: HoursMode;
+  onHoursModeChange: (mode: HoursMode) => void;
 }
 
 // 상수
 const WEEKS_PER_MONTH = 4.345;       // 365 ÷ 7 ÷ 12
-const MONTHLY_HOURS_209 = 209;       // 최저임금 월 환산 (주40 + 주휴8 포함)
-const MONTHLY_HOURS_174 = 174;       // 실근로시간 (주휴 제외)
 const MIN_WAGE_2026 = 10320;         // 2026년 최저시급
 
 // 콤마 포맷팅 함수
@@ -44,32 +45,38 @@ export default function SalaryForm({
   onBaseSalaryChange,
   onAllowancesChange,
   scheduledWorkDays = 5,
+  dailyWorkHours = 8,
   wageType,
   onWageTypeChange,
   hourlyWage: hourlyWageProp,
   onHourlyWageChange,
   absencePolicy,
   onAbsencePolicyChange,
+  hoursMode,
+  onHoursModeChange,
 }: SalaryFormProps) {
   // 입력 모드: 'direct' | 'hourly'
   const [inputMode, setInputMode] = useState<'direct' | 'hourly'>('direct');
 
-  // 급여 구성 방식: 'included' (209시간, 주휴 포함) | 'separated' (174시간, 주휴 분리)
-  const [calcMode, setCalcMode] = useState<'included' | 'separated'>('included');
+  // 급여 구성 방식: hoursMode prop과 동기화
+  const calcMode = hoursMode === '209' ? 'included' : 'separated';
+  const setCalcMode = (mode: 'included' | 'separated') => {
+    onHoursModeChange(mode === 'included' ? '209' : '174');
+  };
 
   // 시급 기반 입력
   const [hourlyWage, setHourlyWage] = useState(MIN_WAGE_2026);
-  // 주 근무시간: 소정근로일 × 8시간 (기본값)
-  const defaultWeeklyHours = scheduledWorkDays * 8;
+  // 주 근무시간: 소정근로일 × 일 근무시간
+  const defaultWeeklyHours = scheduledWorkDays * dailyWorkHours;
   const [weeklyHours, setWeeklyHours] = useState(defaultWeeklyHours);
   const [contractSalary, setContractSalary] = useState(2800000);
 
-  // 소정근로일 변경 시 주 근무시간 자동 업데이트
+  // 소정근로일/일근무시간 변경 시 주 근무시간 자동 업데이트
   useEffect(() => {
     if (inputMode === 'hourly') {
-      setWeeklyHours(scheduledWorkDays * 8);
+      setWeeklyHours(scheduledWorkDays * dailyWorkHours);
     }
-  }, [scheduledWorkDays, inputMode]);
+  }, [scheduledWorkDays, dailyWorkHours, inputMode]);
 
   // 자동 계산 결과
   const [autoCalc, setAutoCalc] = useState({
@@ -84,17 +91,21 @@ export default function SalaryForm({
   // 시급 기반 자동 계산
   useEffect(() => {
     if (inputMode === 'hourly') {
+      const capped = Math.min(weeklyHours, 40);
+      const weeklyHolidayHours = capped / 40 * 8; // 비례 주휴시간
       let calculatedBaseSalary: number;
       let weeklyHolidayPay: number;
 
       if (calcMode === 'included') {
-        // 209시간 방식: 기본급에 주휴수당 포함
-        calculatedBaseSalary = Math.round(hourlyWage * MONTHLY_HOURS_209);
-        weeklyHolidayPay = Math.round(8 * hourlyWage * WEEKS_PER_MONTH); // 참고용 표시
+        // 209방식: 기본급에 주휴수당 포함
+        const monthlyHours = Math.round((capped + weeklyHolidayHours) * WEEKS_PER_MONTH);
+        calculatedBaseSalary = Math.round(hourlyWage * monthlyHours);
+        weeklyHolidayPay = Math.round(weeklyHolidayHours * hourlyWage * WEEKS_PER_MONTH);
       } else {
-        // 174시간 방식: 기본급과 주휴수당 분리
-        calculatedBaseSalary = Math.round(hourlyWage * MONTHLY_HOURS_174);
-        weeklyHolidayPay = Math.round(8 * hourlyWage * WEEKS_PER_MONTH);
+        // 174방식: 기본급과 주휴수당 분리
+        const monthlyHours = Math.round(capped * WEEKS_PER_MONTH);
+        calculatedBaseSalary = Math.round(hourlyWage * monthlyHours);
+        weeklyHolidayPay = Math.round(weeklyHolidayHours * hourlyWage * WEEKS_PER_MONTH);
       }
 
       // 연장 가산분 (0.5배만) = 시급 × 0.5 × 연장시간 × 4.345
@@ -258,6 +269,50 @@ export default function SalaryForm({
         </div>
       )}
 
+      {/* 통상시급 계산 방식 (월급제 공통) */}
+      {wageType === 'MONTHLY' && (
+        <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+          <p className="text-sm font-semibold text-gray-800 mb-2">통상시급 계산 기준</p>
+          <div className="flex gap-4 mb-2">
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                checked={calcMode === 'separated'}
+                onChange={() => setCalcMode('separated')}
+                className="mr-2"
+              />
+              <span className="text-sm">174시간 방식 (주휴 분리)</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                checked={calcMode === 'included'}
+                onChange={() => setCalcMode('included')}
+                className="mr-2"
+              />
+              <span className="text-sm">209시간 방식 (주휴 포함)</span>
+            </label>
+          </div>
+          {(() => {
+            const wh = scheduledWorkDays * dailyWorkHours;
+            const capped = Math.min(wh, 40);
+            const monthlyHours = calcMode === 'included'
+              ? Math.round((capped + capped / 40 * 8) * 4.345)
+              : Math.round(capped * 4.345);
+            return (
+              <p className="text-xs text-indigo-700">
+                주 {wh}시간 → 월 소정근로시간: <strong>{monthlyHours}시간</strong>
+                {baseSalary > 0 && inputMode === 'direct' && (
+                  <span className="ml-2">
+                    (통상시급 ≈ {formatMoney(Math.round(baseSalary / monthlyHours))})
+                  </span>
+                )}
+              </p>
+            );
+          })()}
+        </div>
+      )}
+
       {/* 직접 입력 모드 (월급제) */}
       {wageType === 'MONTHLY' && inputMode === 'direct' && (
         <div>
@@ -277,41 +332,6 @@ export default function SalaryForm({
       {/* 시급 기반 모드 (월급제) */}
       {wageType === 'MONTHLY' && inputMode === 'hourly' && (
         <div className="space-y-4">
-          {/* 급여 구성 방식 선택 */}
-          <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-            <p className="text-sm font-semibold text-gray-800 mb-3">📋 급여 구성 방식</p>
-            <div className="space-y-2">
-              <label className="flex items-start cursor-pointer">
-                <input
-                  type="radio"
-                  checked={calcMode === 'included'}
-                  onChange={() => setCalcMode('included')}
-                  className="mt-1 mr-3"
-                />
-                <div>
-                  <span className="font-medium">기본급에 주휴수당 포함 (209시간)</span>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    최저임금 계산기와 동일한 방식. 기본급 하나로 간단히 표시됩니다.
-                  </p>
-                </div>
-              </label>
-              <label className="flex items-start cursor-pointer">
-                <input
-                  type="radio"
-                  checked={calcMode === 'separated'}
-                  onChange={() => setCalcMode('separated')}
-                  className="mt-1 mr-3"
-                />
-                <div>
-                  <span className="font-medium">기본급과 주휴수당 분리 (174시간)</span>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    급여명세서 작성용. 기본급(실근로)과 주휴수당을 별도로 표시합니다.
-                  </p>
-                </div>
-              </label>
-            </div>
-          </div>
-
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">시급</label>
@@ -350,13 +370,20 @@ export default function SalaryForm({
 
           {/* 자동 계산 결과 */}
           <div className={`p-4 rounded-lg border ${autoCalc.isValid ? 'bg-blue-50 border-blue-200' : 'bg-red-50 border-red-200'}`}>
+            {(() => {
+              const capped = Math.min(weeklyHours, 40);
+              const dispMonthly = calcMode === 'included'
+                ? Math.round((capped + capped / 40 * 8) * WEEKS_PER_MONTH)
+                : Math.round(capped * WEEKS_PER_MONTH);
+              return (
+                <>
             <p className="text-sm font-semibold mb-2">
-              📊 법정 구성 분해 ({calcMode === 'included' ? '209시간 방식' : '174시간 방식'})
+              📊 법정 구성 분해 ({dispMonthly}시간 방식)
             </p>
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">
-                  기본급 (시급 × {calcMode === 'included' ? '209' : '174'}시간)
+                  기본급 (시급 × {dispMonthly}시간)
                   {calcMode === 'included' && <span className="text-xs ml-1">(주휴 포함)</span>}:
                 </span>
                 <span className="font-medium">{formatMoney(autoCalc.baseSalary)}</span>
@@ -394,12 +421,12 @@ export default function SalaryForm({
             </div>
             {calcMode === 'included' && (
               <p className="mt-2 text-xs text-gray-500 bg-gray-100 p-2 rounded">
-                ℹ️ 209시간 = 174시간(실근로) + 35시간(주휴). 기본급에 주휴수당이 포함되어 있습니다.
+                ℹ️ {dispMonthly}시간 = {Math.round(capped * WEEKS_PER_MONTH)}시간(실근로) + {dispMonthly - Math.round(capped * WEEKS_PER_MONTH)}시간(주휴). 기본급에 주휴수당이 포함되어 있습니다.
               </p>
             )}
             {calcMode === 'separated' && (
               <p className="mt-2 text-xs text-gray-500 bg-gray-100 p-2 rounded">
-                ℹ️ 174시간 방식은 기본급과 주휴수당을 분리 표시합니다. 급여명세서 작성에 적합합니다.
+                ℹ️ {dispMonthly}시간 방식은 기본급과 주휴수당을 분리 표시합니다. 급여명세서 작성에 적합합니다.
               </p>
             )}
             {!autoCalc.isValid && (
@@ -413,6 +440,9 @@ export default function SalaryForm({
                 ✅ 직무수당 {formatMoney(autoCalc.otherAllowance)}을 자유롭게 배치할 수 있습니다.
               </p>
             )}
+              </>
+              );
+            })()}
           </div>
         </div>
       )}

@@ -117,11 +117,11 @@ const GuidePage = () => {
               최저임금 검증
             </h3>
             <p className="text-gray-700 mb-4">
-              2026년 최저임금은 시급 <strong>10,030원</strong>입니다. 월 환산액은 다음과 같이 계산합니다:
+              2026년 최저임금은 시급 <strong>10,320원</strong>입니다. 월 환산액은 다음과 같이 계산합니다:
             </p>
             <div className="bg-gray-50 p-4 rounded-lg mb-4">
               <code className="text-sm">
-                10,030원 × 174시간 = 1,745,220원
+                10,320원 × 209시간 = 2,156,880원
               </code>
             </div>
             <p className="text-gray-700 mb-4">

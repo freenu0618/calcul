@@ -47,7 +47,7 @@ class SalaryCalculator:
     5. 총 지급액 → 보험/세금 공제 → 실수령액
     """
 
-    MONTHLY_REGULAR_HOURS = Decimal('174')
+    WEEKS_PER_MONTH = Decimal('4.345')  # 365 ÷ 7 ÷ 12
 
     def __init__(self):
         self.insurance_calculator = InsuranceCalculator()
@@ -55,6 +55,35 @@ class SalaryCalculator:
         self.overtime_calculator = OvertimeCalculator()
         self.weekly_holiday_calculator = WeeklyHolidayPayCalculator()
         self.absence_calculator = AbsenceCalculator()
+
+    @staticmethod
+    def calculate_monthly_regular_hours(
+        weekly_hours: int, hours_mode: str = "174"
+    ) -> Decimal:
+        """월 소정근로시간 동적 계산
+
+        Args:
+            weekly_hours: 주 소정근로시간 (scheduled_work_days × daily_work_hours)
+            hours_mode: "174" (주휴분리) 또는 "209" (주휴포함)
+
+        Examples:
+            40h, 174방식: min(40,40) × 4.345 = 173.8 ≈ 174
+            35h, 174방식: min(35,40) × 4.345 = 152.075 ≈ 152
+            40h, 209방식: (40 + 40/40×8) × 4.345 = 208.56 ≈ 209
+        """
+        capped = min(weekly_hours, 40)
+        weeks = Decimal('4.345')
+        if hours_mode == "209":
+            # 주휴시간 포함: (소정근로 + 주휴시간) × 4.345
+            weekly_holiday_hours = Decimal(capped) / Decimal('40') * Decimal('8')
+            return ((Decimal(capped) + weekly_holiday_hours) * weeks).quantize(
+                Decimal('1'), rounding='ROUND_HALF_UP'
+            )
+        else:
+            # 174방식: 소정근로시간만
+            return (Decimal(capped) * weeks).quantize(
+                Decimal('1'), rounding='ROUND_HALF_UP'
+            )
 
     def calculate(
         self,
@@ -66,6 +95,8 @@ class SalaryCalculator:
         hourly_wage_input: int = 0,
         calculation_month: str = "",
         absence_policy: str = "STRICT",
+        weekly_hours: int = 40,
+        hours_mode: str = "174",
     ) -> SalaryCalculationResult:
         """급여 계산
 
@@ -78,6 +109,8 @@ class SalaryCalculator:
             hourly_wage_input: 시급 (시급제)
             calculation_month: 계산 대상 월 (YYYY-MM)
             absence_policy: 결근 공제 정책
+            weekly_hours: 주 소정근로시간 (scheduled_work_days × daily_work_hours)
+            hours_mode: "174" (주휴분리) 또는 "209" (주휴포함)
         """
         # 0. 계산월 추론 (미지정 시 시프트 날짜에서)
         if not calculation_month and work_shifts:
@@ -115,7 +148,8 @@ class SalaryCalculator:
 
             # 통상임금 = 기본급(공제 전) + 통상임금 포함 수당
             regular_wage = self._calculate_regular_wage(base_salary, allowances)
-            hourly_wage = self._calculate_hourly_wage(regular_wage)
+            monthly_hours = self.calculate_monthly_regular_hours(weekly_hours, hours_mode)
+            hourly_wage = self._calculate_hourly_wage(regular_wage, monthly_hours)
 
             # 결근 공제 후 주휴수당 계산용 시급 전달
             if absence_result:
@@ -191,9 +225,9 @@ class SalaryCalculator:
                 regular_wage += allowance.amount
         return regular_wage
 
-    def _calculate_hourly_wage(self, regular_wage: Money) -> Money:
-        """통상시급 = 통상임금 ÷ 174시간"""
-        return (regular_wage / self.MONTHLY_REGULAR_HOURS).round_to_won()
+    def _calculate_hourly_wage(self, regular_wage: Money, monthly_hours: Decimal) -> Money:
+        """통상시급 = 통상임금 ÷ 월 소정근로시간"""
+        return (regular_wage / monthly_hours).round_to_won()
 
     def _calculate_total_gross(
         self, base_salary: Money, allowances: List[Allowance],
@@ -217,5 +251,6 @@ class SalaryCalculator:
         return total_gross - non_taxable
 
     @classmethod
-    def get_monthly_regular_hours(cls) -> Decimal:
-        return cls.MONTHLY_REGULAR_HOURS
+    def get_monthly_regular_hours(cls, weekly_hours: int = 40, hours_mode: str = "174") -> Decimal:
+        """월 소정근로시간 조회 (동적 계산)"""
+        return cls.calculate_monthly_regular_hours(weekly_hours, hours_mode)

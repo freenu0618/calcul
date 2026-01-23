@@ -17,6 +17,7 @@ export interface Employee {
   employment_type: EmploymentType;
   company_size: CompanySize;
   scheduled_work_days: number; // 주 소정근로일 (1~7)
+  daily_work_hours: number; // 1일 소정근로시간 (기본 8)
 }
 
 // 근무 시프트

@@ -78,6 +78,24 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
         </p>
       </div>
 
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          1일 소정근로시간
+        </label>
+        <select
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          value={employee.daily_work_hours}
+          onChange={(e) => handleChange('daily_work_hours', parseInt(e.target.value))}
+        >
+          {[4, 5, 6, 7, 8, 9, 10, 11, 12].map((h) => (
+            <option key={h} value={h}>{h}시간</option>
+          ))}
+        </select>
+        <p className="mt-1 text-xs text-blue-600 font-medium">
+          → 주 소정근로시간: {employee.scheduled_work_days * employee.daily_work_hours}시간
+        </p>
+      </div>
+
       <Input
         type="number"
         label="부양가족 수 (본인 포함)"

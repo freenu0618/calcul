@@ -13,7 +13,7 @@ import { ShiftInput } from '../components/ShiftInput';
 import { StepWizard, useWizard, type WizardStep } from '../components/wizard';
 import { salaryApi } from '../api';
 import type { Employee, Allowance } from '../types/models';
-import type { SalaryCalculationResponse, WorkShiftRequest, WageType, AbsencePolicy } from '../types/salary';
+import type { SalaryCalculationResponse, WorkShiftRequest, WageType, AbsencePolicy, HoursMode } from '../types/salary';
 
 const WIZARD_STEPS: WizardStep[] = [
   { id: 'employee', title: '근로자 정보', description: '고용형태, 사업장' },
@@ -29,6 +29,7 @@ function Home() {
     employment_type: 'FULL_TIME',
     company_size: 'OVER_5',
     scheduled_work_days: 5,
+    daily_work_hours: 8,
   });
   const [baseSalary, setBaseSalary] = useState<number>(2500000);
   const [allowances, setAllowances] = useState<Allowance[]>([]);
@@ -37,6 +38,7 @@ function Home() {
   const [hourlyWage, setHourlyWage] = useState<number>(10320);
   const [calculationMonth, setCalculationMonth] = useState<string>('');
   const [absencePolicy, setAbsencePolicy] = useState<AbsencePolicy>('STRICT');
+  const [hoursMode, setHoursMode] = useState<HoursMode>('174');
   const [result, setResult] = useState<SalaryCalculationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +56,7 @@ function Home() {
         hourly_wage: hourlyWage,
         calculation_month: calculationMonth,
         absence_policy: absencePolicy,
+        hours_mode: hoursMode,
       });
       setResult(response);
       if (typeof window.gtag !== 'undefined') {
@@ -68,7 +71,7 @@ function Home() {
     } finally {
       setIsLoading(false);
     }
-  }, [employee, baseSalary, allowances, workShifts, wageType, hourlyWage, calculationMonth, absencePolicy]);
+  }, [employee, baseSalary, allowances, workShifts, wageType, hourlyWage, calculationMonth, absencePolicy, hoursMode]);
 
   // Step 1 검증: 이름 필수
   const isStep1Valid = employee.name.trim().length > 0;
@@ -109,12 +112,15 @@ function Home() {
             onBaseSalaryChange={setBaseSalary}
             onAllowancesChange={setAllowances}
             scheduledWorkDays={employee.scheduled_work_days}
+            dailyWorkHours={employee.daily_work_hours}
             wageType={wageType}
             onWageTypeChange={setWageType}
             hourlyWage={hourlyWage}
             onHourlyWageChange={setHourlyWage}
             absencePolicy={absencePolicy}
             onAbsencePolicyChange={setAbsencePolicy}
+            hoursMode={hoursMode}
+            onHoursModeChange={setHoursMode}
           />
         );
       case 2:

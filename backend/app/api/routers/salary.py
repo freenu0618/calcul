@@ -75,7 +75,13 @@ async def calculate_salary(request: SalaryCalculationRequest):
             for ws in request.work_shifts
         ]
 
-        # 2. 급여 계산 (새 파라미터 전달)
+        # 2. 주 소정근로시간 계산
+        weekly_hours = min(
+            request.employee.scheduled_work_days * request.employee.daily_work_hours,
+            84  # 법정 최대
+        )
+
+        # 3. 급여 계산
         calculator = SalaryCalculator()
         result = calculator.calculate(
             employee=employee,
@@ -86,6 +92,8 @@ async def calculate_salary(request: SalaryCalculationRequest):
             hourly_wage_input=request.hourly_wage,
             calculation_month=request.calculation_month,
             absence_policy=request.absence_policy,
+            weekly_hours=weekly_hours,
+            hours_mode=request.hours_mode,
         )
 
         # 3. 경고 생성
@@ -227,6 +235,11 @@ async def calculate_salary(request: SalaryCalculationRequest):
                 "tax_year": 2026,
                 "insurance_year": 2026,
                 "wage_type": result.wage_type,
+                "hours_mode": request.hours_mode,
+                "weekly_hours": weekly_hours,
+                "monthly_regular_hours": int(SalaryCalculator.calculate_monthly_regular_hours(
+                    weekly_hours, request.hours_mode
+                )),
             },
         )
         return response

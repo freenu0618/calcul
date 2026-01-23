@@ -33,6 +33,9 @@ class SalaryCalculationRequest(BaseModel):
     absence_policy: Literal["STRICT", "MODERATE", "LENIENT"] = Field(
         "STRICT", description="결근 공제 정책 (월급제 전용)"
     )
+    hours_mode: Literal["174", "209"] = Field(
+        "174", description="월 소정근로시간 계산 방식 (174=주휴분리, 209=주휴포함)"
+    )
 
     model_config = ConfigDict(json_schema_extra={
         "example": {
