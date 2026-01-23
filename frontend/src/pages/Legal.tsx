@@ -84,7 +84,7 @@ const Legal = () => {
               사용자는 최저임금의 적용을 받는 근로자에게 최저임금액 이상의 임금을 지급하여야 한다.
             </p>
             <p className="text-gray-700 mb-4">
-              <strong>2026년 최저임금:</strong> 시급 10,030원 (월 환산액 1,745,220원)
+              <strong>2026년 최저임금:</strong> 시급 10,320원 (월 환산액 1,795,680원)
             </p>
             <h4 className="font-semibold text-gray-900 mt-4 mb-2">주요 내용</h4>
             <ul className="list-disc list-inside space-y-2 text-gray-700">

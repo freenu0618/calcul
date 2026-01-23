@@ -19,9 +19,9 @@ const ExamplesPage = () => {
     {
       title: '파트타임 근로자 (주 3일)',
       path: '/examples/parttime',
-      description: '시급 10,030원, 주 3일 근무하는 단시간 근로자의 급여 계산 사례',
-      salary: '시급 10,030원',
-      netPay: '약 104만원',
+      description: '시급 10,320원, 주 3일 근무하는 단시간 근로자의 급여 계산 사례',
+      salary: '시급 10,320원',
+      netPay: '약 72만원',
       icon: '⏱️',
     },
     {

@@ -285,7 +285,7 @@ const FulltimeExample = () => {
         <Card title="⚠️ 주의사항">
           <div className="prose max-w-none">
             <ul className="space-y-2 text-gray-700">
-              <li>• <strong>최저임금 충족</strong>: 통상시급 14,368원 &gt; 최저임금 10,030원 ✅</li>
+              <li>• <strong>최저임금 충족</strong>: 통상시급 14,368원 &gt; 최저임금 10,320원 ✅</li>
               <li>• <strong>주휴수당</strong>: 기본급에 이미 포함되어 있습니다 (월급제)</li>
               <li>• <strong>비과세 수당</strong>: 식대 20만원 이하, 자가운전보조금 20만원 이하는 소득세 비과세</li>
               <li>• <strong>연장근로</strong>: 주 40시간 초과 시 연장수당(1.5배) 별도 지급</li>

@@ -31,7 +31,7 @@ const ParttimeExample = () => {
     <MainLayout>
       <Helmet>
         <title>파트타임 근로자 급여 계산 사례 (주 3일) | 급여계산기</title>
-        <meta name="description" content="시급 10,030원, 주 3일 근무하는 단시간 근로자의 실수령액 계산 사례. 주휴수당 비례 계산과 4대 보험 적용 기준을 확인하세요." />
+        <meta name="description" content="시급 10,320원, 주 3일 근무하는 단시간 근로자의 실수령액 계산 사례. 주휴수당 비례 계산과 4대 보험 적용 기준을 확인하세요." />
         <meta name="keywords" content="파트타임 급여, 단시간 근로, 주휴수당, 시급 계산, 알바 실수령액" />
       </Helmet>
 
@@ -78,7 +78,7 @@ const ParttimeExample = () => {
               </div>
               <div>
                 <span className="text-sm text-gray-600">시급</span>
-                <p className="font-semibold text-blue-600">10,030원 (2026 최저임금)</p>
+                <p className="font-semibold text-blue-600">10,320원 (2026 최저임금)</p>
               </div>
               <div>
                 <span className="text-sm text-gray-600">부양가족</span>
@@ -100,24 +100,24 @@ const ParttimeExample = () => {
             <div className="border-l-4 border-green-500 pl-4">
               <h4 className="font-semibold text-gray-900 mb-2">월 기본 급여 (4.345주 기준)</h4>
               <div className="space-y-1 text-gray-700">
-                <p>시급 10,030원 × 15시간/주 × 4.345주</p>
-                <p className="text-xl font-bold text-green-600">= 653,794원</p>
+                <p>시급 10,320원 × 15시간/주 × 4.345주</p>
+                <p className="text-xl font-bold text-green-600">= 672,606원</p>
               </div>
             </div>
 
             <div className="border-l-4 border-purple-500 pl-4">
               <h4 className="font-semibold text-gray-900 mb-2">주휴수당 (비례 계산)</h4>
               <div className="space-y-1 text-gray-700">
-                <p>주휴수당 = (15시간 ÷ 40시간) × 8시간 × 10,030원</p>
-                <p>= 0.375 × 8 × 10,030원 = 30,090원/주</p>
-                <p className="text-xl font-bold text-purple-600">= 130,741원/월</p>
+                <p>주휴수당 = (15시간 ÷ 40시간) × 8시간 × 10,320원</p>
+                <p>= 0.375 × 8 × 10,320원 = 30,960원/주</p>
+                <p className="text-xl font-bold text-purple-600">= 134,521원/월</p>
               </div>
               <p className="text-sm text-gray-600 mt-2">💡 주 15시간 근무는 주 40시간의 37.5%이므로 주휴수당도 37.5%만 받습니다</p>
             </div>
 
             <div className="bg-gray-50 p-4 rounded">
               <h4 className="font-semibold text-gray-900 mb-2">총 지급액 (세전)</h4>
-              <p className="text-3xl font-bold text-gray-900">784,535원</p>
+              <p className="text-3xl font-bold text-gray-900">807,127원</p>
             </div>
           </div>
         </Card>
@@ -134,9 +134,9 @@ const ParttimeExample = () => {
               <div className="pl-10 space-y-2">
                 <div className="bg-blue-50 p-3 rounded">
                   <p className="font-mono text-sm">주 소정근로시간 비율 = 15시간 ÷ 40시간 = 0.375 (37.5%)</p>
-                  <p className="font-mono text-sm">주휴수당 = 0.375 × 8시간 × 10,030원</p>
-                  <p className="font-mono text-sm">= 3시간 × 10,030원 = 30,090원/주</p>
-                  <p className="font-bold text-blue-600 text-lg mt-2">월 주휴수당 = 30,090 × 4.345 = 130,741원</p>
+                  <p className="font-mono text-sm">주휴수당 = 0.375 × 8시간 × 10,320원</p>
+                  <p className="font-mono text-sm">= 3시간 × 10,320원 = 30,960원/주</p>
+                  <p className="font-bold text-blue-600 text-lg mt-2">월 주휴수당 = 30,960 × 4.345 = 134,521원</p>
                 </div>
                 <p className="text-sm text-gray-600">💡 풀타임(주 40시간)은 주휴수당 8시간을 모두 받지만, 파트타임은 근무시간 비율만큼만 받습니다.</p>
               </div>
@@ -162,30 +162,30 @@ const ParttimeExample = () => {
                     <tr>
                       <td className="px-4 py-2">국민연금</td>
                       <td className="px-4 py-2 text-right">4.5%</td>
-                      <td className="px-4 py-2 text-right font-mono">784,535 × 4.5%</td>
-                      <td className="px-4 py-2 text-right font-semibold">35,304원</td>
+                      <td className="px-4 py-2 text-right font-mono">807,127 × 4.5%</td>
+                      <td className="px-4 py-2 text-right font-semibold">36,321원</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2">건강보험</td>
                       <td className="px-4 py-2 text-right">3.545%</td>
-                      <td className="px-4 py-2 text-right font-mono">784,535 × 3.545%</td>
-                      <td className="px-4 py-2 text-right font-semibold">27,812원</td>
+                      <td className="px-4 py-2 text-right font-mono">807,127 × 3.545%</td>
+                      <td className="px-4 py-2 text-right font-semibold">28,613원</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2">장기요양보험</td>
                       <td className="px-4 py-2 text-right">12.95%</td>
-                      <td className="px-4 py-2 text-right font-mono">27,812 × 12.95%</td>
-                      <td className="px-4 py-2 text-right font-semibold">3,602원</td>
+                      <td className="px-4 py-2 text-right font-mono">28,613 × 12.95%</td>
+                      <td className="px-4 py-2 text-right font-semibold">3,705원</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2">고용보험</td>
                       <td className="px-4 py-2 text-right">0.9%</td>
-                      <td className="px-4 py-2 text-right font-mono">784,535 × 0.9%</td>
-                      <td className="px-4 py-2 text-right font-semibold">7,061원</td>
+                      <td className="px-4 py-2 text-right font-mono">807,127 × 0.9%</td>
+                      <td className="px-4 py-2 text-right font-semibold">7,264원</td>
                     </tr>
                     <tr className="bg-blue-50 font-bold">
                       <td colSpan={3} className="px-4 py-2">합계</td>
-                      <td className="px-4 py-2 text-right text-blue-600">73,779원</td>
+                      <td className="px-4 py-2 text-right text-blue-600">75,903원</td>
                     </tr>
                   </tbody>
                 </table>
@@ -201,7 +201,7 @@ const ParttimeExample = () => {
               </div>
               <div className="pl-10 space-y-2">
                 <p className="text-gray-700">
-                  과세표준 = 784,535원 (부양가족 0명)
+                  과세표준 = 807,127원 (부양가족 0명)
                 </p>
                 <div className="bg-green-50 p-3 rounded">
                   <p className="font-mono text-sm">소득세: 6,850원</p>
@@ -223,15 +223,15 @@ const ParttimeExample = () => {
               <div className="space-y-2">
                 <div className="flex justify-between text-gray-700">
                   <span>기본 급여 (주 15시간 × 4.345주)</span>
-                  <span className="font-semibold">653,794원</span>
+                  <span className="font-semibold">672,606원</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>주휴수당 (비례)</span>
-                  <span className="font-semibold">130,741원</span>
+                  <span className="font-semibold">134,521원</span>
                 </div>
                 <div className="border-t pt-2 flex justify-between text-lg font-bold">
                   <span>총 지급액</span>
-                  <span className="text-blue-600">784,535원</span>
+                  <span className="text-blue-600">807,127원</span>
                 </div>
               </div>
             </div>
@@ -242,19 +242,19 @@ const ParttimeExample = () => {
               <div className="space-y-2">
                 <div className="flex justify-between text-gray-700">
                   <span>국민연금</span>
-                  <span className="font-semibold">35,304원</span>
+                  <span className="font-semibold">36,321원</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>건강보험</span>
-                  <span className="font-semibold">27,812원</span>
+                  <span className="font-semibold">28,613원</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>장기요양보험</span>
-                  <span className="font-semibold">3,602원</span>
+                  <span className="font-semibold">3,705원</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>고용보험</span>
-                  <span className="font-semibold">7,061원</span>
+                  <span className="font-semibold">7,264원</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>소득세</span>
@@ -266,7 +266,7 @@ const ParttimeExample = () => {
                 </div>
                 <div className="border-t pt-2 flex justify-between text-lg font-bold">
                   <span>총 공제액</span>
-                  <span className="text-red-600">81,314원</span>
+                  <span className="text-red-600">83,438원</span>
                 </div>
               </div>
             </div>
@@ -275,7 +275,7 @@ const ParttimeExample = () => {
             <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg">
               <div className="flex justify-between items-center">
                 <span className="text-xl font-bold text-gray-900">실수령액</span>
-                <span className="text-4xl font-bold text-blue-600">703,221원</span>
+                <span className="text-4xl font-bold text-blue-600">723,689원</span>
               </div>
               <p className="text-sm text-gray-600 mt-2">
                 공제율: 10.4% (총 지급액 대비)
@@ -288,7 +288,7 @@ const ParttimeExample = () => {
         <Card title="⚠️ 주의사항 및 법적 포인트">
           <div className="prose max-w-none">
             <ul className="space-y-2 text-gray-700">
-              <li>• <strong>최저임금 충족</strong>: 시급 10,030원 = 2026 최저임금 ✅</li>
+              <li>• <strong>최저임금 충족</strong>: 시급 10,320원 = 2026 최저임금 ✅</li>
               <li>• <strong>주휴수당 비례 적용</strong>: 주 15시간 근무 시 37.5% 지급 (법정 의무)</li>
               <li>• <strong>4대 보험 가입</strong>: 주 15시간 이상 근무 시 의무 가입 대상</li>
               <li>• <strong>주 14시간 이하</strong>: 주휴수당 및 4대 보험 의무 없음</li>
@@ -313,12 +313,12 @@ const ParttimeExample = () => {
                 <tr>
                   <td className="px-4 py-2">기본 급여</td>
                   <td className="px-4 py-2 text-right">2,500,000원</td>
-                  <td className="px-4 py-2 text-right">653,794원</td>
+                  <td className="px-4 py-2 text-right">672,606원</td>
                 </tr>
                 <tr>
                   <td className="px-4 py-2">주휴수당</td>
                   <td className="px-4 py-2 text-right">포함 (8시간)</td>
-                  <td className="px-4 py-2 text-right">130,741원 (3시간)</td>
+                  <td className="px-4 py-2 text-right">134,521원 (3시간)</td>
                 </tr>
                 <tr>
                   <td className="px-4 py-2">4대 보험</td>
@@ -333,7 +333,7 @@ const ParttimeExample = () => {
                 <tr className="bg-blue-50 font-bold">
                   <td className="px-4 py-2">실수령액</td>
                   <td className="px-4 py-2 text-right text-blue-600">약 2,380,000원</td>
-                  <td className="px-4 py-2 text-right text-blue-600">703,221원</td>
+                  <td className="px-4 py-2 text-right text-blue-600">723,689원</td>
                 </tr>
               </tbody>
             </table>
