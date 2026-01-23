@@ -69,13 +69,20 @@ export interface DeductionsBreakdown {
   total: MoneyResponse;
 }
 
+// 경고 메시지
+export interface WarningItem {
+  level: 'critical' | 'warning' | 'info';
+  message: string;
+  detail: string;
+}
+
 // 급여 계산 응답
 export interface SalaryCalculationResponse {
   employee_name: string;
   gross_breakdown: GrossBreakdown;
   deductions_breakdown: DeductionsBreakdown;
   net_pay: MoneyResponse;
-  warnings: string[];
+  warnings: WarningItem[];
   calculation_metadata: {
     calculation_date: string;
     tax_year: number;

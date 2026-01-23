@@ -11,7 +11,7 @@ from app.api.schemas import (
 )
 from app.domain.entities import Employee, EmploymentType, CompanySize, WorkShift, Allowance
 from app.domain.value_objects import Money
-from app.domain.services import SalaryCalculator
+from app.domain.services import SalaryCalculator, WarningGenerator
 
 router = APIRouter()
 
@@ -98,10 +98,21 @@ async def calculate_salary(request: SalaryCalculationRequest):
         calculator = SalaryCalculator()
         result = calculator.calculate(employee, base_salary, allowances, work_shifts)
 
-        # 3. 응답 생성
+        # 3. 경고 생성
+        warning_gen = WarningGenerator()
+        warnings = warning_gen.generate(
+            hourly_wage=result.hourly_wage,
+            work_shifts=work_shifts,
+            company_size=employee.company_size,
+            base_salary=base_salary,
+            total_gross=result.total_gross,
+        )
+
+        # 4. 응답 생성
         from app.api.schemas.salary import (
             GrossBreakdown, DeductionsBreakdown, InsuranceBreakdown,
-            TaxBreakdown, OvertimeBreakdown, WeeklyHolidayPayBreakdown
+            TaxBreakdown, OvertimeBreakdown, WeeklyHolidayPayBreakdown,
+            WarningResponse,
         )
 
         # 과세/비과세 수당 계산
@@ -155,7 +166,11 @@ async def calculate_salary(request: SalaryCalculationRequest):
                 total=_convert_to_money_response(result.total_deductions),
             ),
             net_pay=_convert_to_money_response(result.net_pay),
-            warnings=[],
+            warnings=[
+                WarningResponse(
+                    level=w.level, message=w.message, detail=w.detail
+                ) for w in warnings
+            ],
             calculation_metadata={
                 "calculation_date": datetime.now().isoformat(),
                 "tax_year": 2026,

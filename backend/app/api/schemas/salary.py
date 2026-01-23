@@ -111,13 +111,20 @@ class DeductionsBreakdown(BaseModel):
     total: MoneyResponse = Field(..., description="총 공제액")
 
 
+class WarningResponse(BaseModel):
+    """경고 메시지"""
+    level: str = Field(..., description="경고 수준 (critical, warning, info)")
+    message: str = Field(..., description="경고 메시지")
+    detail: str = Field(default="", description="상세 설명")
+
+
 class SalaryCalculationResponse(BaseModel):
     """급여 계산 응답"""
     employee_name: str = Field(..., description="근로자 이름")
     gross_breakdown: GrossBreakdown = Field(..., description="지급 내역")
     deductions_breakdown: DeductionsBreakdown = Field(..., description="공제 내역")
     net_pay: MoneyResponse = Field(..., description="실수령액")
-    warnings: List[str] = Field(
+    warnings: List[WarningResponse] = Field(
         default_factory=list, description="경고 메시지 목록"
     )
     calculation_metadata: Dict[str, Any] = Field(

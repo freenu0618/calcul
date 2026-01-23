@@ -7,6 +7,7 @@ from .tax_calculator import TaxCalculator, TaxResult
 from .overtime_calculator import OvertimeCalculator, OvertimeResult
 from .weekly_holiday_pay_calculator import WeeklyHolidayPayCalculator, WeeklyHolidayPayResult
 from .salary_calculator import SalaryCalculator, SalaryCalculationResult
+from .warning_generator import WarningGenerator, Warning
 
 __all__ = [
     "InsuranceCalculator",
@@ -19,4 +20,6 @@ __all__ = [
     "WeeklyHolidayPayResult",
     "SalaryCalculator",
     "SalaryCalculationResult",
+    "WarningGenerator",
+    "Warning",
 ]

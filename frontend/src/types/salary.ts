@@ -99,12 +99,18 @@ export interface SalaryCalculationRequest {
   work_shifts: WorkShiftRequest[];
 }
 
+export interface WarningItem {
+  level: 'critical' | 'warning' | 'info';
+  message: string;
+  detail: string;
+}
+
 export interface SalaryCalculationResponse {
   employee_name: string;
   gross_breakdown: GrossBreakdown;
   deductions_breakdown: DeductionsBreakdown;
   net_pay: MoneyResponse;
-  warnings: string[];
+  warnings: WarningItem[];
   calculation_metadata: {
     calculation_date: string;
     tax_year: number;

@@ -1,0 +1,110 @@
+{
+  "2026": {
+    "effective_date": "2026-01-01",
+    "minimum_wage": {
+      "hourly": 10320,
+      "monthly_209h": 2156880,
+      "description": "2026년 최저임금"
+    },
+    "insurance": {
+      "national_pension": {
+        "employee_rate": 0.0475,
+        "employer_rate": 0.0475,
+        "upper_limit": 5900000,
+        "lower_limit": 390000,
+        "description": "국민연금 (2026년 연금개혁 반영, 전체 9.5%)"
+      },
+      "health_insurance": {
+        "employee_rate": 0.03595,
+        "employer_rate": 0.03595,
+        "description": "건강보험 (전체 7.19%)"
+      },
+      "long_term_care": {
+        "rate": 0.1314,
+        "base": "health_insurance",
+        "description": "장기요양보험 (건강보험료의 13.14%)"
+      },
+      "employment_insurance": {
+        "employee_rate": 0.009,
+        "employer_rate_small": 0.011,
+        "employer_rate_large": 0.013,
+        "upper_limit": 13500000,
+        "description": "고용보험 (근로자 0.9%)"
+      }
+    },
+    "overtime": {
+      "extended_rate": 1.5,
+      "night_rate": 0.5,
+      "holiday_rate_under_8h": 1.5,
+      "holiday_rate_over_8h": 2.0,
+      "max_weekly_hours": 52,
+      "regular_weekly_hours": 40,
+      "max_overtime_hours": 12,
+      "description": "가산수당 요율 (근로기준법 제56조)"
+    },
+    "tax": {
+      "local_income_tax_rate": 0.1,
+      "description": "지방소득세 = 소득세의 10%"
+    },
+    "weekly_holiday_pay": {
+      "base_hours": 8,
+      "weeks_per_month": 4.345,
+      "min_weekly_hours": 15,
+      "description": "주휴수당 (주 15시간 이상 근무 시 지급)"
+    }
+  },
+  "2025": {
+    "effective_date": "2025-01-01",
+    "minimum_wage": {
+      "hourly": 10030,
+      "monthly_209h": 2096270,
+      "description": "2025년 최저임금"
+    },
+    "insurance": {
+      "national_pension": {
+        "employee_rate": 0.045,
+        "employer_rate": 0.045,
+        "upper_limit": 5900000,
+        "lower_limit": 370000,
+        "description": "국민연금 (전체 9%)"
+      },
+      "health_insurance": {
+        "employee_rate": 0.03545,
+        "employer_rate": 0.03545,
+        "description": "건강보험 (전체 7.09%)"
+      },
+      "long_term_care": {
+        "rate": 0.1295,
+        "base": "health_insurance",
+        "description": "장기요양보험 (건강보험료의 12.95%)"
+      },
+      "employment_insurance": {
+        "employee_rate": 0.009,
+        "employer_rate_small": 0.011,
+        "employer_rate_large": 0.013,
+        "upper_limit": 13500000,
+        "description": "고용보험 (근로자 0.9%)"
+      }
+    },
+    "overtime": {
+      "extended_rate": 1.5,
+      "night_rate": 0.5,
+      "holiday_rate_under_8h": 1.5,
+      "holiday_rate_over_8h": 2.0,
+      "max_weekly_hours": 52,
+      "regular_weekly_hours": 40,
+      "max_overtime_hours": 12,
+      "description": "가산수당 요율 (근로기준법 제56조)"
+    },
+    "tax": {
+      "local_income_tax_rate": 0.1,
+      "description": "지방소득세 = 소득세의 10%"
+    },
+    "weekly_holiday_pay": {
+      "base_hours": 8,
+      "weeks_per_month": 4.345,
+      "min_weekly_hours": 15,
+      "description": "주휴수당 (주 15시간 이상 근무 시 지급)"
+    }
+  }
+}

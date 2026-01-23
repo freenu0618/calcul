@@ -1,8 +1,23 @@
-# Claude Code 관련 파일 (프로젝트 이해용 문서)
+# Claude Code 관련 파일
 .claude/
-.claude.md
-calculator.md
-PLAN.md
+
+# 문서 파일 (루트/백엔드/프론트엔드 README.md만 유지)
+*.md
+!README.md
+frontend/src/**/*.md
+
+# 보안 관련 파일
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+credentials.json
+token.json
+*.secret
+secret.*
+.secrets/
 
 # Python
 __pycache__/

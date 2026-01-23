@@ -79,7 +79,7 @@ async def startup_event():
 
 
 # 라우터 등록
-from app.api.routers import salary, insurance, tax, employees, records, auth
+from app.api.routers import salary, insurance, tax, employees, records, auth, admin
 
 # 인증 라우터 (인증 불필요)
 app.include_router(
@@ -118,4 +118,11 @@ app.include_router(
     records.router,
     prefix="/api/v1/records",
     tags=["Records"],
+)
+
+# 관리자 라우터 (법정 요율 관리)
+app.include_router(
+    admin.router,
+    prefix="/api/v1/admin",
+    tags=["Admin"],
 )
