@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -16,8 +17,10 @@ private val logger = KotlinLogging.logger {}
 /**
  * Python FastAPI 서버로 요청을 프록시하는 서비스
  * 1단계 게이트웨이: Spring Boot가 인증 후 Python으로 급여계산 요청 전달
+ * python.proxy.enabled=true 일 때만 활성화
  */
 @Service
+@ConditionalOnProperty(prefix = "python.proxy", name = ["enabled"], havingValue = "true")
 class PythonProxyService(
     @Value("\${python.proxy.base-url}") private val baseUrl: String,
     @Value("\${python.proxy.timeout}") private val timeout: Long

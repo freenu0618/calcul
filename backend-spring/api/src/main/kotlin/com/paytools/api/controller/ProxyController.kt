@@ -4,6 +4,7 @@ import com.paytools.infrastructure.proxy.PythonProxyService
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Mono
 import java.io.BufferedReader
@@ -11,9 +12,11 @@ import java.io.BufferedReader
 /**
  * Python FastAPI 서버로 요청을 프록시하는 컨트롤러
  * 1단계 게이트웨이: 급여계산, 보험, 세금 API를 Python으로 전달
+ * python.proxy.enabled=true 일 때만 활성화
  */
 @RestController
 @RequestMapping("/api/v1")
+@ConditionalOnProperty(prefix = "python.proxy", name = ["enabled"], havingValue = "true")
 class ProxyController(
     private val pythonProxyService: PythonProxyService
 ) {
