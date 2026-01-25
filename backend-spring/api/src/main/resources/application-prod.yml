@@ -15,15 +15,20 @@ spring:
       connection-timeout: 30000
 
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
 
 logging:
   level:
     root: WARN
     com.paytools: INFO
     org.springframework.security: WARN
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
 
 # Python 프록시 비활성화 (Spring Boot 전환 완료)
 python:
