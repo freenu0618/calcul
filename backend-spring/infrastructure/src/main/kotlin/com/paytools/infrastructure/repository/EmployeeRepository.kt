@@ -34,25 +34,27 @@ interface EmployeeRepository : JpaRepository<EmployeeEntity, UUID> {
     fun findByIsForeigner(isForeigner: Boolean): List<EmployeeEntity>
 
     /**
-     * 수습기간 중인 근무자 조회
+     * 수습기간 중인 근무자 조회 (PostgreSQL 호환)
      */
     @Query(
-        """
-        SELECT e FROM EmployeeEntity e
-        WHERE e.probationMonths > 0
-        AND CURRENT_DATE < FUNCTION('DATE_ADD', e.contractStartDate, e.probationMonths, 'MONTH')
-    """
+        value = """
+        SELECT * FROM employees e
+        WHERE e.probation_months > 0
+        AND CURRENT_DATE < e.contract_start_date + INTERVAL '1 month' * e.probation_months
+    """,
+        nativeQuery = true
     )
     fun findInProbation(): List<EmployeeEntity>
 
     /**
-     * 국민연금 비대상자 조회 (만 60세 이상)
+     * 국민연금 비대상자 조회 (만 60세 이상, PostgreSQL 호환)
      */
     @Query(
-        """
-        SELECT e FROM EmployeeEntity e
-        WHERE FUNCTION('TIMESTAMPDIFF', 'YEAR', e.birthDate, CURRENT_DATE) >= 60
-    """
+        value = """
+        SELECT * FROM employees e
+        WHERE EXTRACT(YEAR FROM AGE(CURRENT_DATE, e.birth_date)) >= 60
+    """,
+        nativeQuery = true
     )
     fun findPensionIneligible(): List<EmployeeEntity>
 
