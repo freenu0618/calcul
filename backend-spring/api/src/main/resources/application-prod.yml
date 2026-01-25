@@ -1,4 +1,7 @@
 # Production Profile
+server:
+  port: ${PORT:8080}
+
 spring:
   datasource:
     # Railway PostgreSQL Reference Variables 사용
