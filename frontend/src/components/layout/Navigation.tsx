@@ -72,7 +72,7 @@ const Navigation = () => {
             {isAuthenticated ? (
               <div className={`flex items-center space-x-2 ml-2 pl-2 border-l ${isLandingPage ? 'border-white/30' : 'border-gray-300'}`}>
                 <span className={`text-sm ${isLandingPage ? 'text-white/80' : 'text-gray-700'}`}>
-                  {user?.full_name || user?.email}
+                  {user?.name || user?.email}
                 </span>
                 <button
                   onClick={handleLogout}
@@ -167,7 +167,7 @@ const Navigation = () => {
               {isAuthenticated ? (
                 <>
                   <div className="px-3 py-2 text-sm text-gray-700">
-                    {user?.full_name || user?.email}
+                    {user?.name || user?.email}
                   </div>
                   <button
                     onClick={handleLogout}

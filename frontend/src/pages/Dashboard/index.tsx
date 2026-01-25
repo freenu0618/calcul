@@ -78,7 +78,7 @@ export default function DashboardPage() {
           {/* 환영 메시지 */}
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              안녕하세요, {user?.full_name || user?.email}님
+              안녕하세요, {user?.name || user?.email}님
             </h1>
             <p className="text-gray-600">오늘도 효율적인 급여 관리를 도와드릴게요.</p>
           </div>
