@@ -9,8 +9,8 @@ import { API_CONFIG } from '../config/api.config';
 interface User {
   id: number;
   email: string;
-  full_name: string | null;
-  is_active: boolean;
+  name: string;
+  role: string;
 }
 
 interface AuthContextType {
@@ -34,66 +34,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 초기 로드 시 localStorage에서 토큰 복구
+  // 초기 로드 시 localStorage에서 토큰 및 사용자 정보 복구
   useEffect(() => {
     const storedToken = localStorage.getItem('auth_token');
-    if (storedToken) {
+    const storedUser = localStorage.getItem('auth_user');
+    if (storedToken && storedUser) {
       setToken(storedToken);
-      fetchCurrentUser(storedToken);
-    } else {
-      setIsLoading(false);
+      setUser(JSON.parse(storedUser));
     }
+    setIsLoading(false);
   }, []);
-
-  // 현재 사용자 정보 가져오기
-  const fetchCurrentUser = async (authToken: string) => {
-    try {
-      const response = await fetch(API_CONFIG.getApiUrl('/auth/me'), {
-        headers: {
-          'Authorization': `Bearer ${authToken}`,
-        },
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-      } else {
-        // 토큰 만료 또는 유효하지 않음
-        localStorage.removeItem('auth_token');
-        setToken(null);
-      }
-    } catch (error) {
-      console.error('Failed to fetch user:', error);
-      localStorage.removeItem('auth_token');
-      setToken(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   // 로그인
   const login = async (email: string, password: string) => {
     const response = await fetch(API_CONFIG.getApiUrl('/auth/login'), {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify({ email, password }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.detail || '로그인에 실패했습니다.');
+      throw new Error(error.message || '로그인에 실패했습니다.');
     }
 
-    const data = await response.json();
-    const authToken = data.access_token;
+    const result = await response.json();
+    const authToken = result.data.accessToken;
 
     localStorage.setItem('auth_token', authToken);
+    localStorage.setItem('auth_user', JSON.stringify(result.data.user));
     setToken(authToken);
-
-    // 사용자 정보 가져오기
-    await fetchCurrentUser(authToken);
+    setUser(result.data.user);
   };
 
   // 회원가입
@@ -101,27 +74,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const response = await fetch(API_CONFIG.getApiUrl('/auth/register'), {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify({
         email,
         password,
-        full_name: fullName,
+        name: fullName,
       }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.detail || '회원가입에 실패했습니다.');
+      throw new Error(error.message || '회원가입에 실패했습니다.');
     }
 
-    // 회원가입 성공 후 자동 로그인
-    await login(email, password);
+    const result = await response.json();
+    const authToken = result.data.accessToken;
+
+    localStorage.setItem('auth_token', authToken);
+    localStorage.setItem('auth_user', JSON.stringify(result.data.user));
+    setToken(authToken);
+    setUser(result.data.user);
   };
 
   // 로그아웃
   const logout = () => {
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
     setToken(null);
     setUser(null);
   };
