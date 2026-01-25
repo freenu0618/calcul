@@ -30,6 +30,7 @@ export default function CalculatorPage() {
     employment_type: 'FULL_TIME',
     company_size: 'OVER_5',
     scheduled_work_days: 5,
+    daily_work_hours: 8, // 추가: 1일 소정근로시간
   });
   const [baseSalary, setBaseSalary] = useState<number>(2500000);
   const [allowances, setAllowances] = useState<Allowance[]>([]);
@@ -38,6 +39,7 @@ export default function CalculatorPage() {
   const [hourlyWage, setHourlyWage] = useState<number>(0);
   const [calculationMonth, setCalculationMonth] = useState<string>('');
   const [absencePolicy, setAbsencePolicy] = useState<AbsencePolicy>('STRICT');
+  const [hoursMode, setHoursMode] = useState<'174' | '209'>('174'); // 추가: 시간 계산 방식
   const [result, setResult] = useState<SalaryCalculationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +57,7 @@ export default function CalculatorPage() {
         hourly_wage: wageType === 'HOURLY' ? hourlyWage : 0,
         calculation_month: calculationMonth,
         absence_policy: absencePolicy,
+        hours_mode: hoursMode, // 추가: 시간 계산 방식
       });
       setResult(response);
       if (typeof window.gtag !== 'undefined') {
@@ -114,6 +117,8 @@ export default function CalculatorPage() {
             onHourlyWageChange={setHourlyWage}
             absencePolicy={absencePolicy}
             onAbsencePolicyChange={setAbsencePolicy}
+            hoursMode={hoursMode}
+            onHoursModeChange={setHoursMode}
           />
         );
       case 2:

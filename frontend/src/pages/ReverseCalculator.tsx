@@ -33,6 +33,7 @@ function ReverseCalculator() {
           employment_type: employmentType,
           company_size: companySize,
           scheduled_work_days: 5,
+          daily_work_hours: 8, // 추가
         },
         allowances: [],
         work_shifts: [],
