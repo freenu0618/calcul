@@ -5,7 +5,10 @@ plugins {
 }
 
 // api 모듈이 실행 가능한 bootJar 생성
-tasks.bootJar { enabled = true }
+tasks.bootJar {
+    enabled = true
+    archiveFileName.set("api.jar")  // 버전 없이 고정 이름
+}
 tasks.jar { enabled = false }
 
 // PostgreSQL 드라이버 버전 강제 오버라이드
