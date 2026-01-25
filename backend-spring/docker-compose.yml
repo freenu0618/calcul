@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: paytools-postgres
+    environment:
+      POSTGRES_DB: paytools
+      POSTGRES_USER: paytools
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paytools -d paytools"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - paytools-network
+
+  # Redis (향후 캐싱/세션 관리용)
+  redis:
+    image: redis:7-alpine
+    container_name: paytools-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - paytools-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  paytools-network:
+    driver: bridge

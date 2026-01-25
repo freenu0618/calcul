@@ -1,0 +1,19 @@
+# Local Development Profile
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/paytools
+    username: paytools
+    password: paytools123
+
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    com.paytools: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+python:
+  proxy:
+    base-url: http://localhost:8000

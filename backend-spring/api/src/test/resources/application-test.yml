@@ -1,0 +1,33 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: false  # H2에서는 Flyway 비활성화
+
+  security:
+    jwt:
+      secret: test-secret-key-for-testing-only-do-not-use-in-production-12345678
+      expiration: 3600000  # 1시간
+
+logging:
+  level:
+    com.paytools: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate: INFO

@@ -1,0 +1,127 @@
+### Phase 3.5 근무자 관리 API 테스트 시나리오
+
+### 1. 근무자 등록 (내국인 - 35세)
+POST http://localhost:8080/api/v1/employees
+Content-Type: application/json
+
+{
+  "name": "홍길동",
+  "residentIdPrefix": "900101-1",
+  "contractStartDate": "2026-01-01",
+  "employmentType": "FULL_TIME",
+  "companySize": "OVER_5",
+  "workStartTime": "09:00",
+  "workEndTime": "18:00",
+  "breakMinutes": 60,
+  "weeklyWorkDays": 5,
+  "dailyWorkHours": 8,
+  "probationMonths": 3,
+  "probationRate": 90
+}
+
+### 2. 근무자 등록 (외국인 - E-9 비자)
+POST http://localhost:8080/api/v1/employees
+Content-Type: application/json
+
+{
+  "name": "응우옌 반 티엔",
+  "residentIdPrefix": "920315-5",
+  "contractStartDate": "2026-02-01",
+  "employmentType": "FULL_TIME",
+  "companySize": "OVER_5",
+  "visaType": "E-9",
+  "workStartTime": "09:00",
+  "workEndTime": "18:00",
+  "breakMinutes": 60,
+  "weeklyWorkDays": 6,
+  "dailyWorkHours": 8,
+  "probationMonths": 0,
+  "probationRate": 100
+}
+
+### 3. 근무자 등록 (만 60세 이상 - 국민연금 비대상)
+POST http://localhost:8080/api/v1/employees
+Content-Type: application/json
+
+{
+  "name": "강미정",
+  "residentIdPrefix": "760623-2",
+  "contractStartDate": "2025-05-02",
+  "employmentType": "PART_TIME",
+  "companySize": "UNDER_5",
+  "workStartTime": "09:00",
+  "workEndTime": "17:00",
+  "breakMinutes": 60,
+  "weeklyWorkDays": 6,
+  "dailyWorkHours": 7,
+  "probationMonths": 3,
+  "probationRate": 100
+}
+
+### 4. 주민번호 중복 등록 시도 (409 Conflict 예상)
+POST http://localhost:8080/api/v1/employees
+Content-Type: application/json
+
+{
+  "name": "홍길동2",
+  "residentIdPrefix": "900101-1",
+  "contractStartDate": "2026-01-01",
+  "employmentType": "FULL_TIME",
+  "companySize": "OVER_5"
+}
+
+### 5. 외국인 체류자격 미입력 (400 Bad Request 예상)
+POST http://localhost:8080/api/v1/employees
+Content-Type: application/json
+
+{
+  "name": "외국인 테스트",
+  "residentIdPrefix": "950101-7",
+  "contractStartDate": "2026-01-01",
+  "employmentType": "FULL_TIME",
+  "companySize": "OVER_5"
+}
+
+### 6. 근무자 목록 조회
+GET http://localhost:8080/api/v1/employees
+
+### 7. 근무자 상세 조회 (위에서 생성된 ID 사용)
+# @name getEmployee
+GET http://localhost:8080/api/v1/employees/{{employeeId}}
+
+### 8. 국민연금 비대상자 조회 (만 60세 이상)
+GET http://localhost:8080/api/v1/employees/pension-ineligible
+
+### 9. 이름 검색
+GET http://localhost:8080/api/v1/employees/search?name=홍길동
+
+### 10. 근무자 정보 수정
+PUT http://localhost:8080/api/v1/employees/{{employeeId}}
+Content-Type: application/json
+
+{
+  "name": "홍길동",
+  "residentIdPrefix": "900101-1",
+  "contractStartDate": "2026-01-01",
+  "employmentType": "FULL_TIME",
+  "companySize": "OVER_5",
+  "workStartTime": "09:00",
+  "workEndTime": "19:00",
+  "breakMinutes": 60,
+  "weeklyWorkDays": 5,
+  "dailyWorkHours": 9,
+  "probationMonths": 0,
+  "probationRate": 100
+}
+
+### 11. 근무자 삭제
+DELETE http://localhost:8080/api/v1/employees/{{employeeId}}
+
+### 12. 삭제된 근무자 조회 (404 Not Found 예상)
+GET http://localhost:8080/api/v1/employees/{{employeeId}}
+
+### Health Check
+GET http://localhost:8080/actuator/health
+
+### Swagger UI
+# http://localhost:8080/swagger-ui.html
