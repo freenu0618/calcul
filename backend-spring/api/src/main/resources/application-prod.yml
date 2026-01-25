@@ -21,9 +21,11 @@ logging:
     com.paytools: INFO
     org.springframework.security: WARN
 
+# Python 프록시 비활성화 (Spring Boot 전환 완료)
 python:
   proxy:
-    base-url: ${PYTHON_API_URL}
+    enabled: false
+    base-url: ${PYTHON_API_URL:}
 
 management:
   endpoint:
