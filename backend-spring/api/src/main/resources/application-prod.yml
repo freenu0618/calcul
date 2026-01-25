@@ -31,6 +31,10 @@ python:
     base-url: ${PYTHON_API_URL:}
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
   endpoint:
     health:
       show-details: never
