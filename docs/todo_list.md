@@ -1,0 +1,1100 @@
+# 프로젝트 TODO 리스트
+
+**작성일**: 2026-01-22
+**마지막 업데이트**: 2026-01-25 (Phase S3 완료 - Spring Boot Railway 배포 완료 + 프론트엔드 연동)
+**기준 문서**: PROJECT_ANALYSIS_REPORT.md v2.2.0
+**프로젝트**: paytools.work (급여 계산기)
+
+---
+
+## 📊 진행 상황 요약
+
+| 단계 | 태스크 수 | 완료 | 진행률 | 비고 |
+|------|-----------|------|--------|------|
+| Phase 2 (핵심) | 4 | 4 | 100% | Python |
+| Phase 2.5 (계산 재설계) | 5 | 5 | 100% | Python |
+| Phase 3.0 (긴급 버그) | 2 | 2 | 100% | Python |
+| Phase 3.1 (역산) | 1 | 1 | 100% | Python |
+| Phase S1 (Spring 초기설정) | 3 | 3 | 100% | ✅ 완료 |
+| Phase S2 (도메인 전환) | 4 | 4 | 100% | ✅ 완료 |
+| **Phase S3 (API 전환+검증)** | **3** | **3** | **100%** | **✅ 완료** |
+| Phase 3.5 (근무자 등록) | 5 | 0 | 0% | Spring |
+| Phase 3.6 (급여 고도화) | 4 | 0 | 0% | Spring |
+| Phase 3.7 (시뮬레이션) | 2 | 0 | 0% | Spring |
+| Phase 3.8 (근로계약서) | 2 | 0 | 0% | Spring |
+| Phase 3.9 (기존 고급) | 3 | 0 | 0% | Spring |
+| Phase 4 (마케팅) | 4 | 0 | 0% | - |
+| Phase 5 (급여대장) | 3 | 0 | 0% | Spring |
+| Phase 6 (AI 챗봇) | 6 | 0 | 0% | Python MS |
+| Phase 7 (요금제) | 2 | 0 | 0% | Spring |
+| **전체** | **53** | **22** | **42%** | |
+
+---
+
+## Phase 2: 핵심 기능 완성 (P1)
+
+> 목표: 사용자 경험 개선
+
+### 2.1 FullCalendar 통합
+- **상태**: ✅ 완료 (2026-01-22)
+- **우선순위**: 높음
+- **예상 작업량**: 2일
+- **설명**:
+  - ShiftCalendar.tsx 구현 ✅
+  - 시각적 캘린더 뷰 ✅
+  - 날짜 클릭으로 시프트 추가/수정/삭제 ✅
+  - ShiftModal.tsx 모달 컴포넌트 ✅
+- **관련 파일**:
+  - `frontend/src/components/ShiftInput/ShiftCalendar.tsx` ✅
+  - `frontend/src/components/ShiftInput/ShiftModal.tsx` ✅
+
+### 2.2 시프트 템플릿 기능
+- **상태**: ✅ 완료 (이전 구현)
+- **우선순위**: 높음
+- **예상 작업량**: 1일
+- **설명**:
+  - 풀타임 주4/5/6 프리셋 ✅
+  - 오전/오후/야간조 프리셋 ✅
+  - 사용자 정의 템플릿 저장 (미구현)
+- **관련 파일**:
+  - `frontend/src/components/ShiftInput/ShiftInput.tsx` (SHIFT_PRESETS 상수)
+
+### 2.3 경고 시스템 강화
+- **상태**: ✅ 완료 (2026-01-23)
+- **우선순위**: 높음
+- **예상 작업량**: 1일
+- **설명**:
+  - 최저임금 미달 경고: "노동청 신고 가능 사항" ✅
+  - 주 52시간 위반 경고: "연장근로 과다" ✅
+  - 포괄임금제 오용 주의 ✅
+  - 경고 수준별 UI (critical/warning/info) ✅
+- **관련 파일**:
+  - `backend/app/domain/services/warning_generator.py` ✅ (신규)
+  - `frontend/src/components/ResultDisplay/WarningAlert.tsx` ✅ (수정)
+
+### 2.4 법정 요율 JSON 관리
+- **상태**: ✅ 완료 (2026-01-23)
+- **우선순위**: 높음
+- **예상 작업량**: 1일
+- **설명**:
+  - 연도별 버전 관리 (2025, 2026) ✅
+  - 최저임금, 보험료율 중앙 관리 ✅
+  - Admin API 구현 (CRUD) ✅
+  - 요율 로더 서비스 (캐싱) ✅
+- **관련 파일**:
+  - `backend/app/core/legal_rates.json` ✅ (신규)
+  - `backend/app/core/legal_rates_loader.py` ✅ (신규)
+  - `backend/app/api/routers/admin.py` ✅ (신규)
+
+---
+
+## Phase 2.5: 월간 시프트 기반 급여 계산 재설계 (P1)
+
+> 목표: 구체적 월간 시프트 기반 정확한 급여 계산
+
+### 2.5.1 월급제/시급제 분기 로직
+- **상태**: ✅ 완료 (2026-01-23)
+- **우선순위**: 높음
+- **설명**:
+  - 월급제: 월급 고정 - 결근 공제
+  - 시급제: 시급 × 실제 근무시간
+  - SalaryCalculator 오케스트레이터 분기 구현
+- **관련 파일**:
+  - `backend/app/domain/services/salary_calculator.py` ✅ (수정)
+  - `backend/app/api/schemas/salary.py` ✅ (wage_type, hourly_wage 필드 추가)
+  - `frontend/src/types/salary.ts` ✅ (WageType, AbsencePolicy 타입)
+  - `frontend/src/components/forms/SalaryForm.tsx` ✅ (급여 형태 선택 UI)
+
+### 2.5.2 결근 공제 계산 서비스
+- **상태**: ✅ 완료 (2026-01-23)
+- **우선순위**: 높음
+- **설명**:
+  - AbsenceCalculator 신규 구현
+  - 3가지 결근 정책: STRICT (일급 공제 + 주휴 미지급), MODERATE (주휴만 미지급), LENIENT (공제 없음)
+  - 소정근로일수 계산 (5인 이상: 공휴일 제외 / 5인 미만: 공휴일 포함)
+- **관련 파일**:
+  - `backend/app/domain/services/absence_calculator.py` ✅ (신규)
+  - `frontend/src/components/forms/SalaryForm.tsx` ✅ (결근 정책 선택 UI)
+
+### 2.5.3 주별 개근 체크 로직 수정
+- **상태**: ✅ 완료 (2026-01-23)
+- **우선순위**: 높음
+- **설명**:
+  - 주별 개근 → 해당 주 주휴수당 지급 (기존: 월 단위 일괄)
+  - 부분 주 완화: 월 경계에 걸친 주는 가능한 근무일 기준 판단
+  - 버그 수정: min_date/max_date를 월 전체 범위로 확장
+- **관련 파일**:
+  - `backend/app/domain/services/weekly_holiday_pay_calculator.py` ✅ (수정)
+  - `backend/app/tests/unit/test_weekly_holiday_pay_calculator.py` ✅ (테스트 기댓값 수정)
+
+### 2.5.4 캘린더 중심 UI 완성
+- **상태**: ✅ 완료 (2026-01-23)
+- **우선순위**: 높음
+- **설명**:
+  - 월 선택 드롭다운 + 월간 템플릿 채우기 버튼
+  - FullCalendar 연동 (날짜 클릭 시 시프트 추가/수정/삭제)
+  - 프리셋: 풀타임 주4/5/6, 오전/오후/야간조
+- **관련 파일**:
+  - `frontend/src/components/ShiftInput/ShiftInput.tsx` ✅ (월 선택, 템플릿)
+  - `frontend/src/components/ShiftInput/ShiftCalendar.tsx` ✅ (FullCalendar)
+  - `frontend/src/components/ShiftInput/ShiftModal.tsx` ✅ (시프트 모달)
+
+### 2.5.5 근무 요약 및 결과 표시
+- **상태**: ✅ 완료 (2026-01-23)
+- **우선순위**: 높음
+- **설명**:
+  - WorkSummary 컴포넌트: 출근일/결근일/총 시간/시간별 상세
+  - Home.tsx에 새 상태 연결 (wageType, hourlyWage, calculationMonth, absencePolicy)
+- **관련 파일**:
+  - `frontend/src/components/ResultDisplay/WorkSummary.tsx` ✅ (신규)
+  - `frontend/src/pages/Home.tsx` ✅ (상태 연결)
+  - `backend/app/api/routers/salary.py` ✅ (WorkSummary 응답 포함)
+
+---
+
+## Phase 3.0: 긴급 버그 수정 (P0) ✅ 완료
+
+> 목표: 법적 정확성 확보
+
+### 3.0.1 최저시급 오류 수정
+- **상태**: ✅ 완료 (2026-01-24)
+- **우선순위**: 긴급
+- **설명**:
+  - 전체 사이트 최저시급 10,030원 → **10,320원** 수정 (2026년 확정)
+  - 월 환산액: 10,320 × 209 = 2,156,880원 / 10,320 × 174 = 1,795,680원
+  - 관련 모든 계산 예시값 재계산 완료
+- **수정 파일** (7개):
+  - `frontend/src/pages/Guide/GuidePage.tsx` ✅
+  - `frontend/src/pages/FAQ.tsx` ✅
+  - `frontend/src/pages/Legal.tsx` ✅
+  - `frontend/src/pages/Examples/ExamplesPage.tsx` ✅
+  - `frontend/src/pages/Examples/ParttimeExample.tsx` ✅
+  - `frontend/src/pages/Examples/FulltimeExample.tsx` ✅
+  - `frontend/src/data/blogPosts.ts` ✅
+- **커밋**: `73f1649` (2026-01-24)
+
+### 3.0.2 월 소정근로시간 동적 계산
+- **상태**: ✅ 완료 (2026-01-24)
+- **우선순위**: 긴급
+- **설명**:
+  - 이전: `MONTHLY_REGULAR_HOURS = Decimal('174')` 고정
+  - 수정: `min(주 소정근로시간, 40) × 4.345` 동적 계산
+  - 209시간 방식: `min(주근로, 40) × 4.345 + (주근로÷40×8) × 4.345`
+  - 두 방식 모두 지원 (174시간 방식 / 209시간 방식)
+  - 프론트엔드: HoursMode 선택 UI + 자동 계산 표시
+- **수정 파일**:
+  - `backend/app/domain/services/salary_calculator.py` ✅ (동적 계산 로직)
+  - `backend/app/api/schemas/salary.py` ✅ (hours_mode 필드)
+  - `frontend/src/types/salary.ts` ✅ (HoursMode 타입)
+  - `frontend/src/components/forms/SalaryForm.tsx` ✅ (시간 방식 선택 UI)
+- **커밋**: `fe9936e` (2026-01-24)
+
+---
+
+## Phase 3.1: 역산 기능 (P2) ✅ 완료
+
+### 3.1.1 역산 계산기 (Net → Gross)
+- **상태**: ✅ 완료 (2026-01-23)
+- **설명**: 실수령액 입력 시 세전 금액 계산 (이진 탐색)
+- **관련 파일**:
+  - `backend/app/domain/services/reverse_calculator.py` ✅
+  - `frontend/src/pages/ReverseCalculator.tsx` ✅
+
+---
+
+## Phase S: Spring Boot 전환 (P0 - 아키텍처 전환)
+
+> **목표**: Python(FastAPI) → Kotlin(Spring Boot) 점진적 전환
+> **방향**: 급여계산/유저관리 = Spring, AI 챗봇 = Python 마이크로서비스
+> **기술 스택**: Kotlin + Spring Boot 3 + Gradle + JPA + Flyway + PostgreSQL(pgvector)
+
+### 전환 아키텍처 (3단계)
+
+```
+[1단계: 게이트웨이]
+  React → Spring Boot (인증/라우팅) → Python (기존 계산 프록시)
+
+[2단계: 도메인 전환]
+  React → Spring Boot (인증 + 급여계산) → Python (점진적 축소)
+
+[3단계: AI 서비스 분리]
+  React → Spring Boot (전체 API) ←→ Python AI Service (RAG/챗봇 전용)
+```
+
+### 멀티모듈 구조
+
+```
+backend-spring/
+├── api/             # Controller, DTO, GlobalExceptionHandler
+├── domain/          # Entity, VO, Service (외부 의존성 없음)
+├── infrastructure/  # JPA Repository, External API, Redis
+└── common/          # 공통 유틸, 예외 정의
+```
+
+---
+
+### S1. 프로젝트 초기 설정 + 인증 게이트웨이 ✅ 완료 (2026-01-25)
+
+#### S1.1 Spring Boot 프로젝트 생성
+- **상태**: ✅ 완료 (2026-01-25)
+- **우선순위**: 긴급
+- **설명**:
+  - Spring Initializr: Kotlin + Gradle (Kotlin DSL)
+  - 의존성: Spring Web, Spring Security, Spring Data JPA, Flyway, PostgreSQL
+  - 멀티모듈 구조: api / domain / infrastructure / common
+  - application.yml 프로파일: local, dev, prod
+  - Docker Compose: PostgreSQL 15 + pgvector 확장
+- **산출물**:
+  - `backend-spring/build.gradle.kts` (루트) ✅
+  - `backend-spring/settings.gradle.kts` ✅
+  - `backend-spring/api/`, `domain/`, `infrastructure/`, `common/` ✅
+  - `backend-spring/docker-compose.yml` (PostgreSQL + Redis + pgvector) ✅
+  - `backend-spring/README.md` ✅
+
+#### S1.2 Spring Security + JWT 인증
+- **상태**: ✅ 완료 (2026-01-25)
+- **우선순위**: 긴급
+- **설명**:
+  - JWT 발급/검증 필터 (기존 Python JWT 호환)
+  - User 엔티티 + JPA Repository
+  - 로그인/회원가입 API (`/api/v1/auth/login`, `/register`)
+  - Flyway 마이그레이션: V1__init_user.sql
+- **관련 파일**:
+  - `infrastructure/security/JwtTokenProvider.kt` ✅
+  - `infrastructure/security/JwtAuthenticationFilter.kt` ✅
+  - `infrastructure/security/SecurityConfig.kt` ✅
+  - `domain/entity/User.kt` ✅
+  - `infrastructure/repository/UserRepository.kt` ✅
+  - `api/service/AuthService.kt` ✅
+  - `api/controller/AuthController.kt` ✅
+
+#### S1.3 Python 프록시 설정
+- **상태**: ✅ 완료 (2026-01-25)
+- **우선순위**: 긴급
+- **설명**:
+  - WebClient로 기존 Python 서버 요청 전달
+  - 인증된 요청만 프록시 (JWT 검증 후)
+  - `/api/v1/salary/**`, `/api/v1/insurance/**` → Python 프록시
+  - 헬스체크 + 폴백 처리
+- **관련 파일**:
+  - `infrastructure/proxy/PythonProxyService.kt` ✅
+  - `api/controller/ProxyController.kt` ✅
+
+---
+
+### S2. 핵심 도메인 전환 (Kotlin 재작성)
+
+#### S2.1 Value Objects 전환
+- **상태**: ✅ 완료 (2026-01-25)
+- **우선순위**: 높음
+- **설명**:
+  - Money: `BigDecimal` 기반, `RoundingMode.HALF_UP`, 원 단위 반올림 ✅
+  - WorkingHours: 분 단위 저장, 시간 변환 메서드 ✅
+  - Kotlin `data class` 활용 ✅
+- **관련 파일**:
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/vo/Money.kt` ✅
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/vo/WorkingHours.kt` ✅
+
+#### S2.2 Entities 전환 (도메인 모델)
+- **상태**: ✅ 완료 (2026-01-25)
+- **우선순위**: 높음
+- **설명**:
+  - Employee: 검증 로직 + EmploymentType, CompanySize enum ✅
+  - WorkShift: `calculateWorkingHours()`, `calculateNightHours()` ✅
+  - Allowance: 4가지 분류 플래그 ✅
+  - Kotlin `data class` 기반 도메인 모델 (JPA 엔티티 아님)
+- **관련 파일**:
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/model/Employee.kt` ✅
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/model/WorkShift.kt` ✅
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/model/Allowance.kt` ✅
+
+#### S2.3 Domain Services 전환
+- **상태**: ✅ 완료 (2026-01-25)
+- **우선순위**: 높음
+- **설명**:
+  - 순수 함수 → Kotlin 클래스 (DI 지원, 사이드이펙트 없음)
+  - 전환 완료:
+    1. InsuranceCalculator (4대 보험, 2026년 요율) ✅
+    2. TaxCalculator (간이세액표) ✅
+    3. OvertimeCalculator (연장/야간/휴일) ✅
+    4. WeeklyHolidayPayCalculator (주휴수당) ✅
+    5. AbsenceCalculator (결근 공제 3정책) ✅
+    6. SalaryCalculator (오케스트레이터) ✅
+  - ReverseSalaryCalculator, WarningGenerator는 Phase S3에서 추가
+- **관련 파일**:
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/service/InsuranceCalculator.kt` ✅
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/service/TaxCalculator.kt` ✅
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/service/OvertimeCalculator.kt` ✅
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/service/WeeklyHolidayPayCalculator.kt` ✅
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/service/AbsenceCalculator.kt` ✅
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/service/SalaryCalculator.kt` ✅
+
+#### S2.4 Result DTO 전환
+- **상태**: ✅ 완료 (2026-01-25)
+- **우선순위**: 높음
+- **설명**:
+  - InsuranceResult, TaxResult, OvertimeResult ✅
+  - WeeklyHolidayPayResult, AbsenceResult ✅
+  - SalaryCalculationResult ✅
+  - 각 서비스 파일 내 `data class`로 구현
+- **관련 파일**:
+  - 각 서비스 파일 내 Result data class 포함
+
+---
+
+### S3. API 계층 전환 + 검증
+
+#### S3.1 Controller + DTO 구현
+- **상태**: ✅ 완료 (2026-01-25)
+- **우선순위**: 높음
+- **설명**:
+  - Request/Response DTO (기존 Pydantic 스키마 1:1 매핑) ✅
+  - SalaryController: `/api/v1/salary/calculate` ✅
+  - InsuranceController: `/api/v1/insurance/rates`, `/calculate` ✅
+  - TaxController: `/api/v1/tax/calculate`, `/estimate-annual` ✅
+  - GlobalExceptionHandler: `@ControllerAdvice` 확장 ✅
+  - API 응답 구조 기존과 동일 유지 (프론트엔드 수정 최소화) ✅
+- **구현 파일**: (총 16개)
+  - DTO Common: `MoneyResponse.kt`, `WorkingHoursResponse.kt`
+  - DTO Request: `EmployeeRequest.kt`, `AllowanceRequest.kt`, `WorkShiftRequest.kt`, `SalaryCalculationRequest.kt`, `InsuranceRequest.kt`, `TaxRequest.kt`
+  - DTO Response: `SalaryCalculationResponse.kt` (9개 nested data class 포함), `InsuranceResponse.kt`, `TaxResponse.kt`
+  - Controller: `SalaryController.kt`, `InsuranceController.kt`, `TaxController.kt`
+  - Domain: `SalaryTypes.kt` (WageType, AbsencePolicy, HoursMode enum)
+  - Exception: `GlobalExceptionHandler.kt` (IllegalArgumentException, IllegalStateException 추가)
+- **빌드 결과**: ✅ 컴파일 및 빌드 성공
+
+#### S3.2 테스트 + Python 결과 비교 검증
+- **상태**: ✅ 완료 (2026-01-25)
+- **우선순위**: 높음
+- **설명**:
+  - 단위 테스트: JUnit 5 + H2 인메모리 DB ✅
+  - 통합 테스트: `@SpringBootTest` + `@AutoConfigureMockMvc` ✅
+  - **핵심: Python vs Kotlin 1원 일치 검증** ✅
+    - 동일 입력값으로 양쪽 API 호출
+    - 결과 비교 스크립트 (net_pay, 각 보험료, 세금 등)
+    - 불일치 시 상세 로그 + 테스트 실패
+- **구현 파일**: (총 6개)
+  - Controller 테스트: `SalaryControllerTest.kt`, `InsuranceControllerTest.kt`, `TaxControllerTest.kt` (20개 테스트 전체 통과)
+  - 테스트 설정: `application-test.yml`, `TaxRequestValidator.kt`
+  - 검증 스크립트: `scripts/verify_parity.py`, `scripts/README.md`
+- **빌드 결과**: ✅ 모든 테스트 통과 (20/20)
+- **InsuranceResult 개선**: 각 보험별 적용 기준액 (base) 추가 반환
+
+#### S3.3 Python AI 마이크로서비스화
+- **상태**: ✅ 계획 완료 (2026-01-25, 실제 전환은 Phase 6)
+- **우선순위**: 중간 (Phase 6 이전 완료)
+- **설명**:
+  - Python 서버에서 API 로직 제거 (급여계산, 보험, 세금)
+  - AI 전용 엔드포인트만 유지:
+    - `/ai/chat/stream` (RAG 챗봇)
+    - `/ai/embed` (문서 임베딩)
+    - `/ai/search` (벡터 검색)
+  - Spring → Python 통신: REST WebClient
+  - 모든 DB 접근은 Spring 경유 (데이터 무결성)
+- **구현 파일**:
+  - `AiServiceClient.kt` - Spring → Python 통신 클라이언트 ✅
+  - `PYTHON_AI_MICROSERVICE_PLAN.md` - 상세 전환 계획 문서 ✅
+- **실제 전환**: Phase 6 (AI 챗봇 구현) 시 수행 예정
+
+---
+
+## Phase 3.5: 근무자 등록 시스템 (P1 - Spring으로 구현)
+
+> 목표: 근무자 정보 관리 + 급여 자동화 기반 구축
+> 참조: `docs/근로계약서.pdf` (실제 계약서 양식)
+> ⚠️ **Phase S 완료 후 진행** — 아래 관련 파일 경로는 Spring 전환 후 `backend-spring/` 하위로 변경됨
+
+### 3.5.1 근무자 DB 모델 설계
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **설명**:
+  - Employee 테이블 확장 (현재: employment_type, company_size만 있음)
+  - 추가 필드:
+    - `name`: 이름
+    - `resident_id_prefix`: 주민번호 앞 7자리 (YYMMDD-N)
+    - `birth_date`: 생년월일 (주민번호에서 자동 추출)
+    - `is_foreigner`: 외국인 여부 (성별코드 5~8이면 외국인)
+    - `visa_type`: 체류자격 (E-9, F-4 등, 외국인만)
+    - `contract_start_date`: 계약 시작일
+    - `work_start_time`: 근무 시작시간 (기본: 09:00)
+    - `work_end_time`: 근무 종료시간 (기본: 18:00)
+    - `break_minutes`: 휴게시간 (분, 기본: 60)
+    - `weekly_work_days`: 주 근무일수 (기본: 5)
+    - `probation_months`: 수습기간 (월, 0=없음)
+    - `probation_rate`: 수습 급여 비율 (%, 기본: 100)
+- **관련 파일**:
+  - `backend/app/domain/entities/employee.py` (수정)
+  - `backend/app/db/models.py` (수정)
+  - `backend/alembic/versions/` (마이그레이션)
+
+### 3.5.2 급여 기간/지급일 설정
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **설명**:
+  - PayrollConfig 모델:
+    - `period_start_day`: 급여 기간 시작일 (기본: 1)
+    - `period_end_day`: 급여 기간 종료일 (기본: 말일)
+    - `pay_day`: 급여 지급일 (기본: 20)
+    - `weekly_holiday`: 주휴일 요일 (기본: 일요일)
+    - `week_start_day`: 주 시작 요일 (기본: 월요일)
+- **관련 파일**:
+  - `backend/app/domain/entities/payroll_config.py` (신규)
+  - `backend/app/api/schemas/employee.py` (신규)
+
+### 3.5.3 국민연금 연령 제한 처리
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **설명**:
+  - 만 60세 이상: 국민연금 의무가입 대상 아님
+  - 주민번호 앞자리에서 나이 자동 계산
+  - 60세 이상 시 "국민연금 제외 가능" 안내 표시
+  - 보험료 계산 시 자동 제외 옵션
+- **로직**:
+  ```python
+  def calculate_age(resident_prefix: str) -> int:
+      # YYMMDD-N에서 나이 계산
+      year_prefix = 1900 if N in [1,2,5,6] else 2000
+      birth_year = year_prefix + int(resident_prefix[:2])
+      return current_year - birth_year
+  ```
+
+### 3.5.4 근무자 등록 UI
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **설명**:
+  - 근무자 정보 입력 폼:
+    - 이름, 주민번호 앞 7자리
+    - 외국인 여부 (자동 감지 + 수동 토글)
+    - 체류자격 선택 (외국인만 표시)
+    - 계약 시작일
+    - 근무시간 (시작/종료/휴게)
+    - 주 근무일수
+    - 수습기간/비율
+  - 근무자 목록 페이지 (/employees)
+  - 근무자 상세/수정 페이지
+- **관련 파일**:
+  - `frontend/src/pages/Employees/EmployeeList.tsx` (신규)
+  - `frontend/src/pages/Employees/EmployeeForm.tsx` (신규)
+  - `frontend/src/components/forms/EmployeeInfoForm.tsx` (수정 - 확장)
+
+### 3.5.5 근무자 API 엔드포인트
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **설명**:
+  - CRUD: POST/GET/PUT/DELETE /api/v1/employees
+  - 무료 요금제: 최대 2명 제한 (Phase 7에서 적용)
+- **관련 파일**:
+  - `backend/app/api/routers/employees.py` (신규)
+  - `backend/app/api/schemas/employee.py` (신규)
+
+---
+
+## Phase 3.6: 급여 설정 고도화 (P1 - Spring으로 구현)
+
+> 목표: 4대보험 유연 설정 + 외국인 지원 + 포괄임금제
+
+### 3.6.1 4대보험 개별 체크박스
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **설명**:
+  - 국민연금, 건강보험, 장기요양보험, 고용보험 각각 체크박스
+  - 기본값: 전체 적용 (체크됨)
+  - 만 60세 이상: 국민연금 자동 해제 + 안내
+  - 주 15시간 미만: 고용보험 제외 가능 안내
+- **관련 파일**:
+  - `backend/app/api/schemas/salary.py` (insurance_options 필드)
+  - `backend/app/domain/services/insurance_calculator.py` (조건부 계산)
+  - `frontend/src/components/forms/InsuranceOptions.tsx` (신규)
+
+### 3.6.2 외국인 근로자 체류자격별 보험 자동 세팅
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **설명**:
+  - 외국인 체크 시 체류자격 선택 드롭다운 표시
+  - 체류자격별 자동 적용 규칙:
+    | 체류자격 | 국민연금 | 건강보험 | 고용보험 | 산재보험 |
+    |---------|---------|---------|---------|---------|
+    | F-2, F-5, F-6 | ✅ 의무 | ✅ 의무 | ✅ 의무 | ✅ 의무 |
+    | E-9, H-2 | ⚠️ 임의 | ✅ 의무 | ⚠️ 임의 | ✅ 의무 |
+    | F-4 (재외동포) | ⚠️ 임의 | ✅ 의무 | ⚠️ 임의 | ✅ 의무 |
+    | D-7~D-9 | ⚠️ 상호주의 | ✅ 의무 | ⚠️ 상호주의 | ✅ 의무 |
+  - 자동 세팅 후 사용자가 수동 변경 가능
+- **관련 파일**:
+  - `backend/app/core/visa_insurance_rules.py` (신규)
+  - `frontend/src/components/forms/ForeignerInsurance.tsx` (신규)
+
+### 3.6.3 포괄임금제 지원
+- **상태**: ⬜ 대기
+- **우선순위**: 중간
+- **설명**:
+  - 계약서 사례: 연장수당을 시간당 고정금액으로 설정 (예: 10,500원)
+  - 설정 옵션:
+    - 포괄임금제 여부 체크
+    - 연장수당 시간당 금액 입력
+    - 월 포함 연장근로 예정시간 입력
+  - 경고: 포괄임금제 시 최저시급 미달 여부 검증
+- **관련 파일**:
+  - `backend/app/api/schemas/salary.py` (inclusive_wage_options)
+  - `backend/app/domain/services/overtime_calculator.py` (분기 로직)
+
+### 3.6.4 209시간/174시간 자동 계산 개선
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **설명**:
+  - 현재: 사용자가 방식 선택 (수동)
+  - 개선: 주 근로시간 입력 시 월 소정근로시간 자동 계산
+  - 174방식: `min(주근로, 40) × 4.345`
+  - 209방식: `(min(주근로, 40) + min(주근로,40)/40×8) × 4.345`
+  - 계약서 방식 사례: `(7×6) × 4.345 + 7 × 4.345 = 약 213시간`
+- **관련 파일**:
+  - `backend/app/domain/services/salary_calculator.py` (계산 로직)
+  - `frontend/src/components/forms/SalaryForm.tsx` (자동 표시)
+
+---
+
+## Phase 3.7: 급여 구조 시뮬레이션 (P2 - Spring으로 구현)
+
+> 목표: 같은 총액에서 기본급/수당 배분에 따른 인건비 차이 비교
+> 참고: A=250만 통째 기본급 vs B=10,320시급+수당 사례
+
+### 3.7.1 급여 구조 비교 엔진
+- **상태**: ⬜ 대기
+- **우선순위**: 중간
+- **설명**:
+  - 입력: 월 총 급여액, 주 근로시간
+  - 시뮬레이션 항목:
+    - 기본급 비율별 통상시급 변화
+    - 통상시급에 따른 가산수당 차이
+    - 퇴직금 산정 기준액 차이
+    - 연차수당 차이 (1년 이상 근무 시)
+  - 결과: "사업주 연간 인건비 부담" 비교표
+- **관련 파일**:
+  - `backend/app/domain/services/salary_simulator.py` (신규)
+  - `backend/app/api/routers/simulation.py` (신규)
+
+### 3.7.2 시뮬레이션 UI
+- **상태**: ⬜ 대기
+- **우선순위**: 중간
+- **설명**:
+  - 슬라이더로 기본급 비율 조정
+  - 실시간 비교표 (A안 vs B안)
+  - 차트: 연간 인건비 구성 비교
+- **관련 파일**:
+  - `frontend/src/pages/Simulation/SalarySimulation.tsx` (신규)
+  - `frontend/src/components/charts/CostCompare.tsx` (신규)
+
+---
+
+## Phase 3.8: 근로계약서 작성 폼 (P2 - Spring으로 구현)
+
+> 목표: 표준근로계약서 양식 기반 작성 + PDF 출력
+> 참조: `docs/근로계약서.pdf`
+
+### 3.8.1 계약서 입력 폼
+- **상태**: ⬜ 대기
+- **우선순위**: 중간
+- **설명**:
+  - 표준근로계약서 양식 필드:
+    1. 계약일자, 수습기간
+    2. 근로시간 (시업/종업, 휴게시간)
+    3. 연장·야간·휴일근로 조건
+    4. 근무장소, 직위, 담당업무
+    5. 근로일, 주휴일
+    6. 임금 (기본급, 수당 항목별)
+    7. 임금 지급시기/방법
+  - 등록된 근무자 정보 자동 반영
+- **관련 파일**:
+  - `frontend/src/pages/Contract/ContractForm.tsx` (신규)
+  - `frontend/src/types/contract.ts` (신규)
+
+### 3.8.2 계약서 PDF 출력
+- **상태**: ⬜ 대기
+- **우선순위**: 중간
+- **설명**:
+  - 입력된 정보로 표준근로계약서 PDF 생성
+  - jsPDF + 한글 폰트 지원
+  - 개인정보 동의서 포함 옵션
+- **관련 파일**:
+  - `frontend/src/utils/contractPdfGenerator.ts` (신규)
+
+---
+
+## Phase 3.9: 기존 고급 기능 (P2)
+
+> 기존 Phase 3의 나머지 항목
+
+### 3.9.1 급여명세서 PDF 출력
+- **상태**: ⬜ 대기
+- **우선순위**: 중간
+- **설명**:
+  - jsPDF 라이브러리 통합
+  - 법적 요구사항 준수 (급여명세서 교부의무)
+- **관련 파일**:
+  - `frontend/src/utils/pdfGenerator.ts` (신규)
+  - `frontend/src/components/ResultDisplay/PDFExport.tsx` (신규)
+
+### 3.9.2 Excel/CSV 임포트/익스포트
+- **상태**: ⬜ 대기
+- **우선순위**: 중간
+- **설명**:
+  - 시프트 데이터 일괄 입력
+  - 급여 계산 결과 다운로드
+- **관련 파일**:
+  - `frontend/src/utils/excelHandler.ts` (신규)
+
+### 3.9.3 시프트 검증
+- **상태**: ⬜ 대기
+- **우선순위**: 중간
+- **설명**:
+  - 11시간 휴식 권장 경고
+  - 시프트 간 간격 확인
+- **관련 파일**:
+  - `backend/app/domain/services/shift_validator.py` (신규)
+
+---
+
+## Phase 4: SEO 및 마케팅 (P3)
+
+> 목표: 트래픽 확보
+
+### 4.1 Google AdSense 연동
+- **상태**: ⬜ 대기
+- **우선순위**: 낮음
+- **예상 작업량**: 심사 대기
+- **설명**:
+  - AdSense 계정 생성
+  - 광고 코드 삽입
+  - 승인 대기
+- **관련 파일**:
+  - `frontend/index.html` (수정)
+  - `frontend/src/components/common/AdBanner.tsx` (신규)
+
+### 4.2 Google Search Console 등록
+- **상태**: ⬜ 대기
+- **우선순위**: 낮음
+- **예상 작업량**: 1일
+- **설명**:
+  - 사이트 소유권 확인
+  - sitemap.xml 제출
+  - 색인 요청
+- **관련 파일**:
+  - `frontend/public/sitemap.xml` (확인)
+  - `frontend/public/robots.txt` (확인)
+
+### 4.3 블로그 콘텐츠 5개 작성
+- **상태**: ⬜ 대기
+- **우선순위**: 낮음
+- **예상 작업량**: 5일
+- **설명**:
+  - SEO 키워드 기반 콘텐츠
+  - 급여 계산 가이드 시리즈
+- **콘텐츠 계획**:
+  1. "2026년 4대보험 요율 총정리"
+  2. "연장근로수당 계산법 완벽 가이드"
+  3. "주휴수당 계산기 사용법"
+  4. "최저임금 위반 시 과태료"
+  5. "급여명세서 필수 기재사항"
+
+### 4.4 Lighthouse 90+ 성능 최적화
+- **상태**: ⬜ 대기
+- **우선순위**: 낮음
+- **예상 작업량**: 2일
+- **설명**:
+  - React.memo 적용
+  - Code Splitting
+  - Image Lazy Loading
+  - Core Web Vitals 개선
+- **목표 점수**:
+  - Performance: 90+
+  - Accessibility: 90+
+  - Best Practices: 90+
+  - SEO: 90+
+
+---
+
+## Phase 5: 급여대장
+
+> 상세 PRD: [PRD_PAYROLL_LEDGER.md](./PRD_PAYROLL_LEDGER.md)
+
+### 5.1 급여대장 - 핵심 CRUD
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **예상 작업량**: 1주
+- **설명**:
+  - 근무 계약 CRUD (work_contracts)
+  - 출퇴근 기록 CRUD (work_shifts)
+  - 직원 관리 연동
+- **신규 DB 테이블**:
+  - `work_contracts`: 근무 계약 (월급제/시급제, 수당)
+  - `work_shifts`: 출퇴근 기록 (날짜별)
+
+### 5.2 급여대장 - UI + 상태 관리
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **예상 작업량**: 1주
+- **설명**:
+  - 급여 기간 관리 (payroll_periods)
+  - 상태 흐름: DRAFT → CONFIRMED → PAID
+  - 직원별 급여 일괄 계산
+- **신규 DB 테이블**:
+  - `payroll_periods`: 급여 기간 (연월별 상태)
+  - `payroll_entries`: 급여대장 엔트리
+
+### 5.3 급여대장 - PDF/엑셀 출력
+- **상태**: ⬜ 대기
+- **우선순위**: 중간
+- **예상 작업량**: 3일
+- **설명**:
+  - PDF 급여명세서 출력 (법적 요구사항 준수)
+  - 엑셀 내보내기
+  - 연간 통계
+
+---
+
+## Phase 6: AI 노무 자문 챗봇 (RAG 기반 - Python 마이크로서비스)
+
+> 상세 설계서: [AI_CHATBOT_ARCHITECTURE.md](./AI_CHATBOT_ARCHITECTURE.md)
+> 벤치마크: [follaw.co.kr](https://www.follaw.co.kr/) "Ait" 서비스
+> ⚠️ **Python 마이크로서비스로 구현** — Spring에서 REST/gRPC로 호출. 모든 DB 접근은 Spring 경유.
+
+### 핵심 아키텍처
+
+```
+[사용자] → [React Chat UI (SSE)] → [FastAPI /api/v1/chat/stream]
+                                              ↓
+                                       [LangGraph Agent]
+                                         ├── Router Node (의도 분류)
+                                         ├── RAG Retrieve (pgvector)
+                                         ├── Tool Node (급여계산, DB조회)
+                                         └── Generate Node (Tiered LLM)
+                                              ├── Gemini Flash (무료, 기본)
+                                              ├── Groq Llama 3.3 (무료, 백업)
+                                              └── GPT-4o-mini (유료, 고난도)
+```
+
+### 6.1 DB + 벡터 인프라
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **예상 작업량**: 3일
+- **설명**:
+  - Railway PostgreSQL에 pgvector 확장 활성화
+  - 임베딩: multilingual-e5-large (무료, 1024차원)
+  - Alembic 마이그레이션
+- **신규 DB 모델**:
+  - `DocumentModel`: 법령/판례 문서 메타데이터
+  - `DocumentChunkModel`: 문서 청크 + 벡터 (embedding Vector(1024))
+  - `UserDocumentChunkModel`: 사업장별 데이터 벡터 (Multi-tenant)
+  - `ChatSessionModel`: 대화 세션
+  - `ChatMessageModel`: 대화 메시지 (role, content, citations)
+  - `TokenUsageModel`: 토큰 사용량 추적 (일별 집계)
+- **관련 파일**:
+  - `backend/app/db/models.py` (수정)
+  - `backend/app/ai/__init__.py` (신규)
+
+### 6.2 RAG 파이프라인
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **예상 작업량**: 4일
+- **설명**:
+  - 법령 데이터 수집 (law.go.kr API, 8개 법률)
+  - 법령 조문별 청킹 + 판례 섹션별 청킹
+  - Hybrid Search: 벡터 유사도(0.7) + 키워드 검색(0.3)
+  - 사업장 데이터 벡터화 (직원/급여/시프트 → 자연어 변환)
+- **데이터 소스**:
+  - 근로기준법, 최저임금법, 소득세법 등 8개 법률
+  - 고용노동부 행정해석 ~500건
+  - 사업장 내부 DB (Employee, SalaryRecord)
+- **관련 파일**:
+  - `backend/app/ai/rag/embedder.py` (신규)
+  - `backend/app/ai/rag/chunker.py` (신규)
+  - `backend/app/ai/rag/retriever.py` (신규)
+  - `backend/app/ai/rag/ingestion.py` (신규)
+
+### 6.3 LangGraph Agent
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **예상 작업량**: 5일
+- **설명**:
+  - Multi-Agent 오케스트레이션 (Router → Specialist)
+  - Tools: 급여계산(기존 SalaryCalculator 래핑), 법령검색, DB조회
+  - Tiered LLM Routing: FAQ캐시 → Gemini → Groq → GPT-4o-mini
+  - 3-tier 캐싱: 정적FAQ + 시맨틱캐시 + 세션캐시
+- **관련 파일**:
+  - `backend/app/ai/agents/graph.py` (신규)
+  - `backend/app/ai/tools/salary_tool.py` (신규)
+  - `backend/app/ai/tools/law_search_tool.py` (신규)
+  - `backend/app/ai/llm/router.py` (신규)
+  - `backend/app/ai/cache/response_cache.py` (신규)
+
+### 6.4 API + 스트리밍
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **예상 작업량**: 3일
+- **설명**:
+  - POST /api/v1/chat/stream (SSE 실시간 응답)
+  - GET /api/v1/chat/sessions (세션 목록)
+  - Rate limiting: 30 req/hour (무료), 300 req/hour (프리미엄)
+  - 토큰 사용량 추적 및 일일 한도
+- **관련 파일**:
+  - `backend/app/ai/router.py` (신규)
+  - `backend/app/ai/schemas.py` (신규)
+  - `backend/app/ai/config.py` (신규)
+
+### 6.5 프론트엔드 Chat UI
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **예상 작업량**: 4일
+- **설명**:
+  - 플로팅 위젯 (우하단) + 전체 페이지 모드 (/chat)
+  - SSE 스트리밍 타이핑 효과
+  - 법령 인용 카드 (Citation) 표시
+  - 대화 세션 관리 사이드바
+- **관련 파일**:
+  - `frontend/src/components/Chat/ChatWidget.tsx` (신규)
+  - `frontend/src/components/Chat/ChatWindow.tsx` (신규)
+  - `frontend/src/components/Chat/MessageBubble.tsx` (신규)
+  - `frontend/src/components/Chat/Citation.tsx` (신규)
+  - `frontend/src/hooks/useChat.ts` (신규)
+  - `frontend/src/pages/Chat/ChatPage.tsx` (신규)
+
+### 6.6 문서화 + 데모
+- **상태**: ⬜ 대기
+- **우선순위**: 중간
+- **예상 작업량**: 2일
+- **설명**:
+  - 시스템 아키텍처 다이어그램 (C4 모델)
+  - RAG 파이프라인 흐름도
+  - 데모 시나리오 3개 준비
+    1. 법령 질의: "연장근로 가산율" → 근로기준법 제56조 인용
+    2. 급여 시뮬레이션: "기본급 280만원 실수령액" → 계산 결과
+    3. 사업장 맞춤: "최저임금 미달 위험 직원" → DB 분석
+- **관련 파일**:
+  - `docs/architecture/SYSTEM_ARCHITECTURE.md` (신규)
+  - `docs/architecture/RAG_PIPELINE.md` (신규)
+
+### 추가 패키지
+
+**백엔드 (requirements.txt 추가)**:
+```
+langchain>=0.3.0, langgraph>=0.2.0
+langchain-google-genai>=2.0.0, langchain-groq>=0.2.0
+sentence-transformers>=3.0.0, pgvector>=0.3.0
+sse-starlette>=2.0.0, tiktoken>=0.7.0, beautifulsoup4>=4.12.0
+```
+
+**프론트엔드 (package.json 추가)**:
+```
+react-markdown, remark-gfm
+```
+
+### 비용 전략 (예상 월 $10-20)
+
+| Tier | LLM | 비용 | 용도 |
+|------|-----|------|------|
+| 1 | 캐시 (FAQ 200개) | $0 | LLM 호출 없이 직접 반환 |
+| 2 | Gemini 2.0 Flash | $0 | 일반 질의 (1500 req/day) |
+| 3 | Groq Llama 3.3 70B | $0 | 백업 (14400 req/day) |
+| 4 | GPT-4o-mini | ~$5 | 복잡한 분석 |
+
+---
+
+## Phase 7: 요금제 및 사용량 제한 (P3)
+
+> 목표: 무료/유료 구분 적용
+
+### 7.1 무료 요금제 제한 구현
+- **상태**: ⬜ 대기
+- **우선순위**: 낮음
+- **설명**:
+  - 근무자 등록: **최대 2명**
+  - AI 상담: **월 5회**
+  - 3명째 등록 시도 시 업그레이드 안내 모달
+  - AI 상담 5회 초과 시 잔여 횟수 표시 + 차단
+- **관련 파일**:
+  - `backend/app/api/middleware/plan_limiter.py` (신규)
+  - `frontend/src/components/common/UpgradeModal.tsx` (신규)
+
+### 7.2 유료 요금제 정의
+- **상태**: ⬜ 대기
+- **우선순위**: 낮음
+- **설명**:
+  - Pro: 근무자 20명, AI 상담 100회/월
+  - Enterprise: 무제한
+  - 결제 시스템 연동 (추후)
+- **관련 파일**:
+  - `backend/app/core/plan_config.py` (신규)
+
+---
+
+## 기타
+
+### 6.1 테스트 에러 2건 수정
+- **상태**: ⬜ 대기
+- **우선순위**: 낮음
+- **예상 작업량**: 1시간
+- **설명**:
+  - 서비스 작동에 영향 없음
+  - `test_output.txt` 인코딩 문제
+  - `test_secured_api.py` 서버 실행 확인 필요
+
+---
+
+## 완료된 항목
+
+### ✅ Phase 1: 긴급 배포 (2026-01-21)
+- [x] Railway에 백엔드 배포
+- [x] PostgreSQL 연결
+- [x] 프론트엔드 환경변수 수정
+- [x] CORS 설정 확인
+- [x] 전체 기능 테스트
+
+### ✅ 추가 기능 (2026-01-21)
+- [x] 급여 구성 방식 선택 옵션 (209시간/174시간)
+- [x] 금액 입력 콤마 포맷팅
+
+### ✅ 랜딩페이지 리뉴얼 (2026-01-22)
+- [x] 마케팅 전문 랜딩페이지 (7개 섹션)
+- [x] 페이지 구조 개편 (/, /calculator, /dashboard)
+- [x] 네비게이션 개선 (투명 모드, 조건부 메뉴)
+- [x] 대시보드 페이지
+- [x] CTA 버튼 로그인 상태별 조건부 렌더링
+
+### ✅ 월간 시프트 기반 급여 계산 재설계 (2026-01-23)
+- [x] 월급제/시급제 분기 로직 (SalaryCalculator)
+- [x] 결근 공제 계산 서비스 (AbsenceCalculator, 3가지 정책)
+- [x] 주별 개근 체크 로직 수정 (주휴수당 주별 지급)
+- [x] 캘린더 중심 UI (월 선택, 템플릿 채우기, ShiftModal)
+- [x] 근무 요약 컴포넌트 (WorkSummary)
+- [x] Home.tsx 상태 연결 (wageType, hourlyWage, calculationMonth, absencePolicy)
+- [x] Cloudflare Pages 배포 완료 (커밋 d5e3827)
+
+### ✅ UI 일러스트레이션 (2026-01-23)
+- [x] SVG 3D 아이콘 (PageIcons.tsx - 7개)
+- [x] 히어로 대시보드 목업 (HeroIllustration.tsx)
+- [x] 빈 상태 일러스트 (EmptyState.tsx)
+- [x] 배포 완료 (커밋 ad5b2bd)
+
+### ✅ 역산 계산기 (2026-01-23)
+- [x] 역산 계산 서비스 (reverse_calculator.py)
+- [x] 역산 계산기 UI (ReverseCalculator.tsx)
+- [x] 배포 완료
+
+### ✅ 긴급 버그 수정 - Phase 3.0 (2026-01-24)
+- [x] 최저시급 10,030원 → 10,320원 전체 사이트 수정 (7개 파일, 커밋 73f1649)
+- [x] 월 소정근로시간 동적 계산 구현 (174방식/209방식 모두 지원, 커밋 fe9936e)
+
+### ✅ Spring Boot Railway 배포 완료 (2026-01-25)
+- [x] Railway 배포 완료 (7가지 빌드 이슈 해결)
+- [x] 프론트엔드-백엔드 통신 이슈 해결:
+  - [x] 필드명 불일치 (full_name → name)
+  - [x] API 응답 형식 불일치 (access_token → data.accessToken)
+  - [x] User 타입 수정 (full_name/is_active → name/role)
+  - [x] UTF-8 인코딩 설정 (application-prod.yml + SecurityConfig)
+- [x] 회원가입/로그인 정상 작동 확인 ✅
+
+---
+
+## 일정 계획
+
+```
+=== 완료 ===
+Week 1 (Phase 2 - 핵심 기능): ✅ 완료
+Week 1.5 (Phase 2.5 - 계산 재설계): ✅ 완료
+Week 2-Day1 (Phase 3.0 - 긴급 버그): ✅ 완료
+
+=== Spring Boot 전환 (Phase S) ===
+Week 2-3 (Phase S1 - 초기설정 + 게이트웨이): ✅ 완료 (2026-01-25)
+├── Day 1-2: Spring Boot 프로젝트 생성 (Kotlin + Gradle + 멀티모듈) ✅
+├── Day 3-4: Docker Compose + Flyway + PostgreSQL/pgvector ✅
+├── Day 5-6: Spring Security + JWT 인증 ✅
+└── Day 7: Python 프록시 설정 ✅
+
+Week 4-5 (Phase S2 - 도메인 전환):
+├── Day 8-9: Value Objects (Money, WorkingHours)
+├── Day 10-11: Entities (Employee, WorkShift, Allowance) + JPA
+├── Day 12-15: Domain Services 8개 Kotlin 재작성
+└── Day 16: Result DTO 전환
+
+Week 6 (Phase S3 - API 전환 + 검증):
+├── Day 17-18: Controller + Request/Response DTO
+├── Day 19-20: 단위 테스트 (JUnit 5 + MockK)
+├── Day 21: 통합 테스트 (TestContainers)
+└── Day 22: Python vs Kotlin 1원 일치 검증 + 프록시 제거
+
+=== Spring 기반 기능 확장 ===
+Week 7 (Phase 3.5 - 근무자 등록, Spring):
+├── Day 23-24: Employee JPA 모델 확장 + Repository
+├── Day 25-26: 근무자 등록 API + UI
+└── Day 27: 국민연금 연령 제한 + 급여기간 설정
+
+Week 8 (Phase 3.6 - 급여 고도화, Spring):
+├── Day 28-29: 4대보험 체크박스 + 외국인 보험
+├── Day 30: 포괄임금제 지원
+└── Day 31: 209/174시간 자동계산 개선
+
+Week 9 (Phase 3.7 + 3.8 - 시뮬레이션 + 계약서):
+├── Day 32-33: 급여 구조 시뮬레이션 엔진 + UI
+└── Day 34-35: 근로계약서 폼 + PDF 출력
+
+Week 10 (Phase 3.9 + 4 - 고급기능 + 마케팅):
+├── Day 36-37: 급여명세서 PDF + Excel/CSV
+├── Day 38: 시프트 검증
+└── Day 39-40: SEO, AdSense, Lighthouse
+
+Week 11-12 (Phase 5 - 급여대장, Spring):
+├── Week 11: 급여대장 CRUD + UI + 상태관리
+└── Week 12: PDF/엑셀 출력 + 연간 통계
+
+=== Python AI 마이크로서비스 ===
+Week 13 (Phase S3.3 + 6.1-6.2 - AI 인프라):
+├── Python 서버 AI 전용화 (기존 API 로직 제거)
+├── pgvector 임베딩 인프라
+└── RAG 파이프라인 (법령 청킹 + 검색)
+
+Week 14-15 (Phase 6.3-6.5 - AI 챗봇):
+├── Week 14: LangGraph Agent + API 스트리밍
+└── Week 15: Chat UI + 문서화/데모
+
+Week 16 (Phase 7 - 요금제):
+└── 무료/유료 제한 적용 + 업그레이드 안내
+```
+
+### 실행 우선순위 요약
+
+```
+[즉시] Phase S1 → S2 → S3 (Spring 전환)
+  ↓
+[이후] Phase 3.5~3.9 (Spring으로 기능 확장)
+  ↓
+[이후] Phase 5 (급여대장, Spring)
+  ↓
+[이후] Phase S3.3 + 6 (Python AI 마이크로서비스)
+  ↓
+[마지막] Phase 4 (마케팅) + Phase 7 (요금제)
+```
+
+---
+
+## 변경 이력
+
+| 날짜 | 변경 내용 |
+|------|-----------|
+| 2026-01-22 | 초기 작성 (PROJECT_ANALYSIS_REPORT.md v1.3.0 기반) |
+| 2026-01-23 | AI 챗봇 상세 설계 반영 (Phase 6 세분화, 아키텍처 확정) |
+| 2026-01-23 | Phase 2 완료 (경고 시스템 강화, 법정 요율 JSON 관리) |
+| 2026-01-23 | Phase 2.5 완료 (월간 시프트 기반 급여 계산 재설계, 배포 완료) |
+| 2026-01-23 | Phase 3.0~3.8 신규 추가 (근무자 등록, 급여 고도화, 시뮬레이션, 계약서) |
+| 2026-01-23 | Phase 7 추가 (요금제 제한) |
+| 2026-01-23 | 역산 기능/UI 일러스트 완료 반영, 일정 재편성 |
+| 2026-01-24 | Phase 3.0 완료 (최저시급 10,320원 수정, 월 소정근로시간 동적 계산) |
+| 2026-01-25 | **Phase S 추가 (Spring Boot 전환 계획)**: Kotlin+Gradle+JPA+Flyway, 3단계 점진 전환, 일정 재편 |
+| 2026-01-25 | **Phase S1 완료**: Spring Boot 멀티모듈 프로젝트 생성, JWT 인증, Python 프록시 구현 |
+| 2026-01-25 | **Phase S2 완료**: Value Objects, Domain Models, Domain Services 6개 Kotlin 전환 |
+| 2026-01-25 | **Phase S3.1 완료**: Controller 3개 + DTO 16개 구현, API 계층 완성, 빌드 성공 |
+| 2026-01-25 | **Phase S3 완료 (전체)**: Spring Boot API 전환 + 테스트 20개 통과 + Python 비교 검증 스크립트 + AI 마이크로서비스 계획 완료 |
+| 2026-01-25 | **Railway 배포 완료**: 프론트엔드-백엔드 통신 이슈 4건 해결, 회원가입/로그인 정상 작동 |
+
+---
+
+**작성자**: Claude Code
+**마지막 업데이트**: 2026-01-25 (Railway 배포 완료 - Spring Boot + 프론트엔드 연동)
