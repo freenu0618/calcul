@@ -3,9 +3,9 @@
  */
 
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navigation from './components/layout/Navigation';
 import Footer from './components/layout/Footer';
@@ -34,6 +34,13 @@ import ReverseCalculator from './pages/ReverseCalculator';
 import { EmployeeList, EmployeeForm } from './pages/Employees';
 
 // GA 타입은 index.html의 전역 스크립트에서 정의됨
+
+// 인증 필요 라우트 (로그인 안 되어 있으면 로그인 페이지로)
+function PrivateRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return <div className="flex justify-center items-center h-64">로딩 중...</div>;
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+}
 
 // GA4 페이지뷰 추적 컴포넌트
 function PageViewTracker() {
@@ -94,10 +101,10 @@ function App() {
                 <Route path="/blog" element={<BlogPage />} />
                 <Route path="/blog/:postId" element={<BlogPost />} />
 
-                {/* 직원 관리 */}
-                <Route path="/employees" element={<EmployeeList />} />
-                <Route path="/employees/new" element={<EmployeeForm />} />
-                <Route path="/employees/:id/edit" element={<EmployeeForm />} />
+                {/* 직원 관리 (인증 필요) */}
+                <Route path="/employees" element={<PrivateRoute><EmployeeList /></PrivateRoute>} />
+                <Route path="/employees/new" element={<PrivateRoute><EmployeeForm /></PrivateRoute>} />
+                <Route path="/employees/:id/edit" element={<PrivateRoute><EmployeeForm /></PrivateRoute>} />
 
                 {/* 기타 페이지 */}
                 <Route path="/about" element={<About />} />

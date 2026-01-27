@@ -20,6 +20,25 @@ const VISA_OPTIONS: { value: VisaType; label: string }[] = [
   { value: 'D-9', label: 'D-9 (무역경영)' },
 ];
 
+/** 시간 문자열을 분으로 변환 */
+const timeToMinutes = (time: string): number => {
+  const [h, m] = time.split(':').map(Number);
+  return h * 60 + m;
+};
+
+/** 법정 최소 휴게시간 계산 (근로기준법 제54조) */
+const getLegalBreakMinutes = (workHours: number): number => {
+  if (workHours >= 8) return 60; // 8시간 이상: 1시간
+  if (workHours >= 4) return 30; // 4시간 이상: 30분
+  return 0;
+};
+
+/** 일일 근로시간 계산 (시업~종업 - 휴게시간) */
+const calcDailyWorkHours = (start: string, end: string, breakMin: number): number => {
+  const totalMin = timeToMinutes(end) - timeToMinutes(start);
+  return Math.max(0, Math.floor((totalMin - breakMin) / 60));
+};
+
 export default function EmployeeForm() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -88,6 +107,27 @@ export default function EmployeeForm() {
       const genderCode = parseInt(value.charAt(7), 10);
       setIsForeigner(genderCode >= 5 && genderCode <= 8);
     }
+  };
+
+  /** 근무시간 변경 시 휴게시간/일일근로시간 자동 계산 */
+  const handleWorkTimeChange = (field: 'work_start_time' | 'work_end_time', value: string) => {
+    const newStart = field === 'work_start_time' ? value : (form.work_start_time || '09:00');
+    const newEnd = field === 'work_end_time' ? value : (form.work_end_time || '18:00');
+
+    // 총 근무시간 계산 (휴게 전)
+    const totalMinutes = timeToMinutes(newEnd) - timeToMinutes(newStart);
+    const rawHours = totalMinutes / 60;
+
+    // 법정 최소 휴게시간 계산
+    const legalBreak = getLegalBreakMinutes(rawHours);
+    const dailyHours = calcDailyWorkHours(newStart, newEnd, legalBreak);
+
+    setForm({
+      ...form,
+      [field]: value,
+      break_minutes: legalBreak,
+      daily_work_hours: dailyHours,
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -223,7 +263,7 @@ export default function EmployeeForm() {
                 <input
                   type="time"
                   value={form.work_start_time}
-                  onChange={(e) => setForm({ ...form, work_start_time: e.target.value })}
+                  onChange={(e) => handleWorkTimeChange('work_start_time', e.target.value)}
                   className="form-input"
                 />
               </FormField>
@@ -231,7 +271,7 @@ export default function EmployeeForm() {
                 <input
                   type="time"
                   value={form.work_end_time}
-                  onChange={(e) => setForm({ ...form, work_end_time: e.target.value })}
+                  onChange={(e) => handleWorkTimeChange('work_end_time', e.target.value)}
                   className="form-input"
                 />
               </FormField>
@@ -239,10 +279,13 @@ export default function EmployeeForm() {
                 <input
                   type="number"
                   value={form.break_minutes}
-                  onChange={(e) => setForm({ ...form, break_minutes: parseInt(e.target.value, 10) })}
+                  onChange={(e) => setForm({ ...form, break_minutes: parseInt(e.target.value, 10) || 0 })}
                   className="form-input"
                   min="0"
                 />
+                <p className="text-xs text-text-sub mt-1">
+                  법정: 4h→30분, 8h→60분
+                </p>
               </FormField>
             </div>
 
@@ -251,7 +294,7 @@ export default function EmployeeForm() {
                 <input
                   type="number"
                   value={form.weekly_work_days}
-                  onChange={(e) => setForm({ ...form, weekly_work_days: parseInt(e.target.value, 10) })}
+                  onChange={(e) => setForm({ ...form, weekly_work_days: parseInt(e.target.value, 10) || 5 })}
                   className="form-input"
                   min="1"
                   max="7"
@@ -261,10 +304,13 @@ export default function EmployeeForm() {
                 <input
                   type="number"
                   value={form.daily_work_hours}
-                  onChange={(e) => setForm({ ...form, daily_work_hours: parseInt(e.target.value, 10) })}
+                  onChange={(e) => setForm({ ...form, daily_work_hours: parseInt(e.target.value, 10) || 8 })}
                   className="form-input"
                   min="1"
                 />
+                <p className="text-xs text-text-sub mt-1">
+                  (시업~종업) - 휴게시간
+                </p>
               </FormField>
             </div>
           </FormSection>

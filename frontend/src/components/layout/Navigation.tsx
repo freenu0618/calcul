@@ -11,7 +11,7 @@ const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
 
-  // 랜딩페이지 여부 확인 (투명 네비게이션용)
+  // 랜딩페이지 여부 확인 (fixed 네비게이션용)
   const isLandingPage = location.pathname === '/';
 
   // 로그인 상태에 따른 메뉴 분기
@@ -43,7 +43,7 @@ const Navigation = () => {
           {/* 로고 */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <span className={`text-2xl font-bold ${isLandingPage ? 'text-white' : 'text-blue-600'}`}>
+              <span className="text-2xl font-bold text-primary">
                 paytools
               </span>
             </Link>
@@ -57,12 +57,8 @@ const Navigation = () => {
                 to={item.path}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive(item.path)
-                    ? isLandingPage
-                      ? 'bg-white/20 text-white'
-                      : 'bg-blue-50 text-blue-600'
-                    : isLandingPage
-                      ? 'text-white/80 hover:text-white hover:bg-white/10'
-                      : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
                 {item.label}
@@ -71,36 +67,28 @@ const Navigation = () => {
 
             {/* 인증 상태에 따른 버튼 */}
             {isAuthenticated ? (
-              <div className={`flex items-center space-x-2 ml-2 pl-2 border-l ${isLandingPage ? 'border-white/30' : 'border-gray-300'}`}>
-                <span className={`text-sm ${isLandingPage ? 'text-white/80' : 'text-gray-700'}`}>
+              <div className="flex items-center space-x-2 ml-2 pl-2 border-l border-gray-300">
+                <span className="text-sm text-gray-700">
                   {user?.name || user?.email}
                 </span>
                 <button
                   onClick={handleLogout}
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    isLandingPage ? 'text-white/80 hover:bg-white/10' : 'text-gray-700 hover:bg-gray-100'
-                  }`}
+                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
                 >
                   로그아웃
                 </button>
               </div>
             ) : (
-              <div className={`flex items-center space-x-2 ml-2 pl-2 border-l ${isLandingPage ? 'border-white/30' : 'border-gray-300'}`}>
+              <div className="flex items-center space-x-2 ml-2 pl-2 border-l border-gray-300">
                 <Link
                   to="/login"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    isLandingPage ? 'text-white/80 hover:text-white' : 'text-gray-700 hover:bg-gray-100'
-                  }`}
+                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
                 >
                   로그인
                 </Link>
                 <Link
                   to="/register"
-                  className={`px-4 py-2 rounded-md text-sm font-medium ${
-                    isLandingPage
-                      ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
-                  }`}
+                  className="px-4 py-2 rounded-md text-sm font-medium bg-primary hover:bg-primary-600 text-white"
                 >
                   무료 시작
                 </Link>
@@ -112,9 +100,7 @@ const Navigation = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`inline-flex items-center justify-center p-2 rounded-md focus:outline-none ${
-                isLandingPage ? 'text-white hover:bg-white/10' : 'text-gray-700 hover:bg-gray-100'
-              }`}
+              className="inline-flex items-center justify-center p-2 rounded-md focus:outline-none text-gray-700 hover:bg-gray-100"
               aria-label="메뉴"
             >
               <svg
