@@ -1,4 +1,5 @@
-export { default as SalaryResult } from './SalaryResult';
+export { default as SalaryResult } from './SalaryResultStitch';
+export { default as SalaryResultLegacy } from './SalaryResult';
 export { default as GrossBreakdown } from './GrossBreakdown';
 export { default as DeductionsBreakdown } from './DeductionsBreakdown';
 export { default as WarningAlert } from './WarningAlert';

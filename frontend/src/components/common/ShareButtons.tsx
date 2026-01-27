@@ -10,9 +10,10 @@ interface ShareButtonsProps {
   title: string;
   description?: string;
   captureTargetId?: string; // 캡처할 요소의 ID
+  variant?: 'default' | 'stitch'; // UI 스타일 변형
 }
 
-export function ShareButtons({ url, title, description, captureTargetId }: ShareButtonsProps) {
+export function ShareButtons({ url, title, description, captureTargetId, variant = 'default' }: ShareButtonsProps) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [isCapturing, setIsCapturing] = useState(false);
@@ -149,6 +150,37 @@ export function ShareButtons({ url, title, description, captureTargetId }: Share
       showToastMessage('복사에 실패했습니다');
     }
   };
+
+  // Stitch 스타일 버튼 렌더링
+  if (variant === 'stitch') {
+    return (
+      <>
+        {/* 카카오톡 공유 버튼 */}
+        <button
+          onClick={handleKakaoShare}
+          className="flex items-center justify-center gap-2 h-14 rounded-xl bg-[#FEE500] text-[#191919] text-base font-bold hover:bg-[#FEE500]/90 transition-colors shadow-lg shadow-yellow-500/10"
+        >
+          <span className="material-symbols-outlined text-[20px]">chat_bubble</span>
+          카카오톡 공유
+        </button>
+        {/* 저장 버튼 */}
+        <button
+          onClick={handleDownloadImage}
+          disabled={isCapturing}
+          className="flex items-center justify-center gap-2 h-14 rounded-xl bg-primary text-white text-base font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 disabled:opacity-50"
+        >
+          <span className="material-symbols-outlined text-[20px]">download</span>
+          {isCapturing ? '처리 중...' : '결과 저장하기'}
+        </button>
+        {/* Toast 알림 */}
+        {showToast && (
+          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+            {toastMessage}
+          </div>
+        )}
+      </>
+    );
+  }
 
   return (
     <div className="mt-6 pt-6 border-t border-gray-200">
