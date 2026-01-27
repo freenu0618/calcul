@@ -45,7 +45,17 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics
   endpoint:
     health:
-      show-details: never
+      show-details: always
+      show-components: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: paytools-api
+    description: Korean Labor Law Salary Calculator API
+    version: 1.0.0
