@@ -9,19 +9,28 @@ export default {
     extend: {
       colors: {
         primary: {
+          DEFAULT: '#0dba7d',
+          50: '#ecfdf5',
+          100: '#d1fae5',
+          500: '#0dba7d',
+          600: '#0a9664',
+          700: '#087a52',
+          800: '#065f40',
+          900: '#04452e',
+        },
+        secondary: {
           DEFAULT: '#1e3fae',
           50: '#f0f4ff',
           100: '#e0e8ff',
           500: '#1e3fae',
           600: '#1a369a',
-          700: '#162d86',
-          800: '#122472',
-          900: '#0e1b5e',
         },
         background: {
           light: '#f6f6f8',
-          dark: '#121520',
+          dark: '#10221c',
         },
+        'text-main': '#0d1c17',
+        'text-sub': '#4b5563',
       },
       fontFamily: {
         display: ['Public Sans', 'Noto Sans KR', 'sans-serif'],

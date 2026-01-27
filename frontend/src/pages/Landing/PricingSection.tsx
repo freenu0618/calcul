@@ -1,162 +1,96 @@
 /**
- * Pricing Section - 요금제 비교표
+ * Pricing Section - 합리적인 요금제
  */
 
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
-const plans = [
-  {
-    name: 'Free',
-    price: 0,
-    originalPrice: null,
-    period: '월',
-    description: '소규모 사업장을 위한 기본 플랜',
-    features: [
-      '직원 5명까지',
-      '기본 급여 계산',
-      'AI 상담 월 10회',
-      '3개월 기록 보관',
-    ],
-    cta: '무료로 시작',
-    highlighted: false,
-    popular: false,
-  },
-  {
-    name: 'Starter',
-    price: 4900,
-    originalPrice: null,
-    period: '월',
-    description: 'PDF 명세서가 필요한 사업장',
-    features: [
-      '직원 5명까지',
-      'PDF 급여명세서',
-      'AI 상담 월 30회',
-      '12개월 기록 보관',
-    ],
-    cta: '시작하기',
-    highlighted: false,
-    popular: false,
-  },
-  {
-    name: 'Basic',
-    price: 14900,
-    originalPrice: 39900,
-    period: '월',
-    description: '성장하는 사업장을 위한 플랜',
-    features: [
-      '직원 10명까지',
-      'AI 상담 월 100회',
-      '계산 근거 상세 설명',
-      '무제한 기록 보관',
-    ],
-    cta: '가장 인기',
-    highlighted: true,
-    popular: true,
-  },
-  {
-    name: 'Pro',
-    price: 29900,
-    originalPrice: 79900,
-    period: '월',
-    description: '전문적인 급여 관리가 필요한 곳',
-    features: [
-      '직원 30명까지',
-      'AI 상담 무제한',
-      '법령 검색 및 맞춤 분석',
-      '엑셀 내보내기',
-    ],
-    cta: '시작하기',
-    highlighted: false,
-    popular: false,
-  },
-];
-
 export default function PricingSection() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <section id="pricing" className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            합리적인 가격, 강력한 기능
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            노무사 비용의 1/10로 전문적인 급여 관리를 시작하세요.
-            <br />
-            <span className="text-blue-600 font-medium">런칭 특가</span>로 최대 60% 할인 중입니다.
-          </p>
+    <section className="py-20 lg:py-28 bg-white" id="pricing">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <h2 className="text-3xl font-bold text-text-main sm:text-4xl mb-4">합리적인 요금제</h2>
+          <p className="text-lg text-text-sub">사업장 규모에 맞는 최적의 플랜을 선택하세요.</p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`relative bg-white rounded-2xl p-6 ${
-                plan.highlighted
-                  ? 'ring-2 ring-blue-600 shadow-xl scale-105'
-                  : 'border border-gray-200 shadow-sm'
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="bg-blue-600 text-white text-sm font-medium px-4 py-1 rounded-full">
-                    추천
-                  </span>
-                </div>
-              )}
-
-              <div className="text-center mb-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                <div className="mb-2">
-                  {plan.originalPrice && (
-                    <span className="text-gray-400 line-through text-lg mr-2">
-                      {plan.originalPrice.toLocaleString()}원
-                    </span>
-                  )}
-                  <span className="text-4xl font-bold text-gray-900">
-                    {plan.price === 0 ? '무료' : `${plan.price.toLocaleString()}`}
-                  </span>
-                  {plan.price > 0 && <span className="text-gray-500">원/{plan.period}</span>}
-                </div>
-                <p className="text-sm text-gray-500">{plan.description}</p>
-              </div>
-
-              <ul className="space-y-3 mb-6">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-2 text-sm">
-                    <svg className="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-600">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                to={isAuthenticated ? '/dashboard' : '/register'}
-                className={`block w-full text-center py-3 rounded-lg font-medium transition-colors ${
-                  plan.highlighted
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
-                }`}
-              >
-                {isAuthenticated ? '대시보드' : plan.cta}
-              </Link>
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {/* Free Plan */}
+          <div className="relative bg-white rounded-2xl p-8 border-2 border-primary shadow-lg flex flex-col">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-bold px-4 py-1.5 rounded-full">
+              가장 인기있는 플랜
             </div>
-          ))}
-        </div>
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-text-main mb-2">소규모 사업장</h3>
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-black text-text-main">0원</span>
+                <span className="text-sm text-text-sub">/월</span>
+              </div>
+              <p className="text-sm text-primary font-bold mt-2">5인 이하 평생 무료</p>
+            </div>
 
-        <div className="mt-12 text-center">
-          <p className="text-gray-500 text-sm">
-            * 결제 정보 없이 무료 플랜으로 시작할 수 있습니다.
-            <br />
-            Enterprise 요금제가 필요하시면{' '}
-            <Link to="/contact" className="text-blue-600 hover:underline">
-              문의하기
+            <ul className="space-y-4 mb-8 flex-1">
+              <li className="flex items-start gap-3 text-sm text-text-sub">
+                <span className="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+                <span>자동 급여 계산 및 명세서 발송</span>
+              </li>
+              <li className="flex items-start gap-3 text-sm text-text-sub">
+                <span className="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+                <span>연차 및 근태 관리 기본</span>
+              </li>
+              <li className="flex items-start gap-3 text-sm text-text-sub">
+                <span className="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+                <span>4대보험 취득/상실 신고 지원</span>
+              </li>
+            </ul>
+
+            <Link
+              to={isAuthenticated ? '/dashboard' : '/register'}
+              className="w-full h-12 rounded-xl bg-primary text-white font-bold hover:bg-primary-600 transition-colors flex items-center justify-center"
+            >
+              {isAuthenticated ? '대시보드로 이동' : '무료로 시작하기'}
             </Link>
-          </p>
+          </div>
+
+          {/* Business Plan */}
+          <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 flex flex-col">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-text-main mb-2">비즈니스</h3>
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-black text-text-main">5,900원</span>
+                <span className="text-sm text-text-sub">/월 (1인당)</span>
+              </div>
+              <p className="text-sm text-gray-400 font-medium mt-2">인원 제한 없음</p>
+            </div>
+
+            <ul className="space-y-4 mb-8 flex-1">
+              <li className="flex items-start gap-3 text-sm text-text-sub">
+                <span className="material-symbols-outlined text-gray-400 text-[20px]">check_circle</span>
+                <span>무료 플랜의 모든 기능 포함</span>
+              </li>
+              <li className="flex items-start gap-3 text-sm text-text-sub">
+                <span className="material-symbols-outlined text-gray-400 text-[20px]">check_circle</span>
+                <span>전문 노무사 1:1 채팅 상담</span>
+              </li>
+              <li className="flex items-start gap-3 text-sm text-text-sub">
+                <span className="material-symbols-outlined text-gray-400 text-[20px]">check_circle</span>
+                <span>퇴직금 자동 정산 및 관리</span>
+              </li>
+              <li className="flex items-start gap-3 text-sm text-text-sub">
+                <span className="material-symbols-outlined text-gray-400 text-[20px]">check_circle</span>
+                <span>전자 근로계약서 무제한</span>
+              </li>
+            </ul>
+
+            <Link
+              to="/contact"
+              className="w-full h-12 rounded-xl bg-white border border-gray-300 text-text-main font-bold hover:bg-gray-100 transition-colors flex items-center justify-center"
+            >
+              도입 문의하기
+            </Link>
+          </div>
         </div>
       </div>
     </section>

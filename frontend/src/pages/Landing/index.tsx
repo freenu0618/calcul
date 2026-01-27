@@ -1,13 +1,11 @@
 /**
- * Landing Page - 마케팅 랜딩페이지
+ * Landing Page - Stitch 디자인 기반 마케팅 랜딩페이지
  */
 
 import { Helmet } from 'react-helmet-async';
 import HeroSection from './HeroSection';
-import LiveDemoSection from './LiveDemoSection';
-import PainPointsSection from './PainPointsSection';
-import SolutionSection from './SolutionSection';
-import SocialProofSection from './SocialProofSection';
+import StatsSection from './StatsSection';
+import FeaturesSection from './FeaturesSection';
 import PricingSection from './PricingSection';
 import FinalCTASection from './FinalCTASection';
 
@@ -29,10 +27,8 @@ export default function LandingPage() {
 
       <div className="overflow-hidden">
         <HeroSection />
-        <LiveDemoSection />
-        <PainPointsSection />
-        <SolutionSection />
-        <SocialProofSection />
+        <StatsSection />
+        <FeaturesSection />
         <PricingSection />
         <FinalCTASection />
       </div>

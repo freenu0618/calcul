@@ -1,74 +1,126 @@
 /**
- * Hero Section - 랜딩페이지 최상단 가치 제안
+ * Hero Section - Stitch 디자인 기반 새 랜딩페이지 히어로
  */
 
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { HeroIllustration } from '../../components/illustrations';
 
 export default function HeroSection() {
   const { isAuthenticated } = useAuth();
-  return (
-    <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white overflow-hidden">
-      {/* 배경 패턴 */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-emerald-400 rounded-full blur-3xl" />
-      </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* 좌측: 텍스트 */}
-          <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-sm mb-8">
-              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-              2026년 최신 법령 반영
+  return (
+    <section className="relative pt-12 pb-20 lg:pt-24 lg:pb-32 overflow-hidden">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+          {/* Text Content */}
+          <div className="flex flex-col gap-6 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 self-center lg:self-start rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary ring-1 ring-inset ring-primary/20">
+              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+              노무사 검토 완료
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              급여 계산 <span className="text-emerald-400">30분</span> →{' '}
-              <span className="text-emerald-400">3분</span>으로
+            <h1 className="text-4xl font-black leading-[1.2] text-text-main sm:text-5xl lg:text-6xl tracking-tight">
+              급여 계산,<br className="hidden lg:block" />
+              이제{' '}
+              <span className="text-primary relative inline-block">
+                3분이면 끝
+                <svg className="absolute -bottom-2 left-0 w-full h-3 text-primary/30" viewBox="0 0 100 10" preserveAspectRatio="none">
+                  <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" strokeWidth="3" />
+                </svg>
+              </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-blue-100 max-w-xl mb-8">
-              4대보험, 소득세, 연장·야간·휴일 수당까지 자동 계산
-              <br />
-              <strong className="text-white">AI 노무 상담</strong>으로 법적 리스크까지 관리하세요
+            <p className="text-lg font-normal text-text-sub leading-relaxed max-w-2xl mx-auto lg:mx-0">
+              2026년 최신 노동법 완벽 반영. <br className="sm:hidden" />
+              복잡한 엑셀 수식 없이 클릭 몇 번으로 급여명세서까지 발송하세요.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start pt-2">
               <Link
                 to={isAuthenticated ? '/dashboard' : '/register'}
-                className="inline-flex items-center justify-center px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50"
+                className="h-12 px-8 rounded-xl bg-primary text-white text-base font-bold shadow-sm hover:bg-primary-600 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"
               >
-                {isAuthenticated ? '대시보드로 이동' : '지금 무료로 시작하기'}
-                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
+                {isAuthenticated ? '대시보드로 이동' : '무료로 시작하기'}
+                <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
               </Link>
               <Link
                 to="/calculator"
-                className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold rounded-lg border border-white/30 transition-all"
+                className="h-12 px-8 rounded-xl bg-white border border-gray-200 text-text-main text-base font-bold shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 flex items-center justify-center"
               >
                 계산기 바로 사용
               </Link>
             </div>
 
-            <div className="flex flex-wrap justify-center lg:justify-start gap-6 text-sm text-blue-200">
-              {['신용카드 불필요', '5명까지 무료', '181개 테스트 검증'].map((text) => (
-                <div key={text} className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  {text}
-                </div>
-              ))}
+            <div className="mt-4 flex items-center justify-center lg:justify-start gap-4 text-xs text-text-sub">
+              <div className="flex items-center gap-1">
+                <span className="material-symbols-outlined text-[18px] text-primary">check_circle</span>
+                5인 미만 사업장 무료
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="material-symbols-outlined text-[18px] text-primary">check_circle</span>
+                별도 설치 없음
+              </div>
             </div>
           </div>
 
-          {/* 우측: 일러스트 */}
-          <div className="hidden lg:flex justify-center">
-            <HeroIllustration className="w-full max-w-md" />
+          {/* Hero Card Mockup */}
+          <div className="relative lg:h-auto flex items-center justify-center">
+            {/* Background Gradient */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-primary/10 via-emerald-50 to-white rounded-full blur-3xl opacity-60 pointer-events-none" />
+
+            {/* Card */}
+            <div className="relative w-full max-w-md bg-white rounded-2xl shadow-lg border border-white/50 p-6 transform hover:scale-[1.02] transition-transform duration-500">
+              {/* Card Header */}
+              <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-gray-400">person</span>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-text-main">김지수 사원</h3>
+                    <p className="text-xs text-gray-400">개발팀 / 정규직</p>
+                  </div>
+                </div>
+                <div className="px-2 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-md">
+                  지급 대기
+                </div>
+              </div>
+
+              {/* Card Content */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">지급 총액</span>
+                  <span className="text-sm font-bold">₩ 3,500,000</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">공제 총액 (4대보험+세금)</span>
+                  <span className="text-sm font-bold text-red-500">- ₩ 425,320</span>
+                </div>
+                <div className="h-px bg-gray-100 my-2" />
+                <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                  <span className="text-base font-bold text-text-main">실 지급액</span>
+                  <span className="text-xl font-black text-primary">₩ 3,074,680</span>
+                </div>
+              </div>
+
+              {/* Card Action */}
+              <div className="mt-6">
+                <button className="w-full py-2.5 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary-600 transition-colors">
+                  명세서 발송
+                </button>
+              </div>
+            </div>
+
+            {/* Floating Badge */}
+            <div className="absolute -bottom-6 -right-4 md:right-8 bg-white p-3 rounded-xl shadow-lg border border-gray-100 flex items-center gap-3 animate-float">
+              <div className="bg-blue-50 p-2 rounded-lg text-secondary">
+                <span className="material-symbols-outlined">gavel</span>
+              </div>
+              <div>
+                <p className="text-[10px] text-gray-400">법적 리스크</p>
+                <p className="text-sm font-bold text-text-main">0% 보장</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
