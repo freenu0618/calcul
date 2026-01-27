@@ -19,6 +19,7 @@ const Navigation = () => {
     ? [
         { path: '/dashboard', label: '대시보드' },
         { path: '/calculator', label: '급여 계산' },
+        { path: '/employees', label: '직원 관리' },
         { path: '/guide', label: '가이드' },
       ]
     : [
@@ -36,7 +37,7 @@ const Navigation = () => {
   };
 
   return (
-    <nav className={`${isLandingPage ? 'bg-transparent absolute top-0 left-0 right-0 z-50' : 'bg-white shadow-md'}`}>
+    <nav className={`${isLandingPage ? 'bg-white/90 backdrop-blur-sm shadow-sm fixed top-0 left-0 right-0 z-50' : 'bg-white shadow-md'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* 로고 */}

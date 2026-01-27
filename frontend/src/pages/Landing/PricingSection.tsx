@@ -34,15 +34,15 @@ export default function PricingSection() {
             <ul className="space-y-4 mb-8 flex-1">
               <li className="flex items-start gap-3 text-sm text-text-sub">
                 <span className="material-symbols-outlined text-primary text-[20px]">check_circle</span>
-                <span>자동 급여 계산 및 명세서 발송</span>
+                <span>4대보험 + 소득세 자동 계산</span>
               </li>
               <li className="flex items-start gap-3 text-sm text-text-sub">
                 <span className="material-symbols-outlined text-primary text-[20px]">check_circle</span>
-                <span>연차 및 근태 관리 기본</span>
+                <span>연장/야간/휴일 수당 계산</span>
               </li>
               <li className="flex items-start gap-3 text-sm text-text-sub">
                 <span className="material-symbols-outlined text-primary text-[20px]">check_circle</span>
-                <span>4대보험 취득/상실 신고 지원</span>
+                <span>주휴수당 비례 계산</span>
               </li>
             </ul>
 
@@ -54,42 +54,44 @@ export default function PricingSection() {
             </Link>
           </div>
 
-          {/* Business Plan */}
-          <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 flex flex-col">
+          {/* Business Plan - Coming Soon */}
+          <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 flex flex-col relative overflow-hidden">
+            <div className="absolute top-4 right-4 bg-gray-200 text-gray-600 text-xs font-bold px-3 py-1 rounded-full">
+              준비 중
+            </div>
             <div className="mb-6">
               <h3 className="text-lg font-bold text-text-main mb-2">비즈니스</h3>
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-black text-text-main">5,900원</span>
-                <span className="text-sm text-text-sub">/월 (1인당)</span>
+                <span className="text-4xl font-black text-gray-400">추후 공개</span>
               </div>
-              <p className="text-sm text-gray-400 font-medium mt-2">인원 제한 없음</p>
+              <p className="text-sm text-gray-400 font-medium mt-2">6인 이상 사업장용</p>
             </div>
 
             <ul className="space-y-4 mb-8 flex-1">
-              <li className="flex items-start gap-3 text-sm text-text-sub">
-                <span className="material-symbols-outlined text-gray-400 text-[20px]">check_circle</span>
+              <li className="flex items-start gap-3 text-sm text-gray-400">
+                <span className="material-symbols-outlined text-gray-300 text-[20px]">schedule</span>
                 <span>무료 플랜의 모든 기능 포함</span>
               </li>
-              <li className="flex items-start gap-3 text-sm text-text-sub">
-                <span className="material-symbols-outlined text-gray-400 text-[20px]">check_circle</span>
-                <span>전문 노무사 1:1 채팅 상담</span>
+              <li className="flex items-start gap-3 text-sm text-gray-400">
+                <span className="material-symbols-outlined text-gray-300 text-[20px]">schedule</span>
+                <span>급여대장 일괄 관리</span>
               </li>
-              <li className="flex items-start gap-3 text-sm text-text-sub">
-                <span className="material-symbols-outlined text-gray-400 text-[20px]">check_circle</span>
-                <span>퇴직금 자동 정산 및 관리</span>
+              <li className="flex items-start gap-3 text-sm text-gray-400">
+                <span className="material-symbols-outlined text-gray-300 text-[20px]">schedule</span>
+                <span>AI 노무 상담 (개발 예정)</span>
               </li>
-              <li className="flex items-start gap-3 text-sm text-text-sub">
-                <span className="material-symbols-outlined text-gray-400 text-[20px]">check_circle</span>
-                <span>전자 근로계약서 무제한</span>
+              <li className="flex items-start gap-3 text-sm text-gray-400">
+                <span className="material-symbols-outlined text-gray-300 text-[20px]">schedule</span>
+                <span>PDF/Excel 내보내기</span>
               </li>
             </ul>
 
-            <Link
-              to="/contact"
-              className="w-full h-12 rounded-xl bg-white border border-gray-300 text-text-main font-bold hover:bg-gray-100 transition-colors flex items-center justify-center"
+            <button
+              disabled
+              className="w-full h-12 rounded-xl bg-gray-200 text-gray-500 font-bold cursor-not-allowed flex items-center justify-center"
             >
-              도입 문의하기
-            </Link>
+              출시 알림 신청
+            </button>
           </div>
         </div>
       </div>

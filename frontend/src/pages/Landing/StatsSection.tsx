@@ -4,10 +4,10 @@
 
 export default function StatsSection() {
   const stats = [
-    { value: '1,250+', label: '이용 중인 사업장' },
-    { value: '98%', label: '고객 만족도' },
-    { value: '100%', label: '급여 정산 정확도' },
-    { value: '0원', label: '초기 도입 비용' },
+    { value: '181개', label: '테스트 케이스 통과' },
+    { value: '2026년', label: '최신 법령 반영' },
+    { value: '8개', label: '지원 법률/규정' },
+    { value: '0원', label: '기본 사용료' },
   ];
 
   return (

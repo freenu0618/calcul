@@ -16,7 +16,7 @@ export default function HeroSection() {
           <div className="flex flex-col gap-6 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 self-center lg:self-start rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary ring-1 ring-inset ring-primary/20">
               <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-              노무사 검토 완료
+              2026년 최신 법령 적용
             </div>
 
             <h1 className="text-4xl font-black leading-[1.2] text-text-main sm:text-5xl lg:text-6xl tracking-tight">
@@ -114,11 +114,11 @@ export default function HeroSection() {
             {/* Floating Badge */}
             <div className="absolute -bottom-6 -right-4 md:right-8 bg-white p-3 rounded-xl shadow-lg border border-gray-100 flex items-center gap-3 animate-float">
               <div className="bg-blue-50 p-2 rounded-lg text-secondary">
-                <span className="material-symbols-outlined">gavel</span>
+                <span className="material-symbols-outlined">verified</span>
               </div>
               <div>
-                <p className="text-[10px] text-gray-400">법적 리스크</p>
-                <p className="text-sm font-bold text-text-main">0% 보장</p>
+                <p className="text-[10px] text-gray-400">테스트 검증</p>
+                <p className="text-sm font-bold text-text-main">181개 통과</p>
               </div>
             </div>
           </div>

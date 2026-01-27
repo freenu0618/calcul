@@ -332,8 +332,123 @@
 
 ---
 
+## 직원 관리 API
+
+### POST `/employees`
+
+새 직원 등록
+
+```json
+// Request
+{
+  "name": "홍길동",
+  "residentIdPrefix": "900101-1",
+  "contractStartDate": "2026-01-01",
+  "employmentType": "FULL_TIME",
+  "companySize": "OVER_5",
+  "visaType": null,
+  "workStartTime": "09:00",
+  "workEndTime": "18:00",
+  "breakMinutes": 60,
+  "weeklyWorkDays": 5,
+  "dailyWorkHours": 8,
+  "probationMonths": 3,
+  "probationRate": 90
+}
+
+// Response
+{
+  "id": "uuid-string",
+  "name": "홍길동",
+  "residentIdPrefix": "900101-1",
+  "birthDate": "1990-01-01",
+  "age": 36,
+  "isForeigner": false,
+  "visaType": null,
+  "contractStartDate": "2026-01-01",
+  "employmentType": "FULL_TIME",
+  "companySize": "OVER_5",
+  "workStartTime": "09:00:00",
+  "workEndTime": "18:00:00",
+  "breakMinutes": 60,
+  "weeklyWorkDays": 5,
+  "dailyWorkHours": 8,
+  "probationMonths": 3,
+  "probationRate": 90,
+  "isPensionEligible": true,
+  "isInProbation": true,
+  "createdAt": "2026-01-27",
+  "updatedAt": "2026-01-27"
+}
+```
+
+### GET `/employees`
+
+직원 목록 조회
+
+```json
+// Response
+{
+  "employees": [...],
+  "totalCount": 5
+}
+```
+
+### GET `/employees/{id}`
+
+직원 상세 조회
+
+### PUT `/employees/{id}`
+
+직원 정보 수정
+
+### DELETE `/employees/{id}`
+
+직원 삭제
+
+### GET `/employees/search?name={name}`
+
+이름으로 직원 검색
+
+### GET `/employees/pension-ineligible`
+
+국민연금 비대상자 조회 (만 60세 이상)
+
+---
+
+## Employee 필드 참조
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| name | string | ✅ | 직원 이름 |
+| residentIdPrefix | string | ✅ | 주민번호 앞 7자리 (YYMMDD-N) |
+| contractStartDate | date | ✅ | 계약 시작일 |
+| employmentType | enum | ✅ | FULL_TIME / PART_TIME |
+| companySize | enum | ✅ | OVER_5 / UNDER_5 |
+| visaType | string | | 체류자격 (외국인만 필수) |
+| workStartTime | time | | 근무 시작 (기본: 09:00) |
+| workEndTime | time | | 근무 종료 (기본: 18:00) |
+| breakMinutes | int | | 휴게시간 분 (기본: 60) |
+| weeklyWorkDays | int | | 주 근무일 (기본: 5) |
+| dailyWorkHours | int | | 일일 근무시간 (기본: 8) |
+| probationMonths | int | | 수습기간 월 (기본: 0) |
+| probationRate | int | | 수습 급여율 % (기본: 100) |
+
+---
+
+## 체류자격 (VisaType)
+
+| 값 | 설명 | 국민연금 | 건강보험 | 고용보험 |
+|----|------|---------|---------|---------|
+| F-2, F-5, F-6 | 거주/영주/결혼이민 | ✅ 의무 | ✅ 의무 | ✅ 의무 |
+| E-9, H-2 | 비전문취업/방문취업 | ⚠️ 임의 | ✅ 의무 | ⚠️ 임의 |
+| F-4 | 재외동포 | ⚠️ 임의 | ✅ 의무 | ⚠️ 임의 |
+| D-7, D-8, D-9 | 주재/투자/무역 | 상호주의 | ✅ 의무 | 상호주의 |
+
+---
+
 ## 버전 정보
 
-- **API Version**: 1.0.0
+- **API Version**: 1.1.0
 - **적용 연도**: 2026년
 - **최종 업데이트**: 2026-01-27

@@ -1,7 +1,7 @@
 # 프로젝트 TODO 리스트
 
 **작성일**: 2026-01-22
-**마지막 업데이트**: 2026-01-25 (Phase S3 완료 - Spring Boot Railway 배포 완료 + 프론트엔드 연동)
+**마지막 업데이트**: 2026-01-27 (Phase 3.5 완료 - 근무자 등록 시스템 + 랜딩페이지 수정)
 **기준 문서**: PROJECT_ANALYSIS_REPORT.md v2.2.0
 **프로젝트**: paytools.work (급여 계산기)
 
@@ -18,7 +18,7 @@
 | Phase S1 (Spring 초기설정) | 3 | 3 | 100% | ✅ 완료 |
 | Phase S2 (도메인 전환) | 4 | 4 | 100% | ✅ 완료 |
 | **Phase S3 (API 전환+검증)** | **3** | **3** | **100%** | **✅ 완료** |
-| Phase 3.5 (근무자 등록) | 5 | 0 | 0% | Spring |
+| **Phase 3.5 (근무자 등록)** | **5** | **4** | **80%** | **✅ 대부분 완료** |
 | Phase 3.6 (급여 고도화) | 4 | 0 | 0% | Spring |
 | Phase 3.7 (시뮬레이션) | 2 | 0 | 0% | Spring |
 | Phase 3.8 (근로계약서) | 2 | 0 | 0% | Spring |
@@ -27,7 +27,7 @@
 | Phase 5 (급여대장) | 3 | 0 | 0% | Spring |
 | Phase 6 (AI 챗봇) | 6 | 0 | 0% | Python MS |
 | Phase 7 (요금제) | 2 | 0 | 0% | Spring |
-| **전체** | **53** | **22** | **42%** | |
+| **전체** | **53** | **26** | **49%** | |
 
 ---
 
@@ -405,27 +405,26 @@ backend-spring/
 > ⚠️ **Phase S 완료 후 진행** — 아래 관련 파일 경로는 Spring 전환 후 `backend-spring/` 하위로 변경됨
 
 ### 3.5.1 근무자 DB 모델 설계
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-27)
 - **우선순위**: 높음
 - **설명**:
-  - Employee 테이블 확장 (현재: employment_type, company_size만 있음)
+  - Employee 테이블 확장 (Spring Boot JPA Entity)
   - 추가 필드:
-    - `name`: 이름
-    - `resident_id_prefix`: 주민번호 앞 7자리 (YYMMDD-N)
-    - `birth_date`: 생년월일 (주민번호에서 자동 추출)
-    - `is_foreigner`: 외국인 여부 (성별코드 5~8이면 외국인)
-    - `visa_type`: 체류자격 (E-9, F-4 등, 외국인만)
-    - `contract_start_date`: 계약 시작일
-    - `work_start_time`: 근무 시작시간 (기본: 09:00)
-    - `work_end_time`: 근무 종료시간 (기본: 18:00)
-    - `break_minutes`: 휴게시간 (분, 기본: 60)
-    - `weekly_work_days`: 주 근무일수 (기본: 5)
-    - `probation_months`: 수습기간 (월, 0=없음)
-    - `probation_rate`: 수습 급여 비율 (%, 기본: 100)
+    - `name`: 이름 ✅
+    - `resident_id_prefix`: 주민번호 앞 7자리 (YYMMDD-N) ✅
+    - `birth_date`: 생년월일 (주민번호에서 자동 추출) ✅
+    - `is_foreigner`: 외국인 여부 (성별코드 5~8이면 외국인) ✅
+    - `visa_type`: 체류자격 (E-9, F-4 등, 외국인만) ✅
+    - `contract_start_date`: 계약 시작일 ✅
+    - `work_start_time`: 근무 시작시간 (기본: 09:00) ✅
+    - `work_end_time`: 근무 종료시간 (기본: 18:00) ✅
+    - `break_minutes`: 휴게시간 (분, 기본: 60) ✅
+    - `weekly_work_days`: 주 근무일수 (기본: 5) ✅
+    - `probation_months`: 수습기간 (월, 0=없음) ✅
+    - `probation_rate`: 수습 급여 비율 (%, 기본: 100) ✅
 - **관련 파일**:
-  - `backend/app/domain/entities/employee.py` (수정)
-  - `backend/app/db/models.py` (수정)
-  - `backend/alembic/versions/` (마이그레이션)
+  - `backend-spring/infrastructure/src/main/kotlin/.../entity/EmployeeEntity.kt` ✅
+  - `backend-spring/infrastructure/src/main/resources/db/migration/V2__create_employees_table.sql` ✅
 
 ### 3.5.2 급여 기간/지급일 설정
 - **상태**: ⬜ 대기
@@ -442,50 +441,63 @@ backend-spring/
   - `backend/app/api/schemas/employee.py` (신규)
 
 ### 3.5.3 국민연금 연령 제한 처리
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-27)
 - **우선순위**: 높음
 - **설명**:
-  - 만 60세 이상: 국민연금 의무가입 대상 아님
-  - 주민번호 앞자리에서 나이 자동 계산
-  - 60세 이상 시 "국민연금 제외 가능" 안내 표시
-  - 보험료 계산 시 자동 제외 옵션
-- **로직**:
-  ```python
-  def calculate_age(resident_prefix: str) -> int:
-      # YYMMDD-N에서 나이 계산
-      year_prefix = 1900 if N in [1,2,5,6] else 2000
-      birth_year = year_prefix + int(resident_prefix[:2])
-      return current_year - birth_year
+  - 만 60세 이상: 국민연금 의무가입 대상 아님 ✅
+  - 주민번호 앞자리에서 나이 자동 계산 ✅
+  - 60세 이상 시 "국민연금 제외 가능" 안내 표시 ✅
+  - 프론트엔드 폼에서 자동 감지 ✅
+- **구현 로직** (TypeScript):
+  ```typescript
+  function getAgeFromResidentId(residentIdPrefix: string): number {
+    const birthYearPrefix = residentIdPrefix.substring(0, 2);
+    const genderDigit = residentIdPrefix.charAt(7);
+    const century = ['1', '2', '5', '6'].includes(genderDigit) ? 1900 : 2000;
+    const birthYear = century + parseInt(birthYearPrefix, 10);
+    return new Date().getFullYear() - birthYear;
+  }
   ```
+- **관련 파일**:
+  - `frontend/src/pages/Employees/EmployeeForm.tsx` ✅
 
 ### 3.5.4 근무자 등록 UI
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-27)
 - **우선순위**: 높음
 - **설명**:
   - 근무자 정보 입력 폼:
-    - 이름, 주민번호 앞 7자리
-    - 외국인 여부 (자동 감지 + 수동 토글)
-    - 체류자격 선택 (외국인만 표시)
-    - 계약 시작일
-    - 근무시간 (시작/종료/휴게)
-    - 주 근무일수
-    - 수습기간/비율
-  - 근무자 목록 페이지 (/employees)
-  - 근무자 상세/수정 페이지
+    - 이름, 주민번호 앞 7자리 ✅
+    - 외국인 여부 (자동 감지 + 수동 토글) ✅
+    - 체류자격 선택 (외국인만 표시) ✅
+    - 계약 시작일 ✅
+    - 근무시간 (시작/종료/휴게) ✅
+    - 주 근무일수 ✅
+    - 수습기간/비율 ✅
+  - 근무자 목록 페이지 (/employees) ✅
+  - 근무자 등록/수정 페이지 (/employees/new, /employees/:id/edit) ✅
+  - 네비게이션에 "직원 관리" 메뉴 추가 ✅
 - **관련 파일**:
-  - `frontend/src/pages/Employees/EmployeeList.tsx` (신규)
-  - `frontend/src/pages/Employees/EmployeeForm.tsx` (신규)
-  - `frontend/src/components/forms/EmployeeInfoForm.tsx` (수정 - 확장)
+  - `frontend/src/pages/Employees/EmployeeList.tsx` ✅ (신규)
+  - `frontend/src/pages/Employees/EmployeeForm.tsx` ✅ (신규)
+  - `frontend/src/pages/Employees/index.tsx` ✅ (신규)
+  - `frontend/src/components/layout/Navigation.tsx` ✅ (수정)
+  - `frontend/src/App.tsx` ✅ (라우트 추가)
 
 ### 3.5.5 근무자 API 엔드포인트
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-27)
 - **우선순위**: 높음
 - **설명**:
-  - CRUD: POST/GET/PUT/DELETE /api/v1/employees
+  - CRUD: POST/GET/PUT/DELETE /api/v1/employees ✅
+  - 이름 검색: GET /api/v1/employees/search?name={name} ✅
+  - 프론트엔드 API 클라이언트 구현 ✅
+  - 타입 정의 (Employee, EmployeeRequest, EmployeeResponse) ✅
   - 무료 요금제: 최대 2명 제한 (Phase 7에서 적용)
 - **관련 파일**:
-  - `backend/app/api/routers/employees.py` (신규)
-  - `backend/app/api/schemas/employee.py` (신규)
+  - `backend-spring/api/src/main/kotlin/.../controller/EmployeeController.kt` ✅
+  - `backend-spring/api/src/main/kotlin/.../dto/EmployeeDto.kt` ✅
+  - `frontend/src/api/employeeApi.ts` ✅ (신규)
+  - `frontend/src/types/employee.ts` ✅ (신규)
+  - `docs/API_REFERENCE.md` ✅ (업데이트)
 
 ---
 
@@ -992,6 +1004,16 @@ react-markdown, remark-gfm
   - [x] UTF-8 인코딩 설정 (application-prod.yml + SecurityConfig)
 - [x] 회원가입/로그인 정상 작동 확인 ✅
 
+### ✅ Phase 3.5 근무자 등록 시스템 (2026-01-27)
+- [x] 근무자 DB 모델 설계 (Employee JPA Entity + Flyway 마이그레이션)
+- [x] 국민연금 연령 제한 처리 (주민번호 기반 나이 자동 계산)
+- [x] 근무자 등록 UI (EmployeeList, EmployeeForm 페이지)
+- [x] 근무자 API 프론트엔드 연동 (employeeApi.ts, employee.ts 타입)
+- [x] API 문서 업데이트 (API_REFERENCE.md Employee API 추가)
+- [x] DB 스키마 문서화 (DATABASE_SCHEMA.md 신규 생성)
+- [x] 랜딩페이지 마케팅 문구 수정 (허위 통계/주장 제거)
+- [x] 네비게이션 가시성 수정 (투명 → 반투명 흰색 배경)
+
 ---
 
 ## 일정 계획
@@ -1093,8 +1115,9 @@ Week 16 (Phase 7 - 요금제):
 | 2026-01-25 | **Phase S3.1 완료**: Controller 3개 + DTO 16개 구현, API 계층 완성, 빌드 성공 |
 | 2026-01-25 | **Phase S3 완료 (전체)**: Spring Boot API 전환 + 테스트 20개 통과 + Python 비교 검증 스크립트 + AI 마이크로서비스 계획 완료 |
 | 2026-01-25 | **Railway 배포 완료**: 프론트엔드-백엔드 통신 이슈 4건 해결, 회원가입/로그인 정상 작동 |
+| 2026-01-27 | **Phase 3.5 완료 (80%)**: 근무자 등록 시스템 구현 (DB/API/UI), 랜딩페이지 마케팅 문구 수정, DB 스키마 문서화 |
 
 ---
 
 **작성자**: Claude Code
-**마지막 업데이트**: 2026-01-25 (Railway 배포 완료 - Spring Boot + 프론트엔드 연동)
+**마지막 업데이트**: 2026-01-27 (Phase 3.5 근무자 등록 시스템 + 랜딩페이지 수정)

@@ -31,6 +31,7 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Contact from './pages/Contact';
 import ReverseCalculator from './pages/ReverseCalculator';
+import { EmployeeList, EmployeeForm } from './pages/Employees';
 
 // GA 타입은 index.html의 전역 스크립트에서 정의됨
 
@@ -92,6 +93,11 @@ function App() {
                 {/* 블로그 */}
                 <Route path="/blog" element={<BlogPage />} />
                 <Route path="/blog/:postId" element={<BlogPost />} />
+
+                {/* 직원 관리 */}
+                <Route path="/employees" element={<EmployeeList />} />
+                <Route path="/employees/new" element={<EmployeeForm />} />
+                <Route path="/employees/:id/edit" element={<EmployeeForm />} />
 
                 {/* 기타 페이지 */}
                 <Route path="/about" element={<About />} />
