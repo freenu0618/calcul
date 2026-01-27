@@ -1,7 +1,7 @@
 /**
  * 급여 계산 API 서비스
  */
-import { apiClient } from './client';
+import { apiClient, transformToCamelCase } from './client';
 import type {
   SalaryCalculationRequest,
   SalaryCalculationResponse,
@@ -18,7 +18,7 @@ export const salaryApi = {
   ): Promise<SalaryCalculationResponse> => {
     const response = await apiClient.post<SalaryCalculationResponse>(
       '/salary/calculate',
-      request
+      transformToCamelCase(request)
     );
     return response.data;
   },
@@ -31,7 +31,7 @@ export const salaryApi = {
   ): Promise<ReverseSalaryResponse> => {
     const response = await apiClient.post<ReverseSalaryResponse>(
       '/salary/reverse-calculate',
-      request
+      transformToCamelCase(request)
     );
     return response.data;
   },

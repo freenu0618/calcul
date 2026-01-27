@@ -4,6 +4,31 @@
 import axios from 'axios';
 import { API_CONFIG } from '../config/api.config';
 
+/**
+ * snake_case → camelCase 변환 유틸리티
+ */
+const snakeToCamel = (str: string): string =>
+  str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+
+/**
+ * 객체의 모든 키를 snake_case → camelCase로 변환
+ */
+export const transformToCamelCase = (obj: unknown): unknown => {
+  if (Array.isArray(obj)) {
+    return obj.map(transformToCamelCase);
+  }
+  if (obj !== null && typeof obj === 'object') {
+    return Object.entries(obj as Record<string, unknown>).reduce(
+      (acc, [key, value]) => ({
+        ...acc,
+        [snakeToCamel(key)]: transformToCamelCase(value),
+      }),
+      {}
+    );
+  }
+  return obj;
+};
+
 export const apiClient = axios.create({
   baseURL: `${API_CONFIG.BASE_URL}${API_CONFIG.API_VERSION}`,
   headers: {
