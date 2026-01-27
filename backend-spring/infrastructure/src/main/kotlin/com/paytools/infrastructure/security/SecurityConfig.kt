@@ -43,6 +43,7 @@ class SecurityConfig(
                     .requestMatchers("/api/v1/salary/**").permitAll()  // 1단계: 급여계산 공개
                     .requestMatchers("/api/v1/insurance/**").permitAll()
                     .requestMatchers("/api/v1/tax/**").permitAll()
+                    .requestMatchers("/api/v1/employees/**").permitAll()  // 포트폴리오용 임시 공개
                     .requestMatchers("/actuator/**").permitAll()
                     .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll()
                     // Protected endpoints
