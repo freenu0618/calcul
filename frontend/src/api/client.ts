@@ -5,13 +5,16 @@ import axios from 'axios';
 import { API_CONFIG } from '../config/api.config';
 
 /**
- * snake_case → camelCase 변환 유틸리티
+ * snake_case ↔ camelCase 변환 유틸리티
  */
 const snakeToCamel = (str: string): string =>
   str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
 
+const camelToSnake = (str: string): string =>
+  str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+
 /**
- * 객체의 모든 키를 snake_case → camelCase로 변환
+ * 객체의 모든 키를 snake_case → camelCase로 변환 + hoursMode 값 변환
  */
 export const transformToCamelCase = (obj: unknown): unknown => {
   if (Array.isArray(obj)) {
@@ -19,9 +22,32 @@ export const transformToCamelCase = (obj: unknown): unknown => {
   }
   if (obj !== null && typeof obj === 'object') {
     return Object.entries(obj as Record<string, unknown>).reduce(
+      (acc, [key, value]) => {
+        const camelKey = snakeToCamel(key);
+        // hoursMode 값 변환: '174' → 'MODE_174'
+        if (camelKey === 'hoursMode' && typeof value === 'string' && !value.startsWith('MODE_')) {
+          return { ...acc, [camelKey]: `MODE_${value}` };
+        }
+        return { ...acc, [camelKey]: transformToCamelCase(value) };
+      },
+      {}
+    );
+  }
+  return obj;
+};
+
+/**
+ * 객체의 모든 키를 camelCase → snake_case로 변환 (응답 처리용)
+ */
+export const transformToSnakeCase = (obj: unknown): unknown => {
+  if (Array.isArray(obj)) {
+    return obj.map(transformToSnakeCase);
+  }
+  if (obj !== null && typeof obj === 'object') {
+    return Object.entries(obj as Record<string, unknown>).reduce(
       (acc, [key, value]) => ({
         ...acc,
-        [snakeToCamel(key)]: transformToCamelCase(value),
+        [camelToSnake(key)]: transformToSnakeCase(value),
       }),
       {}
     );
