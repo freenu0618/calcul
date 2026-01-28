@@ -66,7 +66,7 @@ class SecurityConfig(
                 "https://paytools.work",      // Production
                 "https://calcul-1b9.pages.dev" // Cloudflare Pages
             )
-            allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             allowedHeaders = listOf("*")
             allowCredentials = true
             maxAge = 3600
