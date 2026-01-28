@@ -64,9 +64,9 @@ export default function Tooltip({
         <div
           ref={tooltipRef}
           className={`absolute z-50 ${positionClasses[position]}`}
-          style={{ maxWidth }}
+          style={{ width: maxWidth, minWidth: 280 }}
         >
-          <div className="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 shadow-lg">
+          <div className="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 shadow-lg whitespace-normal break-words">
             {content}
           </div>
           <div
