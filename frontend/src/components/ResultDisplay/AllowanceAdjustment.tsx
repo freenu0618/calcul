@@ -16,6 +16,7 @@ interface AdditionalAllowance {
 interface AllowanceAdjustmentProps {
   result: SalaryCalculationResponse;
   onAdjustedResult: (adjustedResult: AdjustedResult) => void;
+  initialContractAmount?: number; // Step 2에서 입력한 계약 월급
 }
 
 export interface AdjustedResult {
@@ -40,9 +41,16 @@ const estimateIncomeTax = (taxableIncome: number): number => {
 const formatMoney = (amount: number) =>
   new Intl.NumberFormat('ko-KR').format(amount) + '원';
 
-export default function AllowanceAdjustment({ result, onAdjustedResult }: AllowanceAdjustmentProps) {
+export default function AllowanceAdjustment({ result, onAdjustedResult, initialContractAmount = 0 }: AllowanceAdjustmentProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [contractAmount, setContractAmount] = useState<number>(0); // 계약 급여액
+  const [contractAmount, setContractAmount] = useState<number>(initialContractAmount); // 계약 급여액
+
+  // initialContractAmount가 변경되면 contractAmount 업데이트
+  useEffect(() => {
+    if (initialContractAmount > 0) {
+      setContractAmount(initialContractAmount);
+    }
+  }, [initialContractAmount]);
   const [additionalAllowances, setAdditionalAllowances] = useState<AdditionalAllowance[]>([]);
   const [newAllowance, setNewAllowance] = useState({ name: '', amount: 0, isTaxable: true });
 

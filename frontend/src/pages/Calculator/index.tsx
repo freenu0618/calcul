@@ -51,6 +51,7 @@ export default function CalculatorPage() {
   const [calculationMonth, setCalculationMonth] = useState<string>('');
   const [absencePolicy, setAbsencePolicy] = useState<AbsencePolicy>('STRICT');
   const [hoursMode, setHoursMode] = useState<'174' | '209'>('174'); // 추가: 시간 계산 방식
+  const [contractSalary, setContractSalary] = useState<number>(0); // 계약 월급 (계약총액제)
   const [result, setResult] = useState<SalaryCalculationResponse | null>(null);
   const [adjustedResult, setAdjustedResult] = useState<AdjustedResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -178,6 +179,7 @@ export default function CalculatorPage() {
             onBaseSalaryChange={setBaseSalary}
             onAllowancesChange={setAllowances}
             scheduledWorkDays={employee.scheduled_work_days}
+            dailyWorkHours={employee.daily_work_hours}
             wageType={wageType}
             onWageTypeChange={setWageType}
             hourlyWage={hourlyWage}
@@ -186,6 +188,8 @@ export default function CalculatorPage() {
             onAbsencePolicyChange={setAbsencePolicy}
             hoursMode={hoursMode}
             onHoursModeChange={setHoursMode}
+            contractSalary={contractSalary}
+            onContractSalaryChange={setContractSalary}
           />
         );
       case 2:
@@ -258,6 +262,7 @@ export default function CalculatorPage() {
               <AllowanceAdjustment
                 result={result}
                 onAdjustedResult={(adjusted) => setAdjustedResult(adjusted)}
+                initialContractAmount={contractSalary}
               />
 
               {/* 조정된 실수령액 표시 */}

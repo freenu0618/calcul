@@ -57,6 +57,8 @@ export default function SalaryForm({
   onAbsencePolicyChange,
   hoursMode,
   onHoursModeChange,
+  contractSalary: contractSalaryProp,
+  onContractSalaryChange,
 }: SalaryFormProps) {
   // 입력 모드: 'direct' | 'hourly'
   const [inputMode, setInputMode] = useState<'direct' | 'hourly'>('direct');
@@ -72,14 +74,19 @@ export default function SalaryForm({
   // 주 근무시간: 소정근로일 × 일 근무시간
   const defaultWeeklyHours = scheduledWorkDays * dailyWorkHours;
   const [weeklyHours, setWeeklyHours] = useState(defaultWeeklyHours);
-  const [contractSalary, setContractSalary] = useState(2800000);
+  const [contractSalaryInternal, setContractSalaryInternal] = useState(2800000);
+
+  // contractSalary: props가 있으면 props 사용, 없으면 내부 상태
+  const contractSalary = contractSalaryProp ?? contractSalaryInternal;
+  const setContractSalary = (value: number) => {
+    setContractSalaryInternal(value);
+    onContractSalaryChange?.(value);
+  };
 
   // 소정근로일/일근무시간 변경 시 주 근무시간 자동 업데이트
   useEffect(() => {
-    if (inputMode === 'hourly') {
-      setWeeklyHours(scheduledWorkDays * dailyWorkHours);
-    }
-  }, [scheduledWorkDays, dailyWorkHours, inputMode]);
+    setWeeklyHours(scheduledWorkDays * dailyWorkHours);
+  }, [scheduledWorkDays, dailyWorkHours]);
 
   // 자동 계산 결과
   const [autoCalc, setAutoCalc] = useState({
