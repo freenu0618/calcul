@@ -1,9 +1,9 @@
 /**
- * 계약총액제 - 계산 결과 후 수당 임의 조정 컴포넌트
- * 사용자가 계산 후 추가 수당을 입력하면 실수령액이 재계산됨
+ * 계약총액제 - 계약 급여액 기준으로 수당 분배 컴포넌트
+ * 계약 급여액을 입력하면 계산된 급여와의 차액을 보여주고, 그 차액을 수당으로 분배
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { SalaryCalculationResponse } from '../../types/salary';
 
 interface AdditionalAllowance {
@@ -20,15 +20,16 @@ interface AllowanceAdjustmentProps {
 
 export interface AdjustedResult {
   originalNetPay: number;
+  contractAmount: number;
   additionalAllowances: AdditionalAllowance[];
   additionalGross: number;
   additionalDeductions: number;
   adjustedNetPay: number;
+  remainingToAllocate: number;
 }
 
-// 간이세액 계산 (약식 - 실제로는 더 복잡함)
+// 간이세액 계산 (약식)
 const estimateIncomeTax = (taxableIncome: number): number => {
-  // 간이세액표 기준 대략적인 계산 (월 과세소득 기준)
   if (taxableIncome <= 1060000) return 0;
   if (taxableIncome <= 1500000) return Math.round(taxableIncome * 0.02);
   if (taxableIncome <= 3000000) return Math.round(taxableIncome * 0.05);
@@ -36,10 +37,19 @@ const estimateIncomeTax = (taxableIncome: number): number => {
   return Math.round(taxableIncome * 0.12);
 };
 
+const formatMoney = (amount: number) =>
+  new Intl.NumberFormat('ko-KR').format(amount) + '원';
+
 export default function AllowanceAdjustment({ result, onAdjustedResult }: AllowanceAdjustmentProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [contractAmount, setContractAmount] = useState<number>(0); // 계약 급여액
   const [additionalAllowances, setAdditionalAllowances] = useState<AdditionalAllowance[]>([]);
   const [newAllowance, setNewAllowance] = useState({ name: '', amount: 0, isTaxable: true });
+
+  // 계산된 지급총액
+  const calculatedGross = result.gross_breakdown.total.amount;
+  // 차액 (계약 급여액 - 계산된 지급총액)
+  const difference = contractAmount - calculatedGross;
 
   // 추가 수당 합계
   const additionalTaxable = additionalAllowances
@@ -50,8 +60,11 @@ export default function AllowanceAdjustment({ result, onAdjustedResult }: Allowa
     .reduce((sum, a) => sum + a.amount, 0);
   const additionalGross = additionalTaxable + additionalNonTaxable;
 
+  // 남은 분배 가능 금액
+  const remainingToAllocate = Math.max(0, difference - additionalGross);
+
   // 추가 공제 계산 (4대보험 + 소득세)
-  const insuranceRate = 0.0945; // 국민연금4.75% + 건강3.595% + 장기요양0.47% + 고용0.9%
+  const insuranceRate = 0.0945;
   const additionalInsurance = Math.round(additionalTaxable * insuranceRate);
   const additionalTax = estimateIncomeTax(additionalTaxable) - estimateIncomeTax(0);
   const additionalLocalTax = Math.round(additionalTax * 0.1);
@@ -59,6 +72,21 @@ export default function AllowanceAdjustment({ result, onAdjustedResult }: Allowa
 
   // 조정된 실수령액
   const adjustedNetPay = result.net_pay.amount + additionalGross - additionalDeductions;
+
+  // 결과 전달
+  useEffect(() => {
+    if (contractAmount > 0 || additionalAllowances.length > 0) {
+      onAdjustedResult({
+        originalNetPay: result.net_pay.amount,
+        contractAmount,
+        additionalAllowances,
+        additionalGross,
+        additionalDeductions,
+        adjustedNetPay,
+        remainingToAllocate,
+      });
+    }
+  }, [contractAmount, additionalAllowances, additionalGross, additionalDeductions, adjustedNetPay, remainingToAllocate]);
 
   const handleAddAllowance = () => {
     if (newAllowance.name && newAllowance.amount > 0) {
@@ -68,42 +96,27 @@ export default function AllowanceAdjustment({ result, onAdjustedResult }: Allowa
         amount: newAllowance.amount,
         isTaxable: newAllowance.isTaxable,
       };
-      const updated = [...additionalAllowances, allowance];
-      setAdditionalAllowances(updated);
+      setAdditionalAllowances([...additionalAllowances, allowance]);
       setNewAllowance({ name: '', amount: 0, isTaxable: true });
-
-      // 부모에게 결과 전달
-      onAdjustedResult({
-        originalNetPay: result.net_pay.amount,
-        additionalAllowances: updated,
-        additionalGross: updated.reduce((sum, a) => sum + a.amount, 0),
-        additionalDeductions,
-        adjustedNetPay: result.net_pay.amount + updated.reduce((sum, a) => sum + a.amount, 0) - additionalDeductions,
-      });
     }
   };
 
   const handleRemoveAllowance = (id: string) => {
-    const updated = additionalAllowances.filter(a => a.id !== id);
-    setAdditionalAllowances(updated);
-
-    const newAdditionalGross = updated.reduce((sum, a) => sum + a.amount, 0);
-    const newTaxable = updated.filter(a => a.isTaxable).reduce((sum, a) => sum + a.amount, 0);
-    const newInsurance = Math.round(newTaxable * insuranceRate);
-    const newTax = estimateIncomeTax(newTaxable);
-    const newDeductions = newInsurance + newTax + Math.round(newTax * 0.1);
-
-    onAdjustedResult({
-      originalNetPay: result.net_pay.amount,
-      additionalAllowances: updated,
-      additionalGross: newAdditionalGross,
-      additionalDeductions: newDeductions,
-      adjustedNetPay: result.net_pay.amount + newAdditionalGross - newDeductions,
-    });
+    setAdditionalAllowances(additionalAllowances.filter(a => a.id !== id));
   };
 
-  const formatMoney = (amount: number) =>
-    new Intl.NumberFormat('ko-KR').format(amount) + '원';
+  // 남은 금액 전액을 비과세 수당으로 추가
+  const handleAddRemainingAsAllowance = () => {
+    if (remainingToAllocate > 0) {
+      const allowance: AdditionalAllowance = {
+        id: Date.now().toString(),
+        name: '기타수당',
+        amount: remainingToAllocate,
+        isTaxable: false, // 기본값 비과세
+      };
+      setAdditionalAllowances([...additionalAllowances, allowance]);
+    }
+  };
 
   // 빠른 추가 버튼용 프리셋
   const presets = [
@@ -140,9 +153,67 @@ export default function AllowanceAdjustment({ result, onAdjustedResult }: Allowa
 
       {isExpanded && (
         <div className="px-4 pb-4 border-t border-gray-100">
+          {/* 계약 급여액 입력 */}
+          <div className="mt-4 mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              계약 급여액 (월 총액)
+            </label>
+            <div className="flex gap-2 items-center">
+              <input
+                type="number"
+                placeholder="예: 3500000"
+                value={contractAmount || ''}
+                onChange={(e) => setContractAmount(Number(e.target.value))}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              />
+              <span className="text-sm text-gray-500">원</span>
+            </div>
+          </div>
+
+          {/* 차액 표시 */}
+          {contractAmount > 0 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">계약 급여액</span>
+                  <span className="font-medium">{formatMoney(contractAmount)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">계산된 지급총액</span>
+                  <span className="font-medium">{formatMoney(calculatedGross)}</span>
+                </div>
+              </div>
+              <div className="border-t border-amber-200 mt-2 pt-2 flex justify-between items-center">
+                <span className="font-medium text-gray-800">차액 (추가 분배 가능)</span>
+                <span className={`font-bold text-lg ${difference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {difference >= 0 ? '+' : ''}{formatMoney(difference)}
+                </span>
+              </div>
+              {difference > 0 && remainingToAllocate > 0 && (
+                <div className="mt-2 flex justify-between items-center text-sm">
+                  <span className="text-gray-600">남은 분배 금액</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-blue-600">{formatMoney(remainingToAllocate)}</span>
+                    <button
+                      onClick={handleAddRemainingAsAllowance}
+                      className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                      전액 수당 추가
+                    </button>
+                  </div>
+                </div>
+              )}
+              {difference < 0 && (
+                <p className="text-xs text-red-600 mt-2">
+                  ⚠️ 계약 급여액이 계산된 급여보다 적습니다. 최저임금 위반 가능성을 확인하세요.
+                </p>
+              )}
+            </div>
+          )}
+
           {/* 안내 문구 */}
-          <p className="text-xs text-gray-500 mt-3 mb-4">
-            계산 결과에 추가 수당을 입력하면 공제액과 실수령액이 자동으로 재계산됩니다.
+          <p className="text-xs text-gray-500 mb-4">
+            추가 수당을 입력하면 공제액과 실수령액이 자동으로 재계산됩니다.
             비과세 수당(식대 20만원 한도, 교통비 등)은 공제 없이 전액 지급됩니다.
           </p>
 
@@ -151,9 +222,7 @@ export default function AllowanceAdjustment({ result, onAdjustedResult }: Allowa
             {presets.map((preset) => (
               <button
                 key={preset.name}
-                onClick={() => {
-                  setNewAllowance(preset);
-                }}
+                onClick={() => setNewAllowance(preset)}
                 className="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700"
               >
                 + {preset.name}

@@ -1,8 +1,8 @@
 package com.paytools.infrastructure.security
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -18,9 +18,11 @@ import org.springframework.web.filter.CharacterEncodingFilter
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
-    private val oAuth2SuccessHandler: OAuth2SuccessHandler
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter
 ) {
+    // OAuth2SuccessHandler를 Optional로 주입 (환경변수 없을 시 null)
+    @Autowired(required = false)
+    private var oAuth2SuccessHandler: OAuth2SuccessHandler? = null
 
     @Bean
     fun characterEncodingFilter(): CharacterEncodingFilter {
@@ -51,10 +53,14 @@ class SecurityConfig(
                     // Protected endpoints
                     .anyRequest().authenticated()
             }
-            .oauth2Login { oauth2 ->
-                oauth2.successHandler(oAuth2SuccessHandler)
+        // OAuth2 로그인 설정 (환경변수 설정 시에만 활성화)
+        oAuth2SuccessHandler?.let { handler ->
+            http.oauth2Login { oauth2 ->
+                oauth2.successHandler(handler)
             }
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+        }
+
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }
