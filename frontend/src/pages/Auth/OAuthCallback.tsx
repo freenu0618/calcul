@@ -16,16 +16,17 @@ const OAuthCallback = () => {
 
   useEffect(() => {
     const token = searchParams.get('token');
+    const name = searchParams.get('name');
     const errorParam = searchParams.get('error');
 
     if (errorParam) {
-      setError('소셜 로그인에 실패했습니다: ' + errorParam);
+      setError('소셜 로그인에 실패했습니다: ' + decodeURIComponent(errorParam));
       return;
     }
 
     if (token) {
-      // JWT 토큰 저장 및 사용자 정보 로드
-      setTokenDirectly(token);
+      // JWT 토큰 저장 및 사용자 정보 로드 (name은 URL 파라미터에서 가져옴)
+      setTokenDirectly(token, name ? decodeURIComponent(name) : undefined);
       navigate('/', { replace: true });
     } else {
       setError('인증 토큰을 받지 못했습니다.');

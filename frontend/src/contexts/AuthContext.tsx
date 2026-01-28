@@ -20,7 +20,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, fullName: string) => Promise<void>;
   logout: () => void;
-  setTokenDirectly: (token: string) => void;
+  setTokenDirectly: (token: string, name?: string) => void;
   isAuthenticated: boolean;
 }
 
@@ -107,14 +107,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   // OAuth 콜백용: JWT 토큰 직접 설정 (토큰에서 사용자 정보 추출)
-  const setTokenDirectly = (authToken: string) => {
+  const setTokenDirectly = (authToken: string, nameFromUrl?: string) => {
     try {
       // JWT payload 디코딩 (base64)
       const payload = JSON.parse(atob(authToken.split('.')[1]));
       const userData: User = {
-        id: payload.id || 0,
-        email: payload.sub || payload.email || '',
-        name: payload.name || '',
+        id: parseInt(payload.sub, 10) || 0,  // sub가 userId
+        email: payload.email || '',
+        name: nameFromUrl || payload.name || payload.email?.split('@')[0] || '',
         role: payload.role || 'USER',
       };
 
