@@ -17,6 +17,7 @@ interface AllowanceAdjustmentProps {
   result: SalaryCalculationResponse;
   onAdjustedResult: (adjustedResult: AdjustedResult) => void;
   initialContractAmount?: number; // Step 2에서 입력한 계약 월급
+  onApplyAllowances?: (allowances: { name: string; amount: number; isTaxable: boolean }[]) => void;
 }
 
 export interface AdjustedResult {
@@ -41,7 +42,7 @@ const estimateIncomeTax = (taxableIncome: number): number => {
 const formatMoney = (amount: number) =>
   new Intl.NumberFormat('ko-KR').format(amount) + '원';
 
-export default function AllowanceAdjustment({ result, onAdjustedResult, initialContractAmount = 0 }: AllowanceAdjustmentProps) {
+export default function AllowanceAdjustment({ result, onAdjustedResult, initialContractAmount = 0, onApplyAllowances }: AllowanceAdjustmentProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [contractAmount, setContractAmount] = useState<number>(initialContractAmount); // 계약 급여액
 
@@ -324,6 +325,22 @@ export default function AllowanceAdjustment({ result, onAdjustedResult, initialC
               <p className="text-xs text-gray-500 mt-2">
                 * 추가 공제는 예상치이며, 실제 공제액은 다를 수 있습니다.
               </p>
+              {/* 적용하기 버튼 */}
+              {onApplyAllowances && (
+                <button
+                  onClick={() => {
+                    onApplyAllowances(additionalAllowances.map(a => ({
+                      name: a.name,
+                      amount: a.amount,
+                      isTaxable: a.isTaxable,
+                    })));
+                    setAdditionalAllowances([]);
+                  }}
+                  className="w-full mt-3 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+                >
+                  수당 적용하고 재계산하기
+                </button>
+              )}
             </div>
           )}
         </div>

@@ -140,7 +140,7 @@ export default function CalculatorPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [employee, baseSalary, allowances, workShifts, wageType, hourlyWage, calculationMonth, absencePolicy]);
+  }, [employee, baseSalary, allowances, workShifts, wageType, hourlyWage, calculationMonth, absencePolicy, hoursMode]);
 
   const isStep1Valid = employee.name.trim().length > 0;
 
@@ -174,6 +174,7 @@ export default function CalculatorPage() {
       case 1:
         return (
           <SalaryForm
+            key={`salary-${employee.scheduled_work_days}-${employee.daily_work_hours}`}
             baseSalary={baseSalary}
             allowances={allowances}
             onBaseSalaryChange={setBaseSalary}
@@ -263,6 +264,20 @@ export default function CalculatorPage() {
                 result={result}
                 onAdjustedResult={(adjusted) => setAdjustedResult(adjusted)}
                 initialContractAmount={contractSalary}
+                onApplyAllowances={(newAllowances) => {
+                  // 기존 수당에 추가
+                  const converted = newAllowances.map((a) => ({
+                    name: a.name,
+                    amount: a.amount,
+                    is_taxable: a.isTaxable,
+                    is_includable_in_minimum_wage: false,
+                    is_fixed: true,
+                    is_included_in_regular_wage: false,
+                  }));
+                  setAllowances((prev) => [...prev, ...converted]);
+                  // 재계산 트리거
+                  setTimeout(() => handleCalculate(), 100);
+                }}
               />
 
               {/* 조정된 실수령액 표시 */}
