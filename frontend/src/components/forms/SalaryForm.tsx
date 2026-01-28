@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import type { Allowance } from '../../types/models';
 import type { WageType, AbsencePolicy, HoursMode } from '../../types/salary';
 import Button from '../common/Button';
+import Tooltip from '../common/Tooltip';
 
 interface SalaryFormProps {
   baseSalary: number;
@@ -203,7 +204,24 @@ export default function SalaryForm({
 
       {/* 급여 형태 선택 */}
       <div className="bg-gray-50 p-4 rounded-lg">
-        <p className="text-sm font-medium text-gray-700 mb-2">급여 형태</p>
+        <div className="flex items-center gap-2 mb-2">
+          <p className="text-sm font-medium text-gray-700">급여 형태</p>
+          <Tooltip
+            content={
+              <div className="space-y-2">
+                <p><strong>월급제:</strong> 고정 월급 기반. 기본급을 직접 입력하거나 시급 기반으로 자동 계산할 수 있습니다.</p>
+                <p><strong>시급제:</strong> 시급 × 실제 근무시간으로 계산. 시프트 입력 기반으로 정확한 급여를 산출합니다.</p>
+                <p className="text-gray-300 text-xs mt-1">※ 계약총액 역산은 월급제 → 시급 기반 자동 계산에서 사용 가능</p>
+              </div>
+            }
+            position="right"
+            maxWidth={350}
+          >
+            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300 transition-colors">
+              ?
+            </span>
+          </Tooltip>
+        </div>
         <div className="flex gap-4">
           <label className="flex items-center cursor-pointer">
             <input
@@ -245,7 +263,24 @@ export default function SalaryForm({
       {/* 월급제: 입력 방식 선택 */}
       {wageType === 'MONTHLY' && (
         <div className="bg-gray-50 p-4 rounded-lg">
-          <p className="text-sm font-medium text-gray-700 mb-2">기본급 입력 방식</p>
+          <div className="flex items-center gap-2 mb-2">
+            <p className="text-sm font-medium text-gray-700">기본급 입력 방식</p>
+            <Tooltip
+              content={
+                <div className="space-y-2">
+                  <p><strong>직접 입력:</strong> 기본급을 원하는 금액으로 직접 입력합니다.</p>
+                  <p><strong>시급 기반 자동 계산:</strong> 시급과 계약 월급을 입력하면 기본급, 주휴수당, 법정 최소선을 자동 계산합니다.</p>
+                  <p className="text-yellow-300 text-xs">💡 계약총액 역산: 계약 월급에서 법정 구성분을 제외한 잔여 금액을 수당으로 배분할 수 있습니다.</p>
+                </div>
+              }
+              position="right"
+              maxWidth={350}
+            >
+              <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300 transition-colors">
+                ?
+              </span>
+            </Tooltip>
+          </div>
           <div className="flex gap-4">
             <label className="flex items-center">
               <input
@@ -263,7 +298,7 @@ export default function SalaryForm({
                 onChange={() => setInputMode('hourly')}
                 className="mr-2"
               />
-              시급 기반 자동 계산
+              시급 기반 자동 계산 (계약총액 역산)
             </label>
           </div>
         </div>
@@ -272,7 +307,24 @@ export default function SalaryForm({
       {/* 통상시급 계산 방식 (월급제 공통) */}
       {wageType === 'MONTHLY' && (
         <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
-          <p className="text-sm font-semibold text-gray-800 mb-2">통상시급 계산 기준</p>
+          <div className="flex items-center gap-2 mb-2">
+            <p className="text-sm font-semibold text-gray-800">통상시급 계산 기준</p>
+            <Tooltip
+              content={
+                <div className="space-y-2">
+                  <p><strong>174시간 (주휴 분리):</strong> 기본급과 주휴수당을 분리 표시. 급여명세서 작성에 적합합니다.</p>
+                  <p><strong>209시간 (주휴 포함):</strong> 기본급에 주휴수당이 포함된 방식. 최저임금 월 환산 기준입니다.</p>
+                  <p className="text-gray-300 text-xs mt-1">※ 어떤 방식을 선택해도 총 급여액은 동일합니다.</p>
+                </div>
+              }
+              position="right"
+              maxWidth={350}
+            >
+              <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-indigo-200 rounded-full cursor-help hover:bg-indigo-300 transition-colors">
+                ?
+              </span>
+            </Tooltip>
+          </div>
           <div className="flex gap-4 mb-2">
             <label className="flex items-center cursor-pointer">
               <input

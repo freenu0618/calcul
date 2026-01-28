@@ -345,7 +345,7 @@ export default function PayrollDetail() {
               {/* 근무 시프트 템플릿 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">실제 근무 시간 설정</label>
-                <MonthlyTemplate year={period.year} month={period.month} onApply={handleApplyTemplate} showPeriodSelector />
+                <MonthlyTemplate year={period.year} month={period.month} onApply={handleApplyTemplate} />
               </div>
 
               {/* 시프트 요약 */}
