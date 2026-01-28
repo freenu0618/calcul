@@ -5,14 +5,14 @@
  * - 적용 버튼으로 FullCalendar에 일괄 반영
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { WorkShiftRequest } from '../../types/salary';
 
 interface MonthlyTemplateProps {
   year: number;
   month: number;
   onApply: (shifts: WorkShiftRequest[]) => void;
-  showPeriodSelector?: boolean; // 기간 선택 UI 표시 여부
+  onYearMonthChange?: (year: number, month: number) => void;
 }
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
@@ -30,7 +30,11 @@ const TIME_PRESETS = [
 // 24시간 옵션 생성
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`);
 
-export default function MonthlyTemplate({ year, month, onApply, showPeriodSelector = false }: MonthlyTemplateProps) {
+export default function MonthlyTemplate({ year, month, onApply, onYearMonthChange }: MonthlyTemplateProps) {
+  // 내부 년/월 상태 (직접 선택 가능)
+  const [selectedYear, setSelectedYear] = useState(year);
+  const [selectedMonth, setSelectedMonth] = useState(month);
+
   // 요일 선택 상태 [일, 월, 화, 수, 목, 금, 토]
   const [selectedDays, setSelectedDays] = useState<boolean[]>([false, true, true, true, true, true, false]);
   const [startTime, setStartTime] = useState('09:00');
@@ -39,9 +43,29 @@ export default function MonthlyTemplate({ year, month, onApply, showPeriodSelect
   const [isNextDayEnd, setIsNextDayEnd] = useState(false); // 익일 퇴근 여부
 
   // 급여 기간 선택
-  const lastDay = new Date(year, month, 0).getDate();
+  const lastDay = new Date(selectedYear, selectedMonth, 0).getDate();
   const [periodStart, setPeriodStart] = useState(1);
   const [periodEnd, setPeriodEnd] = useState(lastDay);
+
+  // props 변경 시 내부 상태 동기화
+  useEffect(() => {
+    setSelectedYear(year);
+    setSelectedMonth(month);
+  }, [year, month]);
+
+  // 월 변경 시 기간 초기화
+  useEffect(() => {
+    const newLastDay = new Date(selectedYear, selectedMonth, 0).getDate();
+    setPeriodStart(1);
+    setPeriodEnd(newLastDay);
+  }, [selectedYear, selectedMonth]);
+
+  // 년/월 변경 핸들러
+  const handleYearMonthChange = (newYear: number, newMonth: number) => {
+    setSelectedYear(newYear);
+    setSelectedMonth(newMonth);
+    onYearMonthChange?.(newYear, newMonth);
+  };
 
   // 프리셋 적용
   const applyPreset = (preset: typeof TIME_PRESETS[0]) => {
@@ -74,11 +98,11 @@ export default function MonthlyTemplate({ year, month, onApply, showPeriodSelect
     const shifts: WorkShiftRequest[] = [];
 
     for (let day = periodStart; day <= periodEnd; day++) {
-      const date = new Date(year, month - 1, day);
+      const date = new Date(selectedYear, selectedMonth - 1, day);
       const dayOfWeek = date.getDay(); // 0=일, 1=월, ..., 6=토
 
       if (selectedDays[dayOfWeek]) {
-        const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dateStr = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         shifts.push({
           date: dateStr,
           start_time: startTime,
@@ -104,6 +128,10 @@ export default function MonthlyTemplate({ year, month, onApply, showPeriodSelect
   const selectedCount = selectedDays.filter(Boolean).length;
   const previewShifts = generateShifts();
 
+  // 년도 옵션 (현재 년도 기준 -1 ~ +1)
+  const currentYear = new Date().getFullYear();
+  const yearOptions = [currentYear - 1, currentYear, currentYear + 1];
+
   return (
     <div className="bg-gray-50 rounded-lg border border-gray-200 p-4 space-y-4">
       <div className="flex items-center justify-between">
@@ -111,36 +139,55 @@ export default function MonthlyTemplate({ year, month, onApply, showPeriodSelect
           <span className="material-symbols-outlined text-lg">calendar_month</span>
           월간 템플릿 채우기
         </h4>
-        <span className="text-xs text-gray-500">
-          {year}년 {month}월
-        </span>
-      </div>
-
-      {/* 급여 기간 선택 */}
-      {showPeriodSelector && (
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-700">급여 기간:</label>
+        {/* 년/월 선택 */}
+        <div className="flex items-center gap-1">
           <select
-            value={periodStart}
-            onChange={(e) => setPeriodStart(Number(e.target.value))}
-            className="px-2 py-1 border border-gray-300 rounded text-sm"
+            value={selectedYear}
+            onChange={(e) => handleYearMonthChange(Number(e.target.value), selectedMonth)}
+            className="px-2 py-1 border border-gray-300 rounded text-sm bg-white"
           >
-            {Array.from({ length: lastDay }, (_, i) => i + 1).map((d) => (
-              <option key={d} value={d}>{d}일</option>
+            {yearOptions.map((y) => (
+              <option key={y} value={y}>{y}년</option>
             ))}
           </select>
-          <span className="text-gray-500">~</span>
           <select
-            value={periodEnd}
-            onChange={(e) => setPeriodEnd(Number(e.target.value))}
-            className="px-2 py-1 border border-gray-300 rounded text-sm"
+            value={selectedMonth}
+            onChange={(e) => handleYearMonthChange(selectedYear, Number(e.target.value))}
+            className="px-2 py-1 border border-gray-300 rounded text-sm bg-white"
           >
-            {Array.from({ length: lastDay }, (_, i) => i + 1).map((d) => (
-              <option key={d} value={d}>{d}일</option>
+            {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+              <option key={m} value={m}>{m}월</option>
             ))}
           </select>
         </div>
-      )}
+      </div>
+
+      {/* 기간 선택 (항상 표시) */}
+      <div className="flex items-center gap-2 p-2 bg-white rounded border border-gray-200">
+        <label className="text-sm font-medium text-gray-700">적용 기간:</label>
+        <select
+          value={periodStart}
+          onChange={(e) => setPeriodStart(Number(e.target.value))}
+          className="px-2 py-1 border border-gray-300 rounded text-sm"
+        >
+          {Array.from({ length: lastDay }, (_, i) => i + 1).map((d) => (
+            <option key={d} value={d}>{d}일</option>
+          ))}
+        </select>
+        <span className="text-gray-400">~</span>
+        <select
+          value={periodEnd}
+          onChange={(e) => setPeriodEnd(Number(e.target.value))}
+          className="px-2 py-1 border border-gray-300 rounded text-sm"
+        >
+          {Array.from({ length: lastDay }, (_, i) => i + 1).map((d) => (
+            <option key={d} value={d}>{d}일</option>
+          ))}
+        </select>
+        <span className="text-xs text-gray-500 ml-auto">
+          {selectedYear}년 {selectedMonth}월 ({lastDay}일)
+        </span>
+      </div>
 
       {/* 요일 선택 */}
       <div>

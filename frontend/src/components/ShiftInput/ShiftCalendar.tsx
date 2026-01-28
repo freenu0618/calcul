@@ -6,7 +6,7 @@
  * - 월간 템플릿으로 일괄 입력
  */
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -42,6 +42,7 @@ export default function ShiftCalendar({
   onBulkAdd,
   initialMonth,
 }: ShiftCalendarProps) {
+  const calendarRef = useRef<FullCalendar>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [editingShift, setEditingShift] = useState<{ index: number; shift: WorkShiftRequest } | null>(null);
@@ -54,6 +55,14 @@ export default function ShiftCalendar({
   // 현재 표시 연월
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1;
+
+  // 월간 템플릿에서 월 변경 시 캘린더 동기화
+  const handleYearMonthChange = useCallback((year: number, month: number) => {
+    const calendarApi = calendarRef.current?.getApi();
+    if (calendarApi) {
+      calendarApi.gotoDate(new Date(year, month - 1, 1));
+    }
+  }, []);
 
   // 이미 등록된 날짜 Set
   const existingDates = useMemo(() => new Set(shifts.map((s) => s.date)), [shifts]);
@@ -162,7 +171,12 @@ export default function ShiftCalendar({
 
       {/* 월간 템플릿 */}
       {showTemplate && (
-        <MonthlyTemplate year={currentYear} month={currentMonth} onApply={handleTemplateApply} />
+        <MonthlyTemplate
+          year={currentYear}
+          month={currentMonth}
+          onApply={handleTemplateApply}
+          onYearMonthChange={handleYearMonthChange}
+        />
       )}
 
       {/* 캘린더 */}
@@ -184,6 +198,7 @@ export default function ShiftCalendar({
         </div>
 
         <FullCalendar
+          ref={calendarRef}
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
           initialDate={initialMonth ? `${initialMonth}-01` : undefined}
