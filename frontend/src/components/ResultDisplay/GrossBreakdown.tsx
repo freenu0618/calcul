@@ -21,17 +21,33 @@ export default function GrossBreakdown({ breakdown }: GrossBreakdownProps) {
             </h4>
 
             <div className="space-y-3 text-sm">
-                {/* 기본급 */}
-                <div className="flex justify-between">
-                    <span className="text-gray-600">기본급</span>
-                    <span className="font-medium">{breakdown.base_salary.formatted}</span>
-                </div>
-
-                {/* 통상시급 (참고용) */}
-                <div className="flex justify-between text-gray-500 text-xs">
-                    <span>└ 통상시급</span>
-                    <span>{breakdown.hourly_wage.formatted}/시간</span>
-                </div>
+                {/* 기본급 Accordion */}
+                <Accordion
+                    title="기본급"
+                    badge={breakdown.base_salary.formatted}
+                    icon={<span>💵</span>}
+                    defaultOpen
+                >
+                    <div className="space-y-2">
+                        <div className="flex justify-between">
+                            <span className="text-gray-600">입력된 기본급</span>
+                            <span className="font-medium">{breakdown.base_salary.formatted}</span>
+                        </div>
+                        <div className="text-xs text-gray-400 bg-gray-50 p-2 rounded">
+                            <p className="font-medium text-gray-600 mb-1">📐 통상시급 계산</p>
+                            <p>통상시급 = 기본급 ÷ 월 소정근로시간</p>
+                            <p className="mt-1">
+                                = {breakdown.base_salary.amount.toLocaleString()}원 ÷ 174시간
+                            </p>
+                            <p className="text-blue-600 font-medium">
+                                = {breakdown.hourly_wage.formatted}/시간
+                            </p>
+                        </div>
+                        <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded">
+                            💡 174시간 = 주 40시간 × 4.345주 (주휴 제외 실근로시간)
+                        </div>
+                    </div>
+                </Accordion>
 
                 {/* 과세 수당 */}
                 {breakdown.taxable_allowances.amount > 0 && (
@@ -118,10 +134,25 @@ export default function GrossBreakdown({ breakdown }: GrossBreakdownProps) {
                                 <span className="font-medium">{weekly_holiday_pay.amount.formatted}</span>
                             </div>
                             <div className="text-xs text-gray-400 bg-gray-50 p-2 rounded">
-                                {weekly_holiday_pay.calculation}
+                                <p className="font-medium text-gray-600 mb-1">📐 주휴수당 계산</p>
+                                <p>{weekly_holiday_pay.calculation}</p>
+                                <p className="mt-2 text-gray-500">
+                                    = 통상시급 × 8시간 × 주 수
+                                </p>
+                                <p>
+                                    = {hourlyWage.toLocaleString()}원 × 8시간 × 4.345주
+                                </p>
+                                <p className="text-green-600 font-medium">
+                                    = {weekly_holiday_pay.amount.formatted}
+                                </p>
                             </div>
                             <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
                                 ℹ️ 주 15시간 이상 근무 + 소정근로일 개근 시 지급
+                                {weekly_holiday_pay.is_proportional && (
+                                    <span className="block mt-1 text-amber-600">
+                                        ⚠️ 단시간 근로자: 주 소정근로시간 비례 적용
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </Accordion>

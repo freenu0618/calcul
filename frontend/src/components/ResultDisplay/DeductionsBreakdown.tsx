@@ -8,6 +8,7 @@ import Accordion from '../common/Accordion';
 
 interface DeductionsBreakdownProps {
     breakdown: DeductionsType;
+    taxableIncome?: number; // 과세소득 (계산식 표시용)
 }
 
 // 2026년 4대 보험 요율 (연금개혁 반영)
@@ -18,8 +19,11 @@ const RATES = {
     employment: 0.9,
 };
 
-export default function DeductionsBreakdown({ breakdown }: DeductionsBreakdownProps) {
+export default function DeductionsBreakdown({ breakdown, taxableIncome }: DeductionsBreakdownProps) {
     const { insurance, tax } = breakdown;
+
+    // 역산으로 과세소득 추정 (국민연금 기준)
+    const estimatedTaxable = taxableIncome || Math.round(insurance.national_pension.amount / (RATES.pension / 100));
 
     return (
         <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -43,7 +47,8 @@ export default function DeductionsBreakdown({ breakdown }: DeductionsBreakdownPr
                                 <span className="font-medium">{insurance.national_pension.formatted}</span>
                             </div>
                             <div className="text-xs text-gray-400 mt-1 bg-gray-50 p-2 rounded">
-                                과세소득 × {RATES.pension}% (상한 590만원, 하한 39만원)
+                                <p>{estimatedTaxable.toLocaleString()}원 × {RATES.pension}% = {insurance.national_pension.formatted}</p>
+                                <p className="text-gray-500 mt-1">(상한 590만원, 하한 39만원 적용)</p>
                             </div>
                         </div>
 
@@ -54,7 +59,7 @@ export default function DeductionsBreakdown({ breakdown }: DeductionsBreakdownPr
                                 <span className="font-medium">{insurance.health_insurance.formatted}</span>
                             </div>
                             <div className="text-xs text-gray-400 mt-1 bg-gray-50 p-2 rounded">
-                                과세소득 × {RATES.health}%
+                                {estimatedTaxable.toLocaleString()}원 × {RATES.health}% = {insurance.health_insurance.formatted}
                             </div>
                         </div>
 
@@ -65,7 +70,7 @@ export default function DeductionsBreakdown({ breakdown }: DeductionsBreakdownPr
                                 <span className="font-medium">{insurance.long_term_care.formatted}</span>
                             </div>
                             <div className="text-xs text-gray-400 mt-1 bg-gray-50 p-2 rounded">
-                                건강보험료 × {RATES.care}%
+                                {insurance.health_insurance.amount.toLocaleString()}원 × {RATES.care}% = {insurance.long_term_care.formatted}
                             </div>
                         </div>
 
@@ -76,7 +81,8 @@ export default function DeductionsBreakdown({ breakdown }: DeductionsBreakdownPr
                                 <span className="font-medium">{insurance.employment_insurance.formatted}</span>
                             </div>
                             <div className="text-xs text-gray-400 mt-1 bg-gray-50 p-2 rounded">
-                                과세소득 × {RATES.employment}% (상한 1,350만원)
+                                <p>{estimatedTaxable.toLocaleString()}원 × {RATES.employment}% = {insurance.employment_insurance.formatted}</p>
+                                <p className="text-gray-500 mt-1">(상한 1,350만원 적용)</p>
                             </div>
                         </div>
 
@@ -102,7 +108,8 @@ export default function DeductionsBreakdown({ breakdown }: DeductionsBreakdownPr
                                 <span className="font-medium">{tax.income_tax.formatted}</span>
                             </div>
                             <div className="text-xs text-gray-400 mt-1 bg-gray-50 p-2 rounded">
-                                간이세액표 기준 (부양가족 수 반영)
+                                <p>간이세액표 기준 조회 결과</p>
+                                <p className="text-gray-500 mt-1">(과세소득, 부양가족 수에 따라 결정)</p>
                             </div>
                         </div>
 
@@ -113,7 +120,7 @@ export default function DeductionsBreakdown({ breakdown }: DeductionsBreakdownPr
                                 <span className="font-medium">{tax.local_income_tax.formatted}</span>
                             </div>
                             <div className="text-xs text-gray-400 mt-1 bg-gray-50 p-2 rounded">
-                                소득세 × 10%
+                                {tax.income_tax.amount.toLocaleString()}원 × 10% = {tax.local_income_tax.formatted}
                             </div>
                         </div>
 

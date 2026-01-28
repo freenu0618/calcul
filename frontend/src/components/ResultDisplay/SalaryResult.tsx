@@ -117,7 +117,10 @@ export default function SalaryResult({ result }: SalaryResultProps) {
             {/* 지급/공제 breakdown */}
             <div className="grid md:grid-cols-2 gap-4">
                 <GrossBreakdown breakdown={gross_breakdown} />
-                <DeductionsBreakdown breakdown={deductions_breakdown} />
+                <DeductionsBreakdown
+                    breakdown={deductions_breakdown}
+                    taxableIncome={gross_breakdown.total.amount - gross_breakdown.non_taxable_allowances.amount}
+                />
             </div>
 
             {/* 법적 고지 */}
