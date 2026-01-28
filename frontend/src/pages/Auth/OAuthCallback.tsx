@@ -25,13 +25,20 @@ const OAuthCallback = () => {
     }
 
     if (token) {
-      // JWT 토큰 저장 및 사용자 정보 로드 (name은 URL 파라미터에서 가져옴)
-      setTokenDirectly(token, name ? decodeURIComponent(name) : undefined);
-      navigate('/', { replace: true });
+      try {
+        // JWT 토큰 저장 및 사용자 정보 로드 (name은 URL 파라미터에서 가져옴)
+        setTokenDirectly(token, name ? decodeURIComponent(name) : undefined);
+        // 약간의 지연 후 navigate (상태 업데이트 완료 대기)
+        setTimeout(() => {
+          navigate('/', { replace: true });
+        }, 100);
+      } catch (err) {
+        setError('토큰 처리 중 오류가 발생했습니다.');
+      }
     } else {
       setError('인증 토큰을 받지 못했습니다.');
     }
-  }, [searchParams, navigate, setTokenDirectly]);
+  }, []);
 
   if (error) {
     return (

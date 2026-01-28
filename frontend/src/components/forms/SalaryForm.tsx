@@ -24,6 +24,8 @@ interface SalaryFormProps {
   onAbsencePolicyChange: (policy: AbsencePolicy) => void;
   hoursMode: HoursMode;
   onHoursModeChange: (mode: HoursMode) => void;
+  contractSalary?: number;
+  onContractSalaryChange?: (value: number) => void;
 }
 
 // 상수
