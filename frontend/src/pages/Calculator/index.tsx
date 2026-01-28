@@ -12,11 +12,12 @@ import SalaryForm from '../../components/forms/SalaryForm';
 import { SalaryResult } from '../../components/ResultDisplay';
 import { ShiftInput } from '../../components/ShiftInput';
 import { StepWizard, useWizard, type WizardStep } from '../../components/wizard';
-import { salaryApi, payrollApi } from '../../api';
+import { salaryApi, payrollApi, employeeApi } from '../../api';
 import { useAuth } from '../../contexts/AuthContext';
 import type { Employee, Allowance } from '../../types/models';
 import type { SalaryCalculationResponse, WorkShiftRequest, WageType, AbsencePolicy } from '../../types/salary';
 import type { PayrollPeriodResponse } from '../../types/payroll';
+import type { EmployeeResponse } from '../../types/employee';
 
 const WIZARD_STEPS: WizardStep[] = [
   { id: 'employee', title: '근로자 정보', description: '고용형태, 사업장' },
@@ -27,8 +28,11 @@ const WIZARD_STEPS: WizardStep[] = [
 export default function CalculatorPage() {
   const { isAuthenticated } = useAuth();
   const [periods, setPeriods] = useState<PayrollPeriodResponse[]>([]);
+  const [registeredEmployees, setRegisteredEmployees] = useState<EmployeeResponse[]>([]);
   const [selectedPeriodId, setSelectedPeriodId] = useState<string>('');
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+  const [saveError, setSaveError] = useState<string>('');
   const [employee, setEmployee] = useState<Employee>({
     name: '',
     dependents_count: 1,
@@ -50,10 +54,11 @@ export default function CalculatorPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 로그인 시 급여 기간 목록 로드
+  // 로그인 시 급여 기간 및 직원 목록 로드
   useEffect(() => {
     if (isAuthenticated) {
       payrollApi.getPeriods().then((data) => setPeriods(data.periods || [])).catch(() => {});
+      employeeApi.getEmployees().then((data) => setRegisteredEmployees(data.employees || [])).catch(() => {});
     }
   }, [isAuthenticated]);
 
@@ -66,13 +71,14 @@ export default function CalculatorPage() {
 
   // 급여대장에 저장
   const handleSaveToPayroll = async () => {
-    if (!selectedPeriodId || !result) return;
+    if (!selectedPeriodId || !selectedEmployeeId || !result) return;
     setSaveStatus('saving');
+    setSaveError('');
     try {
       const totalMins = workShifts.reduce((sum, s) => sum + calcMinutes(s), 0);
       const holidayMins = workShifts.filter((s) => s.is_holiday_work).reduce((sum, s) => sum + calcMinutes(s), 0);
       await payrollApi.addEntry(Number(selectedPeriodId), {
-        employee_id: '',
+        employee_id: selectedEmployeeId,
         base_salary: result.gross_breakdown.total.amount,
         total_work_minutes: totalMins,
         overtime_minutes: result.work_summary?.overtime_hours?.total_minutes || 0,
@@ -81,8 +87,16 @@ export default function CalculatorPage() {
       });
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 3000);
-    } catch {
+    } catch (err: unknown) {
       setSaveStatus('error');
+      const msg = err instanceof Error ? err.message : '';
+      if (msg.includes('이미') || msg.includes('존재')) {
+        setSaveError('이미 해당 직원의 급여가 등록되어 있습니다.');
+      } else if (msg.includes('확정')) {
+        setSaveError('확정된 급여 기간은 수정할 수 없습니다.');
+      } else {
+        setSaveError(msg || '저장에 실패했습니다.');
+      }
     }
   };
 
@@ -232,26 +246,41 @@ export default function CalculatorPage() {
               {/* 급여대장 저장 (로그인 사용자만) */}
               {isAuthenticated && (
                 <Card title="급여대장에 저장">
-                  <div className="flex items-center gap-4">
-                    <select
-                      value={selectedPeriodId}
-                      onChange={(e) => setSelectedPeriodId(e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
-                    >
-                      <option value="">급여 기간 선택</option>
-                      {periods.map((p) => (
-                        <option key={p.id} value={p.id}>{p.year}년 {p.month}월</option>
-                      ))}
-                    </select>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <select
+                        value={selectedPeriodId}
+                        onChange={(e) => setSelectedPeriodId(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg"
+                      >
+                        <option value="">급여 기간 선택</option>
+                        {periods.map((p) => (
+                          <option key={p.id} value={p.id}>{p.year}년 {p.month}월</option>
+                        ))}
+                      </select>
+                      <select
+                        value={selectedEmployeeId}
+                        onChange={(e) => setSelectedEmployeeId(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg"
+                      >
+                        <option value="">직원 선택</option>
+                        {registeredEmployees.map((emp) => (
+                          <option key={emp.id} value={emp.id}>{emp.name}</option>
+                        ))}
+                      </select>
+                    </div>
                     <button
                       onClick={handleSaveToPayroll}
-                      disabled={!selectedPeriodId || saveStatus === 'saving'}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300"
+                      disabled={!selectedPeriodId || !selectedEmployeeId || saveStatus === 'saving'}
+                      className="w-full py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300"
                     >
-                      {saveStatus === 'saving' ? '저장 중...' : saveStatus === 'success' ? '✓ 저장됨' : '저장'}
+                      {saveStatus === 'saving' ? '저장 중...' : saveStatus === 'success' ? '✓ 저장됨' : '급여대장에 저장'}
                     </button>
+                    {registeredEmployees.length === 0 && (
+                      <p className="text-sm text-amber-600">등록된 직원이 없습니다. 먼저 직원을 등록해주세요.</p>
+                    )}
                   </div>
-                  {saveStatus === 'error' && <p className="mt-2 text-sm text-red-500">저장 실패. 다시 시도해주세요.</p>}
+                  {saveStatus === 'error' && <p className="mt-2 text-sm text-red-500">{saveError}</p>}
                 </Card>
               )}
             </div>

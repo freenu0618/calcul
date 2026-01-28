@@ -4,3 +4,4 @@
 export * from './client';
 export * from './salaryApi';
 export * from './payrollApi';
+export * from './employeeApi';
