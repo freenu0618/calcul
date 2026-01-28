@@ -13,9 +13,10 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* 서비스 소개 */}
           <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-4">급여계산기</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">PayTools</h3>
             <p className="text-sm text-gray-600">
-              한국 근로기준법에 따른 정확한 실수령액 계산 서비스
+              급여 계산 30분 → 3분으로<br />
+              2026년 최신 법령 반영
             </p>
           </div>
 
@@ -111,7 +112,7 @@ const Footer = () => {
               계산 결과로 인한 법적 책임은 사용자에게 있습니다.
             </p>
             <p className="mt-4 text-gray-500">
-              © {currentYear} 급여계산기. All rights reserved.
+              © {currentYear} PayTools. All rights reserved.
             </p>
           </div>
         </div>

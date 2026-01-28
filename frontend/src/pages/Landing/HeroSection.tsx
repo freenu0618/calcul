@@ -54,11 +54,11 @@ export default function HeroSection() {
             <div className="mt-4 flex items-center justify-center lg:justify-start gap-4 text-xs text-text-sub">
               <div className="flex items-center gap-1">
                 <span className="material-symbols-outlined text-[18px] text-primary">check_circle</span>
-                5인 미만 사업장 무료
+                직원 5명까지 무료
               </div>
               <div className="flex items-center gap-1">
                 <span className="material-symbols-outlined text-[18px] text-primary">check_circle</span>
-                별도 설치 없음
+                신용카드 불필요
               </div>
             </div>
           </div>

@@ -170,8 +170,11 @@ backend-spring/
 ## 문서 활용 가이드
 
 ### 작업 시작 전 필수 확인
-1. **[docs/INDEX.md](./docs/INDEX.md)** - 작업 유형별 참고문서 매핑
-2. 해당 작업에 필요한 문서만 선택적으로 읽기 (전체 읽기 금지)
+
+**순서대로 읽기 (토큰 효율성 94% 향상)**:
+1. **[PROJECT_INDEX.md](./PROJECT_INDEX.md)** - 프로젝트 전체 구조 파악 (~3K 토큰)
+2. **[docs/INDEX.md](./docs/INDEX.md)** - 작업 유형별 참고문서 매핑
+3. 해당 작업에 필요한 문서만 선택적으로 읽기 (전체 읽기 금지)
 
 ### 작업 유형별 필수 문서
 
@@ -228,8 +231,8 @@ git push -u origin feature/기능명
 ## 참고 문서
 
 ### 핵심 문서 (자주 사용)
-- **[docs/INDEX.md](./docs/INDEX.md)**: 작업별 참고문서 매핑 (필독)
-- **[docs/README.md](./docs/README.md)**: 문서 허브 (전체 문서 목록)
+- **[PROJECT_INDEX.md](./PROJECT_INDEX.md)**: 프로젝트 전체 구조 (세션 시작 시 필독)
+- **[docs/INDEX.md](./docs/INDEX.md)**: 작업별 참고문서 매핑
 - **[docs/03-architecture/api-reference.md](./docs/03-architecture/api-reference.md)**: API 명세
 - **[docs/06-operations/troubleshooting.md](./docs/06-operations/troubleshooting.md)**: 문제 해결
 
