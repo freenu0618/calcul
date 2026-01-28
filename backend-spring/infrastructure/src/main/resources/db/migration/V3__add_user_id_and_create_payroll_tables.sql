@@ -6,16 +6,33 @@
 -- =====================================================
 ALTER TABLE employees ADD COLUMN IF NOT EXISTS user_id BIGINT;
 
--- 기존 데이터에 대해 user_id 설정 (임시 처리: 첫 번째 사용자에게 할당)
--- 실제 운영에서는 적절한 마이그레이션 전략 필요
+-- 기존 데이터에 대해 user_id 설정 (첫 번째 사용자에게 할당)
 UPDATE employees SET user_id = (SELECT id FROM users LIMIT 1) WHERE user_id IS NULL;
 
--- NOT NULL 제약조건 추가 (데이터 무결성)
-ALTER TABLE employees ALTER COLUMN user_id SET NOT NULL;
+-- user_id가 여전히 NULL인 employees 삭제 (users 테이블이 비어있는 경우)
+DELETE FROM employees WHERE user_id IS NULL;
 
--- 외래키 추가
-ALTER TABLE employees ADD CONSTRAINT fk_employees_user_id
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+-- NOT NULL 제약조건 추가 (오류 무시)
+DO $$
+BEGIN
+    ALTER TABLE employees ALTER COLUMN user_id SET NOT NULL;
+EXCEPTION WHEN OTHERS THEN
+    RAISE NOTICE 'user_id NOT NULL constraint may already exist';
+END $$;
+
+-- 외래키 추가 (이미 있으면 건너뛰기)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.table_constraints
+        WHERE constraint_name = 'fk_employees_user_id'
+    ) THEN
+        ALTER TABLE employees ADD CONSTRAINT fk_employees_user_id
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+    END IF;
+EXCEPTION WHEN OTHERS THEN
+    RAISE NOTICE 'Foreign key may already exist';
+END $$;
 
 -- 인덱스 추가 (성능 최적화)
 CREATE INDEX IF NOT EXISTS idx_employees_user_id ON employees(user_id);
