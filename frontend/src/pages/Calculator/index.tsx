@@ -255,7 +255,9 @@ export default function CalculatorPage() {
                       >
                         <option value="">급여 기간 선택</option>
                         {periods.map((p) => (
-                          <option key={p.id} value={p.id}>{p.year}년 {p.month}월</option>
+                          <option key={p.id} value={p.id} disabled={p.status !== 'DRAFT'}>
+                            {p.year}년 {p.month}월 {p.status !== 'DRAFT' ? `(${p.status === 'CONFIRMED' ? '확정' : '지급완료'})` : ''}
+                          </option>
                         ))}
                       </select>
                       <select
@@ -278,6 +280,9 @@ export default function CalculatorPage() {
                     </button>
                     {registeredEmployees.length === 0 && (
                       <p className="text-sm text-amber-600">등록된 직원이 없습니다. 먼저 직원을 등록해주세요.</p>
+                    )}
+                    {periods.filter((p) => p.status === 'DRAFT').length === 0 && periods.length > 0 && (
+                      <p className="text-sm text-amber-600">저장 가능한 급여 기간이 없습니다. 급여대장에서 새 기간을 만들거나 기존 기간을 수정 상태로 변경해주세요.</p>
                     )}
                   </div>
                   {saveStatus === 'error' && <p className="mt-2 text-sm text-red-500">{saveError}</p>}
