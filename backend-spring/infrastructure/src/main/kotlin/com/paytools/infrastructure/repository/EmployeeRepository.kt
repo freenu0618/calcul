@@ -13,14 +13,22 @@ import java.util.*
 @Repository
 interface EmployeeRepository : JpaRepository<EmployeeEntity, UUID> {
 
-    /**
-     * 주민번호로 조회
-     */
+    /** 사용자별 근무자 목록 조회 */
+    fun findByUserId(userId: Long): List<EmployeeEntity>
+
+    /** 사용자별 특정 근무자 조회 */
+    fun findByUserIdAndId(userId: Long, id: UUID): EmployeeEntity?
+
+    /** 사용자별 이름 검색 */
+    fun findByUserIdAndNameContaining(userId: Long, name: String): List<EmployeeEntity>
+
+    /** 사용자별 주민번호 중복 체크 */
+    fun existsByUserIdAndResidentIdPrefix(userId: Long, residentIdPrefix: String): Boolean
+
+    /** 주민번호로 조회 */
     fun findByResidentIdPrefix(residentIdPrefix: String): EmployeeEntity?
 
-    /**
-     * 이름으로 검색
-     */
+    /** 이름으로 검색 (전체) */
     fun findByNameContaining(name: String): List<EmployeeEntity>
 
     /**

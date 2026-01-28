@@ -20,6 +20,7 @@ const Navigation = () => {
         { path: '/dashboard', label: '대시보드' },
         { path: '/calculator', label: '급여 계산' },
         { path: '/employees', label: '직원 관리' },
+        { path: '/payroll', label: '급여대장' },
         { path: '/guide', label: '가이드' },
       ]
     : [

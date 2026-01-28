@@ -20,7 +20,8 @@ import java.util.*
     name = "employees",
     indexes = [
         Index(name = "idx_employee_name", columnList = "name"),
-        Index(name = "idx_employee_contract_start", columnList = "contract_start_date")
+        Index(name = "idx_employee_contract_start", columnList = "contract_start_date"),
+        Index(name = "idx_employees_user_id", columnList = "user_id")
     ]
 )
 data class EmployeeEntity(
@@ -28,6 +29,10 @@ data class EmployeeEntity(
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
     val id: UUID = UUID.randomUUID(),
+
+    /** 소유 사용자 ID (다중 테넌트 지원) */
+    @Column(name = "user_id", nullable = false)
+    val userId: Long,
 
     // 기본 정보
     @Column(name = "name", nullable = false, length = 100)
