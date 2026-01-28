@@ -2,7 +2,7 @@
  * 급여 계산기 페이지 (기존 Home.tsx 이동)
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
@@ -12,9 +12,11 @@ import SalaryForm from '../../components/forms/SalaryForm';
 import { SalaryResult } from '../../components/ResultDisplay';
 import { ShiftInput } from '../../components/ShiftInput';
 import { StepWizard, useWizard, type WizardStep } from '../../components/wizard';
-import { salaryApi } from '../../api';
+import { salaryApi, payrollApi } from '../../api';
+import { useAuth } from '../../contexts/AuthContext';
 import type { Employee, Allowance } from '../../types/models';
 import type { SalaryCalculationResponse, WorkShiftRequest, WageType, AbsencePolicy } from '../../types/salary';
+import type { PayrollPeriodResponse } from '../../types/payroll';
 
 const WIZARD_STEPS: WizardStep[] = [
   { id: 'employee', title: '근로자 정보', description: '고용형태, 사업장' },
@@ -23,6 +25,10 @@ const WIZARD_STEPS: WizardStep[] = [
 ];
 
 export default function CalculatorPage() {
+  const { isAuthenticated } = useAuth();
+  const [periods, setPeriods] = useState<PayrollPeriodResponse[]>([]);
+  const [selectedPeriodId, setSelectedPeriodId] = useState<string>('');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [employee, setEmployee] = useState<Employee>({
     name: '',
     dependents_count: 1,
@@ -43,6 +49,33 @@ export default function CalculatorPage() {
   const [result, setResult] = useState<SalaryCalculationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 로그인 시 급여 기간 목록 로드
+  useEffect(() => {
+    if (isAuthenticated) {
+      payrollApi.getPeriods().then((res) => setPeriods(res.periods || [])).catch(() => {});
+    }
+  }, [isAuthenticated]);
+
+  // 급여대장에 저장
+  const handleSaveToPayroll = async () => {
+    if (!selectedPeriodId || !result) return;
+    setSaveStatus('saving');
+    try {
+      await payrollApi.addEntry(Number(selectedPeriodId), {
+        employee_id: '', // 임시 직원 ID (추후 직원 선택 UI 추가 가능)
+        base_salary: result.gross_salary,
+        total_work_minutes: workShifts.reduce((sum, s) => sum + (s.work_minutes || 0), 0),
+        overtime_minutes: workShifts.filter((s) => s.is_overtime).reduce((sum, s) => sum + (s.work_minutes || 0), 0),
+        night_minutes: workShifts.filter((s) => s.is_night).reduce((sum, s) => sum + (s.work_minutes || 0), 0),
+        holiday_minutes: workShifts.filter((s) => s.is_holiday).reduce((sum, s) => sum + (s.work_minutes || 0), 0),
+      });
+      setSaveStatus('success');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } catch {
+      setSaveStatus('error');
+    }
+  };
 
   const handleCalculate = useCallback(async () => {
     setIsLoading(true);
@@ -182,10 +215,36 @@ export default function CalculatorPage() {
 
           {/* 계산 결과 */}
           {result ? (
-            <div className="mt-8">
+            <div className="mt-8 space-y-4">
               <Card title="계산 결과">
                 <SalaryResult result={result} />
               </Card>
+
+              {/* 급여대장 저장 (로그인 사용자만) */}
+              {isAuthenticated && (
+                <Card title="급여대장에 저장">
+                  <div className="flex items-center gap-4">
+                    <select
+                      value={selectedPeriodId}
+                      onChange={(e) => setSelectedPeriodId(e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+                    >
+                      <option value="">급여 기간 선택</option>
+                      {periods.map((p) => (
+                        <option key={p.id} value={p.id}>{p.year}년 {p.month}월</option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={handleSaveToPayroll}
+                      disabled={!selectedPeriodId || saveStatus === 'saving'}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300"
+                    >
+                      {saveStatus === 'saving' ? '저장 중...' : saveStatus === 'success' ? '✓ 저장됨' : '저장'}
+                    </button>
+                  </div>
+                  {saveStatus === 'error' && <p className="mt-2 text-sm text-red-500">저장 실패. 다시 시도해주세요.</p>}
+                </Card>
+              )}
             </div>
           ) : !error && !isLoading && (
             <div className="mt-8">
