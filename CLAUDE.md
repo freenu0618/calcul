@@ -257,6 +257,8 @@ git push -u origin feature/기능명
   - [x] 급여 계산 API (POST /api/v1/salary/calculate)
   - [x] 보험료 조회 API (GET /api/v1/insurance/rates, POST /api/v1/insurance/calculate)
   - [x] 세금 계산 API (POST /api/v1/tax/calculate, POST /api/v1/tax/estimate-annual)
+  - [x] 직원 관리 API (CRUD /api/v1/employees)
+  - [x] 급여대장 API (CRUD /api/v1/payroll/periods, /entries, /shifts, /contracts)
 - [x] 통합 테스트 (20개 테스트 전체 통과)
 - [x] Railway 배포 완료 (https://calcul-production.up.railway.app)
 
@@ -267,14 +269,17 @@ git push -u origin feature/기능명
 - [x] 급여 계산기 페이지 (/calculator)
 - [x] 대시보드 페이지 (/dashboard)
 - [x] 로그인/회원가입 페이지
+- [x] 직원 관리 페이지 (/employees)
+- [x] 급여대장 페이지 (/payroll, /payroll/:id)
+- [x] 월간 템플릿 입력 (요일 체크박스 + 시간 라디오버튼)
 - [x] API 클라이언트 레이어 및 TypeScript 타입
 - [x] 급여 계산 API 연동 완료
 - [x] 인증 API 연동 완료 (회원가입/로그인)
 - [x] Cloudflare Pages 배포 완료 (https://paytools.work)
 
 ### 향후 개발 계획
-- [ ] 근무자 등록 시스템 (Phase 3.5)
-- [ ] 급여대장 기능 (Phase 5)
+- [x] 근무자 등록 시스템 (Phase 3.5) ✅ 완료
+- [x] 급여대장 기능 (Phase 5) ✅ 핵심 완료 (PDF/엑셀 출력 미구현)
 - [ ] AI 노무 챗봇 - Python 마이크로서비스 (Phase 6)
 - [ ] 급여명세서 PDF 출력
 - [ ] E2E 테스트 추가
