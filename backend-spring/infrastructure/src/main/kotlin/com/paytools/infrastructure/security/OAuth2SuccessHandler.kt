@@ -1,6 +1,7 @@
 package com.paytools.infrastructure.security
 
-import com.paytools.infrastructure.entity.UserEntity
+import com.paytools.domain.entity.User
+import com.paytools.domain.entity.UserRole
 import com.paytools.infrastructure.repository.UserRepository
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -45,10 +46,10 @@ class OAuth2SuccessHandler(
         }
 
         // 사용자 찾기 또는 생성
-        val user = userRepository.findByEmail(email) ?: createUser(email, name, provider)
+        val user = userRepository.findByEmail(email).orElseGet { createUser(email, name, provider) }
 
         // JWT 토큰 발급
-        val token = jwtTokenProvider.generateToken(user.id.toString())
+        val token = jwtTokenProvider.generateAccessToken(user.id, user.email, user.role.name)
 
         // 프론트엔드로 리다이렉트 (토큰 포함)
         val redirectUrl = "$frontendRedirectUrl?token=$token&name=${encode(user.name)}"
@@ -79,11 +80,12 @@ class OAuth2SuccessHandler(
         }
     }
 
-    private fun createUser(email: String, name: String?, provider: String): UserEntity {
-        val newUser = UserEntity(
+    private fun createUser(email: String, name: String?, provider: String): User {
+        val newUser = User(
             email = email,
-            password = "", // OAuth 사용자는 비밀번호 없음
+            passwordHash = "", // OAuth 사용자는 비밀번호 없음
             name = name ?: email.substringBefore("@"),
+            role = UserRole.USER,
             oauthProvider = provider
         )
         return userRepository.save(newUser)
