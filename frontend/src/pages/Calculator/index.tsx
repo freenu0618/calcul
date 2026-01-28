@@ -9,7 +9,8 @@ import Card from '../../components/common/Card';
 import { CalculatorIcon, EmptyState } from '../../components/illustrations';
 import EmployeeInfoForm from '../../components/forms/EmployeeInfoForm';
 import SalaryForm from '../../components/forms/SalaryForm';
-import { SalaryResult } from '../../components/ResultDisplay';
+import { SalaryResult, AllowanceAdjustment } from '../../components/ResultDisplay';
+import type { AdjustedResult } from '../../components/ResultDisplay';
 import { ShiftInput } from '../../components/ShiftInput';
 import { StepWizard, useWizard, type WizardStep } from '../../components/wizard';
 import { salaryApi, payrollApi, employeeApi } from '../../api';
@@ -51,6 +52,7 @@ export default function CalculatorPage() {
   const [absencePolicy, setAbsencePolicy] = useState<AbsencePolicy>('STRICT');
   const [hoursMode, setHoursMode] = useState<'174' | '209'>('174'); // 추가: 시간 계산 방식
   const [result, setResult] = useState<SalaryCalculationResponse | null>(null);
+  const [adjustedResult, setAdjustedResult] = useState<AdjustedResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -111,6 +113,7 @@ export default function CalculatorPage() {
   const handleCalculate = useCallback(async () => {
     setIsLoading(true);
     setError(null);
+    setAdjustedResult(null); // 새 계산 시 조정 결과 초기화
     try {
       const response = await salaryApi.calculateSalary({
         employee,
@@ -250,6 +253,33 @@ export default function CalculatorPage() {
               <Card title="계산 결과">
                 <SalaryResult result={result} />
               </Card>
+
+              {/* 계약총액제 - 수당 조정 */}
+              <AllowanceAdjustment
+                result={result}
+                onAdjustedResult={(adjusted) => setAdjustedResult(adjusted)}
+              />
+
+              {/* 조정된 실수령액 표시 */}
+              {adjustedResult && adjustedResult.additionalAllowances.length > 0 && (
+                <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-lg p-4 text-white">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-green-100 text-sm">수당 추가 후 실수령액</p>
+                      <p className="text-2xl font-bold">
+                        {new Intl.NumberFormat('ko-KR').format(adjustedResult.adjustedNetPay)}원
+                      </p>
+                    </div>
+                    <div className="text-right text-sm">
+                      <p className="text-green-200">
+                        기존 대비 +{new Intl.NumberFormat('ko-KR').format(
+                          adjustedResult.adjustedNetPay - adjustedResult.originalNetPay
+                        )}원
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* 급여대장 저장 (로그인 사용자만) */}
               {isAuthenticated && (
