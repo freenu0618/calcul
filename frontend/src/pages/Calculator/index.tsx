@@ -53,22 +53,31 @@ export default function CalculatorPage() {
   // 로그인 시 급여 기간 목록 로드
   useEffect(() => {
     if (isAuthenticated) {
-      payrollApi.getPeriods().then((res) => setPeriods(res.periods || [])).catch(() => {});
+      payrollApi.getPeriods().then((data) => setPeriods(data.periods || [])).catch(() => {});
     }
   }, [isAuthenticated]);
+
+  // 시프트에서 근무 분 계산
+  const calcMinutes = (s: WorkShiftRequest) => {
+    const [sh, sm] = s.start_time.split(':').map(Number);
+    const [eh, em] = s.end_time.split(':').map(Number);
+    return Math.max(0, (eh * 60 + em) - (sh * 60 + sm) - s.break_minutes);
+  };
 
   // 급여대장에 저장
   const handleSaveToPayroll = async () => {
     if (!selectedPeriodId || !result) return;
     setSaveStatus('saving');
     try {
+      const totalMins = workShifts.reduce((sum, s) => sum + calcMinutes(s), 0);
+      const holidayMins = workShifts.filter((s) => s.is_holiday_work).reduce((sum, s) => sum + calcMinutes(s), 0);
       await payrollApi.addEntry(Number(selectedPeriodId), {
-        employee_id: '', // 임시 직원 ID (추후 직원 선택 UI 추가 가능)
-        base_salary: result.gross_salary,
-        total_work_minutes: workShifts.reduce((sum, s) => sum + (s.work_minutes || 0), 0),
-        overtime_minutes: workShifts.filter((s) => s.is_overtime).reduce((sum, s) => sum + (s.work_minutes || 0), 0),
-        night_minutes: workShifts.filter((s) => s.is_night).reduce((sum, s) => sum + (s.work_minutes || 0), 0),
-        holiday_minutes: workShifts.filter((s) => s.is_holiday).reduce((sum, s) => sum + (s.work_minutes || 0), 0),
+        employee_id: '',
+        base_salary: result.gross_breakdown.total.amount,
+        total_work_minutes: totalMins,
+        overtime_minutes: result.work_summary?.overtime_hours?.total_minutes || 0,
+        night_minutes: result.work_summary?.night_hours?.total_minutes || 0,
+        holiday_minutes: holidayMins,
       });
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 3000);
