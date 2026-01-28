@@ -29,6 +29,9 @@ class User(
     @Column(name = "is_active", nullable = false)
     var isActive: Boolean = true,
 
+    @Column(name = "oauth_provider")
+    var oauthProvider: String? = null,  // google, kakao, naver (null = 일반 로그인)
+
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: Instant = Instant.now(),
 

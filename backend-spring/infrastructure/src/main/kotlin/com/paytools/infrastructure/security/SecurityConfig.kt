@@ -18,7 +18,8 @@ import org.springframework.web.filter.CharacterEncodingFilter
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    private val jwtAuthenticationFilter: JwtAuthenticationFilter
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    private val oAuth2SuccessHandler: OAuth2SuccessHandler
 ) {
 
     @Bean
@@ -46,8 +47,12 @@ class SecurityConfig(
                     .requestMatchers("/api/v1/employees/**").permitAll()  // 임시 공개 (인증 시스템 개선 시 적용 예정)
                     .requestMatchers("/actuator/**").permitAll()
                     .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll()
+                    .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()  // OAuth2 엔드포인트
                     // Protected endpoints
                     .anyRequest().authenticated()
+            }
+            .oauth2Login { oauth2 ->
+                oauth2.successHandler(oAuth2SuccessHandler)
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
 

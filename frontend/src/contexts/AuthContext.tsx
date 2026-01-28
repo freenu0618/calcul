@@ -20,6 +20,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, fullName: string) => Promise<void>;
   logout: () => void;
+  setTokenDirectly: (token: string) => void;
   isAuthenticated: boolean;
 }
 
@@ -105,6 +106,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(null);
   };
 
+  // OAuth 콜백용: JWT 토큰 직접 설정 (토큰에서 사용자 정보 추출)
+  const setTokenDirectly = (authToken: string) => {
+    try {
+      // JWT payload 디코딩 (base64)
+      const payload = JSON.parse(atob(authToken.split('.')[1]));
+      const userData: User = {
+        id: payload.id || 0,
+        email: payload.sub || payload.email || '',
+        name: payload.name || '',
+        role: payload.role || 'USER',
+      };
+
+      localStorage.setItem('auth_token', authToken);
+      localStorage.setItem('auth_user', JSON.stringify(userData));
+      setToken(authToken);
+      setUser(userData);
+    } catch (e) {
+      console.error('JWT 토큰 파싱 실패:', e);
+      throw new Error('유효하지 않은 토큰입니다.');
+    }
+  };
+
   const value: AuthContextType = {
     user,
     token,
@@ -112,6 +135,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     login,
     register,
     logout,
+    setTokenDirectly,
     isAuthenticated: !!token && !!user,
   };
 

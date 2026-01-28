@@ -28,6 +28,9 @@ dependencies {
     // Spring Security
     implementation("org.springframework.boot:spring-boot-starter-security")
 
+    // OAuth2 Client (Google, Kakao, Naver)
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+
     // WebFlux (for Mono/WebClient in ProxyController)
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 

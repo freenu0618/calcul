@@ -15,6 +15,7 @@ import CalculatorPage from './pages/Calculator';
 import DashboardPage from './pages/Dashboard';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
+import OAuthCallback from './pages/Auth/OAuthCallback';
 import GuidePage from './pages/Guide/GuidePage';
 import InsuranceGuide from './pages/Guide/InsuranceGuide';
 import TaxGuide from './pages/Guide/TaxGuide';
@@ -75,6 +76,7 @@ function App() {
                 {/* 인증 페이지 */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/oauth/callback" element={<OAuthCallback />} />
 
                 {/* 메인 페이지 */}
                 <Route path="/" element={<LandingPage />} />

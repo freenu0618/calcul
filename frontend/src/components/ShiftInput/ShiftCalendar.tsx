@@ -116,7 +116,9 @@ export default function ShiftCalendar({
   }, [editingShift, onShiftRemove]);
 
   const handleDatesSet = useCallback((arg: DatesSetArg) => {
-    setCurrentDate(arg.start);
+    // arg.view.currentStart를 사용하여 정확한 월의 1일을 가져옴
+    // arg.start는 캘린더 그리드 첫 날짜 (이전 달 일요일 포함 가능)
+    setCurrentDate(arg.view.currentStart);
   }, []);
 
   // 월간 템플릿 적용
