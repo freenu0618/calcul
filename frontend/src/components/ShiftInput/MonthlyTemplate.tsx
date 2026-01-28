@@ -16,9 +16,19 @@ interface MonthlyTemplateProps {
 }
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
-const START_TIME_OPTIONS = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00'];
-const END_TIME_OPTIONS = ['15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00'];
 const BREAK_OPTIONS = [0, 30, 60, 90, 120];
+
+// 24시간 프리셋
+const TIME_PRESETS = [
+  { label: '주간', start: '09:00', end: '18:00', icon: '☀️' },
+  { label: '오전', start: '06:00', end: '14:00', icon: '🌅' },
+  { label: '오후', start: '14:00', end: '22:00', icon: '🌆' },
+  { label: '야간', start: '22:00', end: '07:00', icon: '🌙', nextDay: true },
+  { label: '심야', start: '00:00', end: '08:00', icon: '🌃' },
+];
+
+// 24시간 옵션 생성
+const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`);
 
 export default function MonthlyTemplate({ year, month, onApply, showPeriodSelector = false }: MonthlyTemplateProps) {
   // 요일 선택 상태 [일, 월, 화, 수, 목, 금, 토]
@@ -26,11 +36,19 @@ export default function MonthlyTemplate({ year, month, onApply, showPeriodSelect
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('18:00');
   const [breakMinutes, setBreakMinutes] = useState(60);
+  const [isNextDayEnd, setIsNextDayEnd] = useState(false); // 익일 퇴근 여부
 
   // 급여 기간 선택
   const lastDay = new Date(year, month, 0).getDate();
   const [periodStart, setPeriodStart] = useState(1);
   const [periodEnd, setPeriodEnd] = useState(lastDay);
+
+  // 프리셋 적용
+  const applyPreset = (preset: typeof TIME_PRESETS[0]) => {
+    setStartTime(preset.start);
+    setEndTime(preset.end);
+    setIsNextDayEnd(preset.nextDay || false);
+  };
 
   const handleDayToggle = (index: number) => {
     setSelectedDays(prev => {
@@ -179,59 +197,62 @@ export default function MonthlyTemplate({ year, month, onApply, showPeriodSelect
         </div>
       </div>
 
-      {/* 시간 선택 */}
+      {/* 근무 시간대 프리셋 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">근무 시간대</label>
+        <div className="flex gap-2 flex-wrap">
+          {TIME_PRESETS.map((preset) => (
+            <button
+              key={preset.label}
+              type="button"
+              onClick={() => applyPreset(preset)}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                startTime === preset.start && endTime === preset.end && isNextDayEnd === (preset.nextDay || false)
+                  ? 'bg-primary-500 text-white'
+                  : 'bg-white border border-gray-200 text-gray-700 hover:border-primary-300'
+              }`}
+            >
+              {preset.icon} {preset.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 24시간 시간 선택 */}
       <div className="grid grid-cols-2 gap-4">
-        {/* 시작 시간 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">출근 시간</label>
-          <div className="grid grid-cols-4 gap-1">
-            {START_TIME_OPTIONS.map((time) => (
-              <label
-                key={time}
-                className={`flex items-center justify-center p-2 rounded cursor-pointer text-xs font-medium transition-all ${
-                  startTime === time
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-white border border-gray-200 text-gray-700 hover:border-primary-300'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="startTime"
-                  value={time}
-                  checked={startTime === time}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className="sr-only"
-                />
-                {time}
-              </label>
+          <select
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          >
+            {HOUR_OPTIONS.map((time) => (
+              <option key={time} value={time}>{time}</option>
             ))}
-          </div>
+          </select>
         </div>
-
-        {/* 종료 시간 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">퇴근 시간</label>
-          <div className="grid grid-cols-4 gap-1">
-            {END_TIME_OPTIONS.map((time) => (
-              <label
-                key={time}
-                className={`flex items-center justify-center p-2 rounded cursor-pointer text-xs font-medium transition-all ${
-                  endTime === time
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-white border border-gray-200 text-gray-700 hover:border-primary-300'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="endTime"
-                  value={time}
-                  checked={endTime === time}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className="sr-only"
-                />
-                {time}
-              </label>
-            ))}
+          <div className="flex gap-2">
+            <select
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            >
+              {HOUR_OPTIONS.map((time) => (
+                <option key={time} value={time}>{time}</option>
+              ))}
+            </select>
+            <label className="flex items-center gap-1 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg cursor-pointer text-sm">
+              <input
+                type="checkbox"
+                checked={isNextDayEnd}
+                onChange={(e) => setIsNextDayEnd(e.target.checked)}
+                className="rounded"
+              />
+              <span className="text-amber-700">익일</span>
+            </label>
           </div>
         </div>
       </div>
@@ -268,7 +289,7 @@ export default function MonthlyTemplate({ year, month, onApply, showPeriodSelect
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-600">적용 예정:</span>
           <span className="font-medium text-gray-900">
-            {previewShifts.length}일 ({startTime} ~ {endTime}, 휴게 {breakMinutes}분)
+            {previewShifts.length}일 ({startTime} ~ {endTime}{isNextDayEnd ? ' (익일)' : ''}, 휴게 {breakMinutes}분)
           </span>
         </div>
         {previewShifts.length > 0 && (
@@ -277,12 +298,15 @@ export default function MonthlyTemplate({ year, month, onApply, showPeriodSelect
             {(() => {
               const [sh, sm] = startTime.split(':').map(Number);
               const [eh, em] = endTime.split(':').map(Number);
-              const totalMinutes = (eh * 60 + em) - (sh * 60 + sm) - breakMinutes;
+              let totalMinutes = (eh * 60 + em) - (sh * 60 + sm);
+              if (isNextDayEnd || totalMinutes < 0) totalMinutes += 24 * 60; // 익일 퇴근
+              totalMinutes -= breakMinutes;
               const hours = Math.floor(totalMinutes / 60);
               const mins = totalMinutes % 60;
               return `${hours}시간 ${mins > 0 ? `${mins}분` : ''}`;
             })()}
             /일
+            {isNextDayEnd && <span className="text-amber-600 ml-1">(야간근로 포함)</span>}
           </div>
         )}
       </div>
