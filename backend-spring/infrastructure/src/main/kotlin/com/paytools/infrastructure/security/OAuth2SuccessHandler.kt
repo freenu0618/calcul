@@ -63,13 +63,6 @@ class OAuth2SuccessHandler(
                 val name = oauthUser.getAttribute<String>("name")
                 email to name
             }
-            "kakao" -> {
-                val kakaoAccount = oauthUser.getAttribute<Map<String, Any>>("kakao_account")
-                val profile = kakaoAccount?.get("profile") as? Map<String, Any>
-                val email = kakaoAccount?.get("email") as? String
-                val name = profile?.get("nickname") as? String
-                email to name
-            }
             "naver" -> {
                 val responseData = oauthUser.getAttribute<Map<String, Any>>("response")
                 val email = responseData?.get("email") as? String
