@@ -73,14 +73,21 @@ function AccordionSection({
 }
 
 // 상세 항목 행
-function DetailRow({ label, value, sublabel }: { label: string; value: string; sublabel?: string }) {
+function DetailRow({ label, value, sublabel, formula }: { label: string; value: string; sublabel?: string; formula?: string }) {
   return (
-    <div className="flex justify-between items-center text-sm pt-2">
-      <span className="text-gray-600">
-        {label}
-        {sublabel && <span className="text-gray-400 text-xs ml-1">({sublabel})</span>}
-      </span>
-      <span className="font-medium text-gray-900">{value}</span>
+    <div className="pt-2">
+      <div className="flex justify-between items-center text-sm">
+        <span className="text-gray-600">
+          {label}
+          {sublabel && <span className="text-gray-400 text-xs ml-1">({sublabel})</span>}
+        </span>
+        <span className="font-medium text-gray-900">{value}</span>
+      </div>
+      {formula && (
+        <div className="text-xs text-gray-400 mt-1 bg-gray-50 p-2 rounded">
+          {formula}
+        </div>
+      )}
     </div>
   );
 }
@@ -88,6 +95,13 @@ function DetailRow({ label, value, sublabel }: { label: string; value: string; s
 export default function SalaryResultStitch({ result }: SalaryResultStitchProps) {
   const { gross_breakdown, deductions_breakdown, net_pay, warnings } = result;
   const CAPTURE_ID = 'salary-result-capture';
+
+  // 통상시급 및 과세소득 계산
+  const hourlyWage = gross_breakdown.hourly_wage?.amount || Math.round(gross_breakdown.base_salary.amount / 174);
+  const taxableIncome = gross_breakdown.total.amount - gross_breakdown.non_taxable_allowances.amount;
+
+  // 2026년 보험요율
+  const RATES = { pension: 4.75, health: 3.595, care: 13.14, employment: 0.9 };
 
   // 날짜 포맷
   const payDate = new Date();
@@ -158,12 +172,18 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
             amount={gross_breakdown.total.formatted}
             defaultOpen={true}
           >
-            <DetailRow label="기본급" sublabel="Base Pay" value={gross_breakdown.base_salary.formatted} />
+            <DetailRow
+              label="기본급"
+              sublabel="Base Pay"
+              value={gross_breakdown.base_salary.formatted}
+              formula={`통상시급 = ${gross_breakdown.base_salary.amount.toLocaleString()}원 ÷ 174시간 = ${hourlyWage.toLocaleString()}원/시간`}
+            />
             {gross_breakdown.weekly_holiday_pay.amount.amount > 0 && (
               <DetailRow
                 label="주휴수당"
                 sublabel="Weekly Holiday"
                 value={gross_breakdown.weekly_holiday_pay.amount.formatted}
+                formula={`${hourlyWage.toLocaleString()}원 × 8시간 × 4.345주 = ${gross_breakdown.weekly_holiday_pay.amount.formatted}`}
               />
             )}
             {gross_breakdown.overtime_allowances.overtime_pay.amount > 0 && (
@@ -171,6 +191,7 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
                 label="연장근로수당"
                 sublabel="Overtime"
                 value={gross_breakdown.overtime_allowances.overtime_pay.formatted}
+                formula={`${hourlyWage.toLocaleString()}원 × 1.5배 × ${(gross_breakdown.overtime_allowances.overtime_hours.total_minutes / 60).toFixed(1)}시간`}
               />
             )}
             {gross_breakdown.overtime_allowances.night_pay.amount > 0 && (
@@ -178,6 +199,7 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
                 label="야간근로수당"
                 sublabel="Night Work"
                 value={gross_breakdown.overtime_allowances.night_pay.formatted}
+                formula={`${hourlyWage.toLocaleString()}원 × 0.5배 × ${(gross_breakdown.overtime_allowances.night_hours.total_minutes / 60).toFixed(1)}시간 (22:00~06:00 가산분)`}
               />
             )}
             {gross_breakdown.overtime_allowances.holiday_pay.amount > 0 && (
@@ -185,6 +207,7 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
                 label="휴일근로수당"
                 sublabel="Holiday Work"
                 value={gross_breakdown.overtime_allowances.holiday_pay.formatted}
+                formula={`${hourlyWage.toLocaleString()}원 × 1.5배 × ${(gross_breakdown.overtime_allowances.holiday_hours.total_minutes / 60).toFixed(1)}시간`}
               />
             )}
             {gross_breakdown.taxable_allowances.amount > 0 && (
@@ -216,31 +239,37 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
               label="국민연금"
               sublabel="National Pension"
               value={deductions_breakdown.insurance.national_pension.formatted}
+              formula={`${taxableIncome.toLocaleString()}원 × ${RATES.pension}% = ${deductions_breakdown.insurance.national_pension.formatted}`}
             />
             <DetailRow
               label="건강보험"
               sublabel="Health Insurance"
               value={deductions_breakdown.insurance.health_insurance.formatted}
+              formula={`${taxableIncome.toLocaleString()}원 × ${RATES.health}% = ${deductions_breakdown.insurance.health_insurance.formatted}`}
             />
             <DetailRow
               label="장기요양보험"
               sublabel="Care Insurance"
               value={deductions_breakdown.insurance.long_term_care.formatted}
+              formula={`${deductions_breakdown.insurance.health_insurance.amount.toLocaleString()}원 × ${RATES.care}% = ${deductions_breakdown.insurance.long_term_care.formatted}`}
             />
             <DetailRow
               label="고용보험"
               sublabel="Employment Ins."
               value={deductions_breakdown.insurance.employment_insurance.formatted}
+              formula={`${taxableIncome.toLocaleString()}원 × ${RATES.employment}% = ${deductions_breakdown.insurance.employment_insurance.formatted}`}
             />
             <DetailRow
               label="소득세"
               sublabel="Income Tax"
               value={deductions_breakdown.tax.income_tax.formatted}
+              formula="간이세액표 기준 (과세소득, 부양가족 수 반영)"
             />
             <DetailRow
               label="지방소득세"
               sublabel="Local Tax"
               value={deductions_breakdown.tax.local_income_tax.formatted}
+              formula={`${deductions_breakdown.tax.income_tax.amount.toLocaleString()}원 × 10% = ${deductions_breakdown.tax.local_income_tax.formatted}`}
             />
           </AccordionSection>
 
@@ -254,13 +283,23 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
             <div className="pt-4 flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  4대보험 요율 ({result.calculation_metadata.insurance_year}년)
+                  통상시급 계산
+                </p>
+                <div className="bg-blue-50 p-3 rounded text-sm text-blue-700 font-mono space-y-1">
+                  <p>통상시급 = 기본급 ÷ 월 소정근로시간</p>
+                  <p>= {gross_breakdown.base_salary.amount.toLocaleString()}원 ÷ 174시간</p>
+                  <p className="font-bold">= {hourlyWage.toLocaleString()}원/시간</p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  4대보험 요율 ({result.calculation_metadata.insurance_year}년, 연금개혁 반영)
                 </p>
                 <div className="bg-gray-50 p-3 rounded text-sm text-gray-700 font-mono space-y-1">
-                  <p>국민연금: 4.5% (상한 590만원)</p>
-                  <p>건강보험: 3.545%</p>
-                  <p>장기요양: 건강보험료 × 12.95%</p>
-                  <p>고용보험: 0.9%</p>
+                  <p>국민연금: {RATES.pension}% (상한 590만원, 하한 39만원)</p>
+                  <p>건강보험: {RATES.health}%</p>
+                  <p>장기요양: 건강보험료 × {RATES.care}%</p>
+                  <p>고용보험: {RATES.employment}% (상한 1,350만원)</p>
                 </div>
               </div>
               <div className="flex flex-col gap-2">
