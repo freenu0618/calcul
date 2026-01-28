@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'r
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
+import ScrollToTop from './components/common/ScrollToTop';
 import Navigation from './components/layout/Navigation';
 import Footer from './components/layout/Footer';
 import LandingPage from './pages/Landing';
@@ -64,6 +65,7 @@ function App() {
       <HelmetProvider>
         <AuthProvider>
           <Router>
+            <ScrollToTop />
             <PageViewTracker />
             <div className="flex flex-col min-h-screen">
             <Navigation />

@@ -1,8 +1,14 @@
 /**
  * 근로자 정보 입력 폼 컴포넌트
+ * - 로그인 사용자: 등록된 근무자 불러오기 기능 제공
  */
 
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import type { Employee, EmploymentType, CompanySize } from '../../types/models';
+import type { EmployeeResponse } from '../../types/employee';
+import { useAuth } from '../../contexts/AuthContext';
+import { employeeApi } from '../../api/employeeApi';
 import Input from '../common/Input';
 
 interface EmployeeInfoFormProps {
@@ -11,13 +17,94 @@ interface EmployeeInfoFormProps {
 }
 
 export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFormProps) {
+  const { isAuthenticated } = useAuth();
+  const [savedEmployees, setSavedEmployees] = useState<EmployeeResponse[]>([]);
+  const [isLoadingEmployees, setIsLoadingEmployees] = useState(false);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('');
+
+  // 로그인 상태일 때 등록된 근무자 목록 조회
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadSavedEmployees();
+    }
+  }, [isAuthenticated]);
+
+  const loadSavedEmployees = async () => {
+    setIsLoadingEmployees(true);
+    try {
+      const response = await employeeApi.getEmployees();
+      setSavedEmployees(response.employees || []);
+    } catch {
+      console.error('근무자 목록 조회 실패');
+    } finally {
+      setIsLoadingEmployees(false);
+    }
+  };
+
+  // 저장된 근무자 선택 시 정보 자동 입력
+  const handleEmployeeSelect = (employeeId: string) => {
+    setSelectedEmployeeId(employeeId);
+    if (!employeeId) return;
+
+    const selected = savedEmployees.find(e => e.id === employeeId);
+    if (selected) {
+      onChange({
+        ...employee,
+        name: selected.name,
+        employment_type: selected.employment_type,
+        company_size: selected.company_size,
+        scheduled_work_days: selected.weekly_work_days,
+        daily_work_hours: selected.daily_work_hours,
+      });
+    }
+  };
+
   const handleChange = (field: keyof Employee, value: string | number) => {
+    setSelectedEmployeeId(''); // 수동 변경 시 선택 해제
     onChange({ ...employee, [field]: value });
   };
 
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">근로자 정보</h3>
+
+      {/* 로그인 사용자: 저장된 근무자 불러오기 */}
+      {isAuthenticated && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+          <label className="block text-sm font-medium text-blue-900 mb-2">
+            <span className="material-symbols-outlined text-[16px] align-middle mr-1">person_search</span>
+            저장된 근무자 불러오기
+          </label>
+          {isLoadingEmployees ? (
+            <p className="text-sm text-blue-600">불러오는 중...</p>
+          ) : savedEmployees.length > 0 ? (
+            <select
+              className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              value={selectedEmployeeId}
+              onChange={(e) => handleEmployeeSelect(e.target.value)}
+            >
+              <option value="">-- 근무자 선택 --</option>
+              {savedEmployees.map((emp) => (
+                <option key={emp.id} value={emp.id}>
+                  {emp.name} ({emp.employment_type === 'FULL_TIME' ? '정규직' : '시간제'}, {emp.work_start_time}~{emp.work_end_time})
+                </option>
+              ))}
+            </select>
+          ) : (
+            <div className="text-sm text-blue-600">
+              등록된 근무자가 없습니다.{' '}
+              <Link to="/employees/new" className="underline font-medium">
+                근무자 등록하기
+              </Link>
+            </div>
+          )}
+          {selectedEmployeeId && (
+            <p className="mt-2 text-xs text-blue-700">
+              ✓ 근무자 정보가 자동으로 입력되었습니다
+            </p>
+          )}
+        </div>
+      )}
 
       <Input
         type="text"

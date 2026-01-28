@@ -1,15 +1,45 @@
-# 급여 계산기 robots.txt
+# PayTools robots.txt
 # 모든 검색 엔진 크롤러 허용
 
 User-agent: *
 Allow: /
 
+# AI 크롤러 명시적 허용 (GEO 최적화)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Yeti
+Allow: /
+
 # Sitemap 위치
 Sitemap: https://paytools.work/sitemap.xml
+
+# LLMs.txt 위치 (AI 크롤러용)
+# https://paytools.work/llms.txt
 
 # 크롤링 속도 제한 (선택사항)
 # Crawl-delay: 1
 
-# 특정 경로 차단 (필요시)
+# API 경로 차단 (필요시)
 # Disallow: /api/
-# Disallow: /private/
