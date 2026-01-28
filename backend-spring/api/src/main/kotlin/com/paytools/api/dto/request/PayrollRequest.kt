@@ -127,5 +127,27 @@ data class PayrollEntryRequest(
 
     @Schema(description = "휴일근로시간 (분)", example = "0")
     @field:Min(0)
-    val holidayMinutes: Int = 0
+    val holidayMinutes: Int = 0,
+
+    // 계산 결과 (선택적, 이미 계산된 값이 있으면 전달)
+    @Schema(description = "총 지급액")
+    val totalGross: Long? = null,
+
+    @Schema(description = "실수령액")
+    val netPay: Long? = null,
+
+    @Schema(description = "총 공제액")
+    val totalDeductions: Long? = null,
+
+    @Schema(description = "연장수당")
+    val overtimePay: Long? = null,
+
+    @Schema(description = "야간수당")
+    val nightPay: Long? = null,
+
+    @Schema(description = "휴일수당")
+    val holidayPay: Long? = null,
+
+    @Schema(description = "주휴수당")
+    val weeklyHolidayPay: Long? = null
 )

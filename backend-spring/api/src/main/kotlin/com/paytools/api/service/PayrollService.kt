@@ -155,7 +155,15 @@ class PayrollService(
             totalWorkMinutes = request.totalWorkMinutes,
             overtimeMinutes = request.overtimeMinutes,
             nightMinutes = request.nightMinutes,
-            holidayMinutes = request.holidayMinutes
+            holidayMinutes = request.holidayMinutes,
+            // 계산 결과 저장
+            totalGross = request.totalGross,
+            netPay = request.netPay,
+            totalDeductions = request.totalDeductions,
+            overtimePay = request.overtimePay,
+            nightPay = request.nightPay,
+            holidayPay = request.holidayPay,
+            weeklyHolidayPay = request.weeklyHolidayPay
         )
 
         val saved = payrollEntryRepository.save(entity)

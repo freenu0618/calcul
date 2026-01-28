@@ -116,6 +116,14 @@ export interface PayrollEntryRequest {
   overtime_minutes?: number;
   night_minutes?: number;
   holiday_minutes?: number;
+  // 계산 결과 (선택적)
+  total_gross?: number;
+  net_pay?: number;
+  total_deductions?: number;
+  overtime_pay?: number;
+  night_pay?: number;
+  holiday_pay?: number;
+  weekly_holiday_pay?: number;
 }
 
 /** 출퇴근 기록 생성 요청 */

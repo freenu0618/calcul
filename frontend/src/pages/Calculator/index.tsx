@@ -79,11 +79,19 @@ export default function CalculatorPage() {
       const holidayMins = workShifts.filter((s) => s.is_holiday_work).reduce((sum, s) => sum + calcMinutes(s), 0);
       await payrollApi.addEntry(Number(selectedPeriodId), {
         employee_id: selectedEmployeeId,
-        base_salary: result.gross_breakdown.total.amount,
+        base_salary: result.gross_breakdown.base_salary.amount,
         total_work_minutes: totalMins,
         overtime_minutes: result.work_summary?.overtime_hours?.total_minutes || 0,
         night_minutes: result.work_summary?.night_hours?.total_minutes || 0,
         holiday_minutes: holidayMins,
+        // 계산 결과 전달
+        total_gross: result.gross_breakdown.total.amount,
+        net_pay: result.net_pay.amount,
+        total_deductions: result.deductions_breakdown.total.amount,
+        overtime_pay: result.gross_breakdown.overtime_allowances.overtime_pay.amount,
+        night_pay: result.gross_breakdown.overtime_allowances.night_pay.amount,
+        holiday_pay: result.gross_breakdown.overtime_allowances.holiday_pay.amount,
+        weekly_holiday_pay: result.gross_breakdown.weekly_holiday_pay.amount.amount,
       });
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 3000);
