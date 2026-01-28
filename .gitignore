@@ -1,10 +1,10 @@
 # Claude Code 관련 파일
 .claude/
 
-# 문서 파일 (docs 폴더와 README.md 허용)
+# 문서 파일 (docs는 로컬 개발용, GitHub 제외)
 *.md
 !README.md
-!docs/**/*.md
+docs/
 frontend/src/**/*.md
 
 # 보안 관련 파일

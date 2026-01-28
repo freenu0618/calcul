@@ -167,12 +167,76 @@ backend-spring/
 계산 결과로 인한 법적 책임은 사용자에게 있습니다.
 ```
 
+## 문서 활용 가이드
+
+### 작업 시작 전 필수 확인
+1. **[docs/INDEX.md](./docs/INDEX.md)** - 작업 유형별 참고문서 매핑
+2. 해당 작업에 필요한 문서만 선택적으로 읽기 (전체 읽기 금지)
+
+### 작업 유형별 필수 문서
+
+| 작업 유형 | 필수 문서 |
+|----------|----------|
+| **프론트엔드** | `docs/04-development/frontend-guide.md` |
+| **백엔드 API** | `docs/04-development/backend-guide.md`, `docs/03-architecture/api-reference.md` |
+| **급여 계산** | 본 문서 (법적 계산 규칙 섹션) |
+| **배포** | `docs/05-deployment/deployment-guide.md` |
+| **문제 해결** | `docs/06-operations/troubleshooting.md` |
+| **신규 기능** | `docs/01-business/roadmap.md` |
+
+### 작업 완료 후 업데이트 체크리스트
+- [ ] API 변경 시 → `docs/03-architecture/api-reference.md` 업데이트
+- [ ] DB 변경 시 → `docs/03-architecture/database-schema.md` 업데이트
+- [ ] 기능 완료 시 → `docs/07-planning/todo-list.md` 업데이트
+- [ ] 버그 수정 시 → `docs/06-operations/troubleshooting.md` 추가 (재발 방지)
+
+## Git Branch 전략
+
+### 브랜치 네이밍
+```
+feature/기능명    # 새 기능: feature/payroll-ledger
+fix/이슈명        # 버그 수정: fix/overtime-calculation
+docs/문서명       # 문서: docs/api-reference
+hotfix/이슈명     # 긴급 수정: hotfix/login-error
+```
+
+### 작업 흐름
+```bash
+# 1. 최신 main 동기화
+git checkout main && git pull origin main
+
+# 2. 브랜치 생성
+git checkout -b feature/기능명
+
+# 3. 작업 후 커밋 (컨벤션 준수)
+git commit -m "feat: 기능 설명"
+
+# 4. 푸시 및 PR
+git push -u origin feature/기능명
+```
+
+### 커밋 메시지 컨벤션
+| 타입 | 설명 |
+|------|------|
+| `feat` | 새 기능 |
+| `fix` | 버그 수정 |
+| `docs` | 문서 변경 |
+| `refactor` | 리팩토링 |
+| `test` | 테스트 추가 |
+| `chore` | 빌드, 설정 변경 |
+
 ## 참고 문서
 
-- `.claude.md`: 프로젝트 전체 요구사항 및 법적 검토 사항
-- `calculator.md`: 상세 요구사항 및 법적 안전장치
-- `PLAN.md`: 전체 구현 계획 및 기술 스택
-- `PROJECT_ANALYSIS_REPORT.md` : 전체 프로젝트 분석 보고서 및 dev참고자료
+### 핵심 문서 (자주 사용)
+- **[docs/INDEX.md](./docs/INDEX.md)**: 작업별 참고문서 매핑 (필독)
+- **[docs/README.md](./docs/README.md)**: 문서 허브 (전체 문서 목록)
+- **[docs/03-architecture/api-reference.md](./docs/03-architecture/api-reference.md)**: API 명세
+- **[docs/06-operations/troubleshooting.md](./docs/06-operations/troubleshooting.md)**: 문제 해결
+
+### 비즈니스 문서
+- **[docs/01-business/service-overview.md](./docs/01-business/service-overview.md)**: 서비스 개요, 가치 제안
+- **[docs/01-business/pricing-policy.md](./docs/01-business/pricing-policy.md)**: 요금제 정책
+- **[docs/01-business/roadmap.md](./docs/01-business/roadmap.md)**: 제품 로드맵 (Q1~Q4 2026)
 
 ## 현재 구현 상태
 
