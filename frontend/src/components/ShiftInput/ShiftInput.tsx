@@ -28,9 +28,18 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
 }) => {
   const [shifts, setShifts] = useState<WorkShiftRequest[]>(initialShifts);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('calendar');
+  const [periodStart, setPeriodStart] = useState(1);
+  const [periodEnd, setPeriodEnd] = useState(31);
 
   // 기본 월: 현재 월
   const currentMonth = calculationMonth || new Date().toISOString().slice(0, 7);
+  const [year, month] = currentMonth.split('-').map(Number);
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  // 월 변경 시 기간 초기화
+  useEffect(() => {
+    setPeriodEnd(daysInMonth);
+  }, [daysInMonth]);
 
   const handleMonthChange = useCallback((month: string) => {
     onCalculationMonthChange?.(month);
@@ -53,11 +62,9 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
     setShifts(prev => [...prev, newShift]);
   }, []);
 
-  // 월간 템플릿 채우기: 선택한 월의 평일에 프리셋 시프트 생성
+  // 월간 템플릿 채우기: 선택한 기간의 평일에 프리셋 시프트 생성
   const handleFillMonth = useCallback((presetKey: keyof typeof SHIFT_PRESETS) => {
     const preset = SHIFT_PRESETS[presetKey];
-    const [year, month] = currentMonth.split('-').map(Number);
-    const daysInMonth = new Date(year, month, 0).getDate();
     const newShifts: WorkShiftRequest[] = [];
 
     const formatLocalDate = (d: Date): string => {
@@ -67,8 +74,8 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
       return `${y}-${m}-${day}`;
     };
 
-    // 주당 근무일수에 맞춰 평일만 채우기 (월~금 or 월~토)
-    for (let day = 1; day <= daysInMonth; day++) {
+    // 선택한 기간 내에서만 채우기
+    for (let day = periodStart; day <= Math.min(periodEnd, daysInMonth); day++) {
       const date = new Date(year, month - 1, day);
       const dow = date.getDay(); // 0=일, 6=토
       // preset.days: 4=월~목, 5=월~금, 6=월~토
@@ -88,7 +95,7 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
     if (!calculationMonth) {
       onCalculationMonthChange?.(currentMonth);
     }
-  }, [currentMonth, calculationMonth, onCalculationMonthChange]);
+  }, [currentMonth, calculationMonth, onCalculationMonthChange, periodStart, periodEnd, year, month, daysInMonth]);
 
   const handleUpdateShift = useCallback((index: number, updatedShift: WorkShiftRequest) => {
     setShifts(prev => {
@@ -162,8 +169,32 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
       </div>
 
       {/* 월간 템플릿 채우기 */}
-      <div className="bg-gray-50 p-3 rounded-lg">
-        <p className="text-sm text-gray-600 mb-2">월간 템플릿 채우기:</p>
+      <div className="bg-gray-50 p-3 rounded-lg space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-medium text-gray-700">월간 템플릿 채우기</p>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-gray-500">기간:</span>
+            <select
+              value={periodStart}
+              onChange={(e) => setPeriodStart(Number(e.target.value))}
+              className="px-2 py-1 border border-gray-300 rounded text-sm"
+            >
+              {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
+                <option key={d} value={d}>{d}일</option>
+              ))}
+            </select>
+            <span className="text-gray-400">~</span>
+            <select
+              value={periodEnd}
+              onChange={(e) => setPeriodEnd(Number(e.target.value))}
+              className="px-2 py-1 border border-gray-300 rounded text-sm"
+            >
+              {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
+                <option key={d} value={d}>{d}일</option>
+              ))}
+            </select>
+          </div>
+        </div>
         <div className="flex flex-wrap gap-2">
           {Object.entries(SHIFT_PRESETS).map(([key, preset]) => (
             <button
@@ -176,8 +207,8 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
             </button>
           ))}
         </div>
-        <p className="text-xs text-gray-500 mt-2">
-          * 선택한 월의 모든 근무일에 해당 프리셋이 자동 적용됩니다.
+        <p className="text-xs text-gray-500">
+          * {periodStart}일 ~ {periodEnd}일 기간 내 근무일에 프리셋이 적용됩니다.
         </p>
       </div>
 
