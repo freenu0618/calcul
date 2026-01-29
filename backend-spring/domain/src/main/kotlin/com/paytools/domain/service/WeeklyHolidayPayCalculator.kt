@@ -15,8 +15,10 @@ import java.util.Locale
 data class WeeklyHolidayPayResult(
     val weeklyHolidayPay: Money,
     val weeklyHours: WorkingHours,
+    val dailyAvgHours: BigDecimal,  // 1일 평균 근로시간
     val hourlyWage: Money,
-    val isProportional: Boolean
+    val isProportional: Boolean,
+    val calculation: String  // 계산식 표시용
 )
 
 /**
@@ -33,6 +35,7 @@ class WeeklyHolidayPayCalculator {
         val WEEKLY_REGULAR_HOURS = BigDecimal("40")
         val HOLIDAY_HOURS = BigDecimal("8")
         val MINIMUM_WEEKLY_HOURS = BigDecimal("15")
+        val WEEKS_PER_MONTH = BigDecimal("4.345")
         private const val MINIMUM_WEEKLY_MINUTES = 900 // 15시간 = 900분
     }
 
@@ -47,44 +50,58 @@ class WeeklyHolidayPayCalculator {
 
         val isProportional = weeklyHoursDecimal < WEEKLY_REGULAR_HOURS
 
-        // 2. 주 15시간 미만: 주휴수당 없음
+        // 2. 1일 평균 근로시간 = 주 평균 근로시간 / 주 근무일
+        val dailyAvgHours = weeklyHoursDecimal.divide(
+            BigDecimal(scheduledWorkDays), 10, java.math.RoundingMode.HALF_UP
+        )
+
+        // 3. 주 15시간 미만: 주휴수당 없음
         if (weeklyHoursDecimal < MINIMUM_WEEKLY_HOURS) {
             return WeeklyHolidayPayResult(
                 weeklyHolidayPay = Money.ZERO,
                 weeklyHours = avgWeeklyHours,
+                dailyAvgHours = dailyAvgHours,
                 hourlyWage = hourlyWage,
-                isProportional = isProportional
+                isProportional = isProportional,
+                calculation = "주 15시간 미만 - 주휴수당 없음"
             )
         }
 
-        // 3. 개근한 주 수 계산
-        val (qualifyingWeeks, _) = countQualifyingWeeks(workShifts, scheduledWorkDays)
+        // 4. 개근한 주 수 계산
+        val (qualifyingWeeks, totalWeeks) = countQualifyingWeeks(workShifts, scheduledWorkDays)
 
         if (qualifyingWeeks == 0) {
             return WeeklyHolidayPayResult(
                 weeklyHolidayPay = Money.ZERO,
                 weeklyHours = avgWeeklyHours,
+                dailyAvgHours = dailyAvgHours,
                 hourlyWage = hourlyWage,
-                isProportional = isProportional
+                isProportional = isProportional,
+                calculation = "개근한 주 없음 - 주휴수당 없음"
             )
         }
 
-        // 4. 주휴수당 계산
-        val holidayHours = if (isProportional) {
-            weeklyHoursDecimal.divide(WEEKLY_REGULAR_HOURS, 10, java.math.RoundingMode.HALF_UP)
-                .multiply(HOLIDAY_HOURS)
+        // 5. 주휴수당 계산: 1일 평균 근로시간 × 시급 × 4.345주
+        // 결근한 주가 있으면 비례 차감
+        val qualifyingRatio = if (totalWeeks > 0) {
+            BigDecimal(qualifyingWeeks).divide(BigDecimal(totalWeeks), 10, java.math.RoundingMode.HALF_UP)
         } else {
-            HOLIDAY_HOURS
+            BigDecimal.ONE
         }
 
-        val weeklyPay = hourlyWage * holidayHours
-        val monthlyHolidayPay = (weeklyPay * qualifyingWeeks).roundToWon()
+        val effectiveWeeks = WEEKS_PER_MONTH.multiply(qualifyingRatio)
+        val monthlyHolidayPay = (hourlyWage * dailyAvgHours * effectiveWeeks).roundToWon()
+
+        val calculation = "${dailyAvgHours.setScale(1, java.math.RoundingMode.HALF_UP)}시간 × " +
+            "${hourlyWage.amount.toInt()}원 × ${effectiveWeeks.setScale(3, java.math.RoundingMode.HALF_UP)}주"
 
         return WeeklyHolidayPayResult(
             weeklyHolidayPay = monthlyHolidayPay,
             weeklyHours = avgWeeklyHours,
+            dailyAvgHours = dailyAvgHours,
             hourlyWage = hourlyWage,
-            isProportional = isProportional
+            isProportional = isProportional,
+            calculation = calculation
         )
     }
 

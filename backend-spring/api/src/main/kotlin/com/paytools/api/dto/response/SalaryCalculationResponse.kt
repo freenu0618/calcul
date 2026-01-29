@@ -123,17 +123,11 @@ data class WeeklyHolidayPayBreakdown(
 ) {
     companion object {
         fun from(result: WeeklyHolidayPayResult): WeeklyHolidayPayBreakdown {
-            val calculation = if (result.isProportional) {
-                "(${result.weeklyHours.format()} ÷ 40) × 8 × ${result.hourlyWage.amount}원 (비례 지급)"
-            } else {
-                "(${result.weeklyHours.format()} ÷ 40) × 8 × ${result.hourlyWage.amount}원"
-            }
-
             return WeeklyHolidayPayBreakdown(
                 amount = MoneyResponse.from(result.weeklyHolidayPay),
                 weeklyHours = WorkingHoursResponse.from(result.weeklyHours),
                 isProportional = result.isProportional,
-                calculation = calculation
+                calculation = result.calculation
             )
         }
     }

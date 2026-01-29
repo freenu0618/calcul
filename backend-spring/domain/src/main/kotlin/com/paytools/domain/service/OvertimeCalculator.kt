@@ -48,6 +48,19 @@ class OvertimeCalculator {
         companySize: CompanySize,
         scheduledWorkDays: Int = 5
     ): OvertimeResult {
+        // 5인 미만 사업장: 연장/야간/휴일 수당 의무 없음 (근로기준법 미적용)
+        if (companySize == CompanySize.UNDER_5) {
+            return OvertimeResult(
+                overtimePay = Money.ZERO,
+                nightPay = Money.ZERO,
+                holidayPay = Money.ZERO,
+                overtimeHours = WorkingHours.ZERO,
+                nightHours = WorkingHours.ZERO,
+                holidayHours = WorkingHours.ZERO,
+                hourlyWage = hourlyWage
+            )
+        }
+
         val (overtimeHours, overtimePay) = calculateOvertime(workShifts, hourlyWage, scheduledWorkDays)
         val (nightHours, nightPay) = calculateNightWork(workShifts, hourlyWage)
         val (holidayHours, holidayPay) = calculateHolidayWork(workShifts, hourlyWage, companySize)

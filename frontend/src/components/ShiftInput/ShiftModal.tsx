@@ -37,6 +37,27 @@ export default function ShiftModal({
     }
   }, [shift]);
 
+  // 근무시간에 따른 휴게시간 자동 계산 (4시간당 30분)
+  const calculateAutoBreak = (start: string, end: string) => {
+    const [startH, startM] = start.split(':').map(Number);
+    const [endH, endM] = end.split(':').map(Number);
+    let totalMinutes = (endH * 60 + endM) - (startH * 60 + startM);
+    if (totalMinutes < 0) totalMinutes += 24 * 60; // 야간 근무
+    // 4시간당 30분 휴게
+    if (totalMinutes >= 12 * 60) return 90;
+    if (totalMinutes >= 8 * 60) return 60;
+    if (totalMinutes >= 4 * 60) return 30;
+    return 0;
+  };
+
+  // 시작/종료 시간 변경 시 휴게시간 자동 업데이트 (신규 입력 시에만)
+  useEffect(() => {
+    if (!isEditing) {
+      const autoBreak = calculateAutoBreak(startTime, endTime);
+      setBreakMinutes(autoBreak);
+    }
+  }, [startTime, endTime, isEditing]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave({
