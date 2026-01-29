@@ -3,6 +3,7 @@ package com.paytools.domain.service
 import com.paytools.domain.model.Allowance
 import com.paytools.domain.model.CompanySize
 import com.paytools.domain.model.Employee
+import com.paytools.domain.model.InsuranceOptions
 import com.paytools.domain.model.WorkShift
 import com.paytools.domain.vo.Money
 import java.math.BigDecimal
@@ -82,7 +83,8 @@ class SalaryCalculator {
         calculationMonth: String = "",
         absencePolicy: String = "STRICT",
         weeklyHours: Int = 40,
-        hoursMode: String = "174"
+        hoursMode: String = "174",
+        insuranceOptions: InsuranceOptions = InsuranceOptions.ALL_APPLY
     ): SalaryCalculationResult {
         // 0. 계산월 추론
         val effectiveMonth = if (calculationMonth.isEmpty() && workShifts.isNotEmpty()) {
@@ -155,7 +157,7 @@ class SalaryCalculator {
 
         // 6. 보험/세금
         val taxableGross = calculateTaxableGross(totalGross, allowances)
-        val insuranceResult = insuranceCalculator.calculate(taxableGross)
+        val insuranceResult = insuranceCalculator.calculate(taxableGross, insuranceOptions)
         val taxResult = taxCalculator.calculate(
             taxableGross,
             employee.dependentsCount,

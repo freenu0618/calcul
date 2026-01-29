@@ -6,6 +6,24 @@ import com.paytools.domain.service.*
 import io.swagger.v3.oas.annotations.media.Schema
 
 /**
+ * 4대 보험 적용 옵션 응답
+ */
+@Schema(description = "4대 보험 적용 옵션")
+data class InsuranceOptionsResponse(
+    @Schema(description = "국민연금 적용 여부")
+    val applyNationalPension: Boolean,
+
+    @Schema(description = "건강보험 적용 여부")
+    val applyHealthInsurance: Boolean,
+
+    @Schema(description = "장기요양보험 적용 여부")
+    val applyLongTermCare: Boolean,
+
+    @Schema(description = "고용보험 적용 여부")
+    val applyEmploymentInsurance: Boolean
+)
+
+/**
  * 4대 보험 상세
  */
 @Schema(description = "4대 보험 상세")
@@ -23,7 +41,10 @@ data class InsuranceBreakdown(
     val employmentInsurance: MoneyResponse,
 
     @Schema(description = "4대 보험 합계")
-    val total: MoneyResponse
+    val total: MoneyResponse,
+
+    @Schema(description = "적용된 보험 옵션")
+    val appliedOptions: InsuranceOptionsResponse? = null
 ) {
     companion object {
         fun from(result: InsuranceResult): InsuranceBreakdown {
@@ -32,7 +53,13 @@ data class InsuranceBreakdown(
                 healthInsurance = MoneyResponse.from(result.healthInsurance),
                 longTermCare = MoneyResponse.from(result.longTermCare),
                 employmentInsurance = MoneyResponse.from(result.employmentInsurance),
-                total = MoneyResponse.from(result.total())
+                total = MoneyResponse.from(result.total()),
+                appliedOptions = InsuranceOptionsResponse(
+                    applyNationalPension = result.appliedOptions.applyNationalPension,
+                    applyHealthInsurance = result.appliedOptions.applyHealthInsurance,
+                    applyLongTermCare = result.appliedOptions.applyLongTermCare,
+                    applyEmploymentInsurance = result.appliedOptions.applyEmploymentInsurance
+                )
             )
         }
     }

@@ -16,9 +16,11 @@ import { StepWizard, useWizard, type WizardStep } from '../../components/wizard'
 import { salaryApi, payrollApi, employeeApi } from '../../api';
 import { useAuth } from '../../contexts/AuthContext';
 import type { Employee, Allowance } from '../../types/models';
-import type { SalaryCalculationResponse, WorkShiftRequest, WageType, AbsencePolicy } from '../../types/salary';
+import type { SalaryCalculationResponse, WorkShiftRequest, WageType, AbsencePolicy, InsuranceOptions as InsuranceOptionsType } from '../../types/salary';
+import { DEFAULT_INSURANCE_OPTIONS } from '../../types/salary';
 import type { PayrollPeriodResponse } from '../../types/payroll';
 import type { EmployeeResponse } from '../../types/employee';
+import InsuranceOptions from '../../components/forms/InsuranceOptions';
 
 const WIZARD_STEPS: WizardStep[] = [
   { id: 'employee', title: '근로자 정보', description: '고용형태, 사업장' },
@@ -52,6 +54,7 @@ export default function CalculatorPage() {
   const [absencePolicy, setAbsencePolicy] = useState<AbsencePolicy>('STRICT');
   const [hoursMode, setHoursMode] = useState<'174' | '209'>('174'); // 추가: 시간 계산 방식
   const [contractSalary, setContractSalary] = useState<number>(0); // 계약 월급 (계약총액제)
+  const [insuranceOptions, setInsuranceOptions] = useState<InsuranceOptionsType>(DEFAULT_INSURANCE_OPTIONS);
   const [result, setResult] = useState<SalaryCalculationResponse | null>(null);
   const [adjustedResult, setAdjustedResult] = useState<AdjustedResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -125,7 +128,8 @@ export default function CalculatorPage() {
         hourly_wage: wageType === 'HOURLY' ? hourlyWage : 0,
         calculation_month: calculationMonth,
         absence_policy: absencePolicy,
-        hours_mode: hoursMode, // 추가: 시간 계산 방식
+        hours_mode: hoursMode,
+        insurance_options: insuranceOptions,
       });
       setResult(response);
       if (typeof window.gtag !== 'undefined') {
@@ -140,7 +144,7 @@ export default function CalculatorPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [employee, baseSalary, allowances, workShifts, wageType, hourlyWage, calculationMonth, absencePolicy, hoursMode]);
+  }, [employee, baseSalary, allowances, workShifts, wageType, hourlyWage, calculationMonth, absencePolicy, hoursMode, insuranceOptions]);
 
   const isStep1Valid = employee.name.trim().length > 0;
 
@@ -173,25 +177,35 @@ export default function CalculatorPage() {
         );
       case 1:
         return (
-          <SalaryForm
-            key={`salary-${employee.scheduled_work_days}-${employee.daily_work_hours}`}
-            baseSalary={baseSalary}
-            allowances={allowances}
-            onBaseSalaryChange={setBaseSalary}
-            onAllowancesChange={setAllowances}
-            scheduledWorkDays={employee.scheduled_work_days}
-            dailyWorkHours={employee.daily_work_hours}
-            wageType={wageType}
-            onWageTypeChange={setWageType}
-            hourlyWage={hourlyWage}
-            onHourlyWageChange={setHourlyWage}
-            absencePolicy={absencePolicy}
-            onAbsencePolicyChange={setAbsencePolicy}
-            hoursMode={hoursMode}
-            onHoursModeChange={setHoursMode}
-            contractSalary={contractSalary}
-            onContractSalaryChange={setContractSalary}
-          />
+          <div className="space-y-6">
+            <SalaryForm
+              key={`salary-${employee.scheduled_work_days}-${employee.daily_work_hours}`}
+              baseSalary={baseSalary}
+              allowances={allowances}
+              onBaseSalaryChange={setBaseSalary}
+              onAllowancesChange={setAllowances}
+              scheduledWorkDays={employee.scheduled_work_days}
+              dailyWorkHours={employee.daily_work_hours}
+              wageType={wageType}
+              onWageTypeChange={setWageType}
+              hourlyWage={hourlyWage}
+              onHourlyWageChange={setHourlyWage}
+              absencePolicy={absencePolicy}
+              onAbsencePolicyChange={setAbsencePolicy}
+              hoursMode={hoursMode}
+              onHoursModeChange={setHoursMode}
+              contractSalary={contractSalary}
+              onContractSalaryChange={setContractSalary}
+            />
+            <InsuranceOptions
+              options={insuranceOptions}
+              onChange={setInsuranceOptions}
+              age={employee.age}
+              weeklyHours={employee.scheduled_work_days * employee.daily_work_hours}
+              isForigner={employee.is_foreigner}
+              visaType={employee.visa_type}
+            />
+          </div>
         );
       case 2:
         return (

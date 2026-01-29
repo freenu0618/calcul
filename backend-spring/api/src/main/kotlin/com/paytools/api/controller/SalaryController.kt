@@ -70,7 +70,8 @@ class SalaryController {
             calculationMonth = request.calculationMonth,
             absencePolicy = request.absencePolicy.name,
             weeklyHours = request.employee.scheduledWorkDays * request.employee.dailyWorkHours,
-            hoursMode = request.hoursMode.toValue()
+            hoursMode = request.hoursMode.toValue(),
+            insuranceOptions = request.insuranceOptions.toDomain()
         )
 
         // Domain Result → Response DTO 변환

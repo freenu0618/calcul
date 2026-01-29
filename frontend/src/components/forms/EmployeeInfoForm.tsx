@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import type { Employee, EmploymentType, CompanySize } from '../../types/models';
+import type { Employee, EmploymentType, CompanySize, VisaType } from '../../types/models';
 import type { EmployeeResponse } from '../../types/employee';
 import { useAuth } from '../../contexts/AuthContext';
 import { employeeApi } from '../../api/employeeApi';
@@ -59,7 +59,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
     }
   };
 
-  const handleChange = (field: keyof Employee, value: string | number) => {
+  const handleChange = (field: keyof Employee, value: string | number | boolean) => {
     setSelectedEmployeeId(''); // 수동 변경 시 선택 해제
     onChange({ ...employee, [field]: value });
   };
@@ -204,6 +204,69 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
       <p className="text-xs text-gray-500 -mt-2">
         자녀세액공제 적용 (부양가족 수 이하)
       </p>
+
+      {/* 만 나이 (60세 이상 국민연금 제외 안내용) */}
+      <Input
+        type="number"
+        label="만 나이 (선택)"
+        value={employee.age || ''}
+        onChange={(e) => handleChange('age', parseInt(e.target.value) || 0)}
+        min={15}
+        max={100}
+        placeholder="30"
+      />
+      {employee.age && employee.age >= 60 && (
+        <p className="text-xs text-amber-600 -mt-2">
+          ⚠️ 만 60세 이상: 국민연금 의무가입 대상 아님
+        </p>
+      )}
+
+      {/* 외국인 여부 */}
+      <div className="flex items-center gap-3">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={employee.is_foreigner || false}
+            onChange={(e) => {
+              handleChange('is_foreigner', e.target.checked);
+              if (!e.target.checked) {
+                handleChange('visa_type', undefined as unknown as string);
+              }
+            }}
+            className="w-4 h-4 text-blue-600 rounded"
+          />
+          <span className="text-sm text-gray-700">외국인 근로자</span>
+        </label>
+      </div>
+
+      {/* 체류자격 (외국인만) */}
+      {employee.is_foreigner && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            체류자격
+          </label>
+          <select
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            value={employee.visa_type || ''}
+            onChange={(e) => handleChange('visa_type', e.target.value as VisaType)}
+          >
+            <option value="">-- 선택 --</option>
+            <option value="F-2">F-2 (거주)</option>
+            <option value="F-4">F-4 (재외동포)</option>
+            <option value="F-5">F-5 (영주)</option>
+            <option value="F-6">F-6 (결혼이민)</option>
+            <option value="E-9">E-9 (비전문취업)</option>
+            <option value="H-2">H-2 (방문취업)</option>
+            <option value="D-7">D-7 (주재)</option>
+            <option value="D-8">D-8 (기업투자)</option>
+            <option value="D-9">D-9 (무역경영)</option>
+            <option value="OTHER">기타</option>
+          </select>
+          <p className="mt-1 text-xs text-blue-600">
+            체류자격에 따라 4대 보험 적용이 달라집니다
+          </p>
+        </div>
+      )}
     </div>
   );
 }

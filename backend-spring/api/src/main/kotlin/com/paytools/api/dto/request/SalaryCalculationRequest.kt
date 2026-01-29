@@ -44,5 +44,9 @@ data class SalaryCalculationRequest(
     val absencePolicy: AbsencePolicy = AbsencePolicy.STRICT,
 
     @Schema(description = "월 소정근로시간 계산 방식 (174=주휴분리, 209=주휴포함)", example = "174")
-    val hoursMode: HoursMode = HoursMode.MODE_174
+    val hoursMode: HoursMode = HoursMode.MODE_174,
+
+    @Schema(description = "4대 보험 적용 옵션")
+    @field:Valid
+    val insuranceOptions: InsuranceOptionsRequest = InsuranceOptionsRequest()
 )

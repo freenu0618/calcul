@@ -9,6 +9,23 @@ export type WageType = 'MONTHLY' | 'HOURLY';
 export type AbsencePolicy = 'STRICT' | 'MODERATE' | 'LENIENT';
 export type HoursMode = '174' | '209';
 
+/**
+ * 4대 보험 적용 옵션
+ */
+export interface InsuranceOptions {
+  apply_national_pension: boolean;    // 국민연금 적용
+  apply_health_insurance: boolean;    // 건강보험 적용
+  apply_long_term_care: boolean;      // 장기요양보험 적용
+  apply_employment_insurance: boolean; // 고용보험 적용
+}
+
+export const DEFAULT_INSURANCE_OPTIONS: InsuranceOptions = {
+  apply_national_pension: true,
+  apply_health_insurance: true,
+  apply_long_term_care: true,
+  apply_employment_insurance: true,
+};
+
 export interface MoneyResponse {
   amount: number;
   formatted: string;
@@ -82,6 +99,7 @@ export interface InsuranceBreakdown {
   long_term_care: MoneyResponse;
   employment_insurance: MoneyResponse;
   total: MoneyResponse;
+  applied_options?: InsuranceOptions;
 }
 
 export interface TaxBreakdown {
@@ -106,6 +124,7 @@ export interface SalaryCalculationRequest {
   calculation_month: string;
   absence_policy: AbsencePolicy;
   hours_mode: HoursMode;
+  insurance_options?: InsuranceOptions;
 }
 
 export interface WorkSummaryResponse {

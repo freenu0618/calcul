@@ -1,5 +1,6 @@
 package com.paytools.domain.service
 
+import com.paytools.domain.model.InsuranceOptions
 import com.paytools.domain.vo.Money
 import java.math.BigDecimal
 
@@ -14,7 +15,8 @@ data class InsuranceResult(
     val longTermCare: Money,
     val employmentInsurance: Money,
     val employmentInsuranceBase: Money,  // 고용보험 기준액 (상한 적용 후)
-    val baseAmount: Money  // 원본 소득
+    val baseAmount: Money,  // 원본 소득
+    val appliedOptions: InsuranceOptions = InsuranceOptions.ALL_APPLY  // 적용된 옵션
 ) {
     fun total(): Money =
         nationalPension + healthInsurance + longTermCare + employmentInsurance
@@ -47,31 +49,53 @@ class InsuranceCalculator {
 
     /**
      * 4대 보험료 계산
+     * @param grossIncome 총 과세소득
+     * @param options 보험 적용 옵션 (개별 보험 적용/미적용 선택)
      */
-    fun calculate(grossIncome: Money): InsuranceResult {
+    fun calculate(
+        grossIncome: Money,
+        options: InsuranceOptions = InsuranceOptions.ALL_APPLY
+    ): InsuranceResult {
         // 1. 국민연금 (상한/하한 적용)
         val pensionBase = applyNationalPensionLimits(grossIncome)
-        val nationalPension = (pensionBase * NATIONAL_PENSION_RATE).roundToWon()
+        val nationalPension = if (options.applyNationalPension) {
+            (pensionBase * NATIONAL_PENSION_RATE).roundToWon()
+        } else {
+            Money.ZERO
+        }
 
         // 2. 건강보험
-        val healthInsurance = (grossIncome * HEALTH_INSURANCE_RATE).roundToWon()
+        val healthInsurance = if (options.applyHealthInsurance) {
+            (grossIncome * HEALTH_INSURANCE_RATE).roundToWon()
+        } else {
+            Money.ZERO
+        }
 
-        // 3. 장기요양보험 (건강보험료 기준)
-        val longTermCare = (healthInsurance * LONG_TERM_CARE_RATE).roundToWon()
+        // 3. 장기요양보험 (건강보험료 기준, 건강보험 적용 시에만)
+        val longTermCare = if (options.applyHealthInsurance && options.applyLongTermCare) {
+            (healthInsurance * LONG_TERM_CARE_RATE).roundToWon()
+        } else {
+            Money.ZERO
+        }
 
         // 4. 고용보험 (상한 적용)
         val employmentBase = applyEmploymentInsuranceLimit(grossIncome)
-        val employmentInsurance = (employmentBase * EMPLOYMENT_INSURANCE_RATE).roundToWon()
+        val employmentInsurance = if (options.applyEmploymentInsurance) {
+            (employmentBase * EMPLOYMENT_INSURANCE_RATE).roundToWon()
+        } else {
+            Money.ZERO
+        }
 
         return InsuranceResult(
             nationalPension = nationalPension,
-            nationalPensionBase = pensionBase,
+            nationalPensionBase = if (options.applyNationalPension) pensionBase else Money.ZERO,
             healthInsurance = healthInsurance,
-            healthInsuranceBase = grossIncome,
+            healthInsuranceBase = if (options.applyHealthInsurance) grossIncome else Money.ZERO,
             longTermCare = longTermCare,
             employmentInsurance = employmentInsurance,
-            employmentInsuranceBase = employmentBase,
-            baseAmount = grossIncome
+            employmentInsuranceBase = if (options.applyEmploymentInsurance) employmentBase else Money.ZERO,
+            baseAmount = grossIncome,
+            appliedOptions = options
         )
     }
 

@@ -9,6 +9,9 @@ export type EmploymentType = 'FULL_TIME' | 'PART_TIME';
 // 사업장 규모
 export type CompanySize = 'UNDER_5' | 'OVER_5';
 
+// 체류자격 타입
+export type VisaType = 'F-2' | 'F-4' | 'F-5' | 'F-6' | 'E-9' | 'H-2' | 'D-7' | 'D-8' | 'D-9' | 'OTHER';
+
 // 근로자 정보
 export interface Employee {
   name: string;
@@ -18,6 +21,9 @@ export interface Employee {
   company_size: CompanySize;
   scheduled_work_days: number; // 주 소정근로일 (1~7)
   daily_work_hours: number; // 1일 소정근로시간 (기본 8)
+  is_foreigner?: boolean; // 외국인 여부 (Phase 3.6.2)
+  visa_type?: VisaType; // 체류자격 (외국인만)
+  age?: number; // 만 나이 (국민연금 60세 이상 제외 안내용)
 }
 
 // 근무 시프트
