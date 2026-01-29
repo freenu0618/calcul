@@ -36,7 +36,6 @@ import ReverseCalculator from './pages/ReverseCalculator';
 import { EmployeeList, EmployeeForm } from './pages/Employees';
 import { PayrollList, PayrollDetail } from './pages/Payroll';
 import SalarySimulation from './pages/Simulation';
-import ContractPage from './pages/Contract';
 
 // GA 타입은 index.html의 전역 스크립트에서 정의됨
 
@@ -117,9 +116,6 @@ function App() {
                 {/* 급여대장 (인증 필요) */}
                 <Route path="/payroll" element={<PrivateRoute><PayrollList /></PrivateRoute>} />
                 <Route path="/payroll/:id" element={<PrivateRoute><PayrollDetail /></PrivateRoute>} />
-
-                {/* 근로계약서 */}
-                <Route path="/contract" element={<ContractPage />} />
 
                 {/* 기타 페이지 */}
                 <Route path="/about" element={<About />} />
