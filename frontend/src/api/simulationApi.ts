@@ -28,7 +28,7 @@ export async function compareStructures(
   };
 
   const response = await apiClient.post<SimulationCompareResponse>(
-    '/api/v1/simulation/compare',
+    '/simulation/compare',
     apiRequest
   );
 
@@ -52,7 +52,7 @@ export async function simulateSingle(
   };
 
   const response = await apiClient.post<SimulationPlan>(
-    '/api/v1/simulation/single',
+    '/simulation/single',
     apiRequest
   );
 
