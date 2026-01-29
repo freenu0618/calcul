@@ -34,6 +34,9 @@ data class AbsenceResult(
 class AbsenceCalculator {
 
     companion object {
+        // 근로자의 날 (모든 사업장 적용 - 5인 미만 포함)
+        private val LABOR_DAY_2026 = LocalDate.of(2026, 5, 1)
+
         // 2026년 공휴일 (5인 이상 사업장만 적용)
         private val HOLIDAYS_2026 = setOf(
             LocalDate.of(2026, 1, 1),   // 신정
@@ -135,14 +138,19 @@ class AbsenceCalculator {
         scheduledWorkDays: Int,
         isOver5: Boolean
     ): Set<LocalDate> {
-        val holidays = if (isOver5) HOLIDAYS_2026 else emptySet()
+        // 근로자의 날은 모든 사업장에 적용
+        val allHolidays = if (isOver5) {
+            HOLIDAYS_2026 + LABOR_DAY_2026
+        } else {
+            setOf(LABOR_DAY_2026)  // 5인 미만도 근로자의 날은 유급휴일
+        }
         val workWeekdays = WEEKDAY_MAP[scheduledWorkDays] ?: (0..4)
 
         val yearMonth = YearMonth.of(year, month)
         return (1..yearMonth.lengthOfMonth())
             .map { LocalDate.of(year, month, it) }
             .filter { d ->
-                d.dayOfWeek.value - 1 in workWeekdays && d !in holidays
+                d.dayOfWeek.value - 1 in workWeekdays && d !in allHolidays
             }
             .toSet()
     }

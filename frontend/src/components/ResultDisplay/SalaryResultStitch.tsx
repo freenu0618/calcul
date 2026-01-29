@@ -189,7 +189,9 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
                 label="주휴수당"
                 sublabel="Weekly Holiday"
                 value={gross_breakdown.weekly_holiday_pay.amount.formatted}
-                formula={`${hourlyWage.toLocaleString()}원 × 8시간 × 4.345주 = ${gross_breakdown.weekly_holiday_pay.amount.formatted}`}
+                formula={gross_breakdown.weekly_holiday_pay.is_proportional
+                  ? `${hourlyWage.toLocaleString()}원 × (주근무시간/40) × 8시간 × 개근주 (비례계산)`
+                  : `${hourlyWage.toLocaleString()}원 × 8시간 × 4.345주 = ${gross_breakdown.weekly_holiday_pay.amount.formatted}`}
               />
             )}
             {gross_breakdown.overtime_allowances.overtime_pay.amount > 0 && (

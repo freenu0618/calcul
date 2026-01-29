@@ -101,8 +101,19 @@ class SalaryCalculator {
         val hourlyWage: Money
         val regularWage: Money
 
+        // 시급제는 연장근로 계산을 먼저 수행하여 기본급에서 제외
+        val overtimeResultForHourly = if (wageType == "HOURLY") {
+            val hw = Money.of(hourlyWageInput)
+            overtimeCalculator.calculate(
+                workShifts = workShifts,
+                hourlyWage = hw,
+                companySize = employee.companySize,
+                scheduledWorkDays = employee.scheduledWorkDays
+            )
+        } else null
+
         if (wageType == "HOURLY") {
-            // 시급제: 기본급 = 시급 × 실제 근무시간
+            // 시급제: 기본급 = 소정근로시간 × 시급 (연장시간 제외)
             val hw = Money.of(hourlyWageInput)
 
             // 5인 이상: 휴일근무는 OvertimeCalculator에서 1.5배로 지급하므로 기본급에서 제외
@@ -114,8 +125,17 @@ class SalaryCalculator {
             }
 
             val totalMinutes = shiftsForBasePay.sumOf { it.calculateWorkingHours().toMinutes() }
-            val totalHours = BigDecimal(totalMinutes).divide(BigDecimal("60"), 10, RoundingMode.HALF_UP)
-            effectiveBase = (hw * totalHours).roundToWon()
+
+            // 연장근로 시간을 기본급에서 제외 (5인 이상만 연장수당이 별도 지급됨)
+            val overtimeMinutes = if (isOver5) {
+                overtimeResultForHourly?.overtimeHours?.toMinutes() ?: 0
+            } else {
+                0  // 5인 미만: 연장수당 없으므로 모든 시간을 기본급에 포함
+            }
+
+            val regularMinutes = totalMinutes - overtimeMinutes
+            val regularHours = BigDecimal(regularMinutes).divide(BigDecimal("60"), 10, RoundingMode.HALF_UP)
+            effectiveBase = (hw * regularHours).roundToWon()
             hourlyWage = hw
             regularWage = effectiveBase
         } else {
@@ -139,8 +159,8 @@ class SalaryCalculator {
             hourlyWage = calculateHourlyWage(regularWage, monthlyHours)
         }
 
-        // 3. 연장/야간/휴일 수당
-        val overtimeResult = overtimeCalculator.calculate(
+        // 3. 연장/야간/휴일 수당 (시급제는 이미 계산됨, 재사용)
+        val overtimeResult = overtimeResultForHourly ?: overtimeCalculator.calculate(
             workShifts = workShifts,
             hourlyWage = hourlyWage,
             companySize = employee.companySize,
