@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { WorkShiftRequest } from '../../types/salary';
 import ShiftRow from './ShiftRow';
 import ShiftSummary from './ShiftSummary';
 import ShiftCalendar from './ShiftCalendar';
+import { downloadShiftTemplate, parseShiftCsv, exportShiftsToCsv, readFileAsText } from '../../utils/excelHandler';
 
 /**
  * 시프트 프리셋 정의
@@ -30,6 +31,8 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('calendar');
   const [periodStart, setPeriodStart] = useState(1);
   const [periodEnd, setPeriodEnd] = useState(31);
+  const [csvError, setCsvError] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 기본 월: 현재 월
   const currentMonth = calculationMonth || new Date().toISOString().slice(0, 7);
@@ -112,6 +115,27 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
   const handleClearAll = useCallback(() => {
     setShifts([]);
   }, []);
+
+  // CSV 파일 가져오기
+  const handleCsvImport = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCsvError('');
+    try {
+      const text = await readFileAsText(file);
+      const imported = parseShiftCsv(text);
+      setShifts(imported);
+    } catch (err) {
+      setCsvError(err instanceof Error ? err.message : 'CSV 파싱 실패');
+    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }, []);
+
+  // CSV 내보내기
+  const handleCsvExport = useCallback(() => {
+    if (shifts.length === 0) return;
+    exportShiftsToCsv(shifts, `시프트_${currentMonth}.csv`);
+  }, [shifts, currentMonth]);
 
   return (
     <div className="space-y-4">
@@ -210,6 +234,43 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
         <p className="text-xs text-gray-500">
           * {periodStart}일 ~ {periodEnd}일 기간 내 근무일에 프리셋이 적용됩니다.
         </p>
+      </div>
+
+      {/* CSV 가져오기/내보내기 */}
+      <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+        <div className="flex items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv"
+            onChange={handleCsvImport}
+            className="hidden"
+            id="csv-import"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-100"
+          >
+            CSV 가져오기
+          </button>
+          <button
+            type="button"
+            onClick={handleCsvExport}
+            disabled={shifts.length === 0}
+            className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50"
+          >
+            CSV 내보내기
+          </button>
+          <button
+            type="button"
+            onClick={downloadShiftTemplate}
+            className="px-3 py-1.5 text-sm text-blue-600 hover:underline"
+          >
+            템플릿 다운로드
+          </button>
+        </div>
+        {csvError && <span className="text-sm text-red-500">{csvError}</span>}
       </div>
 
       {/* 캘린더 뷰 */}
