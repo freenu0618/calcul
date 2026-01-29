@@ -108,7 +108,7 @@ export default function MonthlyTemplate({ year, month, onApply, onYearMonthChang
           start_time: startTime,
           end_time: endTime,
           break_minutes: breakMinutes,
-          is_holiday_work: dayOfWeek === 0 || dayOfWeek === 6, // 주말은 휴일근로
+          is_holiday_work: false, // 템플릿은 모두 소정근로일(일반근무)로 생성
         });
       }
     }
@@ -369,9 +369,12 @@ export default function MonthlyTemplate({ year, month, onApply, onYearMonthChang
         캘린더에 적용 ({previewShifts.length}일)
       </button>
 
-      <p className="text-xs text-gray-500 text-center">
-        ⚠️ 기존 등록된 시프트가 있는 날짜는 건너뜁니다
-      </p>
+      <div className="text-xs text-gray-500 space-y-1">
+        <p className="text-center">⚠️ 기존 등록된 시프트가 있는 날짜는 건너뜁니다</p>
+        <p className="text-center text-blue-600">
+          💡 휴일근로는 캘린더에서 해당 시프트 클릭 → "휴일 근무"로 변경
+        </p>
+      </div>
     </div>
   );
 }
