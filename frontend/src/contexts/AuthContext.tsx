@@ -6,11 +6,15 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { API_CONFIG } from '../config/api.config';
 
+/** 요금제 타입 */
+export type UserPlan = 'FREE' | 'PRO' | 'ENTERPRISE';
+
 interface User {
   id: number;
   email: string;
   name: string;
   role: string;
+  plan: UserPlan;
 }
 
 interface AuthContextType {
@@ -22,6 +26,8 @@ interface AuthContextType {
   logout: () => void;
   setTokenDirectly: (token: string, name?: string) => void;
   isAuthenticated: boolean;
+  /** 유료 사용자 여부 (PRO 또는 ENTERPRISE) */
+  isPaidUser: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -40,8 +46,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const storedToken = localStorage.getItem('auth_token');
     const storedUser = localStorage.getItem('auth_user');
     if (storedToken && storedUser) {
+      const parsedUser = JSON.parse(storedUser);
       setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+      setUser({ ...parsedUser, plan: parsedUser.plan || 'FREE' });
     }
     setIsLoading(false);
   }, []);
@@ -63,11 +70,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const result = await response.json();
     const authToken = result.data.accessToken;
+    const userData: User = {
+      ...result.data.user,
+      plan: result.data.user.plan || 'FREE', // 기본값 FREE
+    };
 
     localStorage.setItem('auth_token', authToken);
-    localStorage.setItem('auth_user', JSON.stringify(result.data.user));
+    localStorage.setItem('auth_user', JSON.stringify(userData));
     setToken(authToken);
-    setUser(result.data.user);
+    setUser(userData);
   };
 
   // 회원가입
@@ -91,11 +102,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const result = await response.json();
     const authToken = result.data.accessToken;
+    const userData: User = {
+      ...result.data.user,
+      plan: result.data.user.plan || 'FREE', // 신규 가입은 무료
+    };
 
     localStorage.setItem('auth_token', authToken);
-    localStorage.setItem('auth_user', JSON.stringify(result.data.user));
+    localStorage.setItem('auth_user', JSON.stringify(userData));
     setToken(authToken);
-    setUser(result.data.user);
+    setUser(userData);
   };
 
   // 로그아웃
@@ -116,6 +131,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         email: payload.email || '',
         name: nameFromUrl || payload.name || payload.email?.split('@')[0] || '',
         role: payload.role || 'USER',
+        plan: (payload.plan as UserPlan) || 'FREE',
       };
 
       localStorage.setItem('auth_token', authToken);
@@ -128,6 +144,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  // 유료 사용자 여부 (PRO 또는 ENTERPRISE)
+  const isPaidUser = user?.plan === 'PRO' || user?.plan === 'ENTERPRISE';
+
   const value: AuthContextType = {
     user,
     token,
@@ -137,6 +156,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     logout,
     setTokenDirectly,
     isAuthenticated: !!token && !!user,
+    isPaidUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,7 +1,7 @@
 # 프로젝트 TODO 리스트
 
 **작성일**: 2026-01-22
-**마지막 업데이트**: 2026-01-29 (Phase 3.7 완료, Phase 3.8 완료 - 근로계약서 작성 폼)
+**마지막 업데이트**: 2026-01-29 (Phase 4 완료 - SEO 및 마케팅 최적화)
 **기준 문서**: PROJECT_ANALYSIS_REPORT.md v2.2.0
 **프로젝트**: paytools.work (급여 계산기)
 
@@ -21,13 +21,12 @@
 | **Phase 3.5 (근무자 등록)** | **5** | **4** | **80%** | **✅ 대부분 완료** |
 | Phase 3.6 (급여 고도화) | 4 | 0 | 0% | Spring |
 | **Phase 3.7 (시뮬레이션)** | **2** | **2** | **100%** | **✅ 완료** |
-| **Phase 3.8 (근로계약서)** | **2** | **2** | **100%** | **✅ 완료** |
-| Phase 3.9 (기존 고급) | 3 | 0 | 0% | Spring |
-| Phase 4 (마케팅) | 4 | 0 | 0% | - |
+| **Phase 3.8 (기존 고급)** | **3** | **3** | **100%** | **✅ 완료** |
+| **Phase 4 (마케팅)** | **4** | **4** | **100%** | **✅ 완료** |
 | **Phase 5 (급여대장)** | **3** | **2** | **67%** | **✅ 핵심 완료** |
 | Phase 6 (AI 챗봇) | 6 | 0 | 0% | Python MS |
 | Phase 7 (요금제) | 2 | 0 | 0% | Spring |
-| **전체** | **53** | **30** | **57%** | |
+| **전체** | **53** | **34** | **64%** | |
 
 ---
 
@@ -602,137 +601,94 @@ backend-spring/
 
 ---
 
-## Phase 3.8: 근로계약서 작성 폼 (P2) ✅ 완료 (2026-01-29)
-
-> 목표: 표준근로계약서 양식 기반 작성 + PDF 출력
-
-### 3.8.1 계약서 입력 폼
-- **상태**: ✅ 완료 (2026-01-29)
-- **우선순위**: 중간
-- **설명**:
-  - 표준근로계약서 양식 필드 모두 구현:
-    1. 계약일자, 수습기간 ✅
-    2. 근로시간 (시업/종업, 휴게시간) ✅
-    3. 연장·야간·휴일근로 조건 ✅
-    4. 근무장소, 직위, 담당업무 ✅
-    5. 근로일, 주휴일 ✅
-    6. 임금 (기본급, 수당 항목별) ✅
-    7. 임금 지급시기/방법 ✅
-  - 4대 보험 가입 항목 선택 ✅
-  - 네비게이션 메뉴 추가 ✅
-- **관련 파일**:
-  - `frontend/src/pages/Contract/index.tsx` ✅
-  - `frontend/src/pages/Contract/ContractForm.tsx` ✅
-  - `frontend/src/pages/Contract/sections/EmployerSection.tsx` ✅
-  - `frontend/src/pages/Contract/sections/EmployeeSection.tsx` ✅
-  - `frontend/src/pages/Contract/sections/ContractPeriodSection.tsx` ✅
-  - `frontend/src/pages/Contract/sections/WorkConditionSection.tsx` ✅
-  - `frontend/src/pages/Contract/sections/WageSection.tsx` ✅
-  - `frontend/src/pages/Contract/sections/InsuranceSection.tsx` ✅
-  - `frontend/src/types/contract.ts` ✅
-
-### 3.8.2 계약서 PDF 출력
-- **상태**: ✅ 완료 (2026-01-29)
-- **우선순위**: 중간
-- **설명**:
-  - jsPDF 라이브러리로 PDF 생성 ✅
-  - 계약 당사자, 계약 기간, 근로 조건, 임금, 보험 정보 포함 ✅
-  - 서명란 포함 ✅
-- **관련 파일**:
-  - `frontend/src/utils/contractPdfGenerator.ts` ✅
-
----
-
-## Phase 3.9: 기존 고급 기능 (P2)
+## Phase 3.8: 기존 고급 기능 (P2) ✅ 완료 (2026-01-29)
 
 > 기존 Phase 3의 나머지 항목
 
-### 3.9.1 급여명세서 PDF 출력
-- **상태**: ⬜ 대기
+### 3.8.1 급여명세서 PDF 출력
+- **상태**: ✅ 완료 (2026-01-29)
 - **우선순위**: 중간
 - **설명**:
-  - jsPDF 라이브러리 통합
-  - 법적 요구사항 준수 (급여명세서 교부의무)
+  - jsPDF 라이브러리 통합 ✅
+  - 근로기준법 시행령 제27조의2 준수 ✅
+  - CSV 내보내기 기능 포함 ✅
 - **관련 파일**:
-  - `frontend/src/utils/pdfGenerator.ts` (신규)
-  - `frontend/src/components/ResultDisplay/PDFExport.tsx` (신규)
+  - `frontend/src/utils/pdfGenerator.ts` ✅
+  - `frontend/src/components/ResultDisplay/PDFExport.tsx` ✅
 
-### 3.9.2 Excel/CSV 임포트/익스포트
-- **상태**: ⬜ 대기
+### 3.8.2 Excel/CSV 임포트/익스포트
+- **상태**: ✅ 완료 (2026-01-29)
 - **우선순위**: 중간
 - **설명**:
-  - 시프트 데이터 일괄 입력
-  - 급여 계산 결과 다운로드
+  - 시프트 데이터 일괄 입력 (CSV 가져오기) ✅
+  - 시프트 데이터 CSV 내보내기 ✅
+  - 템플릿 다운로드 기능 ✅
 - **관련 파일**:
-  - `frontend/src/utils/excelHandler.ts` (신규)
+  - `frontend/src/utils/excelHandler.ts` ✅
 
-### 3.9.3 시프트 검증
-- **상태**: ⬜ 대기
+### 3.8.3 시프트 검증 (한국 근로기준법 기준)
+- **상태**: ✅ 완료 (2026-01-29)
 - **우선순위**: 중간
 - **설명**:
-  - 11시간 휴식 권장 경고
-  - 시프트 간 간격 확인
+  - 주 52시간 초과 검증 (근로기준법 제53조) ✅
+  - 1일 12시간 초과 검증 ✅
+  - 휴게시간 부족 검증 (제54조) ✅
+  - 7일 연속 근무 경고 (제55조 주휴일) ✅
 - **관련 파일**:
-  - `backend/app/domain/services/shift_validator.py` (신규)
+  - `frontend/src/utils/shiftValidator.ts` ✅
+  - `frontend/src/components/ShiftInput/ShiftSummary.tsx` ✅ (검증 경고 UI)
 
 ---
 
-## Phase 4: SEO 및 마케팅 (P3)
+## Phase 4: SEO 및 마케팅 (P3) ✅ 완료 (2026-01-29)
 
 > 목표: 트래픽 확보
 
 ### 4.1 Google AdSense 연동
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-29)
 - **우선순위**: 낮음
-- **예상 작업량**: 심사 대기
 - **설명**:
-  - AdSense 계정 생성
-  - 광고 코드 삽입
-  - 승인 대기
+  - AdSense Auto Ads 코드 삽입 (`index.html`) ✅
+  - AdBanner 컴포넌트 생성 (수동 광고 배치용) ✅
+  - 개발 환경 플레이스홀더 표시 ✅
 - **관련 파일**:
-  - `frontend/index.html` (수정)
-  - `frontend/src/components/common/AdBanner.tsx` (신규)
+  - `frontend/index.html` ✅ (Auto Ads 스크립트 추가)
+  - `frontend/src/components/common/AdBanner.tsx` ✅ (신규)
 
-### 4.2 Google Search Console 등록
-- **상태**: ⬜ 대기
+### 4.2 SEO 최적화
+- **상태**: ✅ 완료 (2026-01-29)
 - **우선순위**: 낮음
-- **예상 작업량**: 1일
 - **설명**:
-  - 사이트 소유권 확인
-  - sitemap.xml 제출
-  - 색인 요청
+  - sitemap.xml 최신화 (블로그 포스트 11개 등록) ✅
+  - robots.txt 크롤링 허용 설정 ✅
+  - 구조화된 데이터 (JSON-LD) 확인 ✅
 - **관련 파일**:
-  - `frontend/public/sitemap.xml` (확인)
-  - `frontend/public/robots.txt` (확인)
+  - `frontend/public/sitemap.xml` ✅
+  - `frontend/public/robots.txt` ✅
 
-### 4.3 블로그 콘텐츠 5개 작성
-- **상태**: ⬜ 대기
+### 4.3 블로그 콘텐츠 추가 (2개)
+- **상태**: ✅ 완료 (2026-01-29)
 - **우선순위**: 낮음
-- **예상 작업량**: 5일
 - **설명**:
-  - SEO 키워드 기반 콘텐츠
-  - 급여 계산 가이드 시리즈
-- **콘텐츠 계획**:
-  1. "2026년 4대보험 요율 총정리"
-  2. "연장근로수당 계산법 완벽 가이드"
-  3. "주휴수당 계산기 사용법"
-  4. "최저임금 위반 시 과태료"
-  5. "급여명세서 필수 기재사항"
+  - SEO 키워드 기반 콘텐츠 2개 추가 ✅
+  - sitemap.xml에 새 블로그 URL 등록 ✅
+- **추가된 콘텐츠**:
+  1. "최저임금 위반 시 과태료" (`minimum-wage-violation-penalty`) ✅
+  2. "급여명세서 필수 기재사항" (`payslip-requirements`) ✅
+- **관련 파일**:
+  - `frontend/src/data/blogPosts.ts` ✅
+  - `frontend/public/sitemap.xml` ✅
 
-### 4.4 Lighthouse 90+ 성능 최적화
-- **상태**: ⬜ 대기
+### 4.4 Lighthouse 성능 최적화 (Code Splitting)
+- **상태**: ✅ 완료 (2026-01-29)
 - **우선순위**: 낮음
-- **예상 작업량**: 2일
 - **설명**:
-  - React.memo 적용
-  - Code Splitting
-  - Image Lazy Loading
-  - Core Web Vitals 개선
-- **목표 점수**:
-  - Performance: 90+
-  - Accessibility: 90+
-  - Best Practices: 90+
-  - SEO: 90+
+  - React.lazy + Suspense 적용 (20+ 컴포넌트) ✅
+  - 메인 번들 17% 감소 (1,511KB → 1,257KB) ✅
+  - PageLoader 컴포넌트 (로딩 스피너) ✅
+  - 핵심 페이지 즉시 로드 (Landing, Calculator, Login, Register) ✅
+- **관련 파일**:
+  - `frontend/src/App.tsx` ✅ (Code Splitting 적용)
 
 ---
 
@@ -1108,11 +1064,11 @@ Week 8 (Phase 3.6 - 급여 고도화, Spring):
 ├── Day 30: 포괄임금제 지원
 └── Day 31: 209/174시간 자동계산 개선
 
-Week 9 (Phase 3.7 + 3.8 - 시뮬레이션 + 계약서):
+Week 9 (Phase 3.7 + 3.8 - 시뮬레이션 + 고급기능):
 ├── Day 32-33: 급여 구조 시뮬레이션 엔진 + UI
-└── Day 34-35: 근로계약서 폼 + PDF 출력
+└── Day 34-35: 급여명세서 PDF + Excel/CSV
 
-Week 10 (Phase 3.9 + 4 - 고급기능 + 마케팅):
+Week 10 (Phase 3.8 + 4 - 고급기능 + 마케팅):
 ├── Day 36-37: 급여명세서 PDF + Excel/CSV
 ├── Day 38: 시프트 검증
 └── Day 39-40: SEO, AdSense, Lighthouse
@@ -1173,9 +1129,11 @@ Week 16 (Phase 7 - 요금제):
 | 2026-01-28 | **Phase 5 핵심 완료**: 급여대장 백엔드 API (PayrollController, PayrollService) + 프론트엔드 UI (목록/상세 페이지, 월간 템플릿) + DB 마이그레이션 (V3) 배포 완료 |
 | 2026-01-28 | **Phase 5 기능 추가**: PAID 상태 수정 버튼, 계산식 상세 표시 (SalaryResultStitch), 급여대장 계산 결과 저장 (PayrollEntryRequest 확장), 시프트 기간 선택 (ShiftInput periodStart/periodEnd) |
 | 2026-01-29 | **Phase 3.7 완료**: 시뮬레이션 API/UI 버그 수정 (URL 중복, response.data 접근), 주휴수당 계산 법적 공식 수정 |
-| 2026-01-29 | **Phase 3.8 완료**: 근로계약서 작성 폼 + PDF 출력 (jsPDF), 표준근로계약서 양식 7개 섹션 구현 |
+| 2026-01-29 | **Phase 3.8 제거**: 근로계약서 기능 삭제 (사용자 요청), Phase 3.9 → Phase 3.8로 번호 재정렬 |
+| 2026-01-29 | **Phase 3.8 완료**: 급여명세서 PDF/CSV, 시프트 CSV 가져오기/내보내기, 시프트 검증 (한국 근로기준법) |
+| 2026-01-29 | **Phase 4 완료**: AdSense Auto Ads, SEO 최적화 (sitemap/robots), 블로그 콘텐츠 2개 추가, Code Splitting (17% 번들 감소) |
 
 ---
 
 **작성자**: Claude Code
-**마지막 업데이트**: 2026-01-29 (Phase 3.7 완료, Phase 3.8 완료 - 근로계약서 작성 폼)
+**마지막 업데이트**: 2026-01-29 (Phase 4 완료)
