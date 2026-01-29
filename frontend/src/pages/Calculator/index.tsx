@@ -123,13 +123,18 @@ export default function CalculatorPage() {
       // 주 근무시간 계산
       const weeklyHours = employee.scheduled_work_days * employee.daily_work_hours;
 
+      // ★ 시급 기반 자동 계산 모드 감지: 월급제이지만 hourlyWage가 설정된 경우
+      // 이 경우 백엔드에서 실제 근무시간 × 시급으로 기본급 계산 (5인 미만 초과분 포함)
+      const isAutoHourlyMode = wageType === 'MONTHLY' && hourlyWage > 0;
+      const effectiveWageType = isAutoHourlyMode ? 'HOURLY' : wageType;
+
       const response = await salaryApi.calculateSalary({
         employee,
-        base_salary: wageType === 'MONTHLY' ? baseSalary : 0,
+        base_salary: effectiveWageType === 'MONTHLY' ? baseSalary : 0,
         allowances,
         work_shifts: workShifts,
-        wage_type: wageType,
-        hourly_wage: wageType === 'HOURLY' ? hourlyWage : 0,
+        wage_type: effectiveWageType,
+        hourly_wage: effectiveWageType === 'HOURLY' ? hourlyWage : 0,
         calculation_month: calculationMonth,
         absence_policy: absencePolicy,
         hours_mode: hoursMode,

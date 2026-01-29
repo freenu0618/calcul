@@ -143,6 +143,9 @@ export default function SalaryForm({
       // 기본급 업데이트
       onBaseSalaryChange(calculatedBaseSalary);
 
+      // ★ 시급을 부모로 동기화 (백엔드에서 실제 근무시간 기반 계산에 필요)
+      onHourlyWageChange(hourlyWage);
+
       // 임의수당이 양수면 수당에 추가
       if (otherAllowance > 0) {
         updateOtherAllowance(otherAllowance);
