@@ -104,9 +104,16 @@ class SalaryCalculator {
         if (wageType == "HOURLY") {
             // 시급제: 기본급 = 시급 × 실제 근무시간
             val hw = Money.of(hourlyWageInput)
-            val totalMinutes = workShifts
-                .filter { !it.isHolidayWork }
-                .sumOf { it.calculateWorkingHours().toMinutes() }
+
+            // 5인 이상: 휴일근무는 OvertimeCalculator에서 1.5배로 지급하므로 기본급에서 제외
+            // 5인 미만: 휴일가산 없으므로 모든 시간을 기본급에 포함
+            val shiftsForBasePay = if (isOver5) {
+                workShifts.filter { !it.isHolidayWork }
+            } else {
+                workShifts  // 5인 미만: 모든 시간 포함 (휴일가산 없음)
+            }
+
+            val totalMinutes = shiftsForBasePay.sumOf { it.calculateWorkingHours().toMinutes() }
             val totalHours = BigDecimal(totalMinutes).divide(BigDecimal("60"), 10, RoundingMode.HALF_UP)
             effectiveBase = (hw * totalHours).roundToWon()
             hourlyWage = hw
