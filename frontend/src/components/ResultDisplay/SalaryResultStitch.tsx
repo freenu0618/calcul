@@ -182,9 +182,9 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
               value={gross_breakdown.base_salary.formatted}
               formula={isHourlyWage
                 ? `시급제: 통상시급 ${hourlyWage.toLocaleString()}원 × 월 근무시간`
-                : `통상시급 = ${gross_breakdown.base_salary.amount.toLocaleString()}원 ÷ 월소정근로시간 = ${hourlyWage.toLocaleString()}원/시간`}
+                : `통상시급 = ${gross_breakdown.regular_wage.amount.toLocaleString()}원 ÷ 월소정근로시간 = ${hourlyWage.toLocaleString()}원/시간`}
             />
-            {gross_breakdown.weekly_holiday_pay.amount.amount > 0 && (
+            {gross_breakdown.weekly_holiday_pay.amount.amount > 0 ? (
               <DetailRow
                 label="주휴수당"
                 sublabel="Weekly Holiday"
@@ -192,6 +192,13 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
                 formula={gross_breakdown.weekly_holiday_pay.is_proportional
                   ? `${hourlyWage.toLocaleString()}원 × (주근무시간/40) × 8시간 × 개근주 (비례계산)`
                   : `${hourlyWage.toLocaleString()}원 × 8시간 × 4.345주 = ${gross_breakdown.weekly_holiday_pay.amount.formatted}`}
+              />
+            ) : gross_breakdown.weekly_holiday_pay.calculation && (
+              <DetailRow
+                label="주휴수당"
+                sublabel="Weekly Holiday"
+                value="0원"
+                formula={gross_breakdown.weekly_holiday_pay.calculation}
               />
             )}
             {gross_breakdown.overtime_allowances.overtime_pay.amount > 0 && (
@@ -301,8 +308,8 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
                     </>
                   ) : (
                     <>
-                      <p>통상시급 = 기본급 ÷ 월 소정근로시간</p>
-                      <p>= {gross_breakdown.base_salary.amount.toLocaleString()}원 ÷ 월소정근로시간</p>
+                      <p>통상시급 = 통상임금 ÷ 월 소정근로시간</p>
+                      <p>= {gross_breakdown.regular_wage.amount.toLocaleString()}원 ÷ 월소정근로시간</p>
                       <p className="font-bold">= {hourlyWage.toLocaleString()}원/시간</p>
                     </>
                   )}

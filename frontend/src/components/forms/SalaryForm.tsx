@@ -410,11 +410,12 @@ export default function SalaryForm({
               <input
                 type="number"
                 value={weeklyHours}
-                onChange={(e) => setWeeklyHours(parseInt(e.target.value) || 0)}
-                min={1}
-                max={84}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                readOnly
+                className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-600 cursor-not-allowed"
               />
+              <p className="mt-1 text-xs text-gray-500">
+                ※ 근로자 정보에서 자동 계산됨 ({scheduledWorkDays}일 × {dailyWorkHours}시간)
+              </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">계약 월급</label>
