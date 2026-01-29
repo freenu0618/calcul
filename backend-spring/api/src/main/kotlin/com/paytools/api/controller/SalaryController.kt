@@ -124,15 +124,61 @@ class SalaryController {
             "calculation_month" to result.calculationMonth
         )
 
+        // 근무 요약 생성
+        val workSummary = createWorkSummary(request, result)
+
         return SalaryCalculationResponse(
             employeeName = result.employee.name,
             grossBreakdown = grossBreakdown,
             deductionsBreakdown = deductionsBreakdown,
             netPay = MoneyResponse.from(result.netPay),
-            workSummary = null, // TODO: 근무 요약 구현 필요
+            workSummary = workSummary,
             absenceBreakdown = absenceBreakdown,
             warnings = emptyList(), // TODO: 경고 생성기 구현 필요
             calculationMetadata = calculationMetadata
+        )
+    }
+
+    private fun createWorkSummary(
+        request: SalaryCalculationRequest,
+        result: com.paytools.domain.service.SalaryCalculationResult
+    ): WorkSummaryResponse {
+        val workShifts = request.workShifts.map { shiftReq ->
+            WorkShift(
+                date = shiftReq.date,
+                startTime = shiftReq.startTime,
+                endTime = shiftReq.endTime,
+                breakMinutes = shiftReq.breakMinutes,
+                isHolidayWork = shiftReq.isHolidayWork
+            )
+        }
+
+        // 총 근무시간 (휴게시간 제외)
+        val totalWorkMinutes = workShifts.sumOf { it.calculateWorkingHours().toMinutes() }
+        val totalWorkHours = com.paytools.domain.vo.WorkingHours.fromMinutes(totalWorkMinutes)
+
+        // 연장/야간/휴일 시간
+        val overtimeHours = result.overtimeResult.overtimeHours
+        val nightHours = result.overtimeResult.nightHours
+        val holidayHours = result.overtimeResult.holidayHours
+
+        // 소정근로시간 = 총 근무시간 - 연장시간 - 휴일시간
+        val regularMinutes = maxOf(0, totalWorkMinutes - overtimeHours.toMinutes() - holidayHours.toMinutes())
+        val regularHours = com.paytools.domain.vo.WorkingHours.fromMinutes(regularMinutes)
+
+        return WorkSummaryResponse(
+            calculationMonth = result.calculationMonth,
+            wageType = result.wageType,
+            scheduledDays = request.employee.scheduledWorkDays * 4,
+            actualWorkDays = workShifts.size,
+            absentDays = result.absenceResult?.absentDays ?: 0,
+            totalWorkHours = WorkingHoursResponse.from(totalWorkHours),
+            regularHours = WorkingHoursResponse.from(regularHours),
+            overtimeHours = WorkingHoursResponse.from(overtimeHours),
+            nightHours = WorkingHoursResponse.from(nightHours),
+            holidayHours = WorkingHoursResponse.from(holidayHours),
+            weeklyHolidayWeeks = result.weeklyHolidayResult.weeklyHours.toMinutes() / 60 / 40,
+            totalWeeks = 4
         )
     }
 }

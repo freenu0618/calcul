@@ -48,12 +48,17 @@ class WeeklyHolidayPayCalculator {
         val avgWeeklyHours = calculateAverageWeeklyHours(workShifts)
         val weeklyHoursDecimal = avgWeeklyHours.toDecimalHours()
 
+        // 2. 주휴시간 계산 (법적 공식): (min(주소정근로시간, 40) / 40) × 8
+        // 주 40시간 초과분은 주휴수당 계산에 미반영
+        val cappedWeeklyHours = weeklyHoursDecimal.min(WEEKLY_REGULAR_HOURS)
+        val weeklyHolidayHours = cappedWeeklyHours
+            .divide(WEEKLY_REGULAR_HOURS, 10, java.math.RoundingMode.HALF_UP)
+            .multiply(HOLIDAY_HOURS)
+
         val isProportional = weeklyHoursDecimal < WEEKLY_REGULAR_HOURS
 
-        // 2. 1일 평균 근로시간 = 주 평균 근로시간 / 주 근무일
-        val dailyAvgHours = weeklyHoursDecimal.divide(
-            BigDecimal(scheduledWorkDays), 10, java.math.RoundingMode.HALF_UP
-        )
+        // 역호환성: dailyAvgHours 계산 (표시용)
+        val dailyAvgHours = weeklyHolidayHours
 
         // 3. 주 15시간 미만: 주휴수당 없음
         if (weeklyHoursDecimal < MINIMUM_WEEKLY_HOURS) {
@@ -81,8 +86,7 @@ class WeeklyHolidayPayCalculator {
             )
         }
 
-        // 5. 주휴수당 계산: 1일 평균 근로시간 × 시급 × 4.345주
-        // 결근한 주가 있으면 비례 차감
+        // 5. 주휴수당 = 주휴시간 × 시급 × 개근주수 (비례)
         val qualifyingRatio = if (totalWeeks > 0) {
             BigDecimal(qualifyingWeeks).divide(BigDecimal(totalWeeks), 10, java.math.RoundingMode.HALF_UP)
         } else {
@@ -90,9 +94,9 @@ class WeeklyHolidayPayCalculator {
         }
 
         val effectiveWeeks = WEEKS_PER_MONTH.multiply(qualifyingRatio)
-        val monthlyHolidayPay = (hourlyWage * dailyAvgHours * effectiveWeeks).roundToWon()
+        val monthlyHolidayPay = (hourlyWage * weeklyHolidayHours * effectiveWeeks).roundToWon()
 
-        val calculation = "${dailyAvgHours.setScale(1, java.math.RoundingMode.HALF_UP)}시간 × " +
+        val calculation = "(${cappedWeeklyHours.setScale(0)}h/40h)×8 = ${weeklyHolidayHours.setScale(1)}h × " +
             "${hourlyWage.amount.toInt()}원 × ${effectiveWeeks.setScale(3, java.math.RoundingMode.HALF_UP)}주"
 
         return WeeklyHolidayPayResult(
