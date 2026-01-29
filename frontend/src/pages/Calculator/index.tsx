@@ -10,6 +10,7 @@ import { CalculatorIcon, EmptyState } from '../../components/illustrations';
 import EmployeeInfoForm from '../../components/forms/EmployeeInfoForm';
 import SalaryForm from '../../components/forms/SalaryForm';
 import { SalaryResult, AllowanceAdjustment } from '../../components/ResultDisplay';
+import PDFExport from '../../components/ResultDisplay/PDFExport';
 import type { AdjustedResult } from '../../components/ResultDisplay';
 import { ShiftInput } from '../../components/ShiftInput';
 import { StepWizard, useWizard, type WizardStep } from '../../components/wizard';
@@ -271,6 +272,9 @@ export default function CalculatorPage() {
             <div className="mt-8 space-y-4">
               <Card title="계산 결과">
                 <SalaryResult result={result} />
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <PDFExport result={result} employerName={employee.name ? `${employee.name} 급여명세서` : undefined} />
+                </div>
               </Card>
 
               {/* 계약총액제 - 수당 조정 */}
