@@ -19,17 +19,18 @@ const Navigation = () => {
     ? [
         { path: '/dashboard', label: '대시보드' },
         { path: '/calculator', label: '급여 계산' },
-        { path: '/simulation', label: '급여 시뮬레이션' },
+        { path: '/simulation', label: '시뮬레이션' },
+        { path: '/contract', label: '계약서' },
         { path: '/employees', label: '직원 관리' },
         { path: '/payroll', label: '급여대장' },
         { path: '/guide', label: '가이드' },
       ]
     : [
         { path: '/calculator', label: '급여 계산' },
-        { path: '/simulation', label: '급여 시뮬레이션' },
+        { path: '/simulation', label: '시뮬레이션' },
+        { path: '/contract', label: '계약서' },
         { path: '/#pricing', label: '요금제' },
         { path: '/guide', label: '가이드' },
-        { path: '/examples', label: '사례' },
       ];
 
   const isActive = (path: string) => location.pathname === path;

@@ -1,7 +1,7 @@
 # 프로젝트 TODO 리스트
 
 **작성일**: 2026-01-22
-**마지막 업데이트**: 2026-01-28 (Phase 5 기능 추가 - 계산식 표시, 계산 결과 저장, 기간 선택)
+**마지막 업데이트**: 2026-01-29 (Phase 3.7 완료, Phase 3.8 완료 - 근로계약서 작성 폼)
 **기준 문서**: PROJECT_ANALYSIS_REPORT.md v2.2.0
 **프로젝트**: paytools.work (급여 계산기)
 
@@ -20,14 +20,14 @@
 | **Phase S3 (API 전환+검증)** | **3** | **3** | **100%** | **✅ 완료** |
 | **Phase 3.5 (근무자 등록)** | **5** | **4** | **80%** | **✅ 대부분 완료** |
 | Phase 3.6 (급여 고도화) | 4 | 0 | 0% | Spring |
-| Phase 3.7 (시뮬레이션) | 2 | 0 | 0% | Spring |
-| Phase 3.8 (근로계약서) | 2 | 0 | 0% | Spring |
+| **Phase 3.7 (시뮬레이션)** | **2** | **2** | **100%** | **✅ 완료** |
+| **Phase 3.8 (근로계약서)** | **2** | **2** | **100%** | **✅ 완료** |
 | Phase 3.9 (기존 고급) | 3 | 0 | 0% | Spring |
 | Phase 4 (마케팅) | 4 | 0 | 0% | - |
 | **Phase 5 (급여대장)** | **3** | **2** | **67%** | **✅ 핵심 완료** |
 | Phase 6 (AI 챗봇) | 6 | 0 | 0% | Python MS |
 | Phase 7 (요금제) | 2 | 0 | 0% | Spring |
-| **전체** | **53** | **26** | **49%** | |
+| **전체** | **53** | **30** | **57%** | |
 
 ---
 
@@ -564,70 +564,82 @@ backend-spring/
 
 ---
 
-## Phase 3.7: 급여 구조 시뮬레이션 (P2 - Spring으로 구현)
+## Phase 3.7: 급여 구조 시뮬레이션 (P2) ✅ 완료 (2026-01-29)
 
 > 목표: 같은 총액에서 기본급/수당 배분에 따른 인건비 차이 비교
 > 참고: A=250만 통째 기본급 vs B=10,320시급+수당 사례
 
 ### 3.7.1 급여 구조 비교 엔진
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-29)
 - **우선순위**: 중간
 - **설명**:
-  - 입력: 월 총 급여액, 주 근로시간
+  - 입력: 월 총 급여액, 주 근로시간, 예상 연장/야간/휴일 시간 ✅
   - 시뮬레이션 항목:
-    - 기본급 비율별 통상시급 변화
-    - 통상시급에 따른 가산수당 차이
-    - 퇴직금 산정 기준액 차이
-    - 연차수당 차이 (1년 이상 근무 시)
-  - 결과: "사업주 연간 인건비 부담" 비교표
+    - 기본급 비율별 통상시급 변화 ✅
+    - 통상시급에 따른 가산수당 차이 ✅
+    - 퇴직금 산정 기준액 차이 ✅
+    - 연차수당 차이 (1년 이상 근무 시) ✅
+  - 결과: "사업주 연간 인건비 부담" 비교표 ✅
+- **버그 수정** (2026-01-29):
+  - API URL 중복 오류 수정 (`/api/v1/api/v1` → `/simulation/compare`)
+  - axios response.data 접근 오류 수정
 - **관련 파일**:
-  - `backend/app/domain/services/salary_simulator.py` (신규)
-  - `backend/app/api/routers/simulation.py` (신규)
+  - `backend-spring/api/src/main/kotlin/.../controller/SimulationController.kt` ✅
+  - `backend-spring/domain/src/main/kotlin/.../service/SimulationService.kt` ✅
+  - `frontend/src/api/simulationApi.ts` ✅
 
 ### 3.7.2 시뮬레이션 UI
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-29)
 - **우선순위**: 중간
 - **설명**:
-  - 슬라이더로 기본급 비율 조정
-  - 실시간 비교표 (A안 vs B안)
-  - 차트: 연간 인건비 구성 비교
+  - 슬라이더로 기본급 비율 조정 (A안/B안) ✅
+  - 실시간 비교표 (통상시급, 연장수당, 퇴직금, 연간 인건비) ✅
+  - 차이 분석 (연간 인건비 차이율 표시) ✅
+  - 추천 의견 표시 ✅
 - **관련 파일**:
-  - `frontend/src/pages/Simulation/SalarySimulation.tsx` (신규)
-  - `frontend/src/components/charts/CostCompare.tsx` (신규)
+  - `frontend/src/pages/Simulation/SalarySimulation.tsx` ✅
+  - `frontend/src/types/simulation.ts` ✅
 
 ---
 
-## Phase 3.8: 근로계약서 작성 폼 (P2 - Spring으로 구현)
+## Phase 3.8: 근로계약서 작성 폼 (P2) ✅ 완료 (2026-01-29)
 
 > 목표: 표준근로계약서 양식 기반 작성 + PDF 출력
-> 참조: `docs/근로계약서.pdf`
 
 ### 3.8.1 계약서 입력 폼
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-29)
 - **우선순위**: 중간
 - **설명**:
-  - 표준근로계약서 양식 필드:
-    1. 계약일자, 수습기간
-    2. 근로시간 (시업/종업, 휴게시간)
-    3. 연장·야간·휴일근로 조건
-    4. 근무장소, 직위, 담당업무
-    5. 근로일, 주휴일
-    6. 임금 (기본급, 수당 항목별)
-    7. 임금 지급시기/방법
-  - 등록된 근무자 정보 자동 반영
+  - 표준근로계약서 양식 필드 모두 구현:
+    1. 계약일자, 수습기간 ✅
+    2. 근로시간 (시업/종업, 휴게시간) ✅
+    3. 연장·야간·휴일근로 조건 ✅
+    4. 근무장소, 직위, 담당업무 ✅
+    5. 근로일, 주휴일 ✅
+    6. 임금 (기본급, 수당 항목별) ✅
+    7. 임금 지급시기/방법 ✅
+  - 4대 보험 가입 항목 선택 ✅
+  - 네비게이션 메뉴 추가 ✅
 - **관련 파일**:
-  - `frontend/src/pages/Contract/ContractForm.tsx` (신규)
-  - `frontend/src/types/contract.ts` (신규)
+  - `frontend/src/pages/Contract/index.tsx` ✅
+  - `frontend/src/pages/Contract/ContractForm.tsx` ✅
+  - `frontend/src/pages/Contract/sections/EmployerSection.tsx` ✅
+  - `frontend/src/pages/Contract/sections/EmployeeSection.tsx` ✅
+  - `frontend/src/pages/Contract/sections/ContractPeriodSection.tsx` ✅
+  - `frontend/src/pages/Contract/sections/WorkConditionSection.tsx` ✅
+  - `frontend/src/pages/Contract/sections/WageSection.tsx` ✅
+  - `frontend/src/pages/Contract/sections/InsuranceSection.tsx` ✅
+  - `frontend/src/types/contract.ts` ✅
 
 ### 3.8.2 계약서 PDF 출력
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-29)
 - **우선순위**: 중간
 - **설명**:
-  - 입력된 정보로 표준근로계약서 PDF 생성
-  - jsPDF + 한글 폰트 지원
-  - 개인정보 동의서 포함 옵션
+  - jsPDF 라이브러리로 PDF 생성 ✅
+  - 계약 당사자, 계약 기간, 근로 조건, 임금, 보험 정보 포함 ✅
+  - 서명란 포함 ✅
 - **관련 파일**:
-  - `frontend/src/utils/contractPdfGenerator.ts` (신규)
+  - `frontend/src/utils/contractPdfGenerator.ts` ✅
 
 ---
 
@@ -1160,8 +1172,10 @@ Week 16 (Phase 7 - 요금제):
 | 2026-01-27 | **Phase 3.5 완료 (80%)**: 근무자 등록 시스템 구현 (DB/API/UI), 랜딩페이지 마케팅 문구 수정, DB 스키마 문서화 |
 | 2026-01-28 | **Phase 5 핵심 완료**: 급여대장 백엔드 API (PayrollController, PayrollService) + 프론트엔드 UI (목록/상세 페이지, 월간 템플릿) + DB 마이그레이션 (V3) 배포 완료 |
 | 2026-01-28 | **Phase 5 기능 추가**: PAID 상태 수정 버튼, 계산식 상세 표시 (SalaryResultStitch), 급여대장 계산 결과 저장 (PayrollEntryRequest 확장), 시프트 기간 선택 (ShiftInput periodStart/periodEnd) |
+| 2026-01-29 | **Phase 3.7 완료**: 시뮬레이션 API/UI 버그 수정 (URL 중복, response.data 접근), 주휴수당 계산 법적 공식 수정 |
+| 2026-01-29 | **Phase 3.8 완료**: 근로계약서 작성 폼 + PDF 출력 (jsPDF), 표준근로계약서 양식 7개 섹션 구현 |
 
 ---
 
 **작성자**: Claude Code
-**마지막 업데이트**: 2026-01-28 (Phase 5 기능 추가 - 계산식 표시, 계산 결과 저장, 기간 선택)
+**마지막 업데이트**: 2026-01-29 (Phase 3.7 완료, Phase 3.8 완료 - 근로계약서 작성 폼)
