@@ -1,4 +1,5 @@
 import type { WorkShiftRequest } from '../../types/salary';
+import { validateShifts, type ShiftWarning } from '../../utils/shiftValidator';
 
 /**
  * 근무 시프트 요약 컴포넌트
@@ -60,6 +61,7 @@ const ShiftSummary: React.FC<ShiftSummaryProps> = ({ shifts }) => {
   const totalMins = totalMinutes % 60;
   const nightShifts = countNightShifts();
   const holidayShifts = countHolidayShifts();
+  const warnings: ShiftWarning[] = validateShifts(shifts);
 
   // 주 52시간 초과 경고 (월 단위 환산: 52 * 4.345 = 226시간)
   const isOvertime = totalHours > 226;
@@ -115,16 +117,29 @@ const ShiftSummary: React.FC<ShiftSummaryProps> = ({ shifts }) => {
         </div>
       </div>
 
+      {/* 검증 경고 */}
+      {warnings.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {warnings.map((w, idx) => (
+            <div
+              key={idx}
+              className={`p-3 rounded-md text-sm ${
+                w.severity === 'critical'
+                  ? 'bg-red-50 border border-red-200 text-red-700'
+                  : 'bg-yellow-50 border border-yellow-200 text-yellow-700'
+              }`}
+            >
+              <span className="font-medium">{w.severity === 'critical' ? '⚠️ 위반 경고' : '💡 주의'}:</span> {w.message}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* 추가 정보 */}
-      {(isOvertime || nightShifts > 0 || holidayShifts > 0) && (
+      {(nightShifts > 0 || holidayShifts > 0) && (
         <div className="mt-4 pt-4 border-t border-blue-200">
           <div className="text-sm text-gray-700">
             <strong className="text-blue-900">참고:</strong>
-            {isOvertime && (
-              <div className="mt-1">
-                • 주 52시간을 초과하는 경우 근로기준법 위반이 될 수 있습니다.
-              </div>
-            )}
             {nightShifts > 0 && (
               <div className="mt-1">
                 • 야간 근무(22:00~06:00)에 대해 통상시급의 50% 가산 수당이 적용됩니다.
