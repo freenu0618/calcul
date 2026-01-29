@@ -1,7 +1,7 @@
 # 프로젝트 TODO 리스트
 
 **작성일**: 2026-01-22
-**마지막 업데이트**: 2026-01-29 (Phase 4 완료 - SEO 및 마케팅 최적화)
+**마지막 업데이트**: 2026-01-29 (v1.4.0 - Phase 3.6 급여 설정 고도화 완료)
 **기준 문서**: PROJECT_ANALYSIS_REPORT.md v2.2.0
 **프로젝트**: paytools.work (급여 계산기)
 
@@ -19,14 +19,14 @@
 | Phase S2 (도메인 전환) | 4 | 4 | 100% | ✅ 완료 |
 | **Phase S3 (API 전환+검증)** | **3** | **3** | **100%** | **✅ 완료** |
 | **Phase 3.5 (근무자 등록)** | **5** | **4** | **80%** | **✅ 대부분 완료** |
-| Phase 3.6 (급여 고도화) | 4 | 0 | 0% | Spring |
+| **Phase 3.6 (급여 고도화)** | **4** | **4** | **100%** | **✅ 완료** |
 | **Phase 3.7 (시뮬레이션)** | **2** | **2** | **100%** | **✅ 완료** |
 | **Phase 3.8 (기존 고급)** | **3** | **3** | **100%** | **✅ 완료** |
 | **Phase 4 (마케팅)** | **4** | **4** | **100%** | **✅ 완료** |
 | **Phase 5 (급여대장)** | **3** | **2** | **67%** | **✅ 핵심 완료** |
 | Phase 6 (AI 챗봇) | 6 | 0 | 0% | Python MS |
 | Phase 7 (요금제) | 2 | 0 | 0% | Spring |
-| **전체** | **53** | **34** | **64%** | |
+| **전체** | **53** | **38** | **72%** | |
 
 ---
 
@@ -500,28 +500,29 @@ backend-spring/
 
 ---
 
-## Phase 3.6: 급여 설정 고도화 (P1 - Spring으로 구현)
+## Phase 3.6: 급여 설정 고도화 (P1 - Spring으로 구현) ✅ 완료 (2026-01-29)
 
 > 목표: 4대보험 유연 설정 + 외국인 지원 + 포괄임금제
 
 ### 3.6.1 4대보험 개별 체크박스
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-29)
 - **우선순위**: 높음
 - **설명**:
-  - 국민연금, 건강보험, 장기요양보험, 고용보험 각각 체크박스
-  - 기본값: 전체 적용 (체크됨)
-  - 만 60세 이상: 국민연금 자동 해제 + 안내
-  - 주 15시간 미만: 고용보험 제외 가능 안내
+  - 국민연금, 건강보험, 장기요양보험, 고용보험 각각 체크박스 ✅
+  - 기본값: 전체 적용 (체크됨) ✅
+  - 만 60세 이상: 국민연금 자동 해제 + 안내 ✅
+  - 주 15시간 미만: 고용보험 제외 가능 안내 ✅
+  - 건강보험 해제 시 장기요양보험 자동 해제 ✅
 - **관련 파일**:
-  - `backend/app/api/schemas/salary.py` (insurance_options 필드)
-  - `backend/app/domain/services/insurance_calculator.py` (조건부 계산)
-  - `frontend/src/components/forms/InsuranceOptions.tsx` (신규)
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/model/InsuranceOptions.kt` ✅
+  - `backend-spring/api/src/main/kotlin/com/paytools/api/dto/request/InsuranceOptionsRequest.kt` ✅
+  - `frontend/src/components/forms/InsuranceOptions.tsx` ✅ (신규)
 
 ### 3.6.2 외국인 근로자 체류자격별 보험 자동 세팅
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-29)
 - **우선순위**: 높음
 - **설명**:
-  - 외국인 체크 시 체류자격 선택 드롭다운 표시
+  - 외국인 체크 시 체류자격 선택 드롭다운 표시 ✅
   - 체류자격별 자동 적용 규칙:
     | 체류자격 | 국민연금 | 건강보험 | 고용보험 | 산재보험 |
     |---------|---------|---------|---------|---------|
@@ -529,37 +530,40 @@ backend-spring/
     | E-9, H-2 | ⚠️ 임의 | ✅ 의무 | ⚠️ 임의 | ✅ 의무 |
     | F-4 (재외동포) | ⚠️ 임의 | ✅ 의무 | ⚠️ 임의 | ✅ 의무 |
     | D-7~D-9 | ⚠️ 상호주의 | ✅ 의무 | ⚠️ 상호주의 | ✅ 의무 |
-  - 자동 세팅 후 사용자가 수동 변경 가능
+  - 자동 세팅 후 사용자가 수동 변경 가능 ✅
 - **관련 파일**:
-  - `backend/app/core/visa_insurance_rules.py` (신규)
-  - `frontend/src/components/forms/ForeignerInsurance.tsx` (신규)
+  - `frontend/src/types/employee.ts` ✅ (VISA_INSURANCE_RULES)
+  - `frontend/src/components/forms/EmployeeInfoForm.tsx` ✅ (외국인 여부 + 체류자격)
+  - `frontend/src/components/forms/InsuranceOptions.tsx` ✅ (useEffect 자동 세팅)
 
 ### 3.6.3 포괄임금제 지원
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-29)
 - **우선순위**: 중간
 - **설명**:
-  - 계약서 사례: 연장수당을 시간당 고정금액으로 설정 (예: 10,500원)
+  - 계약서 사례: 연장수당을 시간당 고정금액으로 설정 (예: 10,500원) ✅
   - 설정 옵션:
-    - 포괄임금제 여부 체크
-    - 연장수당 시간당 금액 입력
-    - 월 포함 연장근로 예정시간 입력
-  - 경고: 포괄임금제 시 최저시급 미달 여부 검증
+    - 포괄임금제 여부 체크 ✅
+    - 연장수당 시간당 금액 입력 ✅
+    - 월 포함 연장근로 예정시간 입력 ✅
+  - 경고: 포괄임금제 시 최저시급 미달 여부 검증 ✅
+  - 환산시급 자동 계산 및 표시 ✅
 - **관련 파일**:
-  - `backend/app/api/schemas/salary.py` (inclusive_wage_options)
-  - `backend/app/domain/services/overtime_calculator.py` (분기 로직)
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/model/InclusiveWageOptions.kt` ✅ (신규)
+  - `backend-spring/api/src/main/kotlin/com/paytools/api/dto/request/InclusiveWageOptionsRequest.kt` ✅ (신규)
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/service/SalaryCalculator.kt` ✅ (분기 로직)
+  - `frontend/src/components/forms/InclusiveWageOptions.tsx` ✅ (신규)
 
 ### 3.6.4 209시간/174시간 자동 계산 개선
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (이전 구현됨)
 - **우선순위**: 높음
 - **설명**:
-  - 현재: 사용자가 방식 선택 (수동)
-  - 개선: 주 근로시간 입력 시 월 소정근로시간 자동 계산
-  - 174방식: `min(주근로, 40) × 4.345`
-  - 209방식: `(min(주근로, 40) + min(주근로,40)/40×8) × 4.345`
-  - 계약서 방식 사례: `(7×6) × 4.345 + 7 × 4.345 = 약 213시간`
+  - 주 근로시간 입력 시 월 소정근로시간 자동 계산 ✅
+  - 174방식: `min(주근로, 40) × 4.345` ✅
+  - 209방식: `(min(주근로, 40) + min(주근로,40)/40×8) × 4.345` ✅
+  - SalaryForm에서 실시간 표시 ✅
 - **관련 파일**:
-  - `backend/app/domain/services/salary_calculator.py` (계산 로직)
-  - `frontend/src/components/forms/SalaryForm.tsx` (자동 표시)
+  - `backend-spring/domain/src/main/kotlin/com/paytools/domain/service/SalaryCalculator.kt` ✅
+  - `frontend/src/components/forms/SalaryForm.tsx` ✅ (자동 표시)
 
 ---
 
@@ -1132,8 +1136,9 @@ Week 16 (Phase 7 - 요금제):
 | 2026-01-29 | **Phase 3.8 제거**: 근로계약서 기능 삭제 (사용자 요청), Phase 3.9 → Phase 3.8로 번호 재정렬 |
 | 2026-01-29 | **Phase 3.8 완료**: 급여명세서 PDF/CSV, 시프트 CSV 가져오기/내보내기, 시프트 검증 (한국 근로기준법) |
 | 2026-01-29 | **Phase 4 완료**: AdSense Auto Ads, SEO 최적화 (sitemap/robots), 블로그 콘텐츠 2개 추가, Code Splitting (17% 번들 감소) |
+| 2026-01-29 | **급여 계산 버그 수정 (v1.3.0)**: 5인 미만 174시간 초과분 누락 해결, 월간 템플릿 휴일근로 자동 설정 버그 수정, Tooltip 모바일 화면 밖 표시 버그 수정 |
 
 ---
 
 **작성자**: Claude Code
-**마지막 업데이트**: 2026-01-29 (Phase 4 완료)
+**마지막 업데이트**: 2026-01-29 (v1.3.0 - 급여 계산 버그 수정)

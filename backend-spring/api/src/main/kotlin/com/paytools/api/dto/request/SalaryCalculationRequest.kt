@@ -48,5 +48,9 @@ data class SalaryCalculationRequest(
 
     @Schema(description = "4대 보험 적용 옵션")
     @field:Valid
-    val insuranceOptions: InsuranceOptionsRequest = InsuranceOptionsRequest()
+    val insuranceOptions: InsuranceOptionsRequest = InsuranceOptionsRequest(),
+
+    @Schema(description = "포괄임금제 옵션")
+    @field:Valid
+    val inclusiveWageOptions: InclusiveWageOptionsRequest = InclusiveWageOptionsRequest()
 )

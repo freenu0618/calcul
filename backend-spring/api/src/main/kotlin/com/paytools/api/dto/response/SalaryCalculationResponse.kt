@@ -161,6 +161,24 @@ data class WeeklyHolidayPayBreakdown(
 }
 
 /**
+ * 포괄임금제 옵션 응답
+ */
+@Schema(description = "포괄임금제 옵션")
+data class InclusiveWageOptionsResponse(
+    @Schema(description = "포괄임금제 적용 여부")
+    val enabled: Boolean,
+
+    @Schema(description = "연장수당 시간당 고정 금액")
+    val fixedOvertimeHourlyRate: Long,
+
+    @Schema(description = "월 예정 연장근로시간")
+    val monthlyExpectedOvertimeHours: Double,
+
+    @Schema(description = "월 고정 연장수당")
+    val monthlyFixedOvertimePay: MoneyResponse? = null
+)
+
+/**
  * 총 지급액 상세
  */
 @Schema(description = "총 지급액 상세")
@@ -185,6 +203,9 @@ data class GrossBreakdown(
 
     @Schema(description = "주휴수당")
     val weeklyHolidayPay: WeeklyHolidayPayBreakdown,
+
+    @Schema(description = "포괄임금제 고정 연장수당")
+    val inclusiveOvertimePay: MoneyResponse? = null,
 
     @Schema(description = "총 지급액")
     val total: MoneyResponse
@@ -329,6 +350,9 @@ data class SalaryCalculationResponse(
 
     @Schema(description = "결근 공제 상세")
     val absenceBreakdown: AbsenceBreakdown? = null,
+
+    @Schema(description = "포괄임금제 옵션")
+    val inclusiveWageOptions: InclusiveWageOptionsResponse? = null,
 
     @Schema(description = "경고 메시지 목록")
     val warnings: List<WarningResponse> = emptyList(),

@@ -3,9 +3,11 @@ package com.paytools.domain.service
 import com.paytools.domain.model.Allowance
 import com.paytools.domain.model.CompanySize
 import com.paytools.domain.model.Employee
+import com.paytools.domain.model.InclusiveWageOptions
 import com.paytools.domain.model.InsuranceOptions
 import com.paytools.domain.model.WorkShift
 import com.paytools.domain.vo.Money
+import com.paytools.domain.vo.WorkingHours
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -27,7 +29,9 @@ data class SalaryCalculationResult(
     val netPay: Money,
     val wageType: String = "MONTHLY",
     val calculationMonth: String = "",
-    val absenceResult: AbsenceResult? = null
+    val absenceResult: AbsenceResult? = null,
+    val inclusiveWageOptions: InclusiveWageOptions = InclusiveWageOptions.DISABLED,
+    val inclusiveOvertimePay: Money = Money.ZERO  // 포괄임금제 고정 연장수당
 )
 
 /**
@@ -84,7 +88,8 @@ class SalaryCalculator {
         absencePolicy: String = "STRICT",
         weeklyHours: Int = 40,
         hoursMode: String = "174",
-        insuranceOptions: InsuranceOptions = InsuranceOptions.ALL_APPLY
+        insuranceOptions: InsuranceOptions = InsuranceOptions.ALL_APPLY,
+        inclusiveWageOptions: InclusiveWageOptions = InclusiveWageOptions.DISABLED
     ): SalaryCalculationResult {
         // 0. 계산월 추론
         val effectiveMonth = if (calculationMonth.isEmpty() && workShifts.isNotEmpty()) {
@@ -159,13 +164,39 @@ class SalaryCalculator {
             hourlyWage = calculateHourlyWage(regularWage, monthlyHours)
         }
 
-        // 3. 연장/야간/휴일 수당 (시급제는 이미 계산됨, 재사용)
-        val overtimeResult = overtimeResultForHourly ?: overtimeCalculator.calculate(
-            workShifts = workShifts,
-            hourlyWage = hourlyWage,
-            companySize = employee.companySize,
-            scheduledWorkDays = employee.scheduledWorkDays
-        )
+        // 3. 연장/야간/휴일 수당
+        // 포괄임금제: 고정 연장수당으로 대체
+        val (overtimeResult, inclusiveOvertimePay) = if (inclusiveWageOptions.enabled && wageType == "MONTHLY") {
+            val fixedOvertimePay = inclusiveWageOptions.calculateMonthlyFixedOvertimePay()
+            // 야간/휴일은 별도 계산 (시간만 참고용)
+            val actualResult = overtimeCalculator.calculate(
+                workShifts = workShifts,
+                hourlyWage = hourlyWage,
+                companySize = employee.companySize,
+                scheduledWorkDays = employee.scheduledWorkDays
+            )
+            // 포괄임금제: 연장수당을 고정액으로 대체
+            val modifiedResult = OvertimeResult(
+                overtimePay = Money.ZERO,  // 연장수당은 고정액으로 별도 처리
+                nightPay = actualResult.nightPay,
+                holidayPay = actualResult.holidayPay,
+                overtimeHours = WorkingHours.fromMinutes(
+                    (inclusiveWageOptions.monthlyExpectedOvertimeHours * BigDecimal("60")).toInt()
+                ),
+                nightHours = actualResult.nightHours,
+                holidayHours = actualResult.holidayHours,
+                hourlyWage = hourlyWage
+            )
+            modifiedResult to fixedOvertimePay
+        } else {
+            val result = overtimeResultForHourly ?: overtimeCalculator.calculate(
+                workShifts = workShifts,
+                hourlyWage = hourlyWage,
+                companySize = employee.companySize,
+                scheduledWorkDays = employee.scheduledWorkDays
+            )
+            result to Money.ZERO
+        }
 
         // 4. 주휴수당
         val weeklyHolidayResult = weeklyHolidayCalculator.calculate(
@@ -174,11 +205,11 @@ class SalaryCalculator {
             scheduledWorkDays = employee.scheduledWorkDays
         )
 
-        // 5. 총 지급액
+        // 5. 총 지급액 (포괄임금제: 고정 연장수당 포함)
         val totalGross = calculateTotalGross(
             baseSalary = effectiveBase,
             allowances = allowances,
-            overtimePay = overtimeResult.total(),
+            overtimePay = overtimeResult.total() + inclusiveOvertimePay,
             weeklyHolidayPay = weeklyHolidayResult.weeklyHolidayPay
         )
 
@@ -209,7 +240,9 @@ class SalaryCalculator {
             netPay = netPay,
             wageType = wageType,
             calculationMonth = effectiveMonth,
-            absenceResult = absenceResult
+            absenceResult = absenceResult,
+            inclusiveWageOptions = inclusiveWageOptions,
+            inclusiveOvertimePay = inclusiveOvertimePay
         )
     }
 

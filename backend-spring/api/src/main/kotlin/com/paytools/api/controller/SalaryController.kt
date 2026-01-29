@@ -71,7 +71,8 @@ class SalaryController {
             absencePolicy = request.absencePolicy.name,
             weeklyHours = request.employee.scheduledWorkDays * request.employee.dailyWorkHours,
             hoursMode = request.hoursMode.toValue(),
-            insuranceOptions = request.insuranceOptions.toDomain()
+            insuranceOptions = request.insuranceOptions.toDomain(),
+            inclusiveWageOptions = request.inclusiveWageOptions.toDomain()
         )
 
         // Domain Result → Response DTO 변환
@@ -103,6 +104,9 @@ class SalaryController {
             nonTaxableAllowances = MoneyResponse.from(nonTaxableAllowances),
             overtimeAllowances = OvertimeBreakdown.from(result.overtimeResult),
             weeklyHolidayPay = WeeklyHolidayPayBreakdown.from(result.weeklyHolidayResult),
+            inclusiveOvertimePay = if (result.inclusiveWageOptions.enabled) {
+                MoneyResponse.from(result.inclusiveOvertimePay)
+            } else null,
             total = MoneyResponse.from(result.totalGross)
         )
 
@@ -127,6 +131,16 @@ class SalaryController {
         // 근무 요약 생성
         val workSummary = createWorkSummary(request, result)
 
+        // 포괄임금제 옵션 응답
+        val inclusiveWageOptionsResponse = if (result.inclusiveWageOptions.enabled) {
+            InclusiveWageOptionsResponse(
+                enabled = true,
+                fixedOvertimeHourlyRate = result.inclusiveWageOptions.fixedOvertimeHourlyRate,
+                monthlyExpectedOvertimeHours = result.inclusiveWageOptions.monthlyExpectedOvertimeHours.toDouble(),
+                monthlyFixedOvertimePay = MoneyResponse.from(result.inclusiveOvertimePay)
+            )
+        } else null
+
         return SalaryCalculationResponse(
             employeeName = result.employee.name,
             grossBreakdown = grossBreakdown,
@@ -134,6 +148,7 @@ class SalaryController {
             netPay = MoneyResponse.from(result.netPay),
             workSummary = workSummary,
             absenceBreakdown = absenceBreakdown,
+            inclusiveWageOptions = inclusiveWageOptionsResponse,
             warnings = emptyList(), // TODO: 경고 생성기 구현 필요
             calculationMetadata = calculationMetadata
         )

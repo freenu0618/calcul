@@ -17,11 +17,12 @@ import { StepWizard, useWizard, type WizardStep } from '../../components/wizard'
 import { salaryApi, payrollApi, employeeApi } from '../../api';
 import { useAuth } from '../../contexts/AuthContext';
 import type { Employee, Allowance } from '../../types/models';
-import type { SalaryCalculationResponse, WorkShiftRequest, WageType, AbsencePolicy, InsuranceOptions as InsuranceOptionsType } from '../../types/salary';
-import { DEFAULT_INSURANCE_OPTIONS } from '../../types/salary';
+import type { SalaryCalculationResponse, WorkShiftRequest, WageType, AbsencePolicy, InsuranceOptions as InsuranceOptionsType, InclusiveWageOptions as InclusiveWageOptionsType } from '../../types/salary';
+import { DEFAULT_INSURANCE_OPTIONS, DEFAULT_INCLUSIVE_WAGE_OPTIONS } from '../../types/salary';
 import type { PayrollPeriodResponse } from '../../types/payroll';
 import type { EmployeeResponse } from '../../types/employee';
 import InsuranceOptions from '../../components/forms/InsuranceOptions';
+import InclusiveWageOptions from '../../components/forms/InclusiveWageOptions';
 
 const WIZARD_STEPS: WizardStep[] = [
   { id: 'employee', title: '근로자 정보', description: '고용형태, 사업장' },
@@ -56,6 +57,7 @@ export default function CalculatorPage() {
   const [hoursMode, setHoursMode] = useState<'174' | '209'>('174'); // 추가: 시간 계산 방식
   const [contractSalary, setContractSalary] = useState<number>(0); // 계약 월급 (계약총액제)
   const [insuranceOptions, setInsuranceOptions] = useState<InsuranceOptionsType>(DEFAULT_INSURANCE_OPTIONS);
+  const [inclusiveWageOptions, setInclusiveWageOptions] = useState<InclusiveWageOptionsType>(DEFAULT_INCLUSIVE_WAGE_OPTIONS);
   const [result, setResult] = useState<SalaryCalculationResponse | null>(null);
   const [adjustedResult, setAdjustedResult] = useState<AdjustedResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -140,6 +142,7 @@ export default function CalculatorPage() {
         hours_mode: hoursMode,
         insurance_options: insuranceOptions,
         weekly_hours: weeklyHours,
+        inclusive_wage_options: wageType === 'MONTHLY' ? inclusiveWageOptions : undefined,
       });
       setResult(response);
       if (typeof window.gtag !== 'undefined') {
@@ -154,7 +157,7 @@ export default function CalculatorPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [employee, baseSalary, allowances, workShifts, wageType, hourlyWage, calculationMonth, absencePolicy, hoursMode, insuranceOptions]);
+  }, [employee, baseSalary, allowances, workShifts, wageType, hourlyWage, calculationMonth, absencePolicy, hoursMode, insuranceOptions, inclusiveWageOptions]);
 
   const isStep1Valid = employee.name.trim().length > 0;
 
@@ -215,6 +218,14 @@ export default function CalculatorPage() {
               isForigner={employee.is_foreigner}
               visaType={employee.visa_type}
             />
+            {wageType === 'MONTHLY' && (
+              <InclusiveWageOptions
+                options={inclusiveWageOptions}
+                onChange={setInclusiveWageOptions}
+                baseSalary={baseSalary}
+                monthlyHours={Math.round(employee.scheduled_work_days * employee.daily_work_hours * 4.345)}
+              />
+            )}
           </div>
         );
       case 2:

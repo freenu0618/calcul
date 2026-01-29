@@ -26,6 +26,21 @@ export const DEFAULT_INSURANCE_OPTIONS: InsuranceOptions = {
   apply_employment_insurance: true,
 };
 
+/**
+ * 포괄임금제 옵션
+ */
+export interface InclusiveWageOptions {
+  enabled: boolean;                      // 포괄임금제 적용 여부
+  fixed_overtime_hourly_rate: number;    // 연장수당 시간당 고정 금액 (원)
+  monthly_expected_overtime_hours: number; // 월 예정 연장근로시간
+}
+
+export const DEFAULT_INCLUSIVE_WAGE_OPTIONS: InclusiveWageOptions = {
+  enabled: false,
+  fixed_overtime_hourly_rate: 0,
+  monthly_expected_overtime_hours: 0,
+};
+
 export interface MoneyResponse {
   amount: number;
   formatted: string;
@@ -90,6 +105,7 @@ export interface GrossBreakdown {
   non_taxable_allowances: MoneyResponse;
   overtime_allowances: OvertimeBreakdown;
   weekly_holiday_pay: WeeklyHolidayPayBreakdown;
+  inclusive_overtime_pay?: MoneyResponse; // 포괄임금제 고정 연장수당
   total: MoneyResponse;
 }
 
@@ -126,6 +142,7 @@ export interface SalaryCalculationRequest {
   hours_mode: HoursMode;
   insurance_options?: InsuranceOptions;
   weekly_hours?: number; // 주 근무시간 (기본 40)
+  inclusive_wage_options?: InclusiveWageOptions; // 포괄임금제 옵션
 }
 
 export interface WorkSummaryResponse {
@@ -160,6 +177,13 @@ export interface WarningItem {
   detail: string;
 }
 
+export interface InclusiveWageOptionsResponse {
+  enabled: boolean;
+  fixed_overtime_hourly_rate: number;
+  monthly_expected_overtime_hours: number;
+  monthly_fixed_overtime_pay?: MoneyResponse;
+}
+
 export interface SalaryCalculationResponse {
   employee_name: string;
   gross_breakdown: GrossBreakdown;
@@ -167,6 +191,7 @@ export interface SalaryCalculationResponse {
   net_pay: MoneyResponse;
   work_summary?: WorkSummaryResponse;
   absence_breakdown?: AbsenceBreakdown;
+  inclusive_wage_options?: InclusiveWageOptionsResponse;
   warnings: WarningItem[];
   calculation_metadata: {
     calculation_date: string;
