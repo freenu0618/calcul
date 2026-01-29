@@ -96,8 +96,12 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
   const { gross_breakdown, deductions_breakdown, net_pay, warnings } = result;
   const CAPTURE_ID = 'salary-result-capture';
 
-  // 통상시급 및 과세소득 계산
-  const hourlyWage = gross_breakdown.hourly_wage?.amount || Math.round(gross_breakdown.base_salary.amount / 174);
+  // 급여 타입 및 계산 모드 확인
+  const wageType = result.calculation_metadata?.wage_type || 'MONTHLY';
+  const isHourlyWage = wageType === 'HOURLY';
+
+  // 통상시급 (API에서 계산된 값 사용)
+  const hourlyWage = gross_breakdown.hourly_wage?.amount || 0;
   const taxableIncome = gross_breakdown.total.amount - gross_breakdown.non_taxable_allowances.amount;
 
   // 2026년 보험요율
@@ -176,7 +180,9 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
               label="기본급"
               sublabel="Base Pay"
               value={gross_breakdown.base_salary.formatted}
-              formula={`통상시급 = ${gross_breakdown.base_salary.amount.toLocaleString()}원 ÷ 174시간 = ${hourlyWage.toLocaleString()}원/시간`}
+              formula={isHourlyWage
+                ? `시급제: 통상시급 ${hourlyWage.toLocaleString()}원 × 월 근무시간`
+                : `통상시급 = ${gross_breakdown.base_salary.amount.toLocaleString()}원 ÷ 월소정근로시간 = ${hourlyWage.toLocaleString()}원/시간`}
             />
             {gross_breakdown.weekly_holiday_pay.amount.amount > 0 && (
               <DetailRow
@@ -283,12 +289,21 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
             <div className="pt-4 flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  통상시급 계산
+                  통상시급 {isHourlyWage ? '(시급제)' : '계산'}
                 </p>
                 <div className="bg-blue-50 p-3 rounded text-sm text-blue-700 font-mono space-y-1">
-                  <p>통상시급 = 기본급 ÷ 월 소정근로시간</p>
-                  <p>= {gross_breakdown.base_salary.amount.toLocaleString()}원 ÷ 174시간</p>
-                  <p className="font-bold">= {hourlyWage.toLocaleString()}원/시간</p>
+                  {isHourlyWage ? (
+                    <>
+                      <p>시급제 직접 입력</p>
+                      <p className="font-bold">통상시급 = {hourlyWage.toLocaleString()}원/시간</p>
+                    </>
+                  ) : (
+                    <>
+                      <p>통상시급 = 기본급 ÷ 월 소정근로시간</p>
+                      <p>= {gross_breakdown.base_salary.amount.toLocaleString()}원 ÷ 월소정근로시간</p>
+                      <p className="font-bold">= {hourlyWage.toLocaleString()}원/시간</p>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="flex flex-col gap-2">

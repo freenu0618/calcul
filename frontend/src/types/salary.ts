@@ -125,6 +125,7 @@ export interface SalaryCalculationRequest {
   absence_policy: AbsencePolicy;
   hours_mode: HoursMode;
   insurance_options?: InsuranceOptions;
+  weekly_hours?: number; // 주 근무시간 (기본 40)
 }
 
 export interface WorkSummaryResponse {

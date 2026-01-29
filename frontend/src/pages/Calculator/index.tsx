@@ -120,6 +120,9 @@ export default function CalculatorPage() {
     setError(null);
     setAdjustedResult(null); // 새 계산 시 조정 결과 초기화
     try {
+      // 주 근무시간 계산
+      const weeklyHours = employee.scheduled_work_days * employee.daily_work_hours;
+
       const response = await salaryApi.calculateSalary({
         employee,
         base_salary: wageType === 'MONTHLY' ? baseSalary : 0,
@@ -131,6 +134,7 @@ export default function CalculatorPage() {
         absence_policy: absencePolicy,
         hours_mode: hoursMode,
         insurance_options: insuranceOptions,
+        weekly_hours: weeklyHours,
       });
       setResult(response);
       if (typeof window.gtag !== 'undefined') {
