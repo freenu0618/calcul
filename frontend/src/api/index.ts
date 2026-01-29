@@ -5,3 +5,4 @@ export * from './client';
 export * from './salaryApi';
 export * from './payrollApi';
 export * from './employeeApi';
+export * from './simulationApi';
