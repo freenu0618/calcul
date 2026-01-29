@@ -33,7 +33,7 @@ export async function compareStructures(
   );
 
   // API 응답 camelCase → snake_case 변환
-  return transformCompareResponse(response);
+  return transformCompareResponse(response.data);
 }
 
 /**
@@ -56,7 +56,7 @@ export async function simulateSingle(
     apiRequest
   );
 
-  return transformPlanResponse(response);
+  return transformPlanResponse(response.data);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
