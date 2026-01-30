@@ -96,7 +96,7 @@ class WeeklyHolidayPayCalculator {
         val effectiveWeeks = WEEKS_PER_MONTH.multiply(qualifyingRatio)
         val monthlyHolidayPay = (hourlyWage * weeklyHolidayHours * effectiveWeeks).roundToWon()
 
-        val calculation = "(${cappedWeeklyHours.setScale(0)}h/40h)×8 = ${weeklyHolidayHours.setScale(1)}h × " +
+        val calculation = "(${cappedWeeklyHours.setScale(0, java.math.RoundingMode.HALF_UP)}h/40h)×8 = ${weeklyHolidayHours.setScale(1, java.math.RoundingMode.HALF_UP)}h × " +
             "${hourlyWage.amount.toInt()}원 × ${effectiveWeeks.setScale(3, java.math.RoundingMode.HALF_UP)}주"
 
         return WeeklyHolidayPayResult(

@@ -212,7 +212,7 @@ class SalarySimulator {
 
         // 계산식 상세
         val calculation = SimulationCalculation(
-            hourlyWageFormula = "${baseSalary.format()} ÷ ${monthlyHours.setScale(0)}시간 = ${hourlyWage.format()}",
+            hourlyWageFormula = "${baseSalary.format()} ÷ ${monthlyHours.setScale(0, java.math.RoundingMode.HALF_UP)}시간 = ${hourlyWage.format()}",
             overtimeFormula = "${hourlyWage.format()} × ${expectedOvertimeHours}시간 × 1.5 = ${overtimePay.format()}",
             severanceFormula = "기본급 ${baseSalary.format()} (1년 근속 시)",
             annualCostFormula = "(${monthlyWithOvertime.format()} × 12) + ${severanceProvision.format()} = ${annualEmployerCost.format()}"
