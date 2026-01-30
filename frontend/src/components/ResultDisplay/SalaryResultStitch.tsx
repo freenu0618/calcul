@@ -8,6 +8,7 @@
 import { useState } from 'react';
 import type { SalaryCalculationResponse } from '../../types/salary';
 import { ShareButtons } from '../common/ShareButtons';
+import { DonutChart, type DonutChartData } from '../charts';
 
 interface SalaryResultStitchProps {
   result: SalaryCalculationResponse;
@@ -92,6 +93,16 @@ function DetailRow({ label, value, sublabel, formula }: { label: string; value: 
   );
 }
 
+// 차트 색상 팔레트
+const CHART_COLORS = {
+  baseSalary: '#3b82f6',    // blue-500
+  weeklyHoliday: '#10b981', // emerald-500
+  overtime: '#8b5cf6',      // violet-500
+  allowance: '#06b6d4',     // cyan-500
+  deduction: '#ef4444',     // red-500
+  netPay: '#22c55e',        // green-500
+};
+
 export default function SalaryResultStitch({ result }: SalaryResultStitchProps) {
   const { gross_breakdown, deductions_breakdown, net_pay, warnings } = result;
   const CAPTURE_ID = 'salary-result-capture';
@@ -113,6 +124,25 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
   payDate.setDate(10);
   const payDateStr = payDate.toISOString().slice(0, 10).replace(/-/g, '.');
 
+  // 도넛 차트 데이터
+  const grossChartData: DonutChartData[] = [
+    { name: '기본급', value: gross_breakdown.base_salary.amount, color: CHART_COLORS.baseSalary },
+    ...(gross_breakdown.weekly_holiday_pay.amount.amount > 0
+      ? [{ name: '주휴수당', value: gross_breakdown.weekly_holiday_pay.amount.amount, color: CHART_COLORS.weeklyHoliday }]
+      : []),
+    ...(gross_breakdown.overtime_allowances.total.amount > 0
+      ? [{ name: '연장/야간/휴일', value: gross_breakdown.overtime_allowances.total.amount, color: CHART_COLORS.overtime }]
+      : []),
+    ...((gross_breakdown.taxable_allowances.amount + gross_breakdown.non_taxable_allowances.amount) > 0
+      ? [{ name: '기타수당', value: gross_breakdown.taxable_allowances.amount + gross_breakdown.non_taxable_allowances.amount, color: CHART_COLORS.allowance }]
+      : []),
+  ];
+
+  const netVsDeductionData: DonutChartData[] = [
+    { name: '실수령액', value: net_pay.amount, color: CHART_COLORS.netPay },
+    { name: '공제합계', value: deductions_breakdown.total.amount, color: CHART_COLORS.deduction },
+  ];
+
   return (
     <div className="space-y-4">
       <div id={CAPTURE_ID} className="space-y-4">
@@ -133,24 +163,37 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
           <p className="text-gray-500 text-sm">계산 결과는 참고용이며 법적 효력을 갖지 않습니다.</p>
         </div>
 
-        {/* Hero Stats Card - 실수령액 */}
-        <div className="bg-white rounded-xl p-6 sm:p-8 shadow-sm border border-gray-200 flex flex-col items-center sm:items-start gap-2 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-primary/10 transition-all duration-500" />
-          <p className="text-gray-500 text-sm font-medium uppercase tracking-wider">
-            이번 달 실수령액 (Net Pay)
-          </p>
-          <div className="flex items-baseline gap-2 z-10">
-            <h2 className="text-primary text-4xl sm:text-5xl font-bold tracking-tight">
-              {net_pay.formatted}
-            </h2>
-          </div>
-          <div className="w-full h-px bg-gray-100 my-4" />
-          <div className="flex justify-between w-full text-sm text-gray-600">
-            <span>{result.employee_name} | 지급예정일: {payDateStr}</span>
-            <span className="flex items-center gap-1 text-green-600 font-medium">
-              <Icon name="verified" className="text-[16px]" />
-              2026년 법령 적용
-            </span>
+        {/* Hero Stats Card - 실수령액 + 도넛 차트 */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-6 sm:p-8 shadow-sm text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-10 -mt-10 blur-2xl" />
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+            {/* 실수령액 텍스트 */}
+            <div className="text-center lg:text-left z-10">
+              <p className="text-blue-100 text-sm font-medium uppercase tracking-wider mb-2">
+                이번 달 실수령액 (Net Pay)
+              </p>
+              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
+                {net_pay.formatted}
+              </h2>
+              <div className="flex items-center gap-2 text-sm text-blue-100">
+                <span>{result.employee_name} | 지급예정일: {payDateStr}</span>
+              </div>
+              <div className="flex items-center gap-1 text-green-300 font-medium text-sm mt-2">
+                <Icon name="verified" className="text-[16px]" />
+                2026년 법령 적용
+              </div>
+            </div>
+
+            {/* 실수령 vs 공제 도넛 차트 */}
+            <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+              <DonutChart
+                data={netVsDeductionData}
+                centerLabel="실수령"
+                centerValue={`${((net_pay.amount / gross_breakdown.total.amount) * 100).toFixed(1)}%`}
+                size="sm"
+                darkMode
+              />
+            </div>
           </div>
         </div>
 
@@ -164,6 +207,22 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
             </div>
           </div>
         )}
+
+        {/* 지급 구성 차트 */}
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <h3 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
+            <Icon name="pie_chart" className="text-primary text-[20px]" />
+            지급 구성
+          </h3>
+          <div className="flex justify-center">
+            <DonutChart
+              data={grossChartData}
+              centerLabel="지급총액"
+              centerValue={gross_breakdown.total.formatted}
+              size="md"
+            />
+          </div>
+        </div>
 
         {/* Accordion Sections */}
         <div className="flex flex-col gap-3">
