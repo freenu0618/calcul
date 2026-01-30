@@ -30,28 +30,31 @@ export default function Tooltip({
 
     const tooltip = tooltipRef.current.getBoundingClientRect();
     const trigger = triggerRef.current.getBoundingClientRect();
-    const padding = 8; // 화면 가장자리 여백
+    const padding = 8;
     const style: React.CSSProperties = {};
-
-    // 화면 너비 기준 최대 너비 조정 (모바일 대응)
     const screenWidth = window.innerWidth;
     const effectiveMaxWidth = Math.min(maxWidth, screenWidth - padding * 2);
     style.maxWidth = effectiveMaxWidth;
+    style.minWidth = Math.min(200, effectiveMaxWidth); // 최소 너비 보장
 
-    // 좌우 경계 체크
+    // left/right 포지션: 좌우 경계 체크 스킵 (세로 표시 방지)
+    if (position === 'left' || position === 'right') {
+      setAdjustedStyle(style);
+      return;
+    }
+
+    // top/bottom 포지션: 좌우 경계 체크
     if (tooltip.left < padding) {
-      // 왼쪽으로 벗어남 → 왼쪽 정렬
       style.left = -trigger.left + padding;
       style.transform = 'translateX(0)';
     } else if (tooltip.right > screenWidth - padding) {
-      // 오른쪽으로 벗어남 → 오른쪽 정렬
       style.left = 'auto';
       style.right = -(screenWidth - trigger.right - padding);
       style.transform = 'translateX(0)';
     }
 
     setAdjustedStyle(style);
-  }, [maxWidth]);
+  }, [maxWidth, position]);
 
   useEffect(() => {
     if (isVisible) {

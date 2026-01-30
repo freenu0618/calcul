@@ -112,12 +112,14 @@ export default function InclusiveWageOptions({
               <input
                 type="number"
                 value={options.monthly_expected_overtime_hours || ''}
-                onChange={(e) => handleChange('monthly_expected_overtime_hours', parseInt(e.target.value) || 0)}
+                onChange={(e) => handleChange('monthly_expected_overtime_hours', Math.min(52, parseInt(e.target.value) || 0))}
                 placeholder="20"
+                min="0"
+                max="52"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
               <p className="mt-1 text-xs text-gray-500">
-                계약서상 예정 연장시간
+                계약서상 예정 연장시간 (최대 52시간)
               </p>
             </div>
           </div>
