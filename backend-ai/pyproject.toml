@@ -1,0 +1,57 @@
+[tool.poetry]
+name = "paytools-ai"
+version = "0.1.0"
+description = "AI Labor Law Chatbot for PayTools"
+authors = ["PayTools Team"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+# LangChain/LangGraph
+langchain = "^0.3.0"
+langgraph = "^0.2.0"
+langchain-google-genai = "^2.0.0"
+langchain-groq = "^0.2.0"
+langchain-openai = "^0.3.0"
+
+# Embedding & Vector
+sentence-transformers = "^3.0.0"
+pgvector = "^0.3.0"
+
+# FastAPI & Streaming
+fastapi = "^0.115.0"
+uvicorn = {extras = ["standard"], version = "^0.32.0"}
+sse-starlette = "^2.2.0"
+
+# Database
+sqlalchemy = "^2.0.0"
+asyncpg = "^0.30.0"
+alembic = "^1.14.0"
+psycopg2-binary = "^2.9.0"
+
+# Utilities
+tiktoken = "^0.8.0"
+beautifulsoup4 = "^4.12.0"
+httpx = "^0.28.0"
+python-dotenv = "^1.0.0"
+pydantic-settings = "^2.6.0"
+tenacity = "^9.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+pytest-asyncio = "^0.24.0"
+black = "^24.0.0"
+ruff = "^0.6.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "I", "N", "W"]

@@ -11,6 +11,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/common/ScrollToTop';
 import Navigation from './components/layout/Navigation';
 import Footer from './components/layout/Footer';
+import { ChatWidget } from './components/Chat';
 
 // 핵심 페이지는 즉시 로드
 import LandingPage from './pages/Landing';
@@ -144,6 +145,7 @@ function App() {
                 </Suspense>
               </main>
               <Footer />
+              <ChatWidget />
             </div>
           </Router>
         </AuthProvider>
