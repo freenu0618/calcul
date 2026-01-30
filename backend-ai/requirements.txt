@@ -5,8 +5,7 @@ langchain-google-genai>=2.0.0
 langchain-groq>=0.2.0
 langchain-openai>=0.3.0
 
-# Embedding & Vector
-sentence-transformers>=3.0.0
+# Vector DB (임베딩은 Phase 6.2에서 추가)
 pgvector>=0.3.0
 
 # FastAPI & Streaming
