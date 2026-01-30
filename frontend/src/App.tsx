@@ -14,10 +14,13 @@ import Footer from './components/layout/Footer';
 import { ChatWidget } from './components/Chat';
 
 // 핵심 페이지는 즉시 로드
-import LandingPage from './pages/Landing';
+import AIChatPage from './pages/AIChat';
 import CalculatorPage from './pages/Calculator';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
+
+// 랜딩 페이지는 Lazy Loading
+const LandingPage = lazy(() => import('./pages/Landing'));
 
 // 나머지 페이지는 Lazy Loading
 const DashboardPage = lazy(() => import('./pages/Dashboard'));
@@ -63,9 +66,10 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
-// GA4 페이지뷰 추적 컴포넌트
-function PageViewTracker() {
+// GA4 페이지뷰 추적 + 채팅 위젯 표시 여부
+function AppContent() {
   const location = useLocation();
+  const isAIChatPage = location.pathname === '/';
 
   useEffect(() => {
     if (typeof window.gtag !== 'undefined') {
@@ -75,7 +79,73 @@ function PageViewTracker() {
     }
   }, [location]);
 
-  return null;
+  return (
+    <>
+      <ScrollToTop />
+      <div className="flex flex-col min-h-screen">
+        {!isAIChatPage && <Navigation />}
+        <main className="flex-1">
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              {/* 인증 페이지 */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/oauth/callback" element={<OAuthCallback />} />
+
+              {/* 메인 페이지 - AI 채팅 */}
+              <Route path="/" element={<AIChatPage />} />
+              <Route path="/landing" element={<LandingPage />} />
+              <Route path="/calculator" element={<CalculatorPage />} />
+
+              {/* Lazy Loading 페이지 */}
+              <Route path="/reverse-calculator" element={<ReverseCalculator />} />
+              <Route path="/simulation" element={<SalarySimulation />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+
+              {/* 가이드 페이지 */}
+              <Route path="/guide" element={<GuidePage />} />
+              <Route path="/guide/insurance" element={<InsuranceGuide />} />
+              <Route path="/guide/tax" element={<TaxGuide />} />
+              <Route path="/guide/overtime" element={<OvertimeGuide />} />
+
+              {/* FAQ */}
+              <Route path="/faq" element={<FAQ />} />
+
+              {/* 계산 사례 */}
+              <Route path="/examples" element={<ExamplesPage />} />
+              <Route path="/examples/fulltime" element={<FulltimeExample />} />
+              <Route path="/examples/parttime" element={<ParttimeExample />} />
+              <Route path="/examples/shift-work" element={<ShiftWorkExample />} />
+
+              {/* 법률 정보 */}
+              <Route path="/legal" element={<Legal />} />
+
+              {/* 블로그 */}
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/blog/:postId" element={<BlogPost />} />
+
+              {/* 직원 관리 (인증 필요) */}
+              <Route path="/employees" element={<PrivateRoute><EmployeeList /></PrivateRoute>} />
+              <Route path="/employees/new" element={<PrivateRoute><EmployeeForm /></PrivateRoute>} />
+              <Route path="/employees/:id/edit" element={<PrivateRoute><EmployeeForm /></PrivateRoute>} />
+
+              {/* 급여대장 (인증 필요) */}
+              <Route path="/payroll" element={<PrivateRoute><PayrollList /></PrivateRoute>} />
+              <Route path="/payroll/:id" element={<PrivateRoute><PayrollDetail /></PrivateRoute>} />
+
+              {/* 기타 페이지 */}
+              <Route path="/about" element={<About />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/contact" element={<Contact />} />
+            </Routes>
+          </Suspense>
+        </main>
+        {!isAIChatPage && <Footer />}
+        {!isAIChatPage && <ChatWidget />}
+      </div>
+    </>
+  );
 }
 
 function App() {
@@ -84,69 +154,7 @@ function App() {
       <HelmetProvider>
         <AuthProvider>
           <Router>
-            <ScrollToTop />
-            <PageViewTracker />
-            <div className="flex flex-col min-h-screen">
-              <Navigation />
-              <main className="flex-1">
-                <Suspense fallback={<PageLoader />}>
-                  <Routes>
-                    {/* 인증 페이지 */}
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/oauth/callback" element={<OAuthCallback />} />
-
-                    {/* 메인 페이지 (즉시 로드) */}
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/calculator" element={<CalculatorPage />} />
-
-                    {/* Lazy Loading 페이지 */}
-                    <Route path="/reverse-calculator" element={<ReverseCalculator />} />
-                    <Route path="/simulation" element={<SalarySimulation />} />
-                    <Route path="/dashboard" element={<DashboardPage />} />
-
-                    {/* 가이드 페이지 */}
-                    <Route path="/guide" element={<GuidePage />} />
-                    <Route path="/guide/insurance" element={<InsuranceGuide />} />
-                    <Route path="/guide/tax" element={<TaxGuide />} />
-                    <Route path="/guide/overtime" element={<OvertimeGuide />} />
-
-                    {/* FAQ */}
-                    <Route path="/faq" element={<FAQ />} />
-
-                    {/* 계산 사례 */}
-                    <Route path="/examples" element={<ExamplesPage />} />
-                    <Route path="/examples/fulltime" element={<FulltimeExample />} />
-                    <Route path="/examples/parttime" element={<ParttimeExample />} />
-                    <Route path="/examples/shift-work" element={<ShiftWorkExample />} />
-
-                    {/* 법률 정보 */}
-                    <Route path="/legal" element={<Legal />} />
-
-                    {/* 블로그 */}
-                    <Route path="/blog" element={<BlogPage />} />
-                    <Route path="/blog/:postId" element={<BlogPost />} />
-
-                    {/* 직원 관리 (인증 필요) */}
-                    <Route path="/employees" element={<PrivateRoute><EmployeeList /></PrivateRoute>} />
-                    <Route path="/employees/new" element={<PrivateRoute><EmployeeForm /></PrivateRoute>} />
-                    <Route path="/employees/:id/edit" element={<PrivateRoute><EmployeeForm /></PrivateRoute>} />
-
-                    {/* 급여대장 (인증 필요) */}
-                    <Route path="/payroll" element={<PrivateRoute><PayrollList /></PrivateRoute>} />
-                    <Route path="/payroll/:id" element={<PrivateRoute><PayrollDetail /></PrivateRoute>} />
-
-                    {/* 기타 페이지 */}
-                    <Route path="/about" element={<About />} />
-                    <Route path="/privacy" element={<Privacy />} />
-                    <Route path="/terms" element={<Terms />} />
-                    <Route path="/contact" element={<Contact />} />
-                  </Routes>
-                </Suspense>
-              </main>
-              <Footer />
-              <ChatWidget />
-            </div>
+            <AppContent />
           </Router>
         </AuthProvider>
       </HelmetProvider>
