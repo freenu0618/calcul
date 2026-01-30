@@ -11,52 +11,59 @@ const QUICK_QUESTIONS = [
   { icon: '🏥', text: '4대보험 공제율' },
 ];
 
-/** 간단한 마크다운 포맷팅 */
-function formatMessage(text: string) {
-  // 줄바꿈 처리
-  const lines = text.split('\n');
+/** 메시지를 본문과 고정멘트로 분리 */
+function splitMessage(text: string): { body: string; disclaimer: string | null } {
+  const disclaimerMatch = text.match(/※\s*.+$/);
+  if (disclaimerMatch) {
+    return {
+      body: text.slice(0, disclaimerMatch.index).trim(),
+      disclaimer: disclaimerMatch[0],
+    };
+  }
+  return { body: text, disclaimer: null };
+}
 
-  return lines.map((line, i) => {
+/** 문단 포맷팅 */
+function formatBody(text: string) {
+  // 마침표+공백 또는 줄바꿈을 기준으로 문단 분리
+  const paragraphs = text
+    .split(/(?<=\.)\s+/)
+    .filter(p => p.trim());
+
+  return paragraphs.map((para, i) => {
     // 번호 목록 (1. 2. 3.)
-    const listMatch = line.match(/^(\d+)\.\s*\*\*(.+?)\*\*:?\s*(.*)$/);
+    const listMatch = para.match(/^(\d+)\.\s*\*\*(.+?)\*\*:?\s*(.*)$/);
     if (listMatch) {
       return (
         <div key={i} className="mb-2">
-          <span className="font-bold text-primary">{listMatch[1]}. {listMatch[2]}</span>
+          <span className="font-semibold text-primary">{listMatch[1]}. {listMatch[2]}</span>
           {listMatch[3] && <span className="text-gray-600">: {listMatch[3]}</span>}
         </div>
       );
     }
 
-    // 굵은 텍스트만 있는 경우
-    const boldMatch = line.match(/^\*\*(.+?)\*\*:?\s*(.*)$/);
-    if (boldMatch) {
-      return (
-        <div key={i} className="mb-1">
-          <span className="font-bold">{boldMatch[1]}</span>
-          {boldMatch[2] && <span>: {boldMatch[2]}</span>}
-        </div>
-      );
-    }
-
     // - 로 시작하는 목록
-    if (line.startsWith('- ')) {
-      const content = line.slice(2).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+    if (para.startsWith('- ')) {
       return (
-        <div key={i} className="ml-2 mb-1 flex gap-1">
+        <div key={i} className="ml-3 mb-1.5 flex gap-2">
           <span className="text-primary">•</span>
-          <span dangerouslySetInnerHTML={{ __html: content }} />
+          <span>{para.slice(2)}</span>
         </div>
       );
     }
 
-    // 일반 텍스트 (굵은 글씨 처리)
-    if (line.trim()) {
-      const formatted = line.replace(/\*\*(.+?)\*\*/g, '<b class="text-gray-800">$1</b>');
-      return <p key={i} className="mb-1" dangerouslySetInnerHTML={{ __html: formatted }} />;
-    }
+    // 일반 문단
+    const formatted = para
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/`(.+?)`/g, '<code class="bg-gray-100 px-1 rounded text-primary">$1</code>');
 
-    return <br key={i} />;
+    return (
+      <p
+        key={i}
+        className="mb-2 leading-relaxed"
+        dangerouslySetInnerHTML={{ __html: formatted }}
+      />
+    );
   });
 }
 
@@ -68,7 +75,6 @@ export default function HeroChatBox() {
 
   const hasMessages = messages.length > 0;
 
-  // 채팅 박스 내부만 스크롤 (전체 페이지 스크롤 방지)
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
@@ -107,7 +113,7 @@ export default function HeroChatBox() {
         </div>
 
         {/* Messages Area */}
-        <div ref={messagesContainerRef} className="h-64 overflow-y-auto p-4 bg-gray-50">
+        <div ref={messagesContainerRef} className="h-72 overflow-y-auto p-4 bg-gray-50">
           {!hasMessages ? (
             <div className="h-full flex flex-col items-center justify-center text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-3">
@@ -118,22 +124,37 @@ export default function HeroChatBox() {
             </div>
           ) : (
             <div className="space-y-3">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm ${
-                      msg.role === 'user'
-                        ? 'bg-primary text-white rounded-br-md'
-                        : 'bg-white border border-gray-200 text-gray-700 rounded-bl-md'
-                    }`}
-                  >
-                    {msg.role === 'user' ? msg.content : formatMessage(msg.content)}
+              {messages.map((msg) => {
+                if (msg.role === 'user') {
+                  return (
+                    <div key={msg.id} className="flex justify-end">
+                      <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-br-md text-sm bg-primary text-white">
+                        {msg.content}
+                      </div>
+                    </div>
+                  );
+                }
+
+                // AI 응답: 본문과 고정멘트 분리
+                const { body, disclaimer } = splitMessage(msg.content);
+                return (
+                  <div key={msg.id} className="flex justify-start">
+                    <div className="max-w-[90%] space-y-2">
+                      {/* 본문 */}
+                      <div className="px-4 py-3 rounded-2xl rounded-bl-md text-sm bg-white border border-gray-200 text-gray-700">
+                        {formatBody(body)}
+                      </div>
+                      {/* 고정 멘트 */}
+                      {disclaimer && (
+                        <div className="px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-700 flex items-start gap-1.5">
+                          <span className="text-amber-500">⚠️</span>
+                          <span>{disclaimer.replace('※', '').trim()}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
               {isLoading && (
                 <div className="flex justify-start">
                   <div className="bg-white border border-gray-200 px-4 py-2.5 rounded-2xl rounded-bl-md">

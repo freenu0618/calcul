@@ -1,5 +1,5 @@
 /**
- * 채팅 위젯 (플로팅 버튼 + 채팅창)
+ * 채팅 위젯 (플로팅 버튼 + 큰 모달)
  */
 
 import { useState } from 'react';
@@ -13,24 +13,30 @@ export default function ChatWidget() {
       {/* 플로팅 버튼 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
-        aria-label={isOpen ? '채팅 닫기' : '채팅 열기'}
+        className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-r from-primary to-blue-600 hover:from-primary-600 hover:to-blue-700 text-white rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-2xl"
+        aria-label={isOpen ? '채팅 닫기' : 'AI 상담 열기'}
       >
         {isOpen ? (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         ) : (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
+          <span className="text-2xl">🤖</span>
         )}
       </button>
 
-      {/* 채팅창 */}
+      {/* 배경 오버레이 */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-96 h-[32rem] max-h-[80vh] bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
-          <ChatWindow onClose={() => setIsOpen(false)} />
+        <div
+          className="fixed inset-0 bg-black/30 z-40 backdrop-blur-sm"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* 채팅 모달 - 크게 */}
+      {isOpen && (
+        <div className="fixed inset-4 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[480px] sm:h-[600px] md:w-[540px] md:h-[680px] z-50 bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <ChatWindow onClose={() => setIsOpen(false)} isModal />
         </div>
       )}
     </>

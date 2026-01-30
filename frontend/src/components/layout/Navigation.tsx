@@ -5,10 +5,12 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import ChatWindow from '../Chat/ChatWindow';
 
 const Navigation = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
 
   // 랜딩페이지 여부 확인 (fixed 네비게이션용)
@@ -66,6 +68,15 @@ const Navigation = () => {
                 {item.label}
               </Link>
             ))}
+
+            {/* AI 채팅 버튼 */}
+            <button
+              onClick={() => setIsChatOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium bg-gradient-to-r from-primary to-blue-600 text-white hover:from-primary-600 hover:to-blue-700 transition-all"
+            >
+              <span>🤖</span>
+              <span>AI 상담</span>
+            </button>
 
             {/* 인증 상태에 따른 버튼 */}
             {isAuthenticated ? (
@@ -151,6 +162,15 @@ const Navigation = () => {
               </Link>
             ))}
 
+            {/* 모바일 AI 채팅 버튼 */}
+            <button
+              onClick={() => { setIsChatOpen(true); setIsMenuOpen(false); }}
+              className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-base font-medium bg-gradient-to-r from-primary to-blue-600 text-white"
+            >
+              <span>🤖</span>
+              <span>AI 상담</span>
+            </button>
+
             {/* 모바일 인증 버튼 */}
             <div className="border-t border-gray-200 pt-2 mt-2">
               {isAuthenticated ? (
@@ -186,6 +206,19 @@ const Navigation = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* AI 채팅 모달 */}
+      {isChatOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/30 z-[60] backdrop-blur-sm"
+            onClick={() => setIsChatOpen(false)}
+          />
+          <div className="fixed inset-4 sm:inset-auto sm:top-20 sm:right-6 sm:w-[480px] sm:h-[600px] md:w-[540px] md:h-[680px] z-[70] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
+            <ChatWindow onClose={() => setIsChatOpen(false)} isModal />
+          </div>
+        </>
       )}
     </nav>
   );
