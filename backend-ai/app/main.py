@@ -17,8 +17,12 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """앱 시작/종료 이벤트"""
-    # 시작 시 DB 초기화
-    await init_db()
+    # 시작 시 DB 초기화 (실패해도 앱은 시작)
+    try:
+        await init_db()
+    except Exception as e:
+        import logging
+        logging.warning(f"DB 초기화 실패 (서비스는 계속): {e}")
     yield
     # 종료 시 정리 작업
 
