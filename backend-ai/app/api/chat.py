@@ -18,6 +18,21 @@ from app.services.rate_limiter import get_rate_limiter
 router = APIRouter()
 
 
+@router.options("/stream")
+@router.options("/message")
+async def options_handler():
+    """CORS preflight 요청 처리"""
+    from fastapi.responses import Response
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        }
+    )
+
+
 class ChatRequest(BaseModel):
     message: str
     session_id: Optional[str] = None
