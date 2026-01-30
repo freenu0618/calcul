@@ -19,7 +19,7 @@ async def get_agent_response(
     session_id: Optional[str] = None,
 ) -> AsyncGenerator[dict, None]:
     """
-    에이전트 응답 스트리밍
+    에이전트 응답 스트리밍 (한글 토큰 버퍼링)
 
     Args:
         message: 사용자 메시지
@@ -36,10 +36,22 @@ async def get_agent_response(
             HumanMessage(content=message),
         ]
 
-        # 스트리밍 응답
+        # 스트리밍 응답 (토큰 버퍼링으로 한글 띄어쓰기 문제 해결)
+        buffer = ""
+        flush_chars = {" ", ".", ",", "!", "?", "\n", ":", ";", ")", "]", "}", "※"}
+
         async for chunk in tiered_llm.astream(messages):
             if hasattr(chunk, "content") and chunk.content:
-                yield {"type": "token", "data": chunk.content}
+                buffer += chunk.content
+
+                # 문장 부호나 공백이 나오면 버퍼 flush
+                if buffer and buffer[-1] in flush_chars:
+                    yield {"type": "token", "data": buffer}
+                    buffer = ""
+
+        # 남은 버퍼 전송
+        if buffer:
+            yield {"type": "token", "data": buffer}
 
         yield {"type": "done", "data": ""}
 
