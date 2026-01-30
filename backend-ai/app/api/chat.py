@@ -103,7 +103,15 @@ async def chat_stream(
         except Exception as e:
             yield {"event": "error", "data": str(e)}
 
-    return EventSourceResponse(event_generator())
+    return EventSourceResponse(
+        event_generator(),
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*",
+        }
+    )
 
 
 @router.post("/message")

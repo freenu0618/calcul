@@ -34,16 +34,11 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS 설정
+# CORS 설정 - 모든 origin 허용 (SSE 스트리밍 지원)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",  # 로컬 개발
-        "http://localhost:5174",
-        "https://paytools.work",  # 프로덕션
-        "https://www.paytools.work",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,  # "*" 사용 시 False 필수
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
