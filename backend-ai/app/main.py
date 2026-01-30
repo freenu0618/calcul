@@ -39,11 +39,14 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",  # 로컬 개발
+        "http://localhost:5174",
         "https://paytools.work",  # 프로덕션
+        "https://www.paytools.work",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # 라우터 등록
