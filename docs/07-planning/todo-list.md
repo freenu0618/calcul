@@ -25,8 +25,8 @@
 | **Phase 4 (마케팅)** | **4** | **4** | **100%** | **✅ 완료** |
 | **Phase 5 (급여대장)** | **3** | **2** | **67%** | **✅ 핵심 완료** |
 | **Phase 6 (AI 챗봇)** | **6** | **6** | **100%** | **✅ 완료** |
-| Phase 7 (요금제) | 2 | 0 | 0% | Spring |
-| **전체** | **53** | **44** | **83%** | |
+| **Phase 7 (요금제+결제)** | **6** | **0** | **0%** | Polar + Resend |
+| **전체** | **57** | **44** | **77%** | |
 
 ---
 
@@ -924,31 +924,94 @@ react-markdown, remark-gfm
 
 ---
 
-## Phase 7: 요금제 및 사용량 제한 (P3)
+## Phase 7: 요금제 및 결제 시스템 (P3)
 
-> 목표: 무료/유료 구분 적용
+> 목표: 무료/유료 구분 적용 + Polar 결제 연동
+> **결제 서비스**: [Polar](https://polar.sh/) (MoR, 4%+$0.40, 사업자 불필요)
+> **이메일 서비스**: [Resend](https://resend.com/) (무료 3,000개/월)
 
-### 7.1 무료 요금제 제한 구현
+### 요금제 정책 (확정)
+
+| 플랜 | 월 가격 | 직원 수 | AI 상담 | 급여계산 | PDF |
+|------|---------|---------|---------|----------|-----|
+| **Free** | ₩0 | 3명 | 10회/월 | 5회/월 | ❌ |
+| **Basic** | ₩14,900 | 10명 | 30회/월 | 무제한 | ✅ |
+| **Pro** | ₩29,900 | 30명 | 무제한 | 무제한 | ✅ |
+| **Enterprise** | 수동 | 무제한 | 무제한 | 무제한 | ✅ |
+
+### 7.1 DB 스키마
 - **상태**: ⬜ 대기
-- **우선순위**: 낮음
+- **우선순위**: 높음
 - **설명**:
-  - 근무자 등록: **최대 2명**
-  - AI 상담: **월 5회**
-  - 3명째 등록 시도 시 업그레이드 안내 모달
-  - AI 상담 5회 초과 시 잔여 횟수 표시 + 차단
+  - users 테이블 확장 (subscription_tier, subscription_end, polar_customer_id)
+  - subscriptions 테이블 (결제 이력)
+  - usage_tracking 테이블 (AI/급여계산 사용량)
 - **관련 파일**:
-  - `backend/app/api/middleware/plan_limiter.py` (신규)
-  - `frontend/src/components/common/UpgradeModal.tsx` (신규)
+  - `backend-spring/infrastructure/.../V4__add_subscription_tables.sql` (신규)
 
-### 7.2 유료 요금제 정의
+### 7.2 백엔드 - 제한 로직
 - **상태**: ⬜ 대기
-- **우선순위**: 낮음
+- **우선순위**: 높음
 - **설명**:
-  - Pro: 근무자 20명, AI 상담 100회/월
-  - Enterprise: 무제한
-  - 결제 시스템 연동 (추후)
+  - User 엔티티에 subscriptionTier 필드 추가
+  - 직원 등록 시 플랜 한도 체크
+  - 사용량 추적 서비스
 - **관련 파일**:
-  - `backend/app/core/plan_config.py` (신규)
+  - `domain/entity/SubscriptionTier.kt` (신규)
+  - `domain/entity/User.kt` (수정)
+  - `api/service/UsageService.kt` (신규)
+  - `api/config/PlanLimits.kt` (신규)
+
+### 7.3 백엔드 - Polar 연동
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **설명**:
+  - Checkout URL 생성 API
+  - Polar 웹훅 처리 (구독 생성/갱신/취소)
+  - 결제 상태 동기화
+- **API 엔드포인트**:
+  - `GET /api/v1/subscription/me` - 구독 상태 조회
+  - `POST /api/v1/subscription/checkout` - Checkout URL 생성
+  - `POST /api/v1/subscription/webhook` - Polar 웹훅
+  - `GET /api/v1/subscription/usage` - 사용량 조회
+- **관련 파일**:
+  - `api/controller/SubscriptionController.kt` (신규)
+  - `api/service/SubscriptionService.kt` (신규)
+  - `api/service/PolarClient.kt` (신규)
+
+### 7.4 프론트엔드
+- **상태**: ⬜ 대기
+- **우선순위**: 높음
+- **설명**:
+  - 요금제 페이지 (/pricing)
+  - 업그레이드 모달 (제한 도달 시)
+  - 구독 관리 페이지
+- **관련 파일**:
+  - `src/api/subscriptionApi.ts` (신규)
+  - `src/pages/Pricing/index.tsx` (신규)
+  - `src/components/UpgradeModal.tsx` (신규)
+  - `src/contexts/AuthContext.tsx` (수정)
+
+### 7.5 이메일 발송 (Resend)
+- **상태**: ⬜ 대기
+- **우선순위**: 중간
+- **설명**:
+  - 결제 완료 영수증
+  - 구독 갱신 7일 전 알림
+  - 결제 실패 알림
+- **관련 파일**:
+  - `infrastructure/email/ResendEmailService.kt` (신규)
+  - `api/scheduler/SubscriptionScheduler.kt` (신규)
+
+### 7.6 AI 사용량 DB 연동
+- **상태**: ⬜ 대기
+- **우선순위**: 중간
+- **설명**:
+  - Rate limiter를 메모리 → DB 기반으로 변경
+  - Spring API 호출하여 사용량 체크
+- **관련 파일**:
+  - `backend-ai/app/services/rate_limiter.py` (수정)
+  - `backend-ai/app/api/chat.py` (수정)
 
 ---
 
@@ -1138,8 +1201,9 @@ Week 16 (Phase 7 - 요금제):
 | 2026-01-29 | **Phase 4 완료**: AdSense Auto Ads, SEO 최적화 (sitemap/robots), 블로그 콘텐츠 2개 추가, Code Splitting (17% 번들 감소) |
 | 2026-01-29 | **급여 계산 버그 수정 (v1.3.0)**: 5인 미만 174시간 초과분 누락 해결, 월간 템플릿 휴일근로 자동 설정 버그 수정, Tooltip 모바일 화면 밖 표시 버그 수정 |
 | 2026-01-31 | **Phase 6 AI 챗봇 완료 (v1.5.0)**: Python FastAPI 마이크로서비스 + LangGraph Agent + Tiered LLM (Gemini→Groq→GPT) + RAG (법령API + 벡터검색) + 사용자 데이터 조회 도구 + Railway 배포 |
+| 2026-01-31 | **Phase 7 계획 확정**: 결제 서비스 Polar (4%+$0.40, MoR), 이메일 Resend, Free 플랜 제한 (직원 3명, AI 10회, 급여계산 5회), 6단계 구현 계획 수립 |
 
 ---
 
 **작성자**: Claude Code
-**마지막 업데이트**: 2026-01-31 (v1.5.0 - Phase 6 AI 챗봇 완료)
+**마지막 업데이트**: 2026-01-31 (Phase 7 계획 확정)

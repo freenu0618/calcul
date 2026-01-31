@@ -48,17 +48,17 @@ class WeeklyHolidayPayCalculator {
         val avgWeeklyHours = calculateAverageWeeklyHours(workShifts)
         val weeklyHoursDecimal = avgWeeklyHours.toDecimalHours()
 
-        // 2. 주휴시간 계산 (법적 공식): (min(주소정근로시간, 40) / 40) × 8
-        // 주 40시간 초과분은 주휴수당 계산에 미반영
-        val cappedWeeklyHours = weeklyHoursDecimal.min(WEEKLY_REGULAR_HOURS)
-        val weeklyHolidayHours = cappedWeeklyHours
-            .divide(WEEKLY_REGULAR_HOURS, 10, java.math.RoundingMode.HALF_UP)
-            .multiply(HOLIDAY_HOURS)
+        // 2. 주휴시간 계산 (근로기준법 제55조)
+        // 1일 소정근로시간 = 주소정근로시간 / 주소정근로일수
+        val dailyScheduledHours = weeklyHoursDecimal
+            .divide(BigDecimal(scheduledWorkDays), 10, java.math.RoundingMode.HALF_UP)
+        // 주휴시간 = min(1일 소정근로시간, 8시간)
+        val weeklyHolidayHours = dailyScheduledHours.min(HOLIDAY_HOURS)
 
-        val isProportional = weeklyHoursDecimal < WEEKLY_REGULAR_HOURS
+        val isProportional = dailyScheduledHours < HOLIDAY_HOURS
 
-        // 역호환성: dailyAvgHours 계산 (표시용)
-        val dailyAvgHours = weeklyHolidayHours
+        // 1일 평균 근로시간 (표시용)
+        val dailyAvgHours = dailyScheduledHours
 
         // 3. 주 15시간 미만: 주휴수당 없음
         if (weeklyHoursDecimal < MINIMUM_WEEKLY_HOURS) {
@@ -96,7 +96,8 @@ class WeeklyHolidayPayCalculator {
         val effectiveWeeks = WEEKS_PER_MONTH.multiply(qualifyingRatio)
         val monthlyHolidayPay = (hourlyWage * weeklyHolidayHours * effectiveWeeks).roundToWon()
 
-        val calculation = "(${cappedWeeklyHours.setScale(0, java.math.RoundingMode.HALF_UP)}h/40h)×8 = ${weeklyHolidayHours.setScale(1, java.math.RoundingMode.HALF_UP)}h × " +
+        // 계산식: min(1일소정근로시간, 8h) = 주휴시간 × 시급 × 주수
+        val calculation = "min(${dailyScheduledHours.setScale(1, java.math.RoundingMode.HALF_UP)}h, 8h) = ${weeklyHolidayHours.setScale(1, java.math.RoundingMode.HALF_UP)}h × " +
             "${hourlyWage.amount.toInt()}원 × ${effectiveWeeks.setScale(3, java.math.RoundingMode.HALF_UP)}주"
 
         return WeeklyHolidayPayResult(

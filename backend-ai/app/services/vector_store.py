@@ -1,15 +1,12 @@
 """
-벡터 스토어 서비스
-법령 데이터를 임베딩하여 유사도 검색
+벡터 스토어 서비스 (Stub 구현)
+sentence-transformers/PyTorch 의존성 제거로 빌드 시간 단축
+키워드 검색 fallback 사용
 """
 
 import logging
 from typing import Optional
 from dataclasses import dataclass
-
-from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain.schema import Document
 
 from app.services.law_api import LawArticle
 
@@ -24,65 +21,20 @@ class SearchResult:
 
 
 class VectorStoreService:
-    """벡터 스토어 서비스 (ChromaDB + HuggingFace 임베딩)"""
+    """벡터 스토어 서비스 (Stub - 키워드 검색으로 대체됨)"""
 
     def __init__(self):
-        # 한국어 특화 임베딩 모델 (무료, 로컬)
-        self.embeddings = HuggingFaceEmbeddings(
-            model_name="jhgan/ko-sroberta-multitask",
-            model_kwargs={"device": "cpu"},
-            encode_kwargs={"normalize_embeddings": True},
-        )
-        self.vector_store: Optional[Chroma] = None
         self._initialized = False
+        logger.info("VectorStoreService: Using keyword fallback (vector disabled)")
 
     async def initialize(self, articles: list[LawArticle]):
-        """법령 조문으로 벡터 스토어 초기화"""
-        if self._initialized and self.vector_store:
-            return
-
-        documents = []
-        for article in articles:
-            # 문서 생성
-            doc = Document(
-                page_content=f"{article.law_name} 제{article.article_no}조 {article.article_title}\n{article.content}",
-                metadata={
-                    "law_name": article.law_name,
-                    "article_no": article.article_no,
-                    "article_title": article.article_title,
-                },
-            )
-            documents.append(doc)
-
-        if documents:
-            self.vector_store = Chroma.from_documents(
-                documents=documents,
-                embedding=self.embeddings,
-                collection_name="labor_laws",
-            )
-            self._initialized = True
-            logger.info(f"Vector store initialized with {len(documents)} documents")
+        """벡터 스토어 초기화 (no-op)"""
+        self._initialized = True
+        logger.info(f"Vector store stub: {len(articles)} articles (keyword fallback)")
 
     async def search(self, query: str, k: int = 5) -> list[SearchResult]:
-        """쿼리와 유사한 법령 조문 검색"""
-        if not self.vector_store:
-            return []
-
-        try:
-            results = self.vector_store.similarity_search_with_score(query, k=k)
-            search_results = []
-            for doc, score in results:
-                article = LawArticle(
-                    law_name=doc.metadata.get("law_name", ""),
-                    article_no=doc.metadata.get("article_no", ""),
-                    article_title=doc.metadata.get("article_title", ""),
-                    content=doc.page_content,
-                )
-                search_results.append(SearchResult(article=article, score=score))
-            return search_results
-        except Exception as e:
-            logger.error(f"Vector search error: {e}")
-            return []
+        """벡터 검색 (항상 빈 결과 → RAG가 키워드 검색 사용)"""
+        return []
 
 
 # 싱글톤 인스턴스
