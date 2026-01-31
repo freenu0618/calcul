@@ -3,11 +3,18 @@ PayTools AI - FastAPI 메인 애플리케이션
 AI 노무 자문 챗봇 서비스
 """
 
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
+
+# 로깅 설정 (Railway에서 로그 출력)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 from app.db.database import init_db
 from app.api import chat, health
 

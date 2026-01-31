@@ -113,7 +113,7 @@ export default function PayrollDetail() {
     const workMinutes = calculateWorkMinutes(workShifts);
 
     try {
-      const entry = await payrollApi.addEntry(Number(id), {
+      await payrollApi.addEntry(Number(id), {
         employee_id: selectedEmployeeId,
         base_salary: Number(baseSalary),
         total_work_minutes: workMinutes.totalWorkMinutes,
@@ -121,9 +121,8 @@ export default function PayrollDetail() {
         night_minutes: workMinutes.nightMinutes,
         holiday_minutes: workMinutes.holidayMinutes,
       });
-      setLedger((prev) =>
-        prev ? { ...prev, entries: [...prev.entries, entry] } : null
-      );
+      // 서버에서 갱신된 총액을 포함한 전체 데이터 재로드
+      await loadData(Number(id));
       setShowAddModal(false);
       resetAddForm();
     } catch (err: any) {
@@ -141,9 +140,8 @@ export default function PayrollDetail() {
     if (!id || !confirm('이 직원의 급여 정보를 삭제하시겠습니까?')) return;
     try {
       await payrollApi.removeEntry(Number(id), entryId);
-      setLedger((prev) =>
-        prev ? { ...prev, entries: prev.entries.filter((e) => e.id !== entryId) } : null
-      );
+      // 서버에서 갱신된 총액을 포함한 전체 데이터 재로드
+      await loadData(Number(id));
     } catch (err: any) {
       alert(err.response?.data?.message || '삭제에 실패했습니다.');
     }
