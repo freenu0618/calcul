@@ -1,7 +1,7 @@
 """
 Tiered LLM with Fallback Chain & Circuit Breaker
-Tier 1: Groq Llama (빠르고 안정적)
-Tier 2: GPT-4o-mini (fallback)
+Tier 1: GPT-4o-mini (tool calling 정확도 우수)
+Tier 2: Groq Llama (fallback)
 """
 
 import logging
@@ -60,19 +60,7 @@ class TieredLLM:
         self._init_tiers()
 
     def _init_tiers(self):
-        # Tier 1: Groq (빠르고 안정적)
-        if settings.groq_api_key:
-            llm = ChatGroq(
-                model="llama-3.1-8b-instant",
-                temperature=settings.llm_temperature,
-                groq_api_key=settings.groq_api_key,
-                timeout=settings.llm_timeout,
-            )
-            self.tiers.append(("groq", llm))
-            self.circuit_breakers["groq"] = CircuitBreaker()
-            logger.info("Tier 1 (Groq) initialized")
-
-        # Tier 2: OpenAI (fallback)
+        # Tier 1: OpenAI (tool calling 정확도 우수)
         if settings.openai_api_key:
             llm = ChatOpenAI(
                 model="gpt-4o-mini",
@@ -82,7 +70,19 @@ class TieredLLM:
             )
             self.tiers.append(("openai", llm))
             self.circuit_breakers["openai"] = CircuitBreaker()
-            logger.info("Tier 2 (OpenAI) initialized")
+            logger.info("Tier 1 (OpenAI) initialized")
+
+        # Tier 2: Groq (fallback)
+        if settings.groq_api_key:
+            llm = ChatGroq(
+                model="llama-3.1-8b-instant",
+                temperature=settings.llm_temperature,
+                groq_api_key=settings.groq_api_key,
+                timeout=settings.llm_timeout,
+            )
+            self.tiers.append(("groq", llm))
+            self.circuit_breakers["groq"] = CircuitBreaker()
+            logger.info("Tier 2 (Groq) initialized")
 
         if not self.tiers:
             raise ValueError("No LLM API keys configured")
