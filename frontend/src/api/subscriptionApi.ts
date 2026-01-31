@@ -2,7 +2,7 @@
  * 구독 API 클라이언트
  */
 
-import apiClient from './client';
+import { apiClient } from './client';
 
 // Types
 export interface PlanLimits {
