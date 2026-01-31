@@ -6,56 +6,32 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import { useAuth } from '../../contexts/AuthContext';
+import { useChat } from '../../contexts/ChatContext';
+import { useSubscription } from '../../hooks/useSubscription';
 
-const quickActions = [
-  {
-    title: '급여 계산',
-    description: '새로운 급여를 계산합니다',
-    href: '/calculator',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-      </svg>
-    ),
-    color: 'blue',
-  },
-  {
-    title: 'AI 노무 상담',
-    description: '근로기준법 관련 질문하기',
-    href: '#',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-      </svg>
-    ),
-    color: 'purple',
-    comingSoon: true,
-  },
-  {
-    title: '급여대장',
-    description: '월별 급여 기록 관리',
-    href: '#',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
-    ),
-    color: 'emerald',
-    comingSoon: true,
-  },
-  {
-    title: '직원 관리',
-    description: '직원 정보 등록 및 수정',
-    href: '#',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-      </svg>
-    ),
-    color: 'amber',
-    comingSoon: true,
-  },
-];
+// 아이콘 컴포넌트
+const icons = {
+  calculator: (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+    </svg>
+  ),
+  chat: (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+    </svg>
+  ),
+  document: (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  ),
+  users: (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
+  ),
+};
 
 const colorClasses = {
   blue: 'bg-blue-100 text-blue-600',
@@ -66,6 +42,43 @@ const colorClasses = {
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { openChat } = useChat();
+  const { tier, tierLabel, usage, limits, remainingAiChats } = useSubscription();
+
+  const aiUsagePercent = limits.aiChatsPerMonth === Infinity
+    ? 0
+    : Math.round((usage.aiChats / limits.aiChatsPerMonth) * 100);
+
+  const quickActions = [
+    {
+      title: '급여 계산',
+      description: '새로운 급여를 계산합니다',
+      href: '/calculator',
+      icon: icons.calculator,
+      color: 'blue' as const,
+    },
+    {
+      title: 'AI 노무 상담',
+      description: '근로기준법 관련 질문하기',
+      onClick: openChat,
+      icon: icons.chat,
+      color: 'purple' as const,
+    },
+    {
+      title: '급여대장',
+      description: '월별 급여 기록 관리',
+      href: '/payroll',
+      icon: icons.document,
+      color: 'emerald' as const,
+    },
+    {
+      title: '직원 관리',
+      description: '직원 정보 등록 및 수정',
+      href: '/employees',
+      icon: icons.users,
+      color: 'amber' as const,
+    },
+  ];
 
   return (
     <>
@@ -87,31 +100,37 @@ export default function DashboardPage() {
           <div className="mb-12">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">빠른 작업</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {quickActions.map((action) => (
-                <Link
-                  key={action.title}
-                  to={action.href}
-                  className={`relative group bg-white p-6 rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all ${
-                    action.comingSoon ? 'cursor-not-allowed opacity-75' : ''
-                  }`}
-                  onClick={(e) => action.comingSoon && e.preventDefault()}
-                >
-                  {action.comingSoon && (
-                    <span className="absolute top-2 right-2 text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">
-                      준비중
-                    </span>
-                  )}
-                  <div className={`w-12 h-12 ${colorClasses[action.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4`}>
-                    {action.icon}
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-1">{action.title}</h3>
-                  <p className="text-sm text-gray-500">{action.description}</p>
-                </Link>
-              ))}
+              {quickActions.map((action) =>
+                action.href ? (
+                  <Link
+                    key={action.title}
+                    to={action.href}
+                    className="group bg-white p-6 rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all"
+                  >
+                    <div className={`w-12 h-12 ${colorClasses[action.color]} rounded-lg flex items-center justify-center mb-4`}>
+                      {action.icon}
+                    </div>
+                    <h3 className="font-semibold text-gray-900 mb-1">{action.title}</h3>
+                    <p className="text-sm text-gray-500">{action.description}</p>
+                  </Link>
+                ) : (
+                  <button
+                    key={action.title}
+                    onClick={action.onClick}
+                    className="group bg-white p-6 rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all text-left"
+                  >
+                    <div className={`w-12 h-12 ${colorClasses[action.color]} rounded-lg flex items-center justify-center mb-4`}>
+                      {action.icon}
+                    </div>
+                    <h3 className="font-semibold text-gray-900 mb-1">{action.title}</h3>
+                    <p className="text-sm text-gray-500">{action.description}</p>
+                  </button>
+                )
+              )}
             </div>
           </div>
 
-          {/* 최근 활동 (플레이스홀더) */}
+          {/* 최근 활동 */}
           <div className="grid lg:grid-cols-2 gap-8">
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">최근 급여 계산</h2>
@@ -131,21 +150,30 @@ export default function DashboardPage() {
               <div className="mb-4">
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-600">이번 달 사용량</span>
-                  <span className="font-medium">0 / 10회</span>
+                  <span className="font-medium">
+                    {limits.aiChatsPerMonth === Infinity
+                      ? '무제한'
+                      : `${usage.aiChats} / ${limits.aiChatsPerMonth}회`}
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: '0%' }} />
+                  <div
+                    className={`h-2 rounded-full transition-all ${aiUsagePercent > 80 ? 'bg-orange-500' : 'bg-blue-600'}`}
+                    style={{ width: `${aiUsagePercent}%` }}
+                  />
                 </div>
               </div>
               <p className="text-sm text-gray-500 mb-4">
-                Free 플랜: 월 10회 AI 상담 제공
+                {tierLabel} 플랜: 월 {limits.aiChatsPerMonth === Infinity ? '무제한' : `${limits.aiChatsPerMonth}회`} AI 상담 제공
               </p>
-              <Link
-                to="/#pricing"
-                className="text-sm text-blue-600 hover:underline"
-              >
-                더 많은 상담이 필요하신가요? →
-              </Link>
+              {tier === 'FREE' && (
+                <Link
+                  to="/#pricing"
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  더 많은 상담이 필요하신가요? →
+                </Link>
+              )}
             </div>
           </div>
 

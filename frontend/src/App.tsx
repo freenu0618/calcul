@@ -7,6 +7,7 @@ import { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ChatProvider } from './contexts/ChatContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/common/ScrollToTop';
 import Navigation from './components/layout/Navigation';
@@ -83,6 +84,7 @@ function App() {
     <ErrorBoundary>
       <HelmetProvider>
         <AuthProvider>
+          <ChatProvider>
           <Router>
             <ScrollToTop />
             <PageViewTracker />
@@ -148,6 +150,7 @@ function App() {
               <ChatWidget />
             </div>
           </Router>
+          </ChatProvider>
         </AuthProvider>
       </HelmetProvider>
     </ErrorBoundary>
