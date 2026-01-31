@@ -70,8 +70,8 @@ export function useChat(options: UseChatOptions = {}) {
     try {
       abortControllerRef.current = new AbortController();
 
-      // localStorage에서 JWT 토큰 가져오기
-      const token = localStorage.getItem('accessToken');
+      // localStorage에서 JWT 토큰 가져오기 (AuthContext와 동일한 키 사용)
+      const token = localStorage.getItem('auth_token');
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
         'X-User-Id': userId,
