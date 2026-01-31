@@ -1,7 +1,7 @@
 # 프로젝트 TODO 리스트
 
 **작성일**: 2026-01-22
-**마지막 업데이트**: 2026-01-31 (v1.5.0 - Phase 6 AI 챗봇 완료)
+**마지막 업데이트**: 2026-02-01 (v1.6.0 - Phase 7.2, 7.6 사용량 제한 완료)
 **기준 문서**: PROJECT_ANALYSIS_REPORT.md v2.2.0
 **프로젝트**: paytools.work (급여 계산기)
 
@@ -25,8 +25,8 @@
 | **Phase 4 (마케팅)** | **4** | **4** | **100%** | **✅ 완료** |
 | **Phase 5 (급여대장)** | **3** | **2** | **67%** | **✅ 핵심 완료** |
 | **Phase 6 (AI 챗봇)** | **6** | **6** | **100%** | **✅ 완료** |
-| **Phase 7 (요금제+결제)** | **6** | **0** | **0%** | Polar + Resend |
-| **전체** | **57** | **44** | **77%** | |
+| **Phase 7 (요금제+결제)** | **6** | **2** | **33%** | 7.2, 7.6 완료 |
+| **전체** | **57** | **46** | **81%** | |
 
 ---
 
@@ -950,17 +950,20 @@ react-markdown, remark-gfm
   - `backend-spring/infrastructure/.../V4__add_subscription_tables.sql` (신규)
 
 ### 7.2 백엔드 - 제한 로직
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-02-01)
 - **우선순위**: 높음
 - **설명**:
-  - User 엔티티에 subscriptionTier 필드 추가
-  - 직원 등록 시 플랜 한도 체크
-  - 사용량 추적 서비스
+  - User 엔티티에 subscriptionTier 필드 추가 ✅
+  - 직원 등록 시 플랜 한도 체크 ✅
+  - 사용량 추적 서비스 (UsageService) ✅
+  - SalaryController에 급여계산 사용량 체크 추가 ✅
+  - 사용량 조회/증가 API (/subscription/usage, /usage/increment) ✅
 - **관련 파일**:
-  - `domain/entity/SubscriptionTier.kt` (신규)
-  - `domain/entity/User.kt` (수정)
-  - `api/service/UsageService.kt` (신규)
-  - `api/config/PlanLimits.kt` (신규)
+  - `domain/entity/SubscriptionTier.kt` ✅
+  - `domain/entity/User.kt` ✅ (subscriptionTier 필드)
+  - `api/service/UsageService.kt` ✅
+  - `api/controller/SubscriptionController.kt` ✅
+  - `api/controller/SalaryController.kt` ✅ (사용량 체크 추가)
 
 ### 7.3 백엔드 - Polar 연동
 - **상태**: ⬜ 대기
@@ -1004,14 +1007,21 @@ react-markdown, remark-gfm
   - `api/scheduler/SubscriptionScheduler.kt` (신규)
 
 ### 7.6 AI 사용량 DB 연동
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-02-01)
 - **우선순위**: 중간
 - **설명**:
-  - Rate limiter를 메모리 → DB 기반으로 변경
-  - Spring API 호출하여 사용량 체크
+  - 메모리 기반 Rate limiter 제거 ✅
+  - Spring API 호출하여 사용량 체크/증가 ✅
+  - 비로그인 사용자 AI 챗봇 차단 ✅
+  - LLM 기본값 변경: Groq → OpenAI (Tool calling 정확도 개선) ✅
+  - 401 에러 친화적 메시지 표시 ✅
+  - 대시보드/마이페이지 실제 사용량 표시 ✅
 - **관련 파일**:
-  - `backend-ai/app/services/rate_limiter.py` (수정)
-  - `backend-ai/app/api/chat.py` (수정)
+  - `backend-ai/app/api/chat.py` ✅ (Spring API 연동, 토큰 필수 체크)
+  - `backend-ai/app/services/llm.py` ✅ (OpenAI 우선 순위)
+  - `frontend/src/components/Chat/ChatWidget.tsx` ✅ (비로그인 시 숨김)
+  - `frontend/src/hooks/useChat.ts` ✅ (에러 메시지 개선)
+  - `frontend/src/hooks/useSubscription.ts` ✅ (실제 사용량 API 조회)
 
 ---
 
@@ -1202,8 +1212,10 @@ Week 16 (Phase 7 - 요금제):
 | 2026-01-29 | **급여 계산 버그 수정 (v1.3.0)**: 5인 미만 174시간 초과분 누락 해결, 월간 템플릿 휴일근로 자동 설정 버그 수정, Tooltip 모바일 화면 밖 표시 버그 수정 |
 | 2026-01-31 | **Phase 6 AI 챗봇 완료 (v1.5.0)**: Python FastAPI 마이크로서비스 + LangGraph Agent + Tiered LLM (Gemini→Groq→GPT) + RAG (법령API + 벡터검색) + 사용자 데이터 조회 도구 + Railway 배포 |
 | 2026-01-31 | **Phase 7 계획 확정**: 결제 서비스 Polar (4%+$0.40, MoR), 이메일 Resend, Free 플랜 제한 (직원 3명, AI 10회, 급여계산 5회), 6단계 구현 계획 수립 |
+| 2026-02-01 | **Phase 7.2 완료**: UsageService 사용량 추적, SalaryController 급여계산 제한, SubscriptionController 사용량 API |
+| 2026-02-01 | **Phase 7.6 완료**: AI 사용량 Spring DB 연동, LLM 기본값 OpenAI로 변경 (Groq Tool Calling 버그), 비로그인 챗봇 차단, 401 에러 메시지 개선, 대시보드 실제 사용량 표시 |
 
 ---
 
 **작성자**: Claude Code
-**마지막 업데이트**: 2026-01-31 (Phase 7 계획 확정)
+**마지막 업데이트**: 2026-02-01 (Phase 7.2, 7.6 완료)

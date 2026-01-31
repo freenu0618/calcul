@@ -1,2 +1,0 @@
-# SPA fallback (도메인 리다이렉트는 functions/_middleware.ts에서 처리)
-/*    /index.html   200
