@@ -117,6 +117,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
+    localStorage.removeItem('chat_messages'); // 채팅 내역 삭제 (보안)
+    sessionStorage.removeItem('chat_session_id'); // 세션 ID도 삭제
     setToken(null);
     setUser(null);
   };
