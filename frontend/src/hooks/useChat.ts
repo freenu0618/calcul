@@ -151,11 +151,14 @@ export function useChat(options: UseChatOptions = {}) {
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('로그인 후 이용 가능합니다. 무료 회원가입 후 AI 상담을 이용해보세요!');
+        }
         if (response.status === 429) {
           const data = await response.json();
-          throw new Error(data.detail?.message || '요청 한도 초과');
+          throw new Error(data.detail?.message || '이번 달 AI 상담 횟수를 모두 사용했습니다. 업그레이드해주세요.');
         }
-        throw new Error(`HTTP ${response.status}`);
+        throw new Error('일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
       }
 
       const reader = response.body?.getReader();
