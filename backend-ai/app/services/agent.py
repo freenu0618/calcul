@@ -1,6 +1,6 @@
 """
 LangGraph Agent 서비스
-스트리밍 응답 처리
+스트리밍 응답 처리 + RAG (법령 검색)
 """
 
 import logging
@@ -10,6 +10,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.services.llm import get_tiered_llm
 from app.services.prompts import SYSTEM_PROMPT
+from app.services.rag import get_rag_service
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +31,19 @@ async def get_agent_response(
     """
     try:
         tiered_llm = get_tiered_llm()
+        rag_service = get_rag_service()
+
+        # RAG: 관련 법령 컨텍스트 조회
+        rag_context = await rag_service.get_context(message)
+
+        # 법령 컨텍스트가 있으면 프롬프트에 추가
+        system_content = SYSTEM_PROMPT
+        if rag_context.context_text:
+            system_content += f"\n\n{rag_context.context_text}"
+            logger.info(f"RAG: {len(rag_context.relevant_articles)} articles added")
 
         messages = [
-            SystemMessage(content=SYSTEM_PROMPT),
+            SystemMessage(content=system_content),
             HumanMessage(content=message),
         ]
 
