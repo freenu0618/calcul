@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 import { API_CONFIG } from '../config/api.config';
 
 /** 요금제 타입 */
-export type UserPlan = 'FREE' | 'PRO' | 'ENTERPRISE';
+export type UserPlan = 'FREE' | 'TRIAL' | 'BASIC' | 'PRO' | 'ENTERPRISE';
 
 interface User {
   id: number;
@@ -144,8 +144,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  // 유료 사용자 여부 (PRO 또는 ENTERPRISE)
-  const isPaidUser = user?.plan === 'PRO' || user?.plan === 'ENTERPRISE';
+  // 유료 사용자 여부 (TRIAL, BASIC, PRO, ENTERPRISE)
+  const isPaidUser = user?.plan !== 'FREE' && user?.plan !== undefined;
 
   const value: AuthContextType = {
     user,

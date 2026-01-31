@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import { useAuth } from '../../contexts/AuthContext';
-import { useSubscription, PLAN_LIMITS } from '../../hooks/useSubscription';
+import { useSubscription } from '../../hooks/useSubscription';
 import type { SubscriptionTier } from '../../hooks/useSubscription';
 
 // 플랜 정보
@@ -78,12 +78,8 @@ export default function MyPage() {
                   <p className="font-medium text-gray-900">{user?.email}</p>
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500">가입일</label>
-                  <p className="font-medium text-gray-900">
-                    {user?.createdAt
-                      ? new Date(user.createdAt).toLocaleDateString('ko-KR')
-                      : '-'}
-                  </p>
+                  <label className="text-sm text-gray-500">요금제</label>
+                  <p className="font-medium text-gray-900">{tierLabel}</p>
                 </div>
               </div>
 

@@ -10,37 +10,58 @@ import type { SalaryCalculationResponse } from '../types/salary';
 // 폰트 캐시
 let fontLoaded = false;
 
+// 폰트 CDN URL 목록 (순서대로 시도)
+const FONT_URLS = [
+  'https://fastly.jsdelivr.net/gh/AlfaInsmo/korean-font@main/nanum/NanumGothic-Regular.ttf',
+  'https://cdn.jsdelivr.net/gh/AlfaInsmo/korean-font@main/nanum/NanumGothic-Regular.ttf',
+];
+
 /**
- * Noto Sans KR 폰트 로드 (Google Fonts CDN)
+ * Noto Sans KR 폰트 로드 (여러 CDN 시도)
  */
-async function loadKoreanFont(doc: jsPDF): Promise<void> {
+async function loadKoreanFont(doc: jsPDF): Promise<boolean> {
   if (fontLoaded) {
-    doc.setFont('NotoSansKR');
-    return;
+    doc.setFont('NanumGothic');
+    return true;
   }
 
-  try {
-    // Noto Sans KR Regular (약 1MB, 한글 지원)
-    const fontUrl = 'https://cdn.jsdelivr.net/gh/nickshanks/Glyph@master/fonts/NotoSansKR-Regular.otf';
+  for (const fontUrl of FONT_URLS) {
+    try {
+      const response = await fetch(fontUrl, {
+        mode: 'cors',
+        cache: 'force-cache'
+      });
 
-    const response = await fetch(fontUrl);
-    if (!response.ok) throw new Error('Font fetch failed');
+      if (!response.ok) continue;
 
-    const fontData = await response.arrayBuffer();
-    const fontBase64 = btoa(
-      new Uint8Array(fontData).reduce((data, byte) => data + String.fromCharCode(byte), '')
-    );
+      const fontData = await response.arrayBuffer();
 
-    // 폰트 등록
-    doc.addFileToVFS('NotoSansKR-Regular.otf', fontBase64);
-    doc.addFont('NotoSansKR-Regular.otf', 'NotoSansKR', 'normal');
-    doc.setFont('NotoSansKR');
+      // ArrayBuffer → Base64 변환 (큰 파일도 처리 가능)
+      const bytes = new Uint8Array(fontData);
+      let binary = '';
+      const chunkSize = 8192;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        const chunk = bytes.subarray(i, i + chunkSize);
+        binary += String.fromCharCode.apply(null, Array.from(chunk));
+      }
+      const fontBase64 = btoa(binary);
 
-    fontLoaded = true;
-  } catch (error) {
-    console.warn('Korean font load failed, using fallback:', error);
-    // 폴백: 기본 폰트 사용 (한글 깨짐)
+      // 폰트 등록
+      doc.addFileToVFS('NanumGothic-Regular.ttf', fontBase64);
+      doc.addFont('NanumGothic-Regular.ttf', 'NanumGothic', 'normal');
+      doc.setFont('NanumGothic');
+
+      fontLoaded = true;
+      console.log('Korean font loaded successfully');
+      return true;
+    } catch (error) {
+      console.warn(`Font load failed from ${fontUrl}:`, error);
+      continue;
+    }
   }
+
+  console.error('All font sources failed');
+  return false;
 }
 
 /**
@@ -55,7 +76,10 @@ export async function generatePayslipPdf(
   const { gross_breakdown, deductions_breakdown, net_pay, work_summary } = result;
 
   // 한글 폰트 로드
-  await loadKoreanFont(doc);
+  const fontSuccess = await loadKoreanFont(doc);
+  if (!fontSuccess) {
+    alert('한글 폰트를 불러오지 못했습니다. PDF에 한글이 깨질 수 있습니다.');
+  }
 
   let y = 15;
 
