@@ -70,7 +70,7 @@ async def _execute_tool(tool_name: str, tool_args: dict) -> str:
 
 async def _invoke_with_fallback(tiered_llm, messages: list, tools: list):
     """LLM 호출 with fallback (Tool Calling 지원)"""
-    logger.info(f"_invoke_with_fallback called, tiers: {[n for n,_ in tiered_llm.tiers]}")
+    logger.info(f"_invoke_with_fallback called, tiers: {[n for n,_ in tiered_llm.tiers]}, messages: {len(messages)}")
     last_error = None
 
     for name, llm in tiered_llm.tiers:
@@ -83,7 +83,14 @@ async def _invoke_with_fallback(tiered_llm, messages: list, tools: list):
             llm_with_tools = llm.bind_tools(tools)
             response = await llm_with_tools.ainvoke(messages)
             cb.record_success()
-            logger.info(f"LLM response from {name}")
+
+            # 상세 로깅
+            content = getattr(response, 'content', '')
+            tool_calls = getattr(response, 'tool_calls', [])
+            logger.info(f"LLM response from {name}: content_len={len(content) if content else 0}, tool_calls={len(tool_calls)}")
+            if content:
+                logger.debug(f"Content preview: {content[:100]}...")
+
             return response
         except Exception as e:
             cb.record_failure()
@@ -192,11 +199,18 @@ async def get_agent_response(
         full_response = ""
 
         for iteration in range(max_iterations):
+            logger.info(f"Tool loop iteration {iteration + 1}/{max_iterations}")
+
             # LLM 호출 (fallback 지원)
             response = await _invoke_with_fallback(tiered_llm, messages, tools)
 
-            # Tool Call이 있는지 확인
-            if hasattr(response, "tool_calls") and response.tool_calls:
+            # 응답 상태 로깅
+            has_tool_calls = hasattr(response, "tool_calls") and response.tool_calls and len(response.tool_calls) > 0
+            has_content = hasattr(response, "content") and response.content
+            logger.info(f"Response: has_tool_calls={has_tool_calls}, has_content={has_content}")
+
+            # Tool Call이 있는지 확인 (빈 리스트 체크 추가)
+            if has_tool_calls:
                 messages.append(response)  # AI 메시지 추가
 
                 for tool_call in response.tool_calls:
@@ -214,6 +228,7 @@ async def get_agent_response(
 
                     # Tool 실행
                     result = await _execute_tool(tool_name, tool_args)
+                    logger.info(f"Tool result: {result[:200]}...")
 
                     # Tool 결과 메시지 추가
                     messages.append(ToolMessage(content=result, tool_call_id=tool_id))
@@ -226,9 +241,12 @@ async def get_agent_response(
                 continue  # 다시 LLM 호출
 
             # Tool Call이 없으면 최종 응답
-            if hasattr(response, "content") and response.content:
+            if has_content:
                 full_response = response.content
+                logger.info(f"Final response length: {len(full_response)}")
                 break
+            else:
+                logger.warning(f"No content in response at iteration {iteration + 1}")
 
         # 스트리밍 출력 (토큰 단위가 아닌 문장 단위)
         if full_response:
@@ -237,6 +255,11 @@ async def get_agent_response(
             for sentence in sentences:
                 if sentence.strip():
                     yield {"type": "token", "data": sentence}
+        else:
+            # Tool 호출 후 응답이 없는 경우 기본 메시지 제공
+            logger.warning("No response generated after tool calls")
+            full_response = "요청하신 정보를 처리했습니다. 추가 질문이 있으시면 말씀해주세요."
+            yield {"type": "token", "data": full_response}
 
         # 대화 히스토리에 저장
         session.messages.append(("user", message))

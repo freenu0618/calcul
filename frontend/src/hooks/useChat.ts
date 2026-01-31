@@ -2,9 +2,10 @@
  * 채팅 SSE 연결 훅
  * - JWT 토큰으로 사용자 인식
  * - session_id로 대화 히스토리 유지
+ * - localStorage로 대화 내역 보존
  */
 
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 
 export interface ChatMessage {
   id: string;
@@ -18,6 +19,9 @@ interface UseChatOptions {
   apiUrl?: string;
   userId?: string;
 }
+
+const STORAGE_KEY = 'chat_messages';
+const MAX_STORED_MESSAGES = 50;
 
 export function useChat(options: UseChatOptions = {}) {
   const {
@@ -36,10 +40,39 @@ export function useChat(options: UseChatOptions = {}) {
     return id;
   }, []);
 
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // localStorage에서 대화 내역 복원
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return parsed.map((m: any) => ({
+          ...m,
+          timestamp: new Date(m.timestamp)
+        }));
+      }
+    } catch (e) {
+      console.error('Failed to restore chat messages:', e);
+    }
+    return [];
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // 메시지 변경 시 localStorage에 저장
+  useEffect(() => {
+    try {
+      // 스트리밍 중인 메시지는 저장하지 않음
+      const toStore = messages
+        .filter(m => !m.isStreaming)
+        .slice(-MAX_STORED_MESSAGES);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
+    } catch (e) {
+      console.error('Failed to save chat messages:', e);
+    }
+  }, [messages]);
 
   const sendMessage = useCallback(async (content: string) => {
     if (!content.trim() || isLoading) return;
@@ -86,6 +119,7 @@ export function useChat(options: UseChatOptions = {}) {
         body: JSON.stringify({
           message: content.trim(),
           session_id: sessionId,
+          token: token, // body에도 토큰 전달
         }),
         signal: abortControllerRef.current.signal,
       });
@@ -103,7 +137,7 @@ export function useChat(options: UseChatOptions = {}) {
 
       const decoder = new TextDecoder();
       let buffer = '';
-      let currentEvent = 'token'; // 기본 이벤트 타입
+      let currentEvent = 'token';
 
       while (true) {
         const { done, value } = await reader.read();
@@ -115,7 +149,6 @@ export function useChat(options: UseChatOptions = {}) {
 
         for (const line of lines) {
           if (line.startsWith('event: ')) {
-            // SSE 이벤트 타입 저장
             currentEvent = line.slice(7).trim();
             continue;
           }
@@ -124,15 +157,25 @@ export function useChat(options: UseChatOptions = {}) {
 
             if (data === '') continue;
 
-            // tool_call 이벤트는 무시 (내부 처리용)
+            // tool_call 이벤트는 무시
             if (currentEvent === 'tool_call') {
-              // Tool 호출 중 표시 (선택적)
-              // console.log('Tool call:', data);
               continue;
             }
 
-            // done/error 이벤트는 처리하지 않음
-            if (currentEvent === 'done' || currentEvent === 'error') {
+            // done 이벤트는 처리하지 않음
+            if (currentEvent === 'done') {
+              continue;
+            }
+
+            // error 이벤트 처리
+            if (currentEvent === 'error') {
+              setMessages(prev =>
+                prev.map(m =>
+                  m.id === assistantId
+                    ? { ...m, content: `⚠️ ${data}`, isStreaming: false }
+                    : m
+                )
+              );
               continue;
             }
 
@@ -162,7 +205,6 @@ export function useChat(options: UseChatOptions = {}) {
       const errorMessage = (err as Error).message || '오류가 발생했습니다';
       setError(errorMessage);
 
-      // 에러 메시지로 업데이트
       setMessages(prev =>
         prev.map(m =>
           m.id === assistantId
@@ -183,6 +225,7 @@ export function useChat(options: UseChatOptions = {}) {
 
   const clearMessages = useCallback(() => {
     setMessages([]);
+    localStorage.removeItem(STORAGE_KEY);
     setError(null);
   }, []);
 
@@ -191,8 +234,8 @@ export function useChat(options: UseChatOptions = {}) {
     const newId = crypto.randomUUID();
     sessionStorage.setItem('chat_session_id', newId);
     setMessages([]);
+    localStorage.removeItem(STORAGE_KEY);
     setError(null);
-    window.location.reload(); // 새 세션 ID 적용
   }, []);
 
   return {
