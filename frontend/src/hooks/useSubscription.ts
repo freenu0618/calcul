@@ -57,6 +57,8 @@ interface Usage {
   aiChats: number;
   salaryCalcs: number;
   employees: number;
+  pdfExports: number;
+  excelExports: number;
 }
 
 interface SubscriptionState {
@@ -79,37 +81,62 @@ interface SubscriptionState {
 export function useSubscription(): SubscriptionState {
   const { user, isAuthenticated } = useAuth();
   const [employeeCount, setEmployeeCount] = useState(0);
+  const [usageData, setUsageData] = useState({ aiChats: 0, salaryCalcs: 0, pdfExports: 0, excelExports: 0 });
   const [isLoading, setIsLoading] = useState(false);
 
   // 직원 수 조회
   const fetchEmployeeCount = async () => {
     if (!isAuthenticated) return;
 
-    setIsLoading(true);
     try {
       const response = await apiClient.get('/employees');
-      // API 응답: { employees: [...], totalCount: N }
       const data = response.data;
       const count = data?.totalCount ?? data?.employees?.length ?? 0;
       setEmployeeCount(count);
     } catch (error) {
       console.error('Failed to fetch employee count:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
+  // 사용량 조회 (AI 상담, 급여 계산 등)
+  const fetchUsage = async () => {
+    if (!isAuthenticated) return;
+
+    try {
+      const response = await apiClient.get('/subscription/usage');
+      const data = response.data?.data;
+      if (data) {
+        setUsageData({
+          aiChats: data.aiChats ?? 0,
+          salaryCalcs: data.salaryCalcs ?? 0,
+          pdfExports: data.pdfExports ?? 0,
+          excelExports: data.excelExports ?? 0,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch usage:', error);
+    }
+  };
+
+  const refetch = async () => {
+    setIsLoading(true);
+    await Promise.all([fetchEmployeeCount(), fetchUsage()]);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    fetchEmployeeCount();
+    refetch();
   }, [isAuthenticated]);
 
   const tier: SubscriptionTier = (user as any)?.subscriptionTier || 'FREE';
   const limits = PLAN_LIMITS[tier];
 
   const usage: Usage = {
-    aiChats: 0, // TODO: 백엔드 구독 API 연동
-    salaryCalcs: 0,
+    aiChats: usageData.aiChats,
+    salaryCalcs: usageData.salaryCalcs,
     employees: employeeCount,
+    pdfExports: usageData.pdfExports,
+    excelExports: usageData.excelExports,
   };
 
   const tierLabels: Record<SubscriptionTier, string> = {
@@ -134,6 +161,6 @@ export function useSubscription(): SubscriptionState {
     remainingSalaryCalcs: () => Math.max(0, limits.salaryCalcsPerMonth - usage.salaryCalcs),
     remainingEmployeeSlots: () => Math.max(0, limits.maxEmployees - usage.employees),
     tierLabel: tierLabels[tier],
-    refetch: fetchEmployeeCount,
+    refetch,
   };
 }
