@@ -2,7 +2,9 @@
  * useSubscription - 구독/요금제 제한 관리 훅
  */
 
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { apiClient } from '../api/client';
 
 // 요금제 타입
 export type SubscriptionTier = 'FREE' | 'TRIAL' | 'BASIC' | 'PRO' | 'ENTERPRISE';
@@ -18,7 +20,6 @@ export const PLAN_LIMITS = {
     recordRetentionMonths: 3,
   },
   TRIAL: {
-    // Basic과 동일한 제한 (3일 무료 체험)
     maxEmployees: 10,
     aiChatsPerMonth: 30,
     salaryCalcsPerMonth: Infinity,
@@ -62,33 +63,51 @@ interface SubscriptionState {
   tier: SubscriptionTier;
   limits: typeof PLAN_LIMITS[SubscriptionTier];
   usage: Usage;
-  // 제한 체크 함수들
+  isLoading: boolean;
   canAddEmployee: () => boolean;
   canUseAiChat: () => boolean;
   canCalculateSalary: () => boolean;
   canExportPdf: () => boolean;
   canExportExcel: () => boolean;
-  // 남은 횟수
   remainingAiChats: () => number;
   remainingSalaryCalcs: () => number;
   remainingEmployeeSlots: () => number;
-  // 요금제 표시
   tierLabel: string;
+  refetch: () => void;
 }
 
 export function useSubscription(): SubscriptionState {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const [employeeCount, setEmployeeCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // TODO: 백엔드에서 실제 구독 정보 조회
-  // 현재는 Free 플랜 기본값
+  // 직원 수 조회
+  const fetchEmployeeCount = async () => {
+    if (!isAuthenticated) return;
+
+    setIsLoading(true);
+    try {
+      const response = await apiClient.get('/employees');
+      const employees = response.data?.data || response.data || [];
+      setEmployeeCount(Array.isArray(employees) ? employees.length : 0);
+    } catch (error) {
+      console.error('Failed to fetch employee count:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmployeeCount();
+  }, [isAuthenticated]);
+
   const tier: SubscriptionTier = (user as any)?.subscriptionTier || 'FREE';
   const limits = PLAN_LIMITS[tier];
 
-  // TODO: 백엔드에서 실제 사용량 조회
   const usage: Usage = {
-    aiChats: 0,
+    aiChats: 0, // TODO: 백엔드 구독 API 연동
     salaryCalcs: 0,
-    employees: 0,
+    employees: employeeCount,
   };
 
   const tierLabels: Record<SubscriptionTier, string> = {
@@ -103,6 +122,7 @@ export function useSubscription(): SubscriptionState {
     tier,
     limits,
     usage,
+    isLoading,
     canAddEmployee: () => usage.employees < limits.maxEmployees,
     canUseAiChat: () => usage.aiChats < limits.aiChatsPerMonth,
     canCalculateSalary: () => usage.salaryCalcs < limits.salaryCalcsPerMonth,
@@ -112,5 +132,6 @@ export function useSubscription(): SubscriptionState {
     remainingSalaryCalcs: () => Math.max(0, limits.salaryCalcsPerMonth - usage.salaryCalcs),
     remainingEmployeeSlots: () => Math.max(0, limits.maxEmployees - usage.employees),
     tierLabel: tierLabels[tier],
+    refetch: fetchEmployeeCount,
   };
 }
