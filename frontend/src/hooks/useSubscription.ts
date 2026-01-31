@@ -5,7 +5,7 @@
 import { useAuth } from '../contexts/AuthContext';
 
 // 요금제 타입
-export type SubscriptionTier = 'FREE' | 'BASIC' | 'PRO' | 'ENTERPRISE';
+export type SubscriptionTier = 'FREE' | 'TRIAL' | 'BASIC' | 'PRO' | 'ENTERPRISE';
 
 // 요금제별 제한
 export const PLAN_LIMITS = {
@@ -16,6 +16,15 @@ export const PLAN_LIMITS = {
     hasPdfExport: false,
     hasExcelExport: false,
     recordRetentionMonths: 3,
+  },
+  TRIAL: {
+    // Basic과 동일한 제한 (3일 무료 체험)
+    maxEmployees: 10,
+    aiChatsPerMonth: 30,
+    salaryCalcsPerMonth: Infinity,
+    hasPdfExport: true,
+    hasExcelExport: false,
+    recordRetentionMonths: Infinity,
   },
   BASIC: {
     maxEmployees: 10,
@@ -84,6 +93,7 @@ export function useSubscription(): SubscriptionState {
 
   const tierLabels: Record<SubscriptionTier, string> = {
     FREE: 'Free',
+    TRIAL: 'Basic (체험)',
     BASIC: 'Basic',
     PRO: 'Pro',
     ENTERPRISE: 'Enterprise',

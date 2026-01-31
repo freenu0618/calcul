@@ -1,19 +1,21 @@
 """
 LangGraph Agent 서비스
-스트리밍 응답 처리 + RAG (법령 검색) + 사용자 데이터 컨텍스트 + 대화 히스토리
+스트리밍 응답 처리 + RAG (법령 검색) + Tool Calling + 대화 히스토리
 """
 
 import logging
+import json
 import httpx
 from typing import AsyncGenerator, Optional
 from collections import defaultdict
 from dataclasses import dataclass, field
 
-from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage, ToolMessage
 
 from app.services.llm import get_tiered_llm
 from app.services.prompts import SYSTEM_PROMPT
 from app.services.rag import get_rag_service
+from app.services.tools import ALL_TOOLS, GENERAL_TOOLS, USER_DATA_TOOLS, set_user_token
 from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -50,43 +52,20 @@ async def _fetch_user_info(token: str) -> tuple[str, str]:
     return "", ""
 
 
-async def _fetch_user_context(token: str, user_name: str = "") -> str:
-    """사용자 데이터 조회하여 컨텍스트 생성"""
+async def _execute_tool(tool_name: str, tool_args: dict) -> str:
+    """Tool 실행 및 결과 반환"""
+    tool_map = {t.name: t for t in ALL_TOOLS}
+
+    if tool_name not in tool_map:
+        return json.dumps({"error": f"Unknown tool: {tool_name}"})
+
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            # 직원 목록 조회
-            emp_resp = await client.get(
-                f"{settings.spring_api_url}/api/v1/employees",
-                headers={"Authorization": f"Bearer {token}"},
-            )
-            # 급여대장 기간 조회
-            period_resp = await client.get(
-                f"{settings.spring_api_url}/api/v1/payroll/periods",
-                headers={"Authorization": f"Bearer {token}"},
-            )
-
-            context_parts = ["[현재 사용자 정보]"]
-            if user_name:
-                context_parts.append(f"사용자 이름: {user_name}")
-
-            if emp_resp.status_code == 200:
-                employees = emp_resp.json()
-                emp_list = employees if isinstance(employees, list) else employees.get("content", [])
-                context_parts.append(f"등록 직원: {len(emp_list)}명")
-                for e in emp_list[:5]:  # 최대 5명
-                    context_parts.append(f"- {e.get('name')}: {e.get('employmentType')}, 기본급 {e.get('baseSalary', 0):,}원")
-
-            if period_resp.status_code == 200:
-                periods = period_resp.json()
-                period_list = periods if isinstance(periods, list) else periods.get("content", [])
-                if period_list:
-                    latest = period_list[0]
-                    context_parts.append(f"\n최근 급여대장: {latest.get('year')}-{latest.get('month'):02d}")
-
-            return "\n".join(context_parts) if len(context_parts) > 1 else ""
+        tool = tool_map[tool_name]
+        result = await tool.ainvoke(tool_args)
+        return json.dumps(result, ensure_ascii=False, default=str)
     except Exception as e:
-        logger.warning(f"User context fetch failed: {e}")
-        return ""
+        logger.error(f"Tool execution error ({tool_name}): {e}")
+        return json.dumps({"error": str(e)})
 
 
 async def get_agent_response(
@@ -95,7 +74,7 @@ async def get_agent_response(
     user_token: Optional[str] = None,
 ) -> AsyncGenerator[dict, None]:
     """
-    에이전트 응답 스트리밍 (한글 토큰 버퍼링 + 대화 히스토리)
+    에이전트 응답 스트리밍 (Tool Calling + 대화 히스토리)
 
     Args:
         message: 사용자 메시지
@@ -108,6 +87,9 @@ async def get_agent_response(
     try:
         tiered_llm = get_tiered_llm()
         rag_service = get_rag_service()
+
+        # 사용자 토큰 설정 (Tool에서 사용)
+        set_user_token(user_token)
 
         # 세션 관리 (session_id가 없으면 새 세션)
         session_key = session_id or "default"
@@ -127,12 +109,30 @@ async def get_agent_response(
         # 시스템 프롬프트 구성
         system_content = SYSTEM_PROMPT
 
-        # 사용자 데이터 컨텍스트 추가 (로그인된 경우)
+        # 사용자 이름 추가
+        if user_name:
+            system_content += f"\n\n현재 사용자: {user_name}님"
+
+        # Tool 사용 가능 여부 안내
         if user_token:
-            user_context = await _fetch_user_context(user_token, user_name)
-            if user_context:
-                system_content += f"\n\n{user_context}"
-                logger.info("User context added to prompt")
+            system_content += """
+
+[사용 가능한 도구]
+로그인된 사용자이므로 다음 도구를 사용할 수 있습니다:
+- get_my_employees: 직원 목록 조회 ("직원 누구야", "직원 명단" 등)
+- get_employee_detail: 특정 직원 상세 조회 ("김철수 정보", "홍길동 급여" 등)
+- get_payroll_summary: 급여대장 요약 ("이번달 인건비", "급여 총액" 등)
+- get_monthly_labor_cost: 특정 월 인건비 조회
+- salary_calculator: 급여 계산 시뮬레이션
+- insurance_calculator: 4대보험 계산
+
+사용자가 직원이나 급여 데이터를 물어보면 반드시 도구를 사용하세요.
+"""
+        else:
+            system_content += """
+
+[안내] 로그인하면 직원 목록, 급여대장 조회 등 더 많은 기능을 사용할 수 있습니다.
+"""
 
         # 법령 컨텍스트 추가
         if rag_context.context_text:
@@ -152,24 +152,62 @@ async def get_agent_response(
         # 현재 사용자 메시지 추가
         messages.append(HumanMessage(content=message))
 
-        # 스트리밍 응답 (토큰 버퍼링으로 한글 띄어쓰기 문제 해결)
-        buffer = ""
+        # Tool 바인딩 (로그인된 경우 전체, 아니면 일반 도구만)
+        tools = ALL_TOOLS if user_token else GENERAL_TOOLS
+
+        # LLM에 tools 바인딩 (첫 번째 tier 사용)
+        llm_with_tools = tiered_llm.tiers[0][1].bind_tools(tools)
+
+        # Tool Calling 루프 (최대 3회)
+        max_iterations = 3
         full_response = ""
-        flush_chars = {" ", ".", ",", "!", "?", "\n", ":", ";", ")", "]", "}", "※"}
 
-        async for chunk in tiered_llm.astream(messages):
-            if hasattr(chunk, "content") and chunk.content:
-                buffer += chunk.content
-                full_response += chunk.content
+        for iteration in range(max_iterations):
+            # LLM 호출
+            response = await llm_with_tools.ainvoke(messages)
 
-                # 문장 부호나 공백이 나오면 버퍼 flush
-                if buffer and buffer[-1] in flush_chars:
-                    yield {"type": "token", "data": buffer}
-                    buffer = ""
+            # Tool Call이 있는지 확인
+            if hasattr(response, "tool_calls") and response.tool_calls:
+                messages.append(response)  # AI 메시지 추가
 
-        # 남은 버퍼 전송
-        if buffer:
-            yield {"type": "token", "data": buffer}
+                for tool_call in response.tool_calls:
+                    tool_name = tool_call.get("name", "")
+                    tool_args = tool_call.get("args", {})
+                    tool_id = tool_call.get("id", "")
+
+                    logger.info(f"Tool call: {tool_name}({tool_args})")
+
+                    # Tool 호출 알림
+                    yield {
+                        "type": "tool_call",
+                        "data": {"tool": tool_name, "status": "start"}
+                    }
+
+                    # Tool 실행
+                    result = await _execute_tool(tool_name, tool_args)
+
+                    # Tool 결과 메시지 추가
+                    messages.append(ToolMessage(content=result, tool_call_id=tool_id))
+
+                    yield {
+                        "type": "tool_call",
+                        "data": {"tool": tool_name, "status": "end", "result": result[:200]}
+                    }
+
+                continue  # 다시 LLM 호출
+
+            # Tool Call이 없으면 최종 응답
+            if hasattr(response, "content") and response.content:
+                full_response = response.content
+                break
+
+        # 스트리밍 출력 (토큰 단위가 아닌 문장 단위)
+        if full_response:
+            # 문장 단위로 나눠서 스트리밍 효과
+            sentences = full_response.replace(".", ".|").replace("!", "!|").replace("?", "?|").split("|")
+            for sentence in sentences:
+                if sentence.strip():
+                    yield {"type": "token", "data": sentence}
 
         # 대화 히스토리에 저장
         session.messages.append(("user", message))
@@ -186,42 +224,66 @@ async def get_agent_response(
         yield {"type": "error", "data": str(e)}
 
 
-async def get_agent_response_with_tools(
+async def get_agent_response_streaming(
     message: str,
     session_id: Optional[str] = None,
+    user_token: Optional[str] = None,
 ) -> AsyncGenerator[dict, None]:
     """
-    도구 사용이 포함된 에이전트 응답 (LangGraph)
-
-    TODO: Phase 6.3 완료 후 graph.py와 연동
+    스트리밍 전용 응답 (Tool Calling 없이 빠른 응답)
+    단순 질문이나 빠른 응답이 필요할 때 사용
     """
     try:
-        from app.services.graph import get_agent
+        tiered_llm = get_tiered_llm()
+        rag_service = get_rag_service()
 
-        agent = get_agent()
+        # 세션 관리
+        session_key = session_id or "default"
+        session = _sessions[session_key]
 
-        # LangGraph 실행
-        async for event in agent.astream_events(
-            {"messages": [HumanMessage(content=message)]},
-            version="v2",
-        ):
-            event_type = event.get("event")
+        # RAG 컨텍스트
+        rag_context = await rag_service.get_context(message)
 
-            if event_type == "on_chat_model_stream":
-                chunk = event.get("data", {}).get("chunk")
-                if chunk and hasattr(chunk, "content") and chunk.content:
-                    yield {"type": "token", "data": chunk.content}
+        # 시스템 프롬프트
+        system_content = SYSTEM_PROMPT
+        if rag_context.context_text:
+            system_content += f"\n\n{rag_context.context_text}"
 
-            elif event_type == "on_tool_start":
-                tool_name = event.get("name", "unknown")
-                yield {"type": "tool_call", "data": {"tool": tool_name, "status": "start"}}
+        # 메시지 구성
+        messages = [SystemMessage(content=system_content)]
+        for role, content in session.messages[-MAX_HISTORY:]:
+            if role == "user":
+                messages.append(HumanMessage(content=content))
+            else:
+                messages.append(AIMessage(content=content))
+        messages.append(HumanMessage(content=message))
 
-            elif event_type == "on_tool_end":
-                tool_name = event.get("name", "unknown")
-                yield {"type": "tool_call", "data": {"tool": tool_name, "status": "end"}}
+        # 스트리밍 응답
+        buffer = ""
+        full_response = ""
+        flush_chars = {" ", ".", ",", "!", "?", "\n", ":", ";", ")", "]", "}", "※"}
+
+        async for chunk in tiered_llm.astream(messages):
+            if hasattr(chunk, "content") and chunk.content:
+                buffer += chunk.content
+                full_response += chunk.content
+
+                if buffer and buffer[-1] in flush_chars:
+                    yield {"type": "token", "data": buffer}
+                    buffer = ""
+
+        if buffer:
+            yield {"type": "token", "data": buffer}
+
+        # 히스토리 저장
+        session.messages.append(("user", message))
+        session.messages.append(("assistant", full_response))
+
+        if len(session.messages) > MAX_HISTORY * 2:
+            session.messages = session.messages[-MAX_HISTORY * 2:]
 
         yield {"type": "done", "data": ""}
 
     except Exception as e:
-        logger.error(f"Agent with tools error: {e}")
+        logger.error(f"Streaming agent error: {e}")
         yield {"type": "error", "data": str(e)}

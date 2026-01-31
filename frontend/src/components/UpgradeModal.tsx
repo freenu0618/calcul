@@ -42,7 +42,9 @@ const reasonMessages = {
 
 const planFeatures: Record<SubscriptionTier, string[]> = {
   FREE: [],
+  TRIAL: [],
   BASIC: [
+    '3일 무료 체험',
     `직원 ${PLAN_LIMITS.BASIC.maxEmployees}명`,
     '무제한 급여 계산',
     'PDF 급여명세서',
@@ -107,16 +109,23 @@ export default function UpgradeModal({ isOpen, onClose, reason }: UpgradeModalPr
         <div className="border-2 border-blue-500 rounded-xl p-4 mb-6">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium">
-                추천
-              </span>
+              <div className="flex gap-2 items-center">
+                <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-medium">
+                  추천
+                </span>
+                {recommendedPlan === 'BASIC' && (
+                  <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-medium">
+                    3일 무료
+                  </span>
+                )}
+              </div>
               <h3 className="text-lg font-bold text-gray-900 mt-1">
                 {recommendedPlan} 플랜
               </h3>
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold text-gray-900">
-                ₩{recommendedPlan === 'PRO' ? '29,900' : '14,900'}
+                ${recommendedPlan === 'PRO' ? '14.99' : '9.99'}
               </p>
               <p className="text-xs text-gray-500">/월</p>
             </div>
@@ -140,7 +149,7 @@ export default function UpgradeModal({ isOpen, onClose, reason }: UpgradeModalPr
             onClick={onClose}
             className="block w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-center font-semibold rounded-lg transition-colors"
           >
-            요금제 확인하기
+            {recommendedPlan === 'BASIC' ? '3일 무료 체험 시작' : '요금제 확인하기'}
           </Link>
           <button
             onClick={onClose}

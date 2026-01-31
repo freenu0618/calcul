@@ -20,15 +20,17 @@ interface PricingPlan {
   ctaLink: string;
   popular?: boolean;
   disabled?: boolean;
+  trial?: string;
 }
 
+// 가격은 USD (Polar 결제 기준)
 const plans: PricingPlan[] = [
   {
     name: 'Free',
     description: '소규모 사업장 시작',
     monthlyPrice: 0,
     annualPrice: 0,
-    employees: '5명',
+    employees: '3명',
     features: [
       '월 5회 급여 계산',
       '4대보험 + 소득세 자동 계산',
@@ -41,8 +43,8 @@ const plans: PricingPlan[] = [
   {
     name: 'Basic',
     description: '성장하는 사업장',
-    monthlyPrice: 14900,
-    annualPrice: 148900,
+    monthlyPrice: 9.99,
+    annualPrice: 99.99,
     employees: '10명',
     features: [
       '무제한 급여 계산',
@@ -51,15 +53,16 @@ const plans: PricingPlan[] = [
       'PDF 급여명세서',
       '이메일 지원',
     ],
-    cta: '시작하기',
+    cta: '3일 무료 체험',
     ctaLink: '/register',
     popular: true,
+    trial: '3일 무료',
   },
   {
     name: 'Pro',
     description: '전문적인 관리',
-    monthlyPrice: 29900,
-    annualPrice: 298900,
+    monthlyPrice: 14.99,
+    annualPrice: 149.99,
     employees: '30명',
     features: [
       'Basic 플랜의 모든 기능',
@@ -91,7 +94,8 @@ const plans: PricingPlan[] = [
 ];
 
 function formatPrice(price: number): string {
-  return new Intl.NumberFormat('ko-KR').format(price);
+  // USD 소수점 2자리 포맷
+  return price % 1 === 0 ? price.toString() : price.toFixed(2);
 }
 
 export default function PricingSection() {
@@ -175,6 +179,13 @@ export default function PricingSection() {
                 </div>
               )}
 
+              {/* Trial Badge */}
+              {plan.trial && (
+                <div className="absolute top-4 right-4 bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">
+                  {plan.trial}
+                </div>
+              )}
+
               {/* Plan Header */}
               <div className="mb-6">
                 <h3 className="text-lg font-bold text-text-main mb-1">{plan.name}</h3>
@@ -185,16 +196,21 @@ export default function PricingSection() {
               <div className="mb-6">
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl font-black text-text-main">
-                    {plan.monthlyPrice === null ? '' : '₩'}
+                    {plan.monthlyPrice === null ? '' : '$'}
                     {getPrice(plan)}
                   </span>
                   {plan.monthlyPrice !== null && (
                     <span className="text-sm text-text-sub">/월</span>
                   )}
                 </div>
+                {plan.trial && billing === 'monthly' && (
+                  <p className="text-xs text-green-600 font-medium mt-1">
+                    3일 무료 체험 후 자동 결제
+                  </p>
+                )}
                 {billing === 'annual' && getAnnualSavings(plan) && (
                   <p className="text-xs text-green-600 font-medium mt-1">
-                    연 ₩{formatPrice(getAnnualSavings(plan)!)} 절약
+                    연 ${formatPrice(getAnnualSavings(plan)!)} 절약
                   </p>
                 )}
                 <p className="text-sm text-primary font-bold mt-2">

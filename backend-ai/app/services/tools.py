@@ -236,13 +236,32 @@ async def law_search(query: str, law_name: Optional[str] = None) -> dict:
 
 # ==================== 사용자 데이터 조회 도구 ====================
 
-async def _call_spring_api(endpoint: str, token: str) -> dict:
+# 전역 토큰 컨텍스트 (런타임에 주입)
+_current_user_token: Optional[str] = None
+
+
+def set_user_token(token: Optional[str]):
+    """사용자 토큰 설정 (Tool 호출 전 주입)"""
+    global _current_user_token
+    _current_user_token = token
+
+
+def get_user_token() -> Optional[str]:
+    """현재 사용자 토큰 조회"""
+    return _current_user_token
+
+
+async def _call_spring_api(endpoint: str, token: Optional[str] = None) -> dict:
     """Spring API 호출 헬퍼"""
+    auth_token = token or _current_user_token
+    if not auth_token:
+        return {"error": "로그인이 필요합니다. 먼저 로그인해주세요."}
+
     try:
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.get(
                 f"{settings.spring_api_url}{endpoint}",
-                headers={"Authorization": f"Bearer {token}"},
+                headers={"Authorization": f"Bearer {auth_token}"},
             )
             if response.status_code == 200:
                 return response.json()
@@ -256,22 +275,23 @@ async def _call_spring_api(endpoint: str, token: str) -> dict:
 
 
 @tool
-async def get_my_employees(token: str) -> dict:
+async def get_my_employees() -> dict:
     """
     나의 직원 목록 조회.
-    등록된 직원들의 정보를 조회합니다.
-
-    Args:
-        token: 사용자 인증 토큰
+    등록된 직원들의 이름, 고용형태, 기본급 정보를 조회합니다.
+    사용자가 "직원 목록", "우리 직원", "직원 누구" 등을 물어볼 때 사용하세요.
 
     Returns:
         직원 목록 (이름, 고용형태, 기본급 등)
     """
-    result = await _call_spring_api("/api/v1/employees", token)
+    result = await _call_spring_api("/api/v1/employees")
     if "error" in result:
         return result
 
     employees = result if isinstance(result, list) else result.get("content", [])
+    if not employees:
+        return {"message": "등록된 직원이 없습니다. 먼저 직원을 등록해주세요."}
+
     return {
         "count": len(employees),
         "employees": [
@@ -284,37 +304,73 @@ async def get_my_employees(token: str) -> dict:
             }
             for e in employees
         ],
+        "summary": f"총 {len(employees)}명의 직원이 등록되어 있습니다.",
     }
 
 
 @tool
-async def get_payroll_summary(token: str, period_id: Optional[int] = None) -> dict:
+async def get_employee_detail(employee_name: str) -> dict:
+    """
+    특정 직원의 상세 정보 조회.
+    직원 이름으로 검색하여 상세 정보를 반환합니다.
+
+    Args:
+        employee_name: 직원 이름 (예: "김철수", "홍길동")
+
+    Returns:
+        직원 상세 정보 (이름, 고용형태, 기본급, 부양가족 수 등)
+    """
+    result = await _call_spring_api("/api/v1/employees")
+    if "error" in result:
+        return result
+
+    employees = result if isinstance(result, list) else result.get("content", [])
+
+    # 이름으로 검색
+    found = [e for e in employees if employee_name in e.get("name", "")]
+    if not found:
+        return {"error": f"'{employee_name}' 직원을 찾을 수 없습니다."}
+
+    emp = found[0]
+    return {
+        "id": emp.get("id"),
+        "name": emp.get("name"),
+        "employment_type": emp.get("employmentType"),
+        "company_size": emp.get("companySize"),
+        "base_salary": emp.get("baseSalary"),
+        "dependents_count": emp.get("dependentsCount", 1),
+        "weekly_hours": emp.get("weeklyScheduledHours", 40),
+    }
+
+
+@tool
+async def get_payroll_summary(period_id: Optional[int] = None) -> dict:
     """
     급여대장 요약 조회.
     특정 기간의 급여 지출 내역을 조회합니다.
+    "이번달 급여 총액", "인건비 얼마야" 등의 질문에 사용하세요.
 
     Args:
-        token: 사용자 인증 토큰
         period_id: 급여대장 기간 ID (없으면 최신 기간)
 
     Returns:
         급여대장 요약 (총 인건비, 직원수, 공제 합계 등)
     """
     # 급여대장 기간 목록 조회
-    periods = await _call_spring_api("/api/v1/payroll/periods", token)
+    periods = await _call_spring_api("/api/v1/payroll/periods")
     if "error" in periods:
         return periods
 
     period_list = periods if isinstance(periods, list) else periods.get("content", [])
     if not period_list:
-        return {"message": "등록된 급여대장이 없습니다."}
+        return {"message": "등록된 급여대장이 없습니다. 먼저 급여대장을 작성해주세요."}
 
     target_period = period_list[0]  # 최신
     if period_id:
         target_period = next((p for p in period_list if p.get("id") == period_id), period_list[0])
 
     # 해당 기간의 엔트리 조회
-    entries = await _call_spring_api(f"/api/v1/payroll/periods/{target_period['id']}/entries", token)
+    entries = await _call_spring_api(f"/api/v1/payroll/periods/{target_period['id']}/entries")
     if "error" in entries:
         return entries
 
@@ -335,13 +391,12 @@ async def get_payroll_summary(token: str, period_id: Optional[int] = None) -> di
 
 
 @tool
-async def get_monthly_labor_cost(token: str, year: int, month: int) -> dict:
+async def get_monthly_labor_cost(year: int, month: int) -> dict:
     """
     특정 월의 인건비 합계 조회.
     해당 월의 총 인건비와 상세 내역을 조회합니다.
 
     Args:
-        token: 사용자 인증 토큰
         year: 년도 (예: 2026)
         month: 월 (1-12)
 
@@ -349,7 +404,7 @@ async def get_monthly_labor_cost(token: str, year: int, month: int) -> dict:
         월간 인건비 요약
     """
     # 급여대장 기간 목록에서 해당 월 찾기
-    periods = await _call_spring_api("/api/v1/payroll/periods", token)
+    periods = await _call_spring_api("/api/v1/payroll/periods")
     if "error" in periods:
         return periods
 
@@ -363,7 +418,7 @@ async def get_monthly_labor_cost(token: str, year: int, month: int) -> dict:
         return {"message": f"{year}년 {month}월 급여대장이 없습니다."}
 
     # 해당 기간의 엔트리 조회
-    entries = await _call_spring_api(f"/api/v1/payroll/periods/{target['id']}/entries", token)
+    entries = await _call_spring_api(f"/api/v1/payroll/periods/{target['id']}/entries")
     if "error" in entries:
         return entries
 
@@ -382,14 +437,22 @@ async def get_monthly_labor_cost(token: str, year: int, month: int) -> dict:
     }
 
 
-# 도구 목록
-ALL_TOOLS = [
+# 일반 도구 (인증 불필요)
+GENERAL_TOOLS = [
     salary_calculator,
     minimum_wage_check,
     overtime_calculator,
     insurance_calculator,
     law_search,
+]
+
+# 사용자 데이터 도구 (인증 필요)
+USER_DATA_TOOLS = [
     get_my_employees,
+    get_employee_detail,
     get_payroll_summary,
     get_monthly_labor_cost,
 ]
+
+# 전체 도구 목록
+ALL_TOOLS = GENERAL_TOOLS + USER_DATA_TOOLS
