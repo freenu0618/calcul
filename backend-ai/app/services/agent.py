@@ -198,6 +198,9 @@ async def get_agent_response(
         max_iterations = 3
         full_response = ""
 
+        # Tool 결과에서 주요 응답 저장
+        tool_summaries = []
+
         for iteration in range(max_iterations):
             logger.info(f"Tool loop iteration {iteration + 1}/{max_iterations}")
 
@@ -230,6 +233,19 @@ async def get_agent_response(
                     result = await _execute_tool(tool_name, tool_args)
                     logger.info(f"Tool result: {result[:200]}...")
 
+                    # Tool 결과에서 summary/answer/message 추출
+                    try:
+                        import json
+                        result_data = json.loads(result)
+                        if "summary" in result_data:
+                            tool_summaries.append(result_data["summary"])
+                        elif "answer" in result_data:
+                            tool_summaries.append(result_data["answer"])
+                        elif "message" in result_data:
+                            tool_summaries.append(result_data["message"])
+                    except (json.JSONDecodeError, TypeError):
+                        pass
+
                     # Tool 결과 메시지 추가
                     messages.append(ToolMessage(content=result, tool_call_id=tool_id))
 
@@ -242,7 +258,11 @@ async def get_agent_response(
 
             # Tool Call이 없으면 최종 응답
             if has_content:
-                full_response = response.content
+                # Tool 결과 요약이 있으면 앞에 추가
+                if tool_summaries:
+                    full_response = "\n\n".join(tool_summaries) + "\n\n" + response.content
+                else:
+                    full_response = response.content
                 logger.info(f"Final response length: {len(full_response)}")
                 break
             else:
