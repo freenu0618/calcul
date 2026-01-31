@@ -411,6 +411,20 @@ async def get_payroll_summary(year: Optional[int] = None, month: Optional[int] =
     total_net = sum(e.get("netPay", 0) or 0 for e in entry_list)
     total_deductions = total_gross - total_net
 
+    # 직원별 급여 목록 (정렬: 총급여 높은 순)
+    employees = sorted(
+        [
+            {
+                "name": e.get("employeeName", "이름없음"),
+                "total_gross": e.get("totalGross", 0) or 0,
+                "net_pay": e.get("netPay", 0) or 0,
+            }
+            for e in entry_list
+        ],
+        key=lambda x: x["total_gross"],
+        reverse=True
+    )
+
     logger.info(f"Calculated: gross={total_gross}, net={total_net}")
 
     return {
@@ -419,6 +433,7 @@ async def get_payroll_summary(year: Optional[int] = None, month: Optional[int] =
         "total_gross_pay": total_gross,
         "total_net_pay": total_net,
         "total_deductions": total_deductions,
+        "employees": employees,  # 직원별 급여 목록 추가
         "summary": f"{period_year}년 {period_month}월 인건비: 총 {total_gross:,}원 (실지급 {total_net:,}원, 공제 {total_deductions:,}원), 직원 {len(entry_list)}명",
     }
 
