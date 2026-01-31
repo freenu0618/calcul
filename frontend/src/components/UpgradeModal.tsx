@@ -3,7 +3,8 @@
  */
 
 import { Link } from 'react-router-dom';
-import { useSubscription, PLAN_LIMITS, SubscriptionTier } from '../hooks/useSubscription';
+import { useSubscription, PLAN_LIMITS } from '../hooks/useSubscription';
+import type { SubscriptionTier } from '../hooks/useSubscription';
 
 interface UpgradeModalProps {
   isOpen: boolean;

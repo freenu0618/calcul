@@ -43,7 +43,7 @@ const colorClasses = {
 export default function DashboardPage() {
   const { user } = useAuth();
   const { openChat } = useChat();
-  const { tier, tierLabel, usage, limits, remainingAiChats } = useSubscription();
+  const { tier, tierLabel, usage, limits } = useSubscription();
 
   const aiUsagePercent = limits.aiChatsPerMonth === Infinity
     ? 0

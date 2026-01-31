@@ -2,7 +2,8 @@
  * ChatContext - AI 채팅 위젯 전역 상태 관리
  */
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState } from 'react';
+import type { ReactNode } from 'react';
 
 interface ChatContextType {
   isOpen: boolean;
