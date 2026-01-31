@@ -20,59 +20,85 @@ interface UseChatOptions {
   userId?: string;
 }
 
-const STORAGE_KEY = 'chat_messages';
+const STORAGE_KEY_PREFIX = 'chat_messages_';
 const MAX_STORED_MESSAGES = 50;
+
+// 사용자별 스토리지 키 생성
+function getStorageKey(userId: string): string {
+  return `${STORAGE_KEY_PREFIX}${userId}`;
+}
 
 export function useChat(options: UseChatOptions = {}) {
   const {
     apiUrl = import.meta.env.VITE_AI_API_URL || 'http://localhost:8001',
-    userId = 'anonymous'
   } = options;
 
-  // 세션 ID 생성 (탭별 고유, 새로고침 시 유지)
+  // 자동으로 로그인된 사용자 ID 가져오기
+  const userId = useMemo(() => {
+    if (options.userId) return options.userId;
+    try {
+      const authUser = localStorage.getItem('auth_user');
+      if (authUser) {
+        const parsed = JSON.parse(authUser);
+        return String(parsed.id || 'anonymous');
+      }
+    } catch { /* ignore */ }
+    return 'anonymous';
+  }, [options.userId]);
+
+  const storageKey = getStorageKey(userId);
+
+  // 세션 ID 생성 (사용자+탭별 고유)
   const sessionId = useMemo(() => {
-    const key = 'chat_session_id';
+    const key = `chat_session_id_${userId}`;
     let id = sessionStorage.getItem(key);
     if (!id) {
       id = crypto.randomUUID();
       sessionStorage.setItem(key, id);
     }
     return id;
-  }, []);
+  }, [userId]);
 
-  // localStorage에서 대화 내역 복원
-  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+  // localStorage에서 대화 내역 복원 (사용자별)
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+
+  // userId 변경 시 해당 사용자의 메시지 로드
+  useEffect(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(storageKey);
       if (stored) {
         const parsed = JSON.parse(stored);
-        return parsed.map((m: any) => ({
+        setMessages(parsed.map((m: any) => ({
           ...m,
           timestamp: new Date(m.timestamp)
-        }));
+        })));
+      } else {
+        setMessages([]);
       }
     } catch (e) {
       console.error('Failed to restore chat messages:', e);
+      setMessages([]);
     }
-    return [];
-  });
+  }, [storageKey]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // 메시지 변경 시 localStorage에 저장
+  // 메시지 변경 시 localStorage에 저장 (사용자별)
   useEffect(() => {
+    // 초기 로드 시에는 저장하지 않음
+    if (messages.length === 0) return;
+
     try {
-      // 스트리밍 중인 메시지는 저장하지 않음
       const toStore = messages
         .filter(m => !m.isStreaming)
         .slice(-MAX_STORED_MESSAGES);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
+      localStorage.setItem(storageKey, JSON.stringify(toStore));
     } catch (e) {
       console.error('Failed to save chat messages:', e);
     }
-  }, [messages]);
+  }, [messages, storageKey]);
 
   const sendMessage = useCallback(async (content: string) => {
     if (!content.trim() || isLoading) return;
@@ -225,18 +251,18 @@ export function useChat(options: UseChatOptions = {}) {
 
   const clearMessages = useCallback(() => {
     setMessages([]);
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(storageKey);
     setError(null);
-  }, []);
+  }, [storageKey]);
 
   // 새 대화 시작 (세션 초기화)
   const startNewChat = useCallback(() => {
     const newId = crypto.randomUUID();
-    sessionStorage.setItem('chat_session_id', newId);
+    sessionStorage.setItem(`chat_session_id_${userId}`, newId);
     setMessages([]);
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(storageKey);
     setError(null);
-  }, []);
+  }, [storageKey, userId]);
 
   return {
     messages,

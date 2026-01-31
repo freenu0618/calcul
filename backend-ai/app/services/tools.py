@@ -378,8 +378,9 @@ async def get_payroll_summary(period_id: Optional[int] = None) -> dict:
 
     entry_list = ledger.get("entries", [])
 
-    total_gross = sum(e.get("grossPay", 0) for e in entry_list)
-    total_net = sum(e.get("netPay", 0) for e in entry_list)
+    # API 응답 키: totalGross, netPay
+    total_gross = sum(e.get("totalGross", 0) or 0 for e in entry_list)
+    total_net = sum(e.get("netPay", 0) or 0 for e in entry_list)
     total_deductions = total_gross - total_net
 
     return {
@@ -428,8 +429,9 @@ async def get_monthly_labor_cost(year: int, month: int) -> dict:
 
     entry_list = ledger.get("entries", [])
 
-    total_gross = sum(e.get("grossPay", 0) for e in entry_list)
-    total_net = sum(e.get("netPay", 0) for e in entry_list)
+    # API 응답 키: totalGross, netPay
+    total_gross = sum(e.get("totalGross", 0) or 0 for e in entry_list)
+    total_net = sum(e.get("netPay", 0) or 0 for e in entry_list)
 
     return {
         "year": year,

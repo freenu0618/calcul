@@ -115,10 +115,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // 로그아웃
   const logout = () => {
+    // 현재 사용자의 채팅 내역 삭제 (보안)
+    if (user?.id) {
+      localStorage.removeItem(`chat_messages_${user.id}`);
+      sessionStorage.removeItem(`chat_session_id_${user.id}`);
+    }
+    // 비로그인 사용자 채팅도 삭제
+    localStorage.removeItem('chat_messages_anonymous');
+    sessionStorage.removeItem('chat_session_id_anonymous');
+
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
-    localStorage.removeItem('chat_messages'); // 채팅 내역 삭제 (보안)
-    sessionStorage.removeItem('chat_session_id'); // 세션 ID도 삭제
     setToken(null);
     setUser(null);
   };
