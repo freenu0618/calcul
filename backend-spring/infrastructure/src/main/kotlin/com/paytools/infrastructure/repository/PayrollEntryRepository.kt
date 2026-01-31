@@ -37,4 +37,7 @@ interface PayrollEntryRepository : JpaRepository<PayrollEntryEntity, Long> {
 
     /** 급여 기간 내 엔트리 존재 여부 */
     fun existsByPayrollPeriodIdAndEmployeeId(payrollPeriodId: Long, employeeId: UUID): Boolean
+
+    /** 급여 기간의 모든 엔트리 삭제 */
+    fun deleteByPayrollPeriodId(payrollPeriodId: Long)
 }

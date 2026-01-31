@@ -57,6 +57,15 @@ class PayrollController(
         return ResponseEntity.ok(response)
     }
 
+    @Operation(summary = "급여 기간 삭제", description = "급여 기간과 관련 엔트리를 모두 삭제합니다")
+    @DeleteMapping("/periods/{periodId}")
+    fun deletePayrollPeriod(
+        @PathVariable periodId: Long
+    ): ResponseEntity<Void> {
+        payrollService.deletePayrollPeriod(periodId)
+        return ResponseEntity.noContent().build()
+    }
+
     // ==================== 급여 엔트리 ====================
 
     @Operation(summary = "급여 엔트리 추가", description = "급여 기간에 직원의 급여 엔트리를 추가합니다")

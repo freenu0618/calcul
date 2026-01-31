@@ -121,6 +121,23 @@ class PayrollService(
         return PayrollPeriodResponse.from(saved)
     }
 
+    /** 급여 기간 삭제 */
+    @Transactional
+    fun deletePayrollPeriod(periodId: Long) {
+        val userId = getCurrentUserId()
+        val period = payrollPeriodRepository.findById(periodId)
+            .orElseThrow { IllegalArgumentException("급여 기간을 찾을 수 없습니다") }
+
+        if (period.userId != userId) {
+            throw IllegalArgumentException("접근 권한이 없습니다")
+        }
+
+        // 관련 엔트리 먼저 삭제
+        payrollEntryRepository.deleteByPayrollPeriodId(periodId)
+        // 급여 기간 삭제
+        payrollPeriodRepository.delete(period)
+    }
+
     // ==================== 급여 엔트리 ====================
 
     /** 급여 엔트리 추가 */

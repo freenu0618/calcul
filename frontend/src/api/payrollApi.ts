@@ -50,6 +50,11 @@ export const payrollApi = {
     return transformToSnakeCase(response.data) as PayrollPeriodResponse;
   },
 
+  /** 급여 기간 삭제 */
+  deletePeriod: async (periodId: number): Promise<void> => {
+    await apiClient.delete(`/payroll/periods/${periodId}`);
+  },
+
   // ==================== 급여 엔트리 ====================
 
   /** 급여 엔트리 추가 */

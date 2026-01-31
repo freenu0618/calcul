@@ -149,6 +149,17 @@ export default function PayrollDetail() {
     }
   };
 
+  const handleDeletePeriod = async () => {
+    if (!id) return;
+    if (!confirm('이 급여대장을 삭제하시겠습니까?\n모든 급여 데이터가 삭제됩니다.')) return;
+    try {
+      await payrollApi.deletePeriod(Number(id));
+      navigate('/payroll');
+    } catch (err: any) {
+      alert(err.response?.data?.message || '삭제에 실패했습니다.');
+    }
+  };
+
   const handleApplyTemplate = (shifts: WorkShiftRequest[]) => {
     setWorkShifts(shifts);
   };
@@ -234,6 +245,15 @@ export default function PayrollDetail() {
               className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
             >
               수정
+            </button>
+          )}
+          {/* 삭제 버튼 (DRAFT 상태에서만) */}
+          {isDraft && (
+            <button
+              onClick={handleDeletePeriod}
+              className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50"
+            >
+              삭제
             </button>
           )}
         </div>
