@@ -47,6 +47,7 @@ const EmployeeList = lazy(() => import('./pages/Employees/EmployeeList'));
 const EmployeeForm = lazy(() => import('./pages/Employees/EmployeeForm'));
 const PayrollList = lazy(() => import('./pages/Payroll/PayrollList'));
 const PayrollDetail = lazy(() => import('./pages/Payroll/PayrollDetail'));
+const MyPage = lazy(() => import('./pages/MyPage'));
 
 // 로딩 컴포넌트
 function PageLoader() {
@@ -137,6 +138,7 @@ function App() {
                     {/* 급여대장 (인증 필요) */}
                     <Route path="/payroll" element={<PrivateRoute><PayrollList /></PrivateRoute>} />
                     <Route path="/payroll/:id" element={<PrivateRoute><PayrollDetail /></PrivateRoute>} />
+                    <Route path="/mypage" element={<PrivateRoute><MyPage /></PrivateRoute>} />
 
                     {/* 기타 페이지 */}
                     <Route path="/about" element={<About />} />
