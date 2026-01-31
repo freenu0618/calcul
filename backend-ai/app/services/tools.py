@@ -378,10 +378,20 @@ async def get_payroll_summary(period_id: Optional[int] = None) -> dict:
 
     entry_list = ledger.get("entries", [])
 
+    # 디버그: 실제 데이터 확인
+    logger.info(f"Ledger keys: {ledger.keys()}")
+    logger.info(f"Entry count: {len(entry_list)}")
+    if entry_list:
+        logger.info(f"First entry keys: {entry_list[0].keys() if entry_list else 'empty'}")
+        logger.info(f"First entry totalGross: {entry_list[0].get('totalGross')}")
+        logger.info(f"First entry netPay: {entry_list[0].get('netPay')}")
+
     # API 응답 키: totalGross, netPay
     total_gross = sum(e.get("totalGross", 0) or 0 for e in entry_list)
     total_net = sum(e.get("netPay", 0) or 0 for e in entry_list)
     total_deductions = total_gross - total_net
+
+    logger.info(f"Calculated: gross={total_gross}, net={total_net}, deductions={total_deductions}")
 
     return {
         "period": f"{target_period.get('year')}-{target_period.get('month'):02d}",
@@ -429,9 +439,16 @@ async def get_monthly_labor_cost(year: int, month: int) -> dict:
 
     entry_list = ledger.get("entries", [])
 
+    # 디버그: 실제 데이터 확인
+    logger.info(f"[Monthly] Entry count: {len(entry_list)}")
+    if entry_list:
+        logger.info(f"[Monthly] First entry: {entry_list[0]}")
+
     # API 응답 키: totalGross, netPay
     total_gross = sum(e.get("totalGross", 0) or 0 for e in entry_list)
     total_net = sum(e.get("netPay", 0) or 0 for e in entry_list)
+
+    logger.info(f"[Monthly] Calculated: gross={total_gross}, net={total_net}")
 
     return {
         "year": year,
