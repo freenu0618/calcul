@@ -68,6 +68,32 @@ async def _execute_tool(tool_name: str, tool_args: dict) -> str:
         return json.dumps({"error": str(e)})
 
 
+async def _invoke_with_fallback(tiered_llm, messages: list, tools: list):
+    """LLM 호출 with fallback (Tool Calling 지원)"""
+    logger.info(f"_invoke_with_fallback called, tiers: {[n for n,_ in tiered_llm.tiers]}")
+    last_error = None
+
+    for name, llm in tiered_llm.tiers:
+        cb = tiered_llm.circuit_breakers[name]
+        if not cb.can_execute():
+            logger.debug(f"Skipping {name} (circuit open)")
+            continue
+
+        try:
+            llm_with_tools = llm.bind_tools(tools)
+            response = await llm_with_tools.ainvoke(messages)
+            cb.record_success()
+            logger.info(f"LLM response from {name}")
+            return response
+        except Exception as e:
+            cb.record_failure()
+            last_error = e
+            logger.warning(f"{name} failed: {e}")
+            continue
+
+    raise RuntimeError(f"All LLM tiers failed: {last_error}")
+
+
 async def get_agent_response(
     message: str,
     session_id: Optional[str] = None,
@@ -155,16 +181,13 @@ async def get_agent_response(
         # Tool 바인딩 (로그인된 경우 전체, 아니면 일반 도구만)
         tools = ALL_TOOLS if user_token else GENERAL_TOOLS
 
-        # LLM에 tools 바인딩 (첫 번째 tier 사용)
-        llm_with_tools = tiered_llm.tiers[0][1].bind_tools(tools)
-
         # Tool Calling 루프 (최대 3회)
         max_iterations = 3
         full_response = ""
 
         for iteration in range(max_iterations):
-            # LLM 호출
-            response = await llm_with_tools.ainvoke(messages)
+            # LLM 호출 (fallback 지원)
+            response = await _invoke_with_fallback(tiered_llm, messages, tools)
 
             # Tool Call이 있는지 확인
             if hasattr(response, "tool_calls") and response.tool_calls:
@@ -221,7 +244,9 @@ async def get_agent_response(
 
     except Exception as e:
         logger.error(f"Agent error: {e}")
-        yield {"type": "error", "data": str(e)}
+        # 사용자 친화적 에러 메시지
+        user_message = "죄송합니다. 일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+        yield {"type": "error", "data": user_message}
 
 
 async def get_agent_response_streaming(

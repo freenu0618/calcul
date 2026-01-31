@@ -1,8 +1,7 @@
 """
 Tiered LLM with Fallback Chain & Circuit Breaker
-Tier 1: Gemini 2.0 Flash (무료/저렴)
-Tier 2: Groq Llama 3.3 70B (중간)
-Tier 3: GPT-4o-mini (최후 보루)
+Tier 1: Groq Llama (빠르고 안정적)
+Tier 2: GPT-4o-mini (fallback)
 """
 
 import logging
@@ -10,7 +9,6 @@ import time
 from typing import Optional
 from dataclasses import dataclass, field
 
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
 from langchain_core.language_models import BaseChatModel
@@ -62,19 +60,7 @@ class TieredLLM:
         self._init_tiers()
 
     def _init_tiers(self):
-        # Tier 1: Gemini
-        if settings.google_api_key:
-            llm = ChatGoogleGenerativeAI(
-                model="gemini-2.0-flash",
-                temperature=settings.llm_temperature,
-                google_api_key=settings.google_api_key,
-                timeout=settings.llm_timeout,
-            )
-            self.tiers.append(("gemini", llm))
-            self.circuit_breakers["gemini"] = CircuitBreaker()
-            logger.info("Tier 1 (Gemini) initialized")
-
-        # Tier 2: Groq (빠른 응답용 경량 모델)
+        # Tier 1: Groq (빠르고 안정적)
         if settings.groq_api_key:
             llm = ChatGroq(
                 model="llama-3.1-8b-instant",
@@ -84,9 +70,9 @@ class TieredLLM:
             )
             self.tiers.append(("groq", llm))
             self.circuit_breakers["groq"] = CircuitBreaker()
-            logger.info("Tier 2 (Groq) initialized")
+            logger.info("Tier 1 (Groq) initialized")
 
-        # Tier 3: OpenAI
+        # Tier 2: OpenAI (fallback)
         if settings.openai_api_key:
             llm = ChatOpenAI(
                 model="gpt-4o-mini",
@@ -96,7 +82,7 @@ class TieredLLM:
             )
             self.tiers.append(("openai", llm))
             self.circuit_breakers["openai"] = CircuitBreaker()
-            logger.info("Tier 3 (OpenAI) initialized")
+            logger.info("Tier 2 (OpenAI) initialized")
 
         if not self.tiers:
             raise ValueError("No LLM API keys configured")
