@@ -1,10 +1,47 @@
 /**
  * 급여명세서 PDF 생성기
  * 근로기준법 시행령 제27조의2 준수
+ * 한글 폰트 지원 (Noto Sans KR)
  */
 
 import { jsPDF } from 'jspdf';
 import type { SalaryCalculationResponse } from '../types/salary';
+
+// 폰트 캐시
+let fontLoaded = false;
+
+/**
+ * Noto Sans KR 폰트 로드 (Google Fonts CDN)
+ */
+async function loadKoreanFont(doc: jsPDF): Promise<void> {
+  if (fontLoaded) {
+    doc.setFont('NotoSansKR');
+    return;
+  }
+
+  try {
+    // Noto Sans KR Regular (약 1MB, 한글 지원)
+    const fontUrl = 'https://cdn.jsdelivr.net/gh/nickshanks/Glyph@master/fonts/NotoSansKR-Regular.otf';
+
+    const response = await fetch(fontUrl);
+    if (!response.ok) throw new Error('Font fetch failed');
+
+    const fontData = await response.arrayBuffer();
+    const fontBase64 = btoa(
+      new Uint8Array(fontData).reduce((data, byte) => data + String.fromCharCode(byte), '')
+    );
+
+    // 폰트 등록
+    doc.addFileToVFS('NotoSansKR-Regular.otf', fontBase64);
+    doc.addFont('NotoSansKR-Regular.otf', 'NotoSansKR', 'normal');
+    doc.setFont('NotoSansKR');
+
+    fontLoaded = true;
+  } catch (error) {
+    console.warn('Korean font load failed, using fallback:', error);
+    // 폴백: 기본 폰트 사용 (한글 깨짐)
+  }
+}
 
 /**
  * 급여명세서 PDF 생성 및 다운로드
@@ -16,6 +53,9 @@ export async function generatePayslipPdf(
   const doc = new jsPDF('p', 'mm', 'a4');
   const pageWidth = doc.internal.pageSize.getWidth();
   const { gross_breakdown, deductions_breakdown, net_pay, work_summary } = result;
+
+  // 한글 폰트 로드
+  await loadKoreanFont(doc);
 
   let y = 15;
 

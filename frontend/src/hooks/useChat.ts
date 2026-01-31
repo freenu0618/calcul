@@ -103,6 +103,7 @@ export function useChat(options: UseChatOptions = {}) {
 
       const decoder = new TextDecoder();
       let buffer = '';
+      let currentEvent = 'token'; // 기본 이벤트 타입
 
       while (true) {
         const { done, value } = await reader.read();
@@ -114,7 +115,8 @@ export function useChat(options: UseChatOptions = {}) {
 
         for (const line of lines) {
           if (line.startsWith('event: ')) {
-            // SSE event type (token, done, error) - 현재 data만 처리
+            // SSE 이벤트 타입 저장
+            currentEvent = line.slice(7).trim();
             continue;
           }
           if (line.startsWith('data: ')) {
@@ -122,7 +124,19 @@ export function useChat(options: UseChatOptions = {}) {
 
             if (data === '') continue;
 
-            // 토큰 추가
+            // tool_call 이벤트는 무시 (내부 처리용)
+            if (currentEvent === 'tool_call') {
+              // Tool 호출 중 표시 (선택적)
+              // console.log('Tool call:', data);
+              continue;
+            }
+
+            // done/error 이벤트는 처리하지 않음
+            if (currentEvent === 'done' || currentEvent === 'error') {
+              continue;
+            }
+
+            // token 이벤트만 메시지에 추가
             setMessages(prev =>
               prev.map(m =>
                 m.id === assistantId
