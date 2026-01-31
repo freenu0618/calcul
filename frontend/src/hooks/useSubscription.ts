@@ -88,8 +88,10 @@ export function useSubscription(): SubscriptionState {
     setIsLoading(true);
     try {
       const response = await apiClient.get('/employees');
-      const employees = response.data?.data || response.data || [];
-      setEmployeeCount(Array.isArray(employees) ? employees.length : 0);
+      // API 응답: { employees: [...], totalCount: N }
+      const data = response.data;
+      const count = data?.totalCount ?? data?.employees?.length ?? 0;
+      setEmployeeCount(count);
     } catch (error) {
       console.error('Failed to fetch employee count:', error);
     } finally {

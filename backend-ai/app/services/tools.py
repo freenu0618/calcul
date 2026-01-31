@@ -288,7 +288,7 @@ async def get_my_employees() -> dict:
     if "error" in result:
         return result
 
-    employees = result if isinstance(result, list) else result.get("data", [])
+    employees = result if isinstance(result, list) else result.get("employees", [])
     if not employees:
         return {"message": "등록된 직원이 없습니다. 먼저 직원을 등록해주세요."}
 
@@ -324,7 +324,7 @@ async def get_employee_detail(employee_name: str) -> dict:
     if "error" in result:
         return result
 
-    employees = result if isinstance(result, list) else result.get("data", [])
+    employees = result if isinstance(result, list) else result.get("employees", [])
 
     # 이름으로 검색
     found = [e for e in employees if employee_name in e.get("name", "")]
