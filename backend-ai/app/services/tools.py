@@ -234,6 +234,154 @@ async def law_search(query: str, law_name: Optional[str] = None) -> dict:
     }
 
 
+# ==================== 사용자 데이터 조회 도구 ====================
+
+async def _call_spring_api(endpoint: str, token: str) -> dict:
+    """Spring API 호출 헬퍼"""
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.get(
+                f"{settings.spring_api_url}{endpoint}",
+                headers={"Authorization": f"Bearer {token}"},
+            )
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 401:
+                return {"error": "인증 만료. 다시 로그인해주세요."}
+            else:
+                return {"error": f"API 오류: {response.status_code}"}
+    except Exception as e:
+        logger.error(f"Spring API error: {e}")
+        return {"error": str(e)}
+
+
+@tool
+async def get_my_employees(token: str) -> dict:
+    """
+    나의 직원 목록 조회.
+    등록된 직원들의 정보를 조회합니다.
+
+    Args:
+        token: 사용자 인증 토큰
+
+    Returns:
+        직원 목록 (이름, 고용형태, 기본급 등)
+    """
+    result = await _call_spring_api("/api/v1/employees", token)
+    if "error" in result:
+        return result
+
+    employees = result if isinstance(result, list) else result.get("content", [])
+    return {
+        "count": len(employees),
+        "employees": [
+            {
+                "id": e.get("id"),
+                "name": e.get("name"),
+                "employment_type": e.get("employmentType"),
+                "company_size": e.get("companySize"),
+                "base_salary": e.get("baseSalary"),
+            }
+            for e in employees
+        ],
+    }
+
+
+@tool
+async def get_payroll_summary(token: str, period_id: Optional[int] = None) -> dict:
+    """
+    급여대장 요약 조회.
+    특정 기간의 급여 지출 내역을 조회합니다.
+
+    Args:
+        token: 사용자 인증 토큰
+        period_id: 급여대장 기간 ID (없으면 최신 기간)
+
+    Returns:
+        급여대장 요약 (총 인건비, 직원수, 공제 합계 등)
+    """
+    # 급여대장 기간 목록 조회
+    periods = await _call_spring_api("/api/v1/payroll/periods", token)
+    if "error" in periods:
+        return periods
+
+    period_list = periods if isinstance(periods, list) else periods.get("content", [])
+    if not period_list:
+        return {"message": "등록된 급여대장이 없습니다."}
+
+    target_period = period_list[0]  # 최신
+    if period_id:
+        target_period = next((p for p in period_list if p.get("id") == period_id), period_list[0])
+
+    # 해당 기간의 엔트리 조회
+    entries = await _call_spring_api(f"/api/v1/payroll/periods/{target_period['id']}/entries", token)
+    if "error" in entries:
+        return entries
+
+    entry_list = entries if isinstance(entries, list) else entries.get("content", [])
+
+    total_gross = sum(e.get("grossPay", 0) for e in entry_list)
+    total_net = sum(e.get("netPay", 0) for e in entry_list)
+    total_deductions = total_gross - total_net
+
+    return {
+        "period": f"{target_period.get('year')}-{target_period.get('month'):02d}",
+        "employee_count": len(entry_list),
+        "total_gross_pay": total_gross,
+        "total_net_pay": total_net,
+        "total_deductions": total_deductions,
+        "summary": f"{target_period.get('year')}년 {target_period.get('month')}월 인건비: 총 {total_gross:,}원 (실지급 {total_net:,}원, 공제 {total_deductions:,}원)",
+    }
+
+
+@tool
+async def get_monthly_labor_cost(token: str, year: int, month: int) -> dict:
+    """
+    특정 월의 인건비 합계 조회.
+    해당 월의 총 인건비와 상세 내역을 조회합니다.
+
+    Args:
+        token: 사용자 인증 토큰
+        year: 년도 (예: 2026)
+        month: 월 (1-12)
+
+    Returns:
+        월간 인건비 요약
+    """
+    # 급여대장 기간 목록에서 해당 월 찾기
+    periods = await _call_spring_api("/api/v1/payroll/periods", token)
+    if "error" in periods:
+        return periods
+
+    period_list = periods if isinstance(periods, list) else periods.get("content", [])
+    target = next(
+        (p for p in period_list if p.get("year") == year and p.get("month") == month),
+        None,
+    )
+
+    if not target:
+        return {"message": f"{year}년 {month}월 급여대장이 없습니다."}
+
+    # 해당 기간의 엔트리 조회
+    entries = await _call_spring_api(f"/api/v1/payroll/periods/{target['id']}/entries", token)
+    if "error" in entries:
+        return entries
+
+    entry_list = entries if isinstance(entries, list) else entries.get("content", [])
+
+    total_gross = sum(e.get("grossPay", 0) for e in entry_list)
+    total_net = sum(e.get("netPay", 0) for e in entry_list)
+
+    return {
+        "year": year,
+        "month": month,
+        "employee_count": len(entry_list),
+        "total_labor_cost": total_gross,
+        "total_net_pay": total_net,
+        "answer": f"{year}년 {month}월 총 인건비는 {total_gross:,}원입니다. (직원 {len(entry_list)}명)",
+    }
+
+
 # 도구 목록
 ALL_TOOLS = [
     salary_calculator,
@@ -241,4 +389,7 @@ ALL_TOOLS = [
     overtime_calculator,
     insurance_calculator,
     law_search,
+    get_my_employees,
+    get_payroll_summary,
+    get_monthly_labor_cost,
 ]

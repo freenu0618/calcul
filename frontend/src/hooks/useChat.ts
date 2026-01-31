@@ -1,8 +1,10 @@
 /**
  * 채팅 SSE 연결 훅
+ * - JWT 토큰으로 사용자 인식
+ * - session_id로 대화 히스토리 유지
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 
 export interface ChatMessage {
   id: string;
@@ -22,6 +24,17 @@ export function useChat(options: UseChatOptions = {}) {
     apiUrl = import.meta.env.VITE_AI_API_URL || 'http://localhost:8001',
     userId = 'anonymous'
   } = options;
+
+  // 세션 ID 생성 (탭별 고유, 새로고침 시 유지)
+  const sessionId = useMemo(() => {
+    const key = 'chat_session_id';
+    let id = sessionStorage.getItem(key);
+    if (!id) {
+      id = crypto.randomUUID();
+      sessionStorage.setItem(key, id);
+    }
+    return id;
+  }, []);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,13 +70,23 @@ export function useChat(options: UseChatOptions = {}) {
     try {
       abortControllerRef.current = new AbortController();
 
+      // localStorage에서 JWT 토큰 가져오기
+      const token = localStorage.getItem('accessToken');
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'X-User-Id': userId,
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${apiUrl}/api/v1/chat/stream`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-User-Id': userId,
-        },
-        body: JSON.stringify({ message: content.trim() }),
+        headers,
+        body: JSON.stringify({
+          message: content.trim(),
+          session_id: sessionId,
+        }),
         signal: abortControllerRef.current.signal,
       });
 
@@ -137,7 +160,7 @@ export function useChat(options: UseChatOptions = {}) {
       setIsLoading(false);
       abortControllerRef.current = null;
     }
-  }, [apiUrl, userId, isLoading]);
+  }, [apiUrl, userId, sessionId, isLoading]);
 
   const stopGeneration = useCallback(() => {
     abortControllerRef.current?.abort();
@@ -149,12 +172,23 @@ export function useChat(options: UseChatOptions = {}) {
     setError(null);
   }, []);
 
+  // 새 대화 시작 (세션 초기화)
+  const startNewChat = useCallback(() => {
+    const newId = crypto.randomUUID();
+    sessionStorage.setItem('chat_session_id', newId);
+    setMessages([]);
+    setError(null);
+    window.location.reload(); // 새 세션 ID 적용
+  }, []);
+
   return {
     messages,
     isLoading,
     error,
+    sessionId,
     sendMessage,
     stopGeneration,
     clearMessages,
+    startNewChat,
   };
 }

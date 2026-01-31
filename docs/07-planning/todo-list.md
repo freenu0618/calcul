@@ -1,7 +1,7 @@
 # 프로젝트 TODO 리스트
 
 **작성일**: 2026-01-22
-**마지막 업데이트**: 2026-01-29 (v1.4.0 - Phase 3.6 급여 설정 고도화 완료)
+**마지막 업데이트**: 2026-01-31 (v1.5.0 - Phase 6 AI 챗봇 완료)
 **기준 문서**: PROJECT_ANALYSIS_REPORT.md v2.2.0
 **프로젝트**: paytools.work (급여 계산기)
 
@@ -24,9 +24,9 @@
 | **Phase 3.8 (기존 고급)** | **3** | **3** | **100%** | **✅ 완료** |
 | **Phase 4 (마케팅)** | **4** | **4** | **100%** | **✅ 완료** |
 | **Phase 5 (급여대장)** | **3** | **2** | **67%** | **✅ 핵심 완료** |
-| Phase 6 (AI 챗봇) | 6 | 0 | 0% | Python MS |
+| **Phase 6 (AI 챗봇)** | **6** | **6** | **100%** | **✅ 완료** |
 | Phase 7 (요금제) | 2 | 0 | 0% | Spring |
-| **전체** | **53** | **38** | **72%** | |
+| **전체** | **53** | **44** | **83%** | |
 
 ---
 
@@ -777,11 +777,11 @@ backend-spring/
 
 ---
 
-## Phase 6: AI 노무 자문 챗봇 (RAG 기반 - Python 마이크로서비스)
+## Phase 6: AI 노무 자문 챗봇 ✅ 완료 (2026-01-31)
 
-> 상세 설계서: [AI_CHATBOT_ARCHITECTURE.md](./AI_CHATBOT_ARCHITECTURE.md)
-> 벤치마크: [follaw.co.kr](https://www.follaw.co.kr/) "Ait" 서비스
-> ⚠️ **Python 마이크로서비스로 구현** — Spring에서 REST/gRPC로 호출. 모든 DB 접근은 Spring 경유.
+> 상세 설계서: [PHASE6_IMPLEMENTATION_PLAN.md](../08-phase6/PHASE6_IMPLEMENTATION_PLAN.md)
+> **구현 완료**: Python FastAPI + LangGraph + Tiered LLM (Gemini → Groq → GPT)
+> **배포**: Railway (https://zesty-education-production.up.railway.app)
 
 ### 핵심 아키텍처
 
@@ -799,7 +799,7 @@ backend-spring/
 ```
 
 ### 6.1 DB + 벡터 인프라
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-31)
 - **우선순위**: 높음
 - **예상 작업량**: 3일
 - **설명**:
@@ -818,7 +818,7 @@ backend-spring/
   - `backend/app/ai/__init__.py` (신규)
 
 ### 6.2 RAG 파이프라인
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-31)
 - **우선순위**: 높음
 - **예상 작업량**: 4일
 - **설명**:
@@ -837,7 +837,7 @@ backend-spring/
   - `backend/app/ai/rag/ingestion.py` (신규)
 
 ### 6.3 LangGraph Agent
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-31)
 - **우선순위**: 높음
 - **예상 작업량**: 5일
 - **설명**:
@@ -853,7 +853,7 @@ backend-spring/
   - `backend/app/ai/cache/response_cache.py` (신규)
 
 ### 6.4 API + 스트리밍
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-31)
 - **우선순위**: 높음
 - **예상 작업량**: 3일
 - **설명**:
@@ -867,7 +867,7 @@ backend-spring/
   - `backend/app/ai/config.py` (신규)
 
 ### 6.5 프론트엔드 Chat UI
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-31)
 - **우선순위**: 높음
 - **예상 작업량**: 4일
 - **설명**:
@@ -884,7 +884,7 @@ backend-spring/
   - `frontend/src/pages/Chat/ChatPage.tsx` (신규)
 
 ### 6.6 문서화 + 데모
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-01-31)
 - **우선순위**: 중간
 - **예상 작업량**: 2일
 - **설명**:
@@ -1137,8 +1137,9 @@ Week 16 (Phase 7 - 요금제):
 | 2026-01-29 | **Phase 3.8 완료**: 급여명세서 PDF/CSV, 시프트 CSV 가져오기/내보내기, 시프트 검증 (한국 근로기준법) |
 | 2026-01-29 | **Phase 4 완료**: AdSense Auto Ads, SEO 최적화 (sitemap/robots), 블로그 콘텐츠 2개 추가, Code Splitting (17% 번들 감소) |
 | 2026-01-29 | **급여 계산 버그 수정 (v1.3.0)**: 5인 미만 174시간 초과분 누락 해결, 월간 템플릿 휴일근로 자동 설정 버그 수정, Tooltip 모바일 화면 밖 표시 버그 수정 |
+| 2026-01-31 | **Phase 6 AI 챗봇 완료 (v1.5.0)**: Python FastAPI 마이크로서비스 + LangGraph Agent + Tiered LLM (Gemini→Groq→GPT) + RAG (법령API + 벡터검색) + 사용자 데이터 조회 도구 + Railway 배포 |
 
 ---
 
 **작성자**: Claude Code
-**마지막 업데이트**: 2026-01-29 (v1.3.0 - 급여 계산 버그 수정)
+**마지막 업데이트**: 2026-01-31 (v1.5.0 - Phase 6 AI 챗봇 완료)

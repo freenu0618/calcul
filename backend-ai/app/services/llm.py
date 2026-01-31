@@ -74,10 +74,10 @@ class TieredLLM:
             self.circuit_breakers["gemini"] = CircuitBreaker()
             logger.info("Tier 1 (Gemini) initialized")
 
-        # Tier 2: Groq
+        # Tier 2: Groq (빠른 응답용 경량 모델)
         if settings.groq_api_key:
             llm = ChatGroq(
-                model="llama-3.3-70b-versatile",
+                model="llama-3.1-8b-instant",
                 temperature=settings.llm_temperature,
                 groq_api_key=settings.groq_api_key,
                 timeout=settings.llm_timeout,

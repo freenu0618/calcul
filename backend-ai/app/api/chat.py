@@ -36,7 +36,8 @@ async def options_handler():
 class ChatRequest(BaseModel):
     message: str
     session_id: Optional[str] = None
-    user_id: Optional[str] = None  # 임시: 실제로는 JWT에서 추출
+    user_id: Optional[str] = None
+    token: Optional[str] = None  # JWT 토큰 (사용자 데이터 조회용)
 
 
 class ChatResponse(BaseModel):
@@ -58,10 +59,18 @@ def get_user_id(x_user_id: Optional[str] = Header(None)) -> str:
     return x_user_id or "anonymous"
 
 
+def get_auth_token(authorization: Optional[str] = Header(None)) -> Optional[str]:
+    """Authorization 헤더에서 JWT 토큰 추출"""
+    if authorization and authorization.startswith("Bearer "):
+        return authorization[7:]
+    return None
+
+
 @router.post("/stream")
 async def chat_stream(
     request: ChatRequest,
     user_id: str = Depends(get_user_id),
+    auth_token: Optional[str] = Depends(get_auth_token),
 ):
     """
     SSE 스트리밍 챗봇 응답
@@ -96,9 +105,12 @@ async def chat_stream(
     # 요청 기록
     rate_limiter.record_request(effective_user_id)
 
+    # 토큰 우선순위: 요청 body > Authorization 헤더
+    user_token = request.token or auth_token
+
     async def event_generator():
         try:
-            async for event in get_agent_response(request.message, request.session_id):
+            async for event in get_agent_response(request.message, request.session_id, user_token):
                 event_type = event.get("type", "token")
                 data = event.get("data", "")
 
@@ -133,6 +145,7 @@ async def chat_stream(
 async def chat_message(
     request: ChatRequest,
     user_id: str = Depends(get_user_id),
+    auth_token: Optional[str] = Depends(get_auth_token),
 ):
     """
     비스트리밍 챗봇 응답 (단일 응답)
@@ -149,10 +162,11 @@ async def chat_message(
         )
 
     rate_limiter.record_request(effective_user_id)
+    user_token = request.token or auth_token
 
     # 전체 응답 수집
     full_response = ""
-    async for event in get_agent_response(request.message, request.session_id):
+    async for event in get_agent_response(request.message, request.session_id, user_token):
         if event.get("type") == "token":
             full_response += event.get("data", "")
         elif event.get("type") == "error":

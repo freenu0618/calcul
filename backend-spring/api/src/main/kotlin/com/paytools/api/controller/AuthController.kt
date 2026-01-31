@@ -3,6 +3,7 @@ package com.paytools.api.controller
 import com.paytools.common.dto.ApiResponse
 import com.paytools.api.service.AuthResult
 import com.paytools.api.service.AuthService
+import com.paytools.api.service.UserInfo
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
@@ -41,6 +42,19 @@ class AuthController(
             password = request.password
         )
         return ResponseEntity.ok(ApiResponse.success(result))
+    }
+
+    /**
+     * 현재 사용자 정보 조회
+     * GET /api/v1/auth/me
+     */
+    @GetMapping("/me")
+    fun getCurrentUser(
+        @RequestHeader("Authorization") authorization: String
+    ): ResponseEntity<ApiResponse<UserInfo>> {
+        val token = authorization.removePrefix("Bearer ")
+        val user = authService.getUserFromToken(token)
+        return ResponseEntity.ok(ApiResponse.success(user))
     }
 }
 

@@ -1,14 +1,14 @@
 """
 RAG (Retrieval-Augmented Generation) 서비스
-법령 검색 결과를 AI 응답에 포함
+법령 검색 결과를 AI 응답에 포함 (벡터 + 키워드 하이브리드)
 """
 
 import logging
-import re
 from typing import Optional
 from dataclasses import dataclass
 
 from app.services.law_api import get_law_client, LawArticle
+from app.services.vector_store import get_vector_store
 
 logger = logging.getLogger(__name__)
 
@@ -68,28 +68,54 @@ ARTICLE_MAPPING = {
 
 
 class RAGService:
-    """RAG 서비스"""
+    """RAG 서비스 (벡터 + 키워드 하이브리드)"""
 
     def __init__(self):
         self.law_client = get_law_client()
+        self.vector_store = get_vector_store()
         self._cache: dict[str, list[LawArticle]] = {}
+        self._vector_initialized = False
+
+    async def _ensure_vector_store(self):
+        """벡터 스토어 초기화 (최초 1회)"""
+        if self._vector_initialized:
+            return
+
+        # 핵심 노동법령 로드
+        try:
+            labor_laws = await self.law_client.get_labor_laws()
+            all_articles = []
+            for articles in labor_laws.values():
+                all_articles.extend(articles)
+            await self.vector_store.initialize(all_articles)
+            self._vector_initialized = True
+            logger.info(f"Vector store ready with {len(all_articles)} articles")
+        except Exception as e:
+            logger.warning(f"Vector store init failed, using keyword fallback: {e}")
 
     async def get_context(self, query: str) -> RAGContext:
-        """
-        질문에 대한 관련 법령 컨텍스트 조회
+        """질문에 대한 관련 법령 컨텍스트 조회 (벡터 우선, 키워드 폴백)"""
+        # 벡터 스토어 초기화
+        await self._ensure_vector_store()
 
-        Args:
-            query: 사용자 질문
-        """
-        # 키워드 추출
+        # 1차: 벡터 검색
+        if self._vector_initialized:
+            results = await self.vector_store.search(query, k=3)
+            if results:
+                articles = [r.article for r in results]
+                logger.info(f"RAG: Vector search found {len(articles)} articles")
+                return RAGContext(
+                    query=query,
+                    relevant_articles=articles,
+                    context_text=self._format_context(articles),
+                )
+
+        # 2차: 키워드 폴백
         keywords = self._extract_keywords(query)
         if not keywords:
             return RAGContext(query=query, relevant_articles=[], context_text="")
 
-        # 관련 법령 조회
         articles = await self._fetch_relevant_articles(keywords)
-
-        # 컨텍스트 텍스트 생성
         context_text = self._format_context(articles)
 
         return RAGContext(
