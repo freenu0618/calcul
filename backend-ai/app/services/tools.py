@@ -344,14 +344,15 @@ async def get_employee_detail(employee_name: str) -> dict:
 
 
 @tool
-async def get_payroll_summary(period_id: Optional[int] = None) -> dict:
+async def get_payroll_summary(year: Optional[int] = None, month: Optional[int] = None) -> dict:
     """
     급여대장 요약 조회.
     특정 기간의 급여 지출 내역을 조회합니다.
-    "이번달 급여 총액", "인건비 얼마야" 등의 질문에 사용하세요.
+    "이번달 급여 총액", "1월 급여대장", "인건비 얼마야" 등의 질문에 사용하세요.
 
     Args:
-        period_id: 급여대장 기간 ID (없으면 최신 기간)
+        year: 연도 (예: 2026). 없으면 최신 기간
+        month: 월 (1~12). 없으면 최신 기간
 
     Returns:
         급여대장 요약 (총 인건비, 직원수, 공제 합계 등)
@@ -366,9 +367,23 @@ async def get_payroll_summary(period_id: Optional[int] = None) -> dict:
     if not period_list:
         return {"message": "등록된 급여대장이 없습니다. 먼저 급여대장을 작성해주세요."}
 
-    target_period = period_list[0]  # 최신
-    if period_id:
-        target_period = next((p for p in period_list if p.get("id") == period_id), period_list[0])
+    # year/month로 검색하거나 최신 기간 사용
+    target_period = period_list[0]  # 기본: 최신
+    if year and month:
+        found = next((p for p in period_list if p.get("year") == year and p.get("month") == month), None)
+        if found:
+            target_period = found
+        else:
+            return {"message": f"{year}년 {month}월 급여대장이 없습니다."}
+    elif month:
+        # month만 있으면 현재 연도 가정
+        from datetime import datetime
+        current_year = datetime.now().year
+        found = next((p for p in period_list if p.get("year") == current_year and p.get("month") == month), None)
+        if found:
+            target_period = found
+        else:
+            return {"message": f"{current_year}년 {month}월 급여대장이 없습니다."}
 
     # 해당 기간의 상세 조회 (엔트리 포함)
     # API 응답: { period: {...}, entries: [...] }
@@ -377,29 +392,34 @@ async def get_payroll_summary(period_id: Optional[int] = None) -> dict:
         return ledger
 
     entry_list = ledger.get("entries", [])
+    period_year = target_period.get('year')
+    period_month = target_period.get('month')
 
-    # 디버그: 실제 데이터 확인
-    logger.info(f"Ledger keys: {ledger.keys()}")
-    logger.info(f"Entry count: {len(entry_list)}")
-    if entry_list:
-        logger.info(f"First entry keys: {entry_list[0].keys() if entry_list else 'empty'}")
-        logger.info(f"First entry totalGross: {entry_list[0].get('totalGross')}")
-        logger.info(f"First entry netPay: {entry_list[0].get('netPay')}")
+    # 디버그 로그
+    logger.info(f"Ledger: {period_year}-{period_month:02d}, entries={len(entry_list)}")
+
+    # 직원이 0명인 경우 명확한 메시지 반환
+    if not entry_list:
+        return {
+            "period": f"{period_year}-{period_month:02d}",
+            "employee_count": 0,
+            "message": f"{period_year}년 {period_month}월 급여대장에 등록된 직원이 없습니다. 급여대장 페이지에서 직원을 추가해주세요.",
+        }
 
     # API 응답 키: totalGross, netPay
     total_gross = sum(e.get("totalGross", 0) or 0 for e in entry_list)
     total_net = sum(e.get("netPay", 0) or 0 for e in entry_list)
     total_deductions = total_gross - total_net
 
-    logger.info(f"Calculated: gross={total_gross}, net={total_net}, deductions={total_deductions}")
+    logger.info(f"Calculated: gross={total_gross}, net={total_net}")
 
     return {
-        "period": f"{target_period.get('year')}-{target_period.get('month'):02d}",
+        "period": f"{period_year}-{period_month:02d}",
         "employee_count": len(entry_list),
         "total_gross_pay": total_gross,
         "total_net_pay": total_net,
         "total_deductions": total_deductions,
-        "summary": f"{target_period.get('year')}년 {target_period.get('month')}월 인건비: 총 {total_gross:,}원 (실지급 {total_net:,}원, 공제 {total_deductions:,}원)",
+        "summary": f"{period_year}년 {period_month}월 인건비: 총 {total_gross:,}원 (실지급 {total_net:,}원, 공제 {total_deductions:,}원), 직원 {len(entry_list)}명",
     }
 
 
