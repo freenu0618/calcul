@@ -1,12 +1,18 @@
 /**
  * 채팅 위젯 (플로팅 버튼 + 큰 모달)
+ * 로그인 사용자만 표시
  */
 
 import { useChat } from '../../contexts/ChatContext';
+import { useAuth } from '../../contexts/AuthContext';
 import ChatWindow from './ChatWindow';
 
 export default function ChatWidget() {
   const { isOpen, toggleChat, closeChat } = useChat();
+  const { isAuthenticated } = useAuth();
+
+  // 비로그인 시 챗봇 버튼 숨김
+  if (!isAuthenticated) return null;
 
   return (
     <>

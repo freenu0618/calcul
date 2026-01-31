@@ -4,7 +4,10 @@ import com.paytools.api.dto.common.MoneyResponse
 import com.paytools.api.dto.common.WorkingHoursResponse
 import com.paytools.api.dto.request.SalaryCalculationRequest
 import com.paytools.api.dto.response.*
+import com.paytools.api.service.AuthService
+import com.paytools.api.service.UsageService
 import com.paytools.domain.model.*
+import com.paytools.domain.model.UsageType
 import com.paytools.domain.service.SalaryCalculator
 import com.paytools.domain.vo.Money
 import io.swagger.v3.oas.annotations.Operation
@@ -13,20 +16,37 @@ import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Tag(name = "Salary", description = "급여 계산 API")
 @RestController
 @RequestMapping("/api/v1/salary")
-class SalaryController {
+class SalaryController(
+    private val authService: AuthService,
+    private val usageService: UsageService
+) {
 
     private val salaryCalculator = SalaryCalculator()
 
     @Operation(summary = "급여 계산", description = "근로자 정보와 근무 시프트를 기반으로 급여를 계산합니다")
     @PostMapping("/calculate")
     fun calculateSalary(
-        @Valid @RequestBody request: SalaryCalculationRequest
+        @Valid @RequestBody request: SalaryCalculationRequest,
+        @RequestHeader("Authorization", required = false) authorization: String?
     ): ResponseEntity<SalaryCalculationResponse> {
+
+        // 로그인한 사용자만 사용량 체크 (비로그인은 무제한)
+        authorization?.let { auth ->
+            if (auth.startsWith("Bearer ")) {
+                try {
+                    val token = auth.removePrefix("Bearer ")
+                    val userInfo = authService.getUserFromToken(token)
+                    val allowed = usageService.incrementUsage(userInfo.id, UsageType.SALARY_CALC)
+                    if (!allowed) {
+                        return ResponseEntity.status(429).body(null)
+                    }
+                } catch (_: Exception) { /* 인증 실패 시 무시 */ }
+            }
+        }
 
         // DTO → Domain Model 변환
         val employee = Employee(
