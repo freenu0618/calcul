@@ -361,7 +361,8 @@ async def get_payroll_summary(period_id: Optional[int] = None) -> dict:
     if "error" in periods:
         return periods
 
-    period_list = periods if isinstance(periods, list) else periods.get("content", [])
+    # API 응답: { periods: [...], totalCount: N }
+    period_list = periods if isinstance(periods, list) else periods.get("periods", [])
     if not period_list:
         return {"message": "등록된 급여대장이 없습니다. 먼저 급여대장을 작성해주세요."}
 
@@ -369,12 +370,13 @@ async def get_payroll_summary(period_id: Optional[int] = None) -> dict:
     if period_id:
         target_period = next((p for p in period_list if p.get("id") == period_id), period_list[0])
 
-    # 해당 기간의 엔트리 조회
-    entries = await _call_spring_api(f"/api/v1/payroll/periods/{target_period['id']}/entries")
-    if "error" in entries:
-        return entries
+    # 해당 기간의 상세 조회 (엔트리 포함)
+    # API 응답: { period: {...}, entries: [...] }
+    ledger = await _call_spring_api(f"/api/v1/payroll/periods/{target_period['id']}")
+    if "error" in ledger:
+        return ledger
 
-    entry_list = entries if isinstance(entries, list) else entries.get("content", [])
+    entry_list = ledger.get("entries", [])
 
     total_gross = sum(e.get("grossPay", 0) for e in entry_list)
     total_net = sum(e.get("netPay", 0) for e in entry_list)
@@ -408,7 +410,8 @@ async def get_monthly_labor_cost(year: int, month: int) -> dict:
     if "error" in periods:
         return periods
 
-    period_list = periods if isinstance(periods, list) else periods.get("content", [])
+    # API 응답: { periods: [...], totalCount: N }
+    period_list = periods if isinstance(periods, list) else periods.get("periods", [])
     target = next(
         (p for p in period_list if p.get("year") == year and p.get("month") == month),
         None,
@@ -417,12 +420,13 @@ async def get_monthly_labor_cost(year: int, month: int) -> dict:
     if not target:
         return {"message": f"{year}년 {month}월 급여대장이 없습니다."}
 
-    # 해당 기간의 엔트리 조회
-    entries = await _call_spring_api(f"/api/v1/payroll/periods/{target['id']}/entries")
-    if "error" in entries:
-        return entries
+    # 해당 기간의 상세 조회 (엔트리 포함)
+    # API 응답: { period: {...}, entries: [...] }
+    ledger = await _call_spring_api(f"/api/v1/payroll/periods/{target['id']}")
+    if "error" in ledger:
+        return ledger
 
-    entry_list = entries if isinstance(entries, list) else entries.get("content", [])
+    entry_list = ledger.get("entries", [])
 
     total_gross = sum(e.get("grossPay", 0) for e in entry_list)
     total_net = sum(e.get("netPay", 0) for e in entry_list)
