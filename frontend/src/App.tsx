@@ -41,6 +41,7 @@ const Terms = lazy(() => import('./pages/Terms'));
 const Contact = lazy(() => import('./pages/Contact'));
 const ReverseCalculator = lazy(() => import('./pages/ReverseCalculator'));
 const SalarySimulation = lazy(() => import('./pages/Simulation'));
+const PaymentSuccess = lazy(() => import('./pages/Payment/PaymentSuccess'));
 
 // 인증 필요 페이지
 const EmployeeList = lazy(() => import('./pages/Employees/EmployeeList'));
@@ -129,6 +130,9 @@ function App() {
                     {/* 블로그 */}
                     <Route path="/blog" element={<BlogPage />} />
                     <Route path="/blog/:postId" element={<BlogPost />} />
+
+                    {/* 결제 */}
+                    <Route path="/payment/success" element={<PaymentSuccess />} />
 
                     {/* 직원 관리 (인증 필요) */}
                     <Route path="/employees" element={<PrivateRoute><EmployeeList /></PrivateRoute>} />

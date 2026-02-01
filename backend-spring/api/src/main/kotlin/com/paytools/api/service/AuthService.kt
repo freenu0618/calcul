@@ -71,7 +71,8 @@ class AuthService(
                 id = user.id,
                 email = user.email,
                 name = user.name,
-                role = user.role.name
+                role = user.role.name,
+                polarSubscriptionId = user.polarSubscriptionId
             )
         )
     }
@@ -89,7 +90,8 @@ class AuthService(
             id = user.id,
             email = user.email,
             name = user.name,
-            role = user.role.name
+            role = user.role.name,
+            polarSubscriptionId = user.polarSubscriptionId
         )
     }
 }
@@ -104,5 +106,6 @@ data class UserInfo(
     val id: Long,
     val email: String,
     val name: String,
-    val role: String
+    val role: String,
+    val polarSubscriptionId: String? = null
 )

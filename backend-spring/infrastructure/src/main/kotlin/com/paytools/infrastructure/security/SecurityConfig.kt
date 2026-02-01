@@ -50,6 +50,7 @@ class SecurityConfig(
                     .requestMatchers("/actuator/**").permitAll()
                     .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll()
                     .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()  // OAuth2 엔드포인트
+                    .requestMatchers("/api/v1/webhooks/**").permitAll()  // Polar 웹훅 (외부 호출)
                     // Protected endpoints
                     .anyRequest().authenticated()
             }

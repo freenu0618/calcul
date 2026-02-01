@@ -77,3 +77,16 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
+
+# Polar Payment Configuration
+polar:
+  api-url: ${POLAR_API_URL:https://api.polar.sh}
+  api-token: ${POLAR_API_TOKEN:}
+  webhook-secret: ${POLAR_WEBHOOK_SECRET:}
+  success-url: ${FRONTEND_URL:http://localhost:5173}/payment/success
+  cancel-url: ${FRONTEND_URL:http://localhost:5173}/pricing
+  products:
+    basic: ${POLAR_PRODUCT_BASIC:2bc2f52c-e820-4c98-bf94-dff5b72b808d}
+    basic-annual: ${POLAR_PRODUCT_BASIC_ANNUAL:d0310c63-9371-4a40-95ec-f62386003019}
+    pro: ${POLAR_PRODUCT_PRO:8368d5af-77f1-455a-ac9c-ffcf45c077a5}
+    pro-annual: ${POLAR_PRODUCT_PRO_ANNUAL:3549f0c5-1b23-4074-bcbf-abd33a1b8530}

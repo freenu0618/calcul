@@ -6,3 +6,5 @@ export * from './salaryApi';
 export * from './payrollApi';
 export * from './employeeApi';
 export * from './simulationApi';
+export * from './subscriptionApi';
+export * from './paymentApi';

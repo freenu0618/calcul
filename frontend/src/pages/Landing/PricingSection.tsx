@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { paymentApi, type PlanType } from '../../api/paymentApi';
 
 type BillingCycle = 'monthly' | 'annual';
 
@@ -21,6 +22,8 @@ interface PricingPlan {
   popular?: boolean;
   disabled?: boolean;
   trial?: string;
+  planId?: PlanType;  // Polar product mapping
+  annualPlanId?: PlanType;
 }
 
 // 가격은 USD (Polar 결제 기준)
@@ -57,6 +60,8 @@ const plans: PricingPlan[] = [
     ctaLink: '/register',
     popular: true,
     trial: '3일 무료',
+    planId: 'basic',
+    annualPlanId: 'basic_annual',
   },
   {
     name: 'Pro',
@@ -73,6 +78,8 @@ const plans: PricingPlan[] = [
     ],
     cta: '시작하기',
     ctaLink: '/register',
+    planId: 'pro',
+    annualPlanId: 'pro_annual',
   },
   {
     name: 'Enterprise',
@@ -101,6 +108,26 @@ function formatPrice(price: number): string {
 export default function PricingSection() {
   const { isAuthenticated } = useAuth();
   const [billing, setBilling] = useState<BillingCycle>('monthly');
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+
+  const handlePayment = async (plan: PricingPlan) => {
+    if (!isAuthenticated) {
+      window.location.href = '/register';
+      return;
+    }
+
+    const planId = billing === 'annual' ? plan.annualPlanId : plan.planId;
+    if (!planId) return;
+
+    setLoadingPlan(plan.name);
+    try {
+      await paymentApi.redirectToCheckout(planId);
+    } catch (error) {
+      console.error('결제 오류:', error);
+      alert('결제 페이지 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      setLoadingPlan(null);
+    }
+  };
 
   const getPrice = (plan: PricingPlan): string => {
     if (plan.monthlyPrice === null) return '문의';
@@ -237,6 +264,28 @@ export default function PricingSection() {
                   className="w-full h-11 rounded-xl bg-gray-100 text-gray-500 font-bold cursor-not-allowed"
                 >
                   {plan.cta}
+                </button>
+              ) : plan.planId ? (
+                <button
+                  onClick={() => handlePayment(plan)}
+                  disabled={loadingPlan === plan.name}
+                  className={`w-full h-11 rounded-xl font-bold transition-colors flex items-center justify-center ${
+                    plan.popular
+                      ? 'bg-primary text-white hover:bg-primary-600 disabled:bg-primary/50'
+                      : 'bg-gray-100 text-text-main hover:bg-gray-200 disabled:bg-gray-50'
+                  }`}
+                >
+                  {loadingPlan === plan.name ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      처리 중...
+                    </span>
+                  ) : (
+                    plan.cta
+                  )}
                 </button>
               ) : (
                 <Link
