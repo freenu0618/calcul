@@ -25,6 +25,7 @@ interface AuthContextType {
   register: (email: string, password: string, fullName: string) => Promise<void>;
   logout: () => void;
   setTokenDirectly: (token: string, name?: string) => void;
+  refreshUser: () => Promise<void>;
   isAuthenticated: boolean;
   /** 유료 사용자 여부 (PRO 또는 ENTERPRISE) */
   isPaidUser: boolean;
@@ -130,6 +131,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(null);
   };
 
+  // 사용자 정보 새로고침 (결제 후 플랜 갱신 등)
+  const refreshUser = async () => {
+    if (!token) return;
+
+    try {
+      const response = await fetch(API_CONFIG.getApiUrl('/auth/me'), {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        const userData: User = {
+          ...result.data,
+          plan: result.data.subscriptionTier || result.data.plan || 'FREE',
+        };
+        localStorage.setItem('auth_user', JSON.stringify(userData));
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+    }
+  };
+
   // OAuth 콜백용: JWT 토큰 직접 설정 (토큰에서 사용자 정보 추출)
   const setTokenDirectly = (authToken: string, nameFromUrl?: string) => {
     try {
@@ -164,6 +190,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     register,
     logout,
     setTokenDirectly,
+    refreshUser,
     isAuthenticated: !!token && !!user,
     isPaidUser,
   };

@@ -72,6 +72,7 @@ class AuthService(
                 email = user.email,
                 name = user.name,
                 role = user.role.name,
+                subscriptionTier = user.subscriptionTier.name,
                 polarSubscriptionId = user.polarSubscriptionId
             )
         )
@@ -91,6 +92,7 @@ class AuthService(
             email = user.email,
             name = user.name,
             role = user.role.name,
+            subscriptionTier = user.subscriptionTier.name,
             polarSubscriptionId = user.polarSubscriptionId
         )
     }
@@ -107,5 +109,6 @@ data class UserInfo(
     val email: String,
     val name: String,
     val role: String,
+    val subscriptionTier: String = "FREE",
     val polarSubscriptionId: String? = null
 )

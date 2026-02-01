@@ -4,15 +4,17 @@
 
 import { useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
+  const { refreshUser } = useAuth();
 
   useEffect(() => {
-    // 결제 완료 후 사용자 정보 새로고침을 위해 localStorage 플래그 설정
-    localStorage.setItem('payment_completed', 'true');
-  }, []);
+    // 결제 완료 후 사용자 정보 새로고침
+    refreshUser();
+  }, [refreshUser]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">

@@ -128,7 +128,8 @@ export function useSubscription(): SubscriptionState {
     refetch();
   }, [isAuthenticated]);
 
-  const tier: SubscriptionTier = (user as any)?.subscriptionTier || 'FREE';
+  // user.subscriptionTier (API), user.plan (AuthContext) 둘 다 지원
+  const tier: SubscriptionTier = (user as any)?.subscriptionTier || (user as any)?.plan || 'FREE';
   const limits = PLAN_LIMITS[tier];
 
   const usage: Usage = {
