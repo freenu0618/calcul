@@ -3,6 +3,7 @@ package com.paytools.api.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.paytools.api.config.PolarConfig
 import com.paytools.domain.model.SubscriptionTier
+import com.paytools.infrastructure.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -20,6 +21,7 @@ import java.util.Base64
 class PolarWebhookService(
     private val polarConfig: PolarConfig,
     private val subscriptionService: SubscriptionService,
+    private val userRepository: UserRepository,
     private val objectMapper: ObjectMapper
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -119,73 +121,103 @@ class PolarWebhookService(
     }
 
     private fun handleSubscriptionActive(data: Map<*, *>): WebhookResult {
-        val metadata = data["metadata"] as? Map<*, *>
-        val userId = (metadata?.get("user_id") as? String)?.toLongOrNull()
-        val plan = metadata?.get("plan") as? String
         val subscriptionId = data["id"] as? String
         val customerId = data["customer_id"] as? String
 
-        if (userId == null || plan == null) {
-            logger.warn("Missing user_id or plan in subscription metadata")
-            return WebhookResult(false, "Missing metadata")
+        // customer 객체에서 이메일 추출
+        val customer = data["customer"] as? Map<*, *>
+        val email = customer?.get("email") as? String
+
+        // product에서 product_id 추출하여 플랜 결정
+        val product = data["product"] as? Map<*, *>
+        val productId = product?.get("id") as? String
+
+        logger.info("Subscription active - email: $email, productId: $productId")
+
+        if (email == null) {
+            logger.warn("Missing customer email in subscription event")
+            return WebhookResult(false, "Missing customer email")
         }
 
-        val tier = planToTier(plan)
+        // 이메일로 사용자 찾기
+        val user = userRepository.findByEmail(email).orElse(null)
+        if (user == null) {
+            logger.warn("User not found for email: $email")
+            return WebhookResult(false, "User not found")
+        }
+
+        // product_id로 티어 결정
+        val tier = productIdToTier(productId)
         val periodEnd = parseDateTime(data["current_period_end"] as? String)
 
         subscriptionService.upgradeSubscription(
-            userId = userId,
+            userId = user.id!!,
             tier = tier,
             polarSubscriptionId = subscriptionId,
             polarCustomerId = customerId,
             periodEnd = periodEnd
         )
 
-        logger.info("User $userId upgraded to $tier")
-        return WebhookResult(true, "Subscription activated for user $userId")
+        logger.info("User ${user.id} (${email}) upgraded to $tier")
+        return WebhookResult(true, "Subscription activated for user ${user.id}")
     }
 
     private fun handleSubscriptionUpdated(data: Map<*, *>): WebhookResult {
-        val metadata = data["metadata"] as? Map<*, *>
-        val userId = (metadata?.get("user_id") as? String)?.toLongOrNull()
-
-        if (userId != null) {
+        val user = findUserFromSubscriptionData(data)
+        if (user != null) {
             val periodEnd = parseDateTime(data["current_period_end"] as? String)
-            // 구독 기간 업데이트 등 추가 로직
-            logger.info("Subscription updated for user $userId")
+            logger.info("Subscription updated for user ${user.id}, periodEnd: $periodEnd")
         }
-
         return WebhookResult(true, "Subscription updated")
     }
 
     private fun handleSubscriptionCanceled(data: Map<*, *>): WebhookResult {
-        val metadata = data["metadata"] as? Map<*, *>
-        val userId = (metadata?.get("user_id") as? String)?.toLongOrNull()
-
-        if (userId != null) {
-            subscriptionService.cancelSubscription(userId, cancelAtPeriodEnd = true)
-            logger.info("Subscription canceled for user $userId")
+        val user = findUserFromSubscriptionData(data)
+        if (user != null) {
+            subscriptionService.cancelSubscription(user.id!!, cancelAtPeriodEnd = true)
+            logger.info("Subscription canceled for user ${user.id}")
         }
-
         return WebhookResult(true, "Subscription canceled")
     }
 
     private fun handleSubscriptionRevoked(data: Map<*, *>): WebhookResult {
-        val metadata = data["metadata"] as? Map<*, *>
-        val userId = (metadata?.get("user_id") as? String)?.toLongOrNull()
-
-        if (userId != null) {
-            subscriptionService.expireSubscription(userId)
-            logger.info("Subscription revoked for user $userId")
+        val user = findUserFromSubscriptionData(data)
+        if (user != null) {
+            subscriptionService.expireSubscription(user.id!!)
+            logger.info("Subscription revoked for user ${user.id}")
         }
-
         return WebhookResult(true, "Subscription revoked")
+    }
+
+    /**
+     * 구독 데이터에서 사용자 찾기 (customer.email 기반)
+     */
+    private fun findUserFromSubscriptionData(data: Map<*, *>): com.paytools.domain.entity.User? {
+        val customer = data["customer"] as? Map<*, *>
+        val email = customer?.get("email") as? String
+        if (email == null) {
+            logger.warn("Missing customer email in subscription data")
+            return null
+        }
+        return userRepository.findByEmail(email).orElse(null)
     }
 
     private fun planToTier(plan: String): SubscriptionTier {
         return when (plan.lowercase()) {
             "basic", "basic_annual", "basic-annual" -> SubscriptionTier.BASIC
             "pro", "pro_annual", "pro-annual" -> SubscriptionTier.PRO
+            else -> SubscriptionTier.FREE
+        }
+    }
+
+    /**
+     * Product ID로 구독 티어 결정
+     */
+    private fun productIdToTier(productId: String?): SubscriptionTier {
+        if (productId == null) return SubscriptionTier.FREE
+        return when (productId) {
+            polarConfig.products.basic, polarConfig.products.basicAnnual -> SubscriptionTier.BASIC
+            polarConfig.products.pro, polarConfig.products.proAnnual -> SubscriptionTier.PRO
             else -> SubscriptionTier.FREE
         }
     }
