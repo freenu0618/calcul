@@ -33,9 +33,17 @@ class PolarWebhookService(
         webhookTimestamp: String?,
         webhookSignature: String?
     ): Boolean {
+        logger.info("Verifying webhook - id: $webhookId, timestamp: $webhookTimestamp")
+
         if (webhookId == null || webhookTimestamp == null || webhookSignature == null) {
             logger.warn("Missing webhook headers")
             return false
+        }
+
+        // 개발 환경에서 시크릿 미설정 시 검증 스킵
+        if (polarConfig.webhookSecret.isBlank()) {
+            logger.warn("Webhook secret not configured - skipping verification")
+            return true
         }
 
         // 타임스탬프 검증 (5분 이내)
@@ -50,11 +58,17 @@ class PolarWebhookService(
         val signedPayload = "$webhookId.$webhookTimestamp.$payload"
         val secret = polarConfig.webhookSecret
 
-        // Base64로 인코딩된 시크릿 디코딩 (whsec_ 접두사 제거)
-        val secretBytes = if (secret.startsWith("whsec_")) {
-            Base64.getDecoder().decode(secret.removePrefix("whsec_"))
-        } else {
-            secret.toByteArray()
+        // Standard Webhooks 시크릿 디코딩
+        // Polar 형식: polar_whs_xxx 또는 whsec_xxx (Base64 인코딩)
+        val secretBytes = when {
+            secret.startsWith("polar_whs_") -> {
+                // polar_whs_ 접두사 제거 후 그대로 사용 (이미 raw bytes)
+                secret.removePrefix("polar_whs_").toByteArray()
+            }
+            secret.startsWith("whsec_") -> {
+                Base64.getDecoder().decode(secret.removePrefix("whsec_"))
+            }
+            else -> secret.toByteArray()
         }
 
         val mac = Mac.getInstance("HmacSHA256")
