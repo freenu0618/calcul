@@ -172,29 +172,27 @@ class PolarWebhookService(
      */
     private fun activateSubscription(data: Map<*, *>): WebhookResult {
         val subscriptionId = data["id"] as? String
-        val customerId = data["customer_id"] as? String
 
-        // 1. metadata에서 user_id 직접 확인 (Polar 대시보드에서 보이는 형태)
+        // 1. customer 객체에서 customer_id와 이메일 추출
+        val customer = data["customer"] as? Map<*, *>
+        val customerId = customer?.get("id") as? String
+            ?: data["customer_id"] as? String  // fallback
+        val email = customer?.get("email") as? String
+
+        // 2. metadata에서 user_id 직접 확인
         val metadata = data["metadata"] as? Map<*, *>
         val metadataUserId = (metadata?.get("user_id") as? String)?.toLongOrNull()
             ?: (metadata?.get("user_id") as? Number)?.toLong()
-        val metadataPlan = metadata?.get("plan") as? String
 
-        // 2. customer 객체에서 이메일 추출
-        val customer = data["customer"] as? Map<*, *>
-        val email = customer?.get("email") as? String
-
-        // 3. product에서 product_id 추출
+        // 3. product에서 product_id 추출 (티어 결정에 사용)
         val product = data["product"] as? Map<*, *>
         val productId = product?.get("id") as? String
 
         logger.info("=== ACTIVATING SUBSCRIPTION ===")
-        logger.info("Raw data keys: ${data.keys}")
-        logger.info("metadata: $metadata")
-        logger.info("metadataUserId: $metadataUserId, email: $email")
-        logger.info("productId: $productId, metadataPlan: $metadataPlan")
+        logger.info("subscriptionId: $subscriptionId, customerId: $customerId")
+        logger.info("email: $email, metadataUserId: $metadataUserId")
+        logger.info("productId: $productId")
         logger.info("customer object: $customer")
-        logger.info("product object: $product")
 
         // 사용자 찾기: metadata.user_id 우선, 없으면 email로 조회
         val user = if (metadataUserId != null) {
@@ -211,13 +209,9 @@ class PolarWebhookService(
         }
         logger.info("Found user: id=${user.id}, email=${user.email}, currentTier=${user.subscriptionTier}")
 
-        // 티어 결정: metadata.plan 또는 product_id로
-        val tier = if (metadataPlan != null) {
-            planToTier(metadataPlan)
-        } else {
-            productIdToTier(productId)
-        }
-        logger.info("Determined tier: $tier (from ${if (metadataPlan != null) "metadataPlan" else "productId"})")
+        // 티어 결정: product_id 우선 (업그레이드 시 새 상품 반영)
+        val tier = productIdToTier(productId)
+        logger.info("Determined tier: $tier from productId: $productId")
 
         val periodEnd = parseDateTime(data["current_period_end"] as? String)
             ?: parseDateTime(data["trial_end_at"] as? String)
