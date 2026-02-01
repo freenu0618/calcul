@@ -59,25 +59,39 @@ class PolarWebhookService(
         return try {
             // 서명 검증
             val signedPayload = "$webhookId.$webhookTimestamp.$payload"
+            val signedPayloadBytes = signedPayload.toByteArray(Charsets.UTF_8)
             val secret = polarConfig.webhookSecret
-
-            // Standard Webhooks 시크릿 디코딩
-            val secretBytes = decodeWebhookSecret(secret)
-
-            val mac = Mac.getInstance("HmacSHA256")
-            mac.init(SecretKeySpec(secretBytes, "HmacSHA256"))
-            val expectedSignature = Base64.getEncoder().encodeToString(mac.doFinal(signedPayload.toByteArray()))
 
             // v1,signature 형식에서 signature 추출
             val signatures = webhookSignature.split(" ").mapNotNull { sig ->
                 if (sig.startsWith("v1,")) sig.removePrefix("v1,") else null
             }
-
-            val isValid = signatures.any { it == expectedSignature }
-            if (!isValid) {
-                logger.warn("Signature mismatch - expected: ${expectedSignature.take(20)}..., got: ${signatures.firstOrNull()?.take(20)}...")
+            val receivedSig = signatures.firstOrNull()
+            if (receivedSig == null) {
+                logger.warn("No v1 signature found in header: $webhookSignature")
+                return false
             }
-            isValid
+
+            // 여러 디코딩 방식 시도
+            val secretVariants = listOf(
+                "base64" to tryBase64Decode(secret.removePrefix("polar_whs_").removePrefix("whsec_")),
+                "urlsafe" to tryUrlSafeBase64Decode(secret.removePrefix("polar_whs_").removePrefix("whsec_")),
+                "raw" to secret.removePrefix("polar_whs_").removePrefix("whsec_").toByteArray(Charsets.UTF_8)
+            )
+
+            for ((method, secretBytes) in secretVariants) {
+                if (secretBytes == null) continue
+                val mac = Mac.getInstance("HmacSHA256")
+                mac.init(SecretKeySpec(secretBytes, "HmacSHA256"))
+                val computed = Base64.getEncoder().encodeToString(mac.doFinal(signedPayloadBytes))
+                if (computed == receivedSig) {
+                    logger.info("Signature verified using method: $method")
+                    return true
+                }
+            }
+
+            logger.warn("Signature mismatch - received: ${receivedSig.take(20)}...")
+            false
         } catch (e: Exception) {
             logger.error("Signature verification error: ${e.message}", e)
             false
@@ -85,24 +99,26 @@ class PolarWebhookService(
     }
 
     /**
-     * 웹훅 시크릿 디코딩 (여러 형식 지원)
+     * Base64 패딩 추가 (4의 배수가 되도록)
      */
-    private fun decodeWebhookSecret(secret: String): ByteArray {
-        return when {
-            secret.startsWith("polar_whs_") -> {
-                // polar_whs_ 접두사 제거 후 Base64 디코딩
-                try {
-                    Base64.getDecoder().decode(secret.removePrefix("polar_whs_"))
-                } catch (e: Exception) {
-                    // Base64 실패 시 raw bytes로 시도
-                    logger.warn("Base64 decode failed for polar_whs_, using raw bytes")
-                    secret.removePrefix("polar_whs_").toByteArray()
-                }
-            }
-            secret.startsWith("whsec_") -> {
-                Base64.getDecoder().decode(secret.removePrefix("whsec_"))
-            }
-            else -> secret.toByteArray()
+    private fun addBase64Padding(s: String): String {
+        val padding = (4 - s.length % 4) % 4
+        return s + "=".repeat(padding)
+    }
+
+    private fun tryBase64Decode(s: String): ByteArray? {
+        return try {
+            Base64.getDecoder().decode(addBase64Padding(s))
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun tryUrlSafeBase64Decode(s: String): ByteArray? {
+        return try {
+            Base64.getUrlDecoder().decode(addBase64Padding(s))
+        } catch (e: Exception) {
+            null
         }
     }
 
