@@ -172,7 +172,13 @@ class PolarWebhookService(
         val product = data["product"] as? Map<*, *>
         val productId = product?.get("id") as? String
 
-        logger.info("Activating subscription - metadataUserId: $metadataUserId, email: $email, productId: $productId, plan: $metadataPlan")
+        logger.info("=== ACTIVATING SUBSCRIPTION ===")
+        logger.info("Raw data keys: ${data.keys}")
+        logger.info("metadata: $metadata")
+        logger.info("metadataUserId: $metadataUserId, email: $email")
+        logger.info("productId: $productId, metadataPlan: $metadataPlan")
+        logger.info("customer object: $customer")
+        logger.info("product object: $product")
 
         // 사용자 찾기: metadata.user_id 우선, 없으면 email로 조회
         val user = if (metadataUserId != null) {
@@ -184,9 +190,10 @@ class PolarWebhookService(
         }
 
         if (user == null) {
-            logger.warn("User not found - metadataUserId: $metadataUserId, email: $email")
+            logger.error("!!! USER NOT FOUND - metadataUserId: $metadataUserId, email: $email")
             return WebhookResult(false, "User not found")
         }
+        logger.info("Found user: id=${user.id}, email=${user.email}, currentTier=${user.subscriptionTier}")
 
         // 티어 결정: metadata.plan 또는 product_id로
         val tier = if (metadataPlan != null) {
@@ -194,19 +201,26 @@ class PolarWebhookService(
         } else {
             productIdToTier(productId)
         }
+        logger.info("Determined tier: $tier (from ${if (metadataPlan != null) "metadataPlan" else "productId"})")
 
         val periodEnd = parseDateTime(data["current_period_end"] as? String)
             ?: parseDateTime(data["trial_end_at"] as? String)
+        logger.info("Period end: $periodEnd")
 
-        subscriptionService.upgradeSubscription(
-            userId = user.id!!,
-            tier = tier,
-            polarSubscriptionId = subscriptionId,
-            polarCustomerId = customerId,
-            periodEnd = periodEnd
-        )
+        try {
+            subscriptionService.upgradeSubscription(
+                userId = user.id!!,
+                tier = tier,
+                polarSubscriptionId = subscriptionId,
+                polarCustomerId = customerId,
+                periodEnd = periodEnd
+            )
+            logger.info("SUCCESS! User ${user.id} upgraded to $tier (subscription: $subscriptionId)")
+        } catch (e: Exception) {
+            logger.error("FAILED to upgrade subscription: ${e.message}", e)
+            return WebhookResult(false, "Upgrade failed: ${e.message}")
+        }
 
-        logger.info("User ${user.id} upgraded to $tier (subscription: $subscriptionId)")
         return WebhookResult(true, "Subscription activated for user ${user.id}")
     }
 
