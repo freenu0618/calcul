@@ -2,10 +2,11 @@
  * 채팅 SSE 연결 훅
  * - JWT 토큰으로 사용자 인식
  * - session_id로 대화 히스토리 유지
- * - localStorage로 대화 내역 보존
+ * - localStorage로 대화 내역 보존 (사용자별 격리)
  */
 
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 export interface ChatMessage {
   id: string;
@@ -17,13 +18,11 @@ export interface ChatMessage {
 
 interface UseChatOptions {
   apiUrl?: string;
-  userId?: string;
 }
 
 const STORAGE_KEY_PREFIX = 'chat_messages_';
 const MAX_STORED_MESSAGES = 50;
 
-// 사용자별 스토리지 키 생성
 function getStorageKey(userId: string): string {
   return `${STORAGE_KEY_PREFIX}${userId}`;
 }
@@ -33,18 +32,13 @@ export function useChat(options: UseChatOptions = {}) {
     apiUrl = import.meta.env.VITE_AI_API_URL || 'http://localhost:8001',
   } = options;
 
-  // 자동으로 로그인된 사용자 ID 가져오기
+  // useAuth()로 사용자 상태 추적 - 로그인/로그아웃 시 자동 감지
+  const { user, isAuthenticated } = useAuth();
+
+  // 사용자별 고유 ID (로그인: user.id, 비로그인: 'anonymous')
   const userId = useMemo(() => {
-    if (options.userId) return options.userId;
-    try {
-      const authUser = localStorage.getItem('auth_user');
-      if (authUser) {
-        const parsed = JSON.parse(authUser);
-        return String(parsed.id || 'anonymous');
-      }
-    } catch { /* ignore */ }
-    return 'anonymous';
-  }, [options.userId]);
+    return isAuthenticated && user?.id ? String(user.id) : 'anonymous';
+  }, [isAuthenticated, user?.id]);
 
   const storageKey = getStorageKey(userId);
 
@@ -59,11 +53,18 @@ export function useChat(options: UseChatOptions = {}) {
     return id;
   }, [userId]);
 
-  // localStorage에서 대화 내역 복원 (사용자별)
+  // localStorage에서 대화 내역 복원 (사용자별 완전 격리)
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const prevUserIdRef = useRef<string | null>(null);
 
-  // userId 변경 시 해당 사용자의 메시지 로드
+  // userId 변경 시 즉시 초기화 후 해당 사용자의 메시지 로드 (보안)
   useEffect(() => {
+    // 사용자 변경 감지 시 즉시 메시지 초기화 (다른 사용자 데이터 노출 방지)
+    if (prevUserIdRef.current !== null && prevUserIdRef.current !== userId) {
+      setMessages([]);
+    }
+    prevUserIdRef.current = userId;
+
     try {
       const stored = localStorage.getItem(storageKey);
       if (stored) {
@@ -79,7 +80,7 @@ export function useChat(options: UseChatOptions = {}) {
       console.error('Failed to restore chat messages:', e);
       setMessages([]);
     }
-  }, [storageKey]);
+  }, [storageKey, userId]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
