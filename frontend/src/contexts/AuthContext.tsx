@@ -169,7 +169,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         email: payload.email || '',
         name: nameFromUrl || payload.name || payload.email?.split('@')[0] || '',
         role: payload.role || 'USER',
-        plan: (payload.plan as UserPlan) || 'FREE',
+        plan: (payload.subscriptionTier as UserPlan) || (payload.plan as UserPlan) || 'FREE',
       };
 
       localStorage.setItem('auth_token', authToken);
