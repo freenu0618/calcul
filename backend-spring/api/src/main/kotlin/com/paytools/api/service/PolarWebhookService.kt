@@ -57,7 +57,8 @@ class PolarWebhookService(
         }
 
         return try {
-            // 서명 검증
+            // 서명 검증 (Standard Webhooks 스펙)
+            // 서명 대상: "{webhook-id}.{webhook-timestamp}.{payload}"
             val signedPayload = "$webhookId.$webhookTimestamp.$payload"
             val signedPayloadBytes = signedPayload.toByteArray(Charsets.UTF_8)
             val secret = polarConfig.webhookSecret
@@ -72,53 +73,24 @@ class PolarWebhookService(
                 return false
             }
 
-            // 여러 디코딩 방식 시도
-            val secretVariants = listOf(
-                "base64" to tryBase64Decode(secret.removePrefix("polar_whs_").removePrefix("whsec_")),
-                "urlsafe" to tryUrlSafeBase64Decode(secret.removePrefix("polar_whs_").removePrefix("whsec_")),
-                "raw" to secret.removePrefix("polar_whs_").removePrefix("whsec_").toByteArray(Charsets.UTF_8)
-            )
+            // Polar SDK 방식: 시크릿 전체를 UTF-8 바이트로 사용
+            // (prefix 제거 없이 그대로 사용)
+            val secretBytes = secret.toByteArray(Charsets.UTF_8)
+            val mac = Mac.getInstance("HmacSHA256")
+            mac.init(SecretKeySpec(secretBytes, "HmacSHA256"))
+            val computed = Base64.getEncoder().encodeToString(mac.doFinal(signedPayloadBytes))
 
-            for ((method, secretBytes) in secretVariants) {
-                if (secretBytes == null) continue
-                val mac = Mac.getInstance("HmacSHA256")
-                mac.init(SecretKeySpec(secretBytes, "HmacSHA256"))
-                val computed = Base64.getEncoder().encodeToString(mac.doFinal(signedPayloadBytes))
-                if (computed == receivedSig) {
-                    logger.info("Signature verified using method: $method")
-                    return true
-                }
+            if (computed == receivedSig) {
+                logger.info("Webhook signature verified successfully")
+                return true
             }
 
-            logger.warn("Signature mismatch - received: ${receivedSig.take(20)}...")
+            // 디버깅: 계산된 서명 로그 (처음 20자만)
+            logger.warn("Signature mismatch - received: ${receivedSig.take(20)}..., computed: ${computed.take(20)}...")
             false
         } catch (e: Exception) {
             logger.error("Signature verification error: ${e.message}", e)
             false
-        }
-    }
-
-    /**
-     * Base64 패딩 추가 (4의 배수가 되도록)
-     */
-    private fun addBase64Padding(s: String): String {
-        val padding = (4 - s.length % 4) % 4
-        return s + "=".repeat(padding)
-    }
-
-    private fun tryBase64Decode(s: String): ByteArray? {
-        return try {
-            Base64.getDecoder().decode(addBase64Padding(s))
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    private fun tryUrlSafeBase64Decode(s: String): ByteArray? {
-        return try {
-            Base64.getUrlDecoder().decode(addBase64Padding(s))
-        } catch (e: Exception) {
-            null
         }
     }
 
