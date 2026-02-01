@@ -49,7 +49,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (storedToken && storedUser) {
       const parsedUser = JSON.parse(storedUser);
       setToken(storedToken);
-      setUser({ ...parsedUser, plan: parsedUser.plan || 'FREE' });
+      setUser({
+        ...parsedUser,
+        plan: parsedUser.subscriptionTier || parsedUser.plan || 'FREE',
+      });
     }
     setIsLoading(false);
   }, []);
@@ -73,7 +76,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const authToken = result.data.accessToken;
     const userData: User = {
       ...result.data.user,
-      plan: result.data.user.plan || 'FREE', // 기본값 FREE
+      plan: result.data.user.subscriptionTier || result.data.user.plan || 'FREE',
     };
 
     localStorage.setItem('auth_token', authToken);
@@ -105,7 +108,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const authToken = result.data.accessToken;
     const userData: User = {
       ...result.data.user,
-      plan: result.data.user.plan || 'FREE', // 신규 가입은 무료
+      plan: result.data.user.subscriptionTier || result.data.user.plan || 'FREE',
     };
 
     localStorage.setItem('auth_token', authToken);
