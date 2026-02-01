@@ -64,8 +64,8 @@ class PolarWebhookService(
         // Polar 형식: polar_whs_xxx 또는 whsec_xxx (Base64 인코딩)
         val secretBytes = when {
             secret.startsWith("polar_whs_") -> {
-                // polar_whs_ 접두사 제거 후 그대로 사용 (이미 raw bytes)
-                secret.removePrefix("polar_whs_").toByteArray()
+                // polar_whs_ 접두사 제거 후 Base64 디코딩
+                Base64.getDecoder().decode(secret.removePrefix("polar_whs_"))
             }
             secret.startsWith("whsec_") -> {
                 Base64.getDecoder().decode(secret.removePrefix("whsec_"))
