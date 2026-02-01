@@ -42,7 +42,7 @@ class PolarWebhookService(
             return false
         }
 
-        // 개발 환경에서 시크릿 미설정 시 검증 스킵
+        // 시크릿 미설정 시 검증 스킵
         if (polarConfig.webhookSecret.isBlank()) {
             logger.warn("Webhook secret not configured - skipping verification")
             return true
@@ -56,33 +56,54 @@ class PolarWebhookService(
             return false
         }
 
-        // 서명 검증
-        val signedPayload = "$webhookId.$webhookTimestamp.$payload"
-        val secret = polarConfig.webhookSecret
+        return try {
+            // 서명 검증
+            val signedPayload = "$webhookId.$webhookTimestamp.$payload"
+            val secret = polarConfig.webhookSecret
 
-        // Standard Webhooks 시크릿 디코딩
-        // Polar 형식: polar_whs_xxx 또는 whsec_xxx (Base64 인코딩)
-        val secretBytes = when {
+            // Standard Webhooks 시크릿 디코딩
+            val secretBytes = decodeWebhookSecret(secret)
+
+            val mac = Mac.getInstance("HmacSHA256")
+            mac.init(SecretKeySpec(secretBytes, "HmacSHA256"))
+            val expectedSignature = Base64.getEncoder().encodeToString(mac.doFinal(signedPayload.toByteArray()))
+
+            // v1,signature 형식에서 signature 추출
+            val signatures = webhookSignature.split(" ").mapNotNull { sig ->
+                if (sig.startsWith("v1,")) sig.removePrefix("v1,") else null
+            }
+
+            val isValid = signatures.any { it == expectedSignature }
+            if (!isValid) {
+                logger.warn("Signature mismatch - expected: ${expectedSignature.take(20)}..., got: ${signatures.firstOrNull()?.take(20)}...")
+            }
+            isValid
+        } catch (e: Exception) {
+            logger.error("Signature verification error: ${e.message}", e)
+            false
+        }
+    }
+
+    /**
+     * 웹훅 시크릿 디코딩 (여러 형식 지원)
+     */
+    private fun decodeWebhookSecret(secret: String): ByteArray {
+        return when {
             secret.startsWith("polar_whs_") -> {
                 // polar_whs_ 접두사 제거 후 Base64 디코딩
-                Base64.getDecoder().decode(secret.removePrefix("polar_whs_"))
+                try {
+                    Base64.getDecoder().decode(secret.removePrefix("polar_whs_"))
+                } catch (e: Exception) {
+                    // Base64 실패 시 raw bytes로 시도
+                    logger.warn("Base64 decode failed for polar_whs_, using raw bytes")
+                    secret.removePrefix("polar_whs_").toByteArray()
+                }
             }
             secret.startsWith("whsec_") -> {
                 Base64.getDecoder().decode(secret.removePrefix("whsec_"))
             }
             else -> secret.toByteArray()
         }
-
-        val mac = Mac.getInstance("HmacSHA256")
-        mac.init(SecretKeySpec(secretBytes, "HmacSHA256"))
-        val expectedSignature = Base64.getEncoder().encodeToString(mac.doFinal(signedPayload.toByteArray()))
-
-        // v1,signature 형식에서 signature 추출
-        val signatures = webhookSignature.split(" ").mapNotNull { sig ->
-            if (sig.startsWith("v1,")) sig.removePrefix("v1,") else null
-        }
-
-        return signatures.any { it == expectedSignature }
     }
 
     /**
@@ -116,39 +137,66 @@ class PolarWebhookService(
     }
 
     private fun handleSubscriptionCreated(data: Map<*, *>): WebhookResult {
-        logger.info("Subscription created: ${data["id"]}")
-        return WebhookResult(true, "Subscription created")
+        logger.info("Subscription created: ${data["id"]}, status: ${data["status"]}")
+
+        // Trial 시작 시에도 플랜 활성화
+        val status = data["status"] as? String
+        if (status == "trialing" || status == "active") {
+            return activateSubscription(data)
+        }
+        return WebhookResult(true, "Subscription created - status: $status")
     }
 
     private fun handleSubscriptionActive(data: Map<*, *>): WebhookResult {
+        return activateSubscription(data)
+    }
+
+    /**
+     * 구독 활성화 공통 로직 (created, active 이벤트에서 사용)
+     */
+    private fun activateSubscription(data: Map<*, *>): WebhookResult {
         val subscriptionId = data["id"] as? String
         val customerId = data["customer_id"] as? String
 
-        // customer 객체에서 이메일 추출
+        // 1. metadata에서 user_id 직접 확인 (Polar 대시보드에서 보이는 형태)
+        val metadata = data["metadata"] as? Map<*, *>
+        val metadataUserId = (metadata?.get("user_id") as? String)?.toLongOrNull()
+            ?: (metadata?.get("user_id") as? Number)?.toLong()
+        val metadataPlan = metadata?.get("plan") as? String
+
+        // 2. customer 객체에서 이메일 추출
         val customer = data["customer"] as? Map<*, *>
         val email = customer?.get("email") as? String
 
-        // product에서 product_id 추출하여 플랜 결정
+        // 3. product에서 product_id 추출
         val product = data["product"] as? Map<*, *>
         val productId = product?.get("id") as? String
 
-        logger.info("Subscription active - email: $email, productId: $productId")
+        logger.info("Activating subscription - metadataUserId: $metadataUserId, email: $email, productId: $productId, plan: $metadataPlan")
 
-        if (email == null) {
-            logger.warn("Missing customer email in subscription event")
-            return WebhookResult(false, "Missing customer email")
+        // 사용자 찾기: metadata.user_id 우선, 없으면 email로 조회
+        val user = if (metadataUserId != null) {
+            userRepository.findById(metadataUserId).orElse(null)
+        } else if (email != null) {
+            userRepository.findByEmail(email).orElse(null)
+        } else {
+            null
         }
 
-        // 이메일로 사용자 찾기
-        val user = userRepository.findByEmail(email).orElse(null)
         if (user == null) {
-            logger.warn("User not found for email: $email")
+            logger.warn("User not found - metadataUserId: $metadataUserId, email: $email")
             return WebhookResult(false, "User not found")
         }
 
-        // product_id로 티어 결정
-        val tier = productIdToTier(productId)
+        // 티어 결정: metadata.plan 또는 product_id로
+        val tier = if (metadataPlan != null) {
+            planToTier(metadataPlan)
+        } else {
+            productIdToTier(productId)
+        }
+
         val periodEnd = parseDateTime(data["current_period_end"] as? String)
+            ?: parseDateTime(data["trial_end_at"] as? String)
 
         subscriptionService.upgradeSubscription(
             userId = user.id!!,
@@ -158,7 +206,7 @@ class PolarWebhookService(
             periodEnd = periodEnd
         )
 
-        logger.info("User ${user.id} (${email}) upgraded to $tier")
+        logger.info("User ${user.id} upgraded to $tier (subscription: $subscriptionId)")
         return WebhookResult(true, "Subscription activated for user ${user.id}")
     }
 
