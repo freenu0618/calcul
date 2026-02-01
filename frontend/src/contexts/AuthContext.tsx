@@ -24,7 +24,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, fullName: string) => Promise<void>;
   logout: () => void;
-  setTokenDirectly: (token: string, name?: string) => void;
+  setTokenDirectly: (token: string, name?: string) => Promise<void>;
   refreshUser: () => Promise<void>;
   isAuthenticated: boolean;
   /** 유료 사용자 여부 (PRO 또는 ENTERPRISE) */
@@ -159,23 +159,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  // OAuth 콜백용: JWT 토큰 직접 설정 (토큰에서 사용자 정보 추출)
-  const setTokenDirectly = (authToken: string, nameFromUrl?: string) => {
+  // OAuth 콜백용: JWT 토큰 직접 설정 후 서버에서 전체 사용자 정보 조회
+  const setTokenDirectly = async (authToken: string, nameFromUrl?: string) => {
     try {
-      // JWT payload 디코딩 (base64)
+      // JWT payload 디코딩 (기본 정보만)
       const payload = JSON.parse(atob(authToken.split('.')[1]));
-      const userData: User = {
-        id: parseInt(payload.sub, 10) || 0,  // sub가 userId
+      const basicUserData: User = {
+        id: parseInt(payload.sub, 10) || 0,
         email: payload.email || '',
         name: nameFromUrl || payload.name || payload.email?.split('@')[0] || '',
         role: payload.role || 'USER',
-        plan: (payload.subscriptionTier as UserPlan) || (payload.plan as UserPlan) || 'FREE',
+        plan: 'FREE', // 임시값, 아래에서 서버 조회로 갱신
       };
 
       localStorage.setItem('auth_token', authToken);
-      localStorage.setItem('auth_user', JSON.stringify(userData));
+      localStorage.setItem('auth_user', JSON.stringify(basicUserData));
       setToken(authToken);
-      setUser(userData);
+      setUser(basicUserData);
+
+      // 서버에서 전체 사용자 정보 조회 (subscriptionTier 포함)
+      const response = await fetch(API_CONFIG.getApiUrl('/auth/me'), {
+        headers: { 'Authorization': `Bearer ${authToken}` },
+      });
+      if (response.ok) {
+        const result = await response.json();
+        const fullUserData: User = {
+          ...result.data,
+          plan: result.data.subscriptionTier || result.data.plan || 'FREE',
+        };
+        localStorage.setItem('auth_user', JSON.stringify(fullUserData));
+        setUser(fullUserData);
+      }
     } catch (e) {
       console.error('JWT 토큰 파싱 실패:', e);
       throw new Error('유효하지 않은 토큰입니다.');
