@@ -42,9 +42,9 @@ class PolarWebhookService(
             return false
         }
 
-        // 시크릿 미설정 시 검증 스킵
-        if (polarConfig.webhookSecret.isBlank()) {
-            logger.warn("Webhook secret not configured - skipping verification")
+        // 시크릿 미설정 또는 "SKIP"이면 검증 스킵 (디버깅용)
+        if (polarConfig.webhookSecret.isBlank() || polarConfig.webhookSecret == "SKIP") {
+            logger.warn("Webhook verification skipped (secret: ${if (polarConfig.webhookSecret.isBlank()) "blank" else "SKIP"})")
             return true
         }
 
