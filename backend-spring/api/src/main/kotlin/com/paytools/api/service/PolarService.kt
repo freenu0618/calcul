@@ -117,6 +117,35 @@ class PolarService(
         }
     }
 
+    /**
+     * Customer Portal URL 생성
+     * POST /v1/customer-sessions/ → customerPortalUrl
+     */
+    fun getCustomerPortalUrl(customerId: String): String? {
+        val requestBody = mapOf("customer_id" to customerId)
+
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+            setBearerAuth(polarConfig.apiToken)
+        }
+
+        val request = HttpEntity(requestBody, headers)
+
+        return try {
+            val response = restTemplate.exchange(
+                "${polarConfig.apiUrl}/v1/customer-sessions/",
+                HttpMethod.POST,
+                request,
+                Map::class.java
+            )
+            val body = response.body as? Map<*, *>
+            body?.get("customer_portal_url") as? String
+        } catch (e: Exception) {
+            logger.error("Failed to get customer portal URL for customer: $customerId", e)
+            null
+        }
+    }
+
     data class CheckoutResult(
         val success: Boolean,
         val checkoutUrl: String = "",

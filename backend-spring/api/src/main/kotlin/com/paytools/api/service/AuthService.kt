@@ -73,7 +73,8 @@ class AuthService(
                 name = user.name,
                 role = user.role.name,
                 subscriptionTier = user.subscriptionTier.name,
-                polarSubscriptionId = user.polarSubscriptionId
+                polarSubscriptionId = user.polarSubscriptionId,
+                polarCustomerId = user.polarCustomerId
             )
         )
     }
@@ -93,7 +94,8 @@ class AuthService(
             name = user.name,
             role = user.role.name,
             subscriptionTier = user.subscriptionTier.name,
-            polarSubscriptionId = user.polarSubscriptionId
+            polarSubscriptionId = user.polarSubscriptionId,
+            polarCustomerId = user.polarCustomerId
         )
     }
 }
@@ -110,5 +112,6 @@ data class UserInfo(
     val name: String,
     val role: String,
     val subscriptionTier: String = "FREE",
-    val polarSubscriptionId: String? = null
+    val polarSubscriptionId: String? = null,
+    val polarCustomerId: String? = null
 )

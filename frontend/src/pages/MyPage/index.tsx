@@ -2,12 +2,13 @@
  * 마이페이지 - 계정 및 구독 관리
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSubscription } from '../../hooks/useSubscription';
+import { API_CONFIG } from '../../config/api.config';
 import type { SubscriptionTier } from '../../hooks/useSubscription';
 
 // 플랜 정보
@@ -20,11 +21,66 @@ const planInfo: Record<SubscriptionTier, { name: string; price: string; color: s
 };
 
 export default function MyPage() {
-  const { user, logout } = useAuth();
+  const { user, token, logout, refreshUser } = useAuth();
   const { tier, tierLabel, usage, limits } = useSubscription();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 페이지 진입 시 사용자 정보 자동 갱신 (결제 후 플랜 반영)
+  useEffect(() => {
+    if (token) {
+      refreshUser();
+    }
+  }, [token, refreshUser]);
 
   const plan = planInfo[tier];
+
+  // 구독 관리 포탈 열기
+  const handleManageSubscription = async () => {
+    if (!token) return;
+    setIsLoading(true);
+    try {
+      const response = await fetch(API_CONFIG.getApiUrl('/payment/portal'), {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      const result = await response.json();
+      if (result.success && result.data?.portalUrl) {
+        window.open(result.data.portalUrl, '_blank');
+      } else {
+        alert(result.message || '구독 관리 페이지를 열 수 없습니다.');
+      }
+    } catch {
+      alert('오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Pro 업그레이드 체크아웃
+  const handleUpgradeToPro = async () => {
+    if (!token) return;
+    setIsLoading(true);
+    try {
+      const response = await fetch(API_CONFIG.getApiUrl('/payment/checkout'), {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ plan: 'pro' }),
+      });
+      const result = await response.json();
+      if (result.success && result.data?.checkoutUrl) {
+        window.location.href = result.data.checkoutUrl;
+      } else {
+        alert(result.message || '결제 페이지를 열 수 없습니다.');
+      }
+    } catch {
+      alert('오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // 사용량 계산
   const usageItems = [
@@ -138,16 +194,21 @@ export default function MyPage() {
                   </Link>
                 )}
                 {tier === 'BASIC' && (
-                  <Link
-                    to="/#pricing"
-                    className="block w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-center text-sm font-semibold rounded-lg transition-colors"
+                  <button
+                    onClick={handleUpgradeToPro}
+                    disabled={isLoading}
+                    className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white text-sm font-semibold rounded-lg transition-colors"
                   >
-                    Pro로 업그레이드
-                  </Link>
+                    {isLoading ? '처리 중...' : 'Pro로 업그레이드'}
+                  </button>
                 )}
                 {(tier === 'BASIC' || tier === 'PRO' || tier === 'TRIAL') && (
-                  <button className="w-full py-2.5 text-gray-600 hover:text-gray-900 text-sm font-medium">
-                    구독 관리
+                  <button
+                    onClick={handleManageSubscription}
+                    disabled={isLoading}
+                    className="w-full py-2.5 text-gray-600 hover:text-gray-900 disabled:text-gray-400 text-sm font-medium"
+                  >
+                    {isLoading ? '처리 중...' : '구독 관리'}
                   </button>
                 )}
               </div>

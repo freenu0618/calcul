@@ -70,6 +70,29 @@ class PolarController(
         }
     }
 
+    /**
+     * Customer Portal URL 생성
+     * GET /api/v1/payment/portal
+     */
+    @GetMapping("/portal")
+    fun getCustomerPortal(
+        @RequestHeader("Authorization") authorization: String
+    ): ResponseEntity<ApiResponse<PortalResponse>> {
+        val user = getUserFromToken(authorization)
+
+        val customerId = user.polarCustomerId
+        if (customerId.isNullOrBlank()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("구독 정보가 없습니다"))
+        }
+
+        val portalUrl = polarService.getCustomerPortalUrl(customerId)
+        return if (portalUrl != null) {
+            ResponseEntity.ok(ApiResponse.success(PortalResponse(portalUrl = portalUrl)))
+        } else {
+            ResponseEntity.badRequest().body(ApiResponse.error("포탈 URL 생성 실패"))
+        }
+    }
+
     private fun getUserFromToken(authorization: String): UserInfo {
         val token = authorization.removePrefix("Bearer ")
         return authService.getUserFromToken(token)
@@ -83,5 +106,9 @@ class PolarController(
     data class CheckoutResponse(
         val checkoutUrl: String,
         val checkoutId: String
+    )
+
+    data class PortalResponse(
+        val portalUrl: String
     )
 }

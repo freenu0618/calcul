@@ -241,12 +241,8 @@ class PolarWebhookService(
     }
 
     private fun handleSubscriptionUpdated(data: Map<*, *>): WebhookResult {
-        val user = findUserFromSubscriptionData(data)
-        if (user != null) {
-            val periodEnd = parseDateTime(data["current_period_end"] as? String)
-            logger.info("Subscription updated for user ${user.id}, periodEnd: $periodEnd")
-        }
-        return WebhookResult(true, "Subscription updated")
+        // 업그레이드/다운그레이드 시에도 티어 업데이트 필요
+        return activateSubscription(data)
     }
 
     private fun handleSubscriptionCanceled(data: Map<*, *>): WebhookResult {
