@@ -9,34 +9,42 @@ import type { SalaryCalculationResponse } from '../types/salary';
 
 // 폰트 캐시
 let fontLoaded = false;
+let cachedFontBase64: string | null = null;
 
-// 폰트 CDN URL 목록 (순서대로 시도)
+// 폰트 URL 목록 (로컬 우선, CDN 백업)
 const FONT_URLS = [
-  'https://fastly.jsdelivr.net/gh/AlfaInsmo/korean-font@main/nanum/NanumGothic-Regular.ttf',
-  'https://cdn.jsdelivr.net/gh/AlfaInsmo/korean-font@main/nanum/NanumGothic-Regular.ttf',
+  '/fonts/NanumGothic-Regular.ttf', // 로컬 파일 (가장 안정적)
+  'https://cdn.jsdelivr.net/gh/nicejmp1/cdn/NanumGothic-Regular.ttf',
 ];
 
 /**
- * Noto Sans KR 폰트 로드 (여러 CDN 시도)
+ * 한글 폰트 로드 (로컬 우선, CDN 백업)
  */
 async function loadKoreanFont(doc: jsPDF): Promise<boolean> {
-  if (fontLoaded) {
+  // 이미 로드된 폰트 재사용
+  if (fontLoaded && cachedFontBase64) {
+    doc.addFileToVFS('NanumGothic-Regular.ttf', cachedFontBase64);
+    doc.addFont('NanumGothic-Regular.ttf', 'NanumGothic', 'normal');
     doc.setFont('NanumGothic');
     return true;
   }
 
   for (const fontUrl of FONT_URLS) {
     try {
-      const response = await fetch(fontUrl, {
-        mode: 'cors',
-        cache: 'force-cache'
-      });
-
-      if (!response.ok) continue;
+      console.log(`Trying font: ${fontUrl}`);
+      const response = await fetch(fontUrl, { cache: 'force-cache' });
+      if (!response.ok) {
+        console.warn(`Font fetch failed: ${response.status}`);
+        continue;
+      }
 
       const fontData = await response.arrayBuffer();
+      if (fontData.byteLength < 10000) {
+        console.warn(`Font file too small: ${fontData.byteLength} bytes`);
+        continue;
+      }
 
-      // ArrayBuffer → Base64 변환 (큰 파일도 처리 가능)
+      // ArrayBuffer → Base64 변환
       const bytes = new Uint8Array(fontData);
       let binary = '';
       const chunkSize = 8192;
@@ -51,8 +59,10 @@ async function loadKoreanFont(doc: jsPDF): Promise<boolean> {
       doc.addFont('NanumGothic-Regular.ttf', 'NanumGothic', 'normal');
       doc.setFont('NanumGothic');
 
+      // 캐시에 저장
+      cachedFontBase64 = fontBase64;
       fontLoaded = true;
-      console.log('Korean font loaded successfully');
+      console.log(`Korean font loaded from: ${fontUrl}`);
       return true;
     } catch (error) {
       console.warn(`Font load failed from ${fontUrl}:`, error);
