@@ -22,7 +22,8 @@ class PolarWebhookService(
     private val polarConfig: PolarConfig,
     private val subscriptionService: SubscriptionService,
     private val userRepository: UserRepository,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val resendService: ResendService
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -198,6 +199,20 @@ class PolarWebhookService(
                 periodEnd = periodEnd
             )
             logger.info("SUCCESS! User ${user.id} upgraded to $tier (subscription: $subscriptionId)")
+
+            // 결제 완료 이메일 발송
+            try {
+                val amount = extractAmount(data)
+                resendService.sendPaymentReportEmail(
+                    toEmail = user.email,
+                    userName = user.name ?: user.email.substringBefore("@"),
+                    tier = tier,
+                    amount = amount,
+                    periodEnd = periodEnd
+                )
+            } catch (emailError: Exception) {
+                logger.warn("Failed to send payment email: ${emailError.message}")
+            }
         } catch (e: Exception) {
             logger.error("FAILED to upgrade subscription: ${e.message}", e)
             return WebhookResult(false, "Upgrade failed: ${e.message}")
@@ -270,6 +285,18 @@ class PolarWebhookService(
         } catch (e: Exception) {
             null
         }
+    }
+
+    /**
+     * 결제 금액 추출 (cents → 원)
+     */
+    private fun extractAmount(data: Map<*, *>): Int {
+        // price 객체에서 금액 추출
+        val price = data["price"] as? Map<*, *>
+        val amountCents = (price?.get("price_amount") as? Number)?.toInt()
+            ?: (data["amount"] as? Number)?.toInt()
+            ?: 0
+        return amountCents // Polar는 이미 원 단위
     }
 
     data class WebhookResult(

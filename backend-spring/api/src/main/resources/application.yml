@@ -78,6 +78,12 @@ springdoc:
     path: /swagger-ui.html
     enabled: true
 
+# Resend Email Configuration
+resend:
+  api-key: ${RESEND_API_KEY:}
+  from-email: ${RESEND_FROM_EMAIL:PayTools <noreply@paytools.work>}
+  enabled: ${RESEND_ENABLED:true}
+
 # Polar Payment Configuration
 polar:
   api-url: ${POLAR_API_URL:https://api.polar.sh}
