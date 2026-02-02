@@ -146,11 +146,55 @@ class PolarService(
         }
     }
 
+    /**
+     * 주문 환불 (리포트 생성 실패 시 자동 환불용)
+     * POST /v1/refunds
+     */
+    fun refundOrder(orderId: String, reason: String = "service_failure"): RefundResult {
+        val requestBody = mapOf(
+            "order_id" to orderId,
+            "reason" to reason
+        )
+
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+            setBearerAuth(polarConfig.apiToken)
+        }
+
+        val request = HttpEntity(requestBody, headers)
+
+        return try {
+            val response = restTemplate.exchange(
+                "${polarConfig.apiUrl}/v1/refunds",
+                HttpMethod.POST,
+                request,
+                Map::class.java
+            )
+            val body = response.body as? Map<*, *>
+            RefundResult(
+                success = true,
+                refundId = body?.get("id") as? String ?: ""
+            )
+        } catch (e: Exception) {
+            logger.error("Failed to refund order: $orderId", e)
+            RefundResult(
+                success = false,
+                error = e.message ?: "환불 처리 실패"
+            )
+        }
+    }
+
     data class CheckoutResult(
         val success: Boolean,
         val checkoutUrl: String = "",
         val checkoutId: String = "",
         val clientSecret: String? = null,
+        val error: String? = null
+    )
+
+    data class RefundResult(
+        val success: Boolean,
+        val refundId: String = "",
         val error: String? = null
     )
 }

@@ -304,12 +304,18 @@ export default function PricingSection() {
         </div>
 
         {/* Footer Note */}
-        <p className="text-center text-sm text-text-sub mt-8">
-          모든 유료 플랜은 7일 이내 전액 환불 가능합니다.{' '}
-          <Link to="/terms" className="text-primary hover:underline">
-            환불 정책 보기
-          </Link>
-        </p>
+        <div className="text-center text-sm text-text-sub mt-8 space-y-2">
+          <p>
+            <span className="text-amber-600 font-medium">※ 결제 시 입력한 이메일로 리포트가 발송됩니다.</span>{' '}
+            이메일 주소 오입력으로 인한 미수신은 환불 대상이 아닙니다.
+          </p>
+          <p>
+            리포트 생성 오류 발생 시 자동 전액 환불됩니다.{' '}
+            <Link to="/terms" className="text-primary hover:underline">
+              환불 정책 보기
+            </Link>
+          </p>
+        </div>
       </div>
     </section>
   );
