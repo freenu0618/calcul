@@ -7,24 +7,31 @@ import HeroSection from './HeroSection';
 import StatsSection from './StatsSection';
 import FeaturesSection from './FeaturesSection';
 import PricingSection from './PricingSection';
+import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
 export default function LandingPage() {
   return (
     <>
       <Helmet>
-        <title>PayTools - 급여 계산 30분 → 3분으로 | 급여계산기</title>
+        <title>급여계산기 - 4대보험 주휴수당 자동계산 | PayTools</title>
         <meta
           name="description"
-          content="4대보험, 소득세, 연장·야간·휴일 수당 자동 계산. 2026년 최신 법령 반영. 직원 5명까지 무료로 시작하세요."
+          content="4대보험, 소득세, 주휴수당, 연장·야간·휴일 수당 자동 계산. 2026년 최신 법령 반영. 186개 테스트로 검증된 정확성. 직원 3명까지 무료."
         />
-        <meta property="og:title" content="PayTools - 급여 계산 30분 → 3분으로" />
+        <meta name="keywords" content="급여계산기,4대보험계산기,주휴수당계산,연장근로수당,실수령액계산,급여명세서" />
+        <link rel="canonical" href="https://paytools.work" />
+        <meta property="og:title" content="급여계산기 - 4대보험 주휴수당 자동계산 | PayTools" />
         <meta
           property="og:description"
-          content="4대보험, 소득세, 가산수당 자동 계산. 2026년 최신 법령 반영, 181개 테스트 검증."
+          content="4대보험, 소득세, 주휴수당 자동 계산. 2026년 최신 법령 반영. 노무사 비용의 1/7."
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://paytools.work" />
+        <meta property="og:site_name" content="PayTools" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="급여계산기 - 4대보험 주휴수당 자동계산" />
+        <meta name="twitter:description" content="급여 계산 30분 → 3분. 2026년 최신 법령 자동 반영." />
       </Helmet>
 
       <div className="overflow-hidden">
@@ -32,6 +39,7 @@ export default function LandingPage() {
         <StatsSection />
         <FeaturesSection />
         <PricingSection />
+        <FAQSection />
         <FinalCTASection />
       </div>
     </>
