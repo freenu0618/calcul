@@ -10,6 +10,7 @@ import type { EmployeeResponse } from '../../types/employee';
 import { useAuth } from '../../contexts/AuthContext';
 import { employeeApi } from '../../api/employeeApi';
 import Input from '../common/Input';
+import Tooltip from '../common/Tooltip';
 
 interface EmployeeInfoFormProps {
   employee: Employee;
@@ -116,9 +117,17 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
       />
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          고용 형태
-        </label>
+        <div className="flex items-center gap-2 mb-1">
+          <label className="block text-sm font-medium text-gray-700">
+            고용 형태
+          </label>
+          <Tooltip
+            content="정규직: 주 40시간 이상 근무. 시간제: 주 40시간 미만 단시간 근로자. 4대보험 가입 기준이 다릅니다."
+            position="right"
+          >
+            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+          </Tooltip>
+        </div>
         <select
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           value={employee.employment_type}
@@ -130,9 +139,17 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          사업장 규모
-        </label>
+        <div className="flex items-center gap-2 mb-1">
+          <label className="block text-sm font-medium text-gray-700">
+            사업장 규모
+          </label>
+          <Tooltip
+            content="5인 이상: 휴일근로 8시간 초과 시 2배 가산. 5인 미만: 1.5배 가산. 근로기준법 적용 범위가 다릅니다."
+            position="right"
+          >
+            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+          </Tooltip>
+        </div>
         <select
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           value={employee.company_size}
@@ -141,15 +158,20 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
           <option value="OVER_5">5인 이상 사업장</option>
           <option value="UNDER_5">5인 미만 사업장</option>
         </select>
-        <p className="mt-1 text-xs text-gray-500">
-          휴일근로 8시간 초과 시 가산율에 영향
-        </p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          주 소정근로일 (계약)
-        </label>
+        <div className="flex items-center gap-2 mb-1">
+          <label className="block text-sm font-medium text-gray-700">
+            주 소정근로일 (계약)
+          </label>
+          <Tooltip
+            content="근로계약서에 명시된 주간 근무일 수. 개근 여부 판단 기준이며, 실제 근무일이 소정근로일 이상이면 주휴수당이 발생합니다."
+            position="right"
+          >
+            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+          </Tooltip>
+        </div>
         <select
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           value={employee.scheduled_work_days}
@@ -160,15 +182,23 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
           <option value={6}>주 6일</option>
           <option value={7}>주 7일</option>
         </select>
-        <p className="mt-1 text-xs text-gray-500">
-          개근 여부 판단 기준 (실제 근무일 ≥ 소정근로일 → 주휴수당)
+        <p className="mt-1 text-xs text-blue-600 font-medium">
+          → 주 소정근로시간: {employee.scheduled_work_days * employee.daily_work_hours}시간
         </p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          1일 소정근로시간
-        </label>
+        <div className="flex items-center gap-2 mb-1">
+          <label className="block text-sm font-medium text-gray-700">
+            1일 소정근로시간
+          </label>
+          <Tooltip
+            content="근로계약서에 명시된 하루 근무시간. 주 소정근로시간과 통상시급 계산에 사용됩니다."
+            position="right"
+          >
+            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+          </Tooltip>
+        </div>
         <select
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           value={employee.daily_work_hours}
@@ -178,48 +208,81 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
             <option key={h} value={h}>{h}시간</option>
           ))}
         </select>
-        <p className="mt-1 text-xs text-blue-600 font-medium">
-          → 주 소정근로시간: {employee.scheduled_work_days * employee.daily_work_hours}시간
-        </p>
       </div>
 
-      <Input
-        type="number"
-        label="부양가족 수 (본인 포함)"
-        value={employee.dependents_count}
-        onChange={(e) => handleChange('dependents_count', parseInt(e.target.value) || 0)}
-        min={1}
-        placeholder="2"
-        required
-      />
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <label className="block text-sm font-medium text-gray-700">
+            부양가족 수 (본인 포함)
+          </label>
+          <Tooltip
+            content="본인을 포함한 부양가족 수. 소득세 간이세액표 적용에 사용됩니다. 부양가족이 많을수록 세금이 줄어듭니다."
+            position="right"
+          >
+            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+          </Tooltip>
+        </div>
+        <input
+          type="number"
+          value={employee.dependents_count}
+          onChange={(e) => handleChange('dependents_count', parseInt(e.target.value) || 0)}
+          min={1}
+          placeholder="2"
+          required
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+        />
+      </div>
 
-      <Input
-        type="number"
-        label="20세 이하 자녀 수"
-        value={employee.children_under_20}
-        onChange={(e) => handleChange('children_under_20', parseInt(e.target.value) || 0)}
-        min={0}
-        placeholder="1"
-      />
-      <p className="text-xs text-gray-500 -mt-2">
-        자녀세액공제 적용 (부양가족 수 이하)
-      </p>
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <label className="block text-sm font-medium text-gray-700">
+            20세 이하 자녀 수
+          </label>
+          <Tooltip
+            content="만 20세 이하 자녀 수. 자녀세액공제 적용에 사용됩니다. 부양가족 수를 초과할 수 없습니다."
+            position="right"
+          >
+            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+          </Tooltip>
+        </div>
+        <input
+          type="number"
+          value={employee.children_under_20}
+          onChange={(e) => handleChange('children_under_20', parseInt(e.target.value) || 0)}
+          min={0}
+          placeholder="1"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+        />
+      </div>
 
       {/* 만 나이 (60세 이상 국민연금 제외 안내용) */}
-      <Input
-        type="number"
-        label="만 나이 (선택)"
-        value={employee.age || ''}
-        onChange={(e) => handleChange('age', parseInt(e.target.value) || 0)}
-        min={15}
-        max={100}
-        placeholder="30"
-      />
-      {employee.age && employee.age >= 60 && (
-        <p className="text-xs text-amber-600 -mt-2">
-          ⚠️ 만 60세 이상: 국민연금 의무가입 대상 아님
-        </p>
-      )}
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <label className="block text-sm font-medium text-gray-700">
+            만 나이 (선택)
+          </label>
+          <Tooltip
+            content="만 60세 이상은 국민연금 의무가입 대상이 아닙니다. 만 18세 미만은 고용보험 가입 제외될 수 있습니다."
+            position="right"
+          >
+            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+          </Tooltip>
+        </div>
+        <input
+          type="number"
+          value={employee.age || ''}
+          onChange={(e) => handleChange('age', parseInt(e.target.value) || 0)}
+          min={15}
+          max={100}
+          placeholder="30"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+        />
+        {employee.age && employee.age >= 60 && (
+          <p className="text-xs text-amber-600 mt-1">
+            ⚠️ 만 60세 이상: 국민연금 의무가입 대상 아님
+          </p>
+        )}
+      </div>
 
       {/* 외국인 여부 */}
       <div className="flex items-center gap-3">

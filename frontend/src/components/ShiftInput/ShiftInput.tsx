@@ -28,7 +28,9 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
   onChange, initialShifts = [], calculationMonth = '', onCalculationMonthChange,
 }) => {
   const [shifts, setShifts] = useState<WorkShiftRequest[]>(initialShifts);
-  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('calendar');
+  // 모바일에서는 리스트 뷰 기본값 (터치 친화적)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>(isMobile ? 'list' : 'calendar');
   const [periodStart, setPeriodStart] = useState(1);
   const [periodEnd, setPeriodEnd] = useState(31);
   const [csvError, setCsvError] = useState<string>('');

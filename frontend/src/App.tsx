@@ -8,6 +8,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'r
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ChatProvider } from './contexts/ChatContext';
+import { ToastProvider } from './components/common/Toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/common/ScrollToTop';
 import Navigation from './components/layout/Navigation';
@@ -87,6 +88,7 @@ function App() {
       <HelmetProvider>
         <AuthProvider>
           <ChatProvider>
+          <ToastProvider>
           <Router>
             <ScrollToTop />
             <PageViewTracker />
@@ -156,6 +158,7 @@ function App() {
               <ChatWidget />
             </div>
           </Router>
+          </ToastProvider>
           </ChatProvider>
         </AuthProvider>
       </HelmetProvider>

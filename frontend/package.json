@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/validate-env.js",
+    "prebuild": "node scripts/validate-env.cjs",
     "build": "tsc -b && vite build",
     "postbuild": "node scripts/copy-404.js",
     "lint": "eslint .",

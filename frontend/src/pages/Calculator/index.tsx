@@ -23,6 +23,7 @@ import type { PayrollPeriodResponse } from '../../types/payroll';
 import type { EmployeeResponse } from '../../types/employee';
 import InsuranceOptions from '../../components/forms/InsuranceOptions';
 import InclusiveWageOptions from '../../components/forms/InclusiveWageOptions';
+import TutorialOverlay from '../../components/Onboarding/TutorialOverlay';
 
 const WIZARD_STEPS: WizardStep[] = [
   { id: 'employee', title: '근로자 정보', description: '고용형태, 사업장' },
@@ -248,6 +249,9 @@ export default function CalculatorPage() {
         <title>급여 계산기 | paytools - 4대보험, 소득세 자동 계산</title>
         <meta name="description" content="기본급, 수당, 4대보험, 소득세를 자동 계산. 2026년 최신 세율 적용." />
       </Helmet>
+
+      {/* 첫 방문자 튜토리얼 */}
+      <TutorialOverlay />
 
       <MainLayout>
         <div className="max-w-4xl mx-auto">
