@@ -1,229 +1,164 @@
 /**
  * 급여명세서 PDF 생성기
- * 근로기준법 시행령 제27조의2 준수
- * 한글 폰트 지원 (Noto Sans KR)
+ * html2canvas 방식으로 한글 완벽 지원
  */
 
 import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 import type { SalaryCalculationResponse } from '../types/salary';
 
-// 폰트 캐시
-let fontLoaded = false;
-let cachedFontBase64: string | null = null;
-
-// 폰트 URL 목록 (로컬 우선, CDN 백업)
-const FONT_URLS = [
-  '/fonts/NanumGothic-Regular.ttf', // 로컬 파일 (가장 안정적)
-  'https://cdn.jsdelivr.net/gh/nicejmp1/cdn/NanumGothic-Regular.ttf',
-];
-
 /**
- * 한글 폰트 로드 (로컬 우선, CDN 백업)
+ * 숫자를 원화 형식으로 포맷
  */
-async function loadKoreanFont(doc: jsPDF): Promise<boolean> {
-  // 이미 로드된 폰트 재사용
-  if (fontLoaded && cachedFontBase64) {
-    doc.addFileToVFS('NanumGothic-Regular.ttf', cachedFontBase64);
-    doc.addFont('NanumGothic-Regular.ttf', 'NanumGothic', 'normal');
-    doc.setFont('NanumGothic');
-    return true;
-  }
-
-  for (const fontUrl of FONT_URLS) {
-    try {
-      console.log(`Trying font: ${fontUrl}`);
-      const response = await fetch(fontUrl, { cache: 'force-cache' });
-      if (!response.ok) {
-        console.warn(`Font fetch failed: ${response.status}`);
-        continue;
-      }
-
-      const fontData = await response.arrayBuffer();
-      if (fontData.byteLength < 10000) {
-        console.warn(`Font file too small: ${fontData.byteLength} bytes`);
-        continue;
-      }
-
-      // ArrayBuffer → Base64 변환
-      const bytes = new Uint8Array(fontData);
-      let binary = '';
-      const chunkSize = 8192;
-      for (let i = 0; i < bytes.length; i += chunkSize) {
-        const chunk = bytes.subarray(i, i + chunkSize);
-        binary += String.fromCharCode.apply(null, Array.from(chunk));
-      }
-      const fontBase64 = btoa(binary);
-
-      // 폰트 등록
-      doc.addFileToVFS('NanumGothic-Regular.ttf', fontBase64);
-      doc.addFont('NanumGothic-Regular.ttf', 'NanumGothic', 'normal');
-      doc.setFont('NanumGothic');
-
-      // 캐시에 저장
-      cachedFontBase64 = fontBase64;
-      fontLoaded = true;
-      console.log(`Korean font loaded from: ${fontUrl}`);
-      return true;
-    } catch (error) {
-      console.warn(`Font load failed from ${fontUrl}:`, error);
-      continue;
-    }
-  }
-
-  console.error('All font sources failed');
-  return false;
+function formatKRW(amount: number): string {
+  return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(amount);
 }
 
 /**
- * 급여명세서 PDF 생성 및 다운로드
+ * 급여명세서 PDF 생성 및 다운로드 (html2canvas 방식)
  */
 export async function generatePayslipPdf(
   result: SalaryCalculationResponse,
   employerName: string = 'PayTools 사업장'
 ): Promise<void> {
-  const doc = new jsPDF('p', 'mm', 'a4');
-  const pageWidth = doc.internal.pageSize.getWidth();
   const { gross_breakdown, deductions_breakdown, net_pay, work_summary } = result;
-
-  // 한글 폰트 로드
-  const fontSuccess = await loadKoreanFont(doc);
-  if (!fontSuccess) {
-    alert('한글 폰트를 불러오지 못했습니다. PDF에 한글이 깨질 수 있습니다.');
-  }
-
-  let y = 15;
-
-  // 제목
-  doc.setFontSize(16);
-  doc.text('급 여 명 세 서', pageWidth / 2, y, { align: 'center' });
-  y += 10;
-
-  // 기본 정보
-  doc.setFontSize(9);
   const calcDate = result.calculation_metadata.calculation_date;
   const yearMonth = calcDate.slice(0, 7).replace('-', '년 ') + '월';
 
-  doc.text(`귀속연월: ${yearMonth}`, 15, y);
-  doc.text(`지급일: ${calcDate.replace(/-/g, '.')}`, pageWidth - 50, y);
-  y += 6;
-  doc.text(`성    명: ${result.employee_name}`, 15, y);
-  doc.text(`사업장: ${employerName}`, pageWidth - 70, y);
-  y += 10;
-
-  // 구분선
-  doc.setLineWidth(0.5);
-  doc.line(15, y, pageWidth - 15, y);
-  y += 8;
-
-  // 지급 내역 테이블
-  doc.setFontSize(10);
-  doc.text('[지급 내역]', 15, y);
-  y += 6;
-
+  // 지급 항목
   const payItems = [
-    { label: '기본급', amount: gross_breakdown.base_salary },
-    { label: '주휴수당', amount: gross_breakdown.weekly_holiday_pay.amount },
-    { label: '연장근로수당', amount: gross_breakdown.overtime_allowances.overtime_pay },
-    { label: '야간근로수당', amount: gross_breakdown.overtime_allowances.night_pay },
-    { label: '휴일근로수당', amount: gross_breakdown.overtime_allowances.holiday_pay },
-    { label: '과세수당', amount: gross_breakdown.taxable_allowances },
-    { label: '비과세수당', amount: gross_breakdown.non_taxable_allowances },
-  ].filter(item => item.amount.amount > 0);
+    { label: '기본급', amount: gross_breakdown.base_salary.amount },
+    { label: '주휴수당', amount: gross_breakdown.weekly_holiday_pay.amount.amount },
+    { label: '연장근로수당', amount: gross_breakdown.overtime_allowances.overtime_pay.amount },
+    { label: '야간근로수당', amount: gross_breakdown.overtime_allowances.night_pay.amount },
+    { label: '휴일근로수당', amount: gross_breakdown.overtime_allowances.holiday_pay.amount },
+    { label: '과세수당', amount: gross_breakdown.taxable_allowances.amount },
+    { label: '비과세수당', amount: gross_breakdown.non_taxable_allowances.amount },
+  ].filter(item => item.amount > 0);
 
-  doc.setFontSize(9);
-  payItems.forEach((item) => {
-    doc.text(item.label, 20, y);
-    doc.text(item.amount.formatted, pageWidth - 40, y, { align: 'right' });
-    y += 5;
-  });
-
-  y += 3;
-  doc.setFontSize(10);
-  doc.text('총 지급액', 20, y);
-  doc.text(gross_breakdown.total.formatted, pageWidth - 40, y, { align: 'right' });
-  y += 10;
-
-  // 공제 내역 테이블
-  doc.text('[공제 내역]', 15, y);
-  y += 6;
-
+  // 공제 항목
   const deductItems = [
-    { label: '국민연금', amount: deductions_breakdown.insurance.national_pension },
-    { label: '건강보험', amount: deductions_breakdown.insurance.health_insurance },
-    { label: '장기요양보험', amount: deductions_breakdown.insurance.long_term_care },
-    { label: '고용보험', amount: deductions_breakdown.insurance.employment_insurance },
-    { label: '소득세', amount: deductions_breakdown.tax.income_tax },
-    { label: '지방소득세', amount: deductions_breakdown.tax.local_income_tax },
-  ].filter(item => item.amount.amount > 0);
+    { label: '국민연금', amount: deductions_breakdown.insurance.national_pension.amount },
+    { label: '건강보험', amount: deductions_breakdown.insurance.health_insurance.amount },
+    { label: '장기요양보험', amount: deductions_breakdown.insurance.long_term_care.amount },
+    { label: '고용보험', amount: deductions_breakdown.insurance.employment_insurance.amount },
+    { label: '소득세', amount: deductions_breakdown.tax.income_tax.amount },
+    { label: '지방소득세', amount: deductions_breakdown.tax.local_income_tax.amount },
+  ].filter(item => item.amount > 0);
 
-  doc.setFontSize(9);
-  deductItems.forEach((item) => {
-    doc.text(item.label, 20, y);
-    doc.text(item.amount.formatted, pageWidth - 40, y, { align: 'right' });
-    y += 5;
-  });
+  // HTML 템플릿 생성
+  const html = `
+    <div id="payslip-pdf" style="width: 595px; padding: 40px; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: white; color: #1e293b;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="font-size: 24px; margin: 0;">급 여 명 세 서</h1>
+      </div>
 
-  y += 3;
-  doc.setFontSize(10);
-  doc.text('총 공제액', 20, y);
-  doc.text(deductions_breakdown.total.formatted, pageWidth - 40, y, { align: 'right' });
-  y += 10;
+      <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 14px;">
+        <div>
+          <p style="margin: 4px 0;"><strong>귀속연월:</strong> ${yearMonth}</p>
+          <p style="margin: 4px 0;"><strong>성    명:</strong> ${result.employee_name}</p>
+        </div>
+        <div style="text-align: right;">
+          <p style="margin: 4px 0;"><strong>지급일:</strong> ${calcDate.replace(/-/g, '.')}</p>
+          <p style="margin: 4px 0;"><strong>사업장:</strong> ${employerName}</p>
+        </div>
+      </div>
 
-  // 구분선
-  doc.setLineWidth(0.5);
-  doc.line(15, y, pageWidth - 15, y);
-  y += 8;
+      <hr style="border: none; border-top: 2px solid #1e293b; margin: 20px 0;">
 
-  // 실수령액
-  doc.setFontSize(12);
-  doc.text('실수령액', 20, y);
-  doc.text(net_pay.formatted, pageWidth - 40, y, { align: 'right' });
-  y += 15;
+      <div style="margin-bottom: 24px;">
+        <h3 style="font-size: 14px; margin: 0 0 12px; color: #3b82f6;">[지급 내역]</h3>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          ${payItems.map(item => `
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+              <td style="padding: 8px 0;">${item.label}</td>
+              <td style="padding: 8px 0; text-align: right;">${formatKRW(item.amount)}</td>
+            </tr>
+          `).join('')}
+          <tr style="background: #f1f5f9; font-weight: bold;">
+            <td style="padding: 10px 0;">총 지급액</td>
+            <td style="padding: 10px 0; text-align: right;">${gross_breakdown.total.formatted}</td>
+          </tr>
+        </table>
+      </div>
 
-  // 근무 요약 (있는 경우)
-  if (work_summary) {
-    doc.setFontSize(10);
-    doc.text('[근무 요약]', 15, y);
-    y += 6;
-    doc.setFontSize(9);
-    doc.text(`총 근무일수: ${work_summary.actual_work_days}일`, 20, y);
-    y += 5;
-    doc.text(`총 근무시간: ${work_summary.total_work_hours.formatted}`, 20, y);
-    y += 5;
-    if (work_summary.overtime_hours.total_minutes > 0) {
-      doc.text(`연장근로시간: ${work_summary.overtime_hours.formatted}`, 20, y);
-      y += 5;
-    }
-    if (work_summary.night_hours.total_minutes > 0) {
-      doc.text(`야간근로시간: ${work_summary.night_hours.formatted}`, 20, y);
-      y += 5;
-    }
-    if (work_summary.holiday_hours.total_minutes > 0) {
-      doc.text(`휴일근로시간: ${work_summary.holiday_hours.formatted}`, 20, y);
-      y += 5;
-    }
-    y += 10;
+      <div style="margin-bottom: 24px;">
+        <h3 style="font-size: 14px; margin: 0 0 12px; color: #ef4444;">[공제 내역]</h3>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          ${deductItems.map(item => `
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+              <td style="padding: 8px 0;">${item.label}</td>
+              <td style="padding: 8px 0; text-align: right;">${formatKRW(item.amount)}</td>
+            </tr>
+          `).join('')}
+          <tr style="background: #fef2f2; font-weight: bold;">
+            <td style="padding: 10px 0;">총 공제액</td>
+            <td style="padding: 10px 0; text-align: right;">${deductions_breakdown.total.formatted}</td>
+          </tr>
+        </table>
+      </div>
+
+      <hr style="border: none; border-top: 2px solid #1e293b; margin: 20px 0;">
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #3b82f6; color: white; border-radius: 8px; margin-bottom: 24px;">
+        <span style="font-size: 18px; font-weight: bold;">실수령액</span>
+        <span style="font-size: 24px; font-weight: bold;">${net_pay.formatted}</span>
+      </div>
+
+      ${work_summary ? `
+        <div style="margin-bottom: 24px;">
+          <h3 style="font-size: 14px; margin: 0 0 12px; color: #64748b;">[근무 요약]</h3>
+          <div style="font-size: 13px; color: #64748b;">
+            <p style="margin: 4px 0;">총 근무일수: ${work_summary.actual_work_days}일</p>
+            <p style="margin: 4px 0;">총 근무시간: ${work_summary.total_work_hours.formatted}</p>
+            ${work_summary.overtime_hours.total_minutes > 0 ? `<p style="margin: 4px 0;">연장근로: ${work_summary.overtime_hours.formatted}</p>` : ''}
+            ${work_summary.night_hours.total_minutes > 0 ? `<p style="margin: 4px 0;">야간근로: ${work_summary.night_hours.formatted}</p>` : ''}
+            ${work_summary.holiday_hours.total_minutes > 0 ? `<p style="margin: 4px 0;">휴일근로: ${work_summary.holiday_hours.formatted}</p>` : ''}
+          </div>
+        </div>
+      ` : ''}
+
+      <div style="text-align: center; font-size: 11px; color: #94a3b8; margin-top: 30px;">
+        <p style="margin: 4px 0;">본 급여명세서는 근로기준법 시행령 제27조의2에 따라 교부합니다.</p>
+        <p style="margin: 4px 0;">* 본 문서는 PayTools에서 생성되었으며, 참고용입니다.</p>
+      </div>
+    </div>
+  `;
+
+  // 임시 컨테이너 생성
+  const container = document.createElement('div');
+  container.innerHTML = html;
+  container.style.position = 'absolute';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  document.body.appendChild(container);
+
+  try {
+    const element = container.querySelector('#payslip-pdf') as HTMLElement;
+
+    // html2canvas로 이미지 변환
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+    });
+
+    // PDF 생성
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+    // 파일 저장
+    const fileName = `급여명세서_${result.employee_name}_${calcDate.slice(0, 7)}.pdf`;
+    pdf.save(fileName);
+  } finally {
+    // 임시 컨테이너 제거
+    document.body.removeChild(container);
   }
-
-  // 법적 고지
-  doc.setFontSize(8);
-  doc.text(
-    '본 급여명세서는 근로기준법 시행령 제27조의2에 따라 교부합니다.',
-    pageWidth / 2,
-    y,
-    { align: 'center' }
-  );
-  y += 5;
-  doc.text(
-    '* 본 문서는 PayTools에서 생성되었으며, 참고용입니다.',
-    pageWidth / 2,
-    y,
-    { align: 'center' }
-  );
-
-  // 파일 저장
-  const fileName = `급여명세서_${result.employee_name}_${calcDate.slice(0, 7)}.pdf`;
-  doc.save(fileName);
 }
 
 /**
