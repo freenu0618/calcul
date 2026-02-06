@@ -4,6 +4,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { jwtDecode } from 'jwt-decode';
 import { API_CONFIG } from '../config/api.config';
 
 /** 요금제 타입 */
@@ -162,8 +163,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // OAuth 콜백용: JWT 토큰 직접 설정 후 서버에서 전체 사용자 정보 조회
   const setTokenDirectly = async (authToken: string, nameFromUrl?: string) => {
     try {
-      // JWT payload 디코딩 (기본 정보만)
-      const payload = JSON.parse(atob(authToken.split('.')[1]));
+      // JWT payload 디코딩 (jwt-decode 라이브러리 사용)
+      interface JwtPayload {
+        sub: string;
+        email?: string;
+        name?: string;
+        role?: string;
+        exp?: number;
+      }
+
+      const payload = jwtDecode<JwtPayload>(authToken);
+
+      // 토큰 만료 확인
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        throw new Error('만료된 토큰입니다.');
+      }
+
       const basicUserData: User = {
         id: parseInt(payload.sub, 10) || 0,
         email: payload.email || '',
@@ -192,7 +207,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     } catch (e) {
       console.error('JWT 토큰 파싱 실패:', e);
-      throw new Error('유효하지 않은 토큰입니다.');
+      // 상세한 에러 처리
+      if (e instanceof Error) {
+        if (e.message.includes('만료')) {
+          throw new Error('토큰이 만료되었습니다. 다시 로그인해주세요.');
+        }
+        if (e.message.includes('Invalid token')) {
+          throw new Error('유효하지 않은 토큰 형식입니다.');
+        }
+      }
+      throw new Error('토큰 처리 중 오류가 발생했습니다.');
     }
   };
 
