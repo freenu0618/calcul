@@ -82,9 +82,13 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateResidentIdException::class)
     fun handleDuplicateResidentId(e: DuplicateResidentIdException): ResponseEntity<ApiResponse<Nothing>> {
+        // 서버 로그에는 상세 정보 기록 (보안 감사용)
+        logger.warn { "중복 주민번호 등록 시도: ${e.residentIdPrefix}" }
+
+        // 클라이언트에는 일반적인 메시지만 반환 (개인정보 노출 방지)
         return ResponseEntity
             .status(HttpStatus.CONFLICT)
-            .body(ApiResponse.error("이미 등록된 주민번호입니다: ${e.residentIdPrefix}"))
+            .body(ApiResponse.error("이미 등록된 근로자 정보입니다. 관리자에게 문의하세요."))
     }
 
     @ExceptionHandler(Exception::class)
