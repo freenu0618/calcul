@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class RateLimitFilter : OncePerRequestFilter() {
 
     private val requestCounts = ConcurrentHashMap<String, RequestCounter>()
-    private val maxRequestsPerMinute = 60
+    private val maxRequestsPerMinute = 300
     private val windowMs = 60_000L // 1분
 
     override fun doFilterInternal(

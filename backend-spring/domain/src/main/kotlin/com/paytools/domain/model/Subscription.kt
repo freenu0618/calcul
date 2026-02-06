@@ -37,7 +37,7 @@ data class PlanLimits(
         val FREE = PlanLimits(
             maxEmployees = 3,
             aiChatsPerMonth = 10,
-            salaryCalcsPerMonth = 5,
+            salaryCalcsPerMonth = 100,
             hasPdfExport = false,
             hasExcelExport = false,
             recordRetentionMonths = 3
