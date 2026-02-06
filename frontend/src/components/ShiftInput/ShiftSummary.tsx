@@ -11,12 +11,19 @@ import { validateShifts, type ShiftWarning } from '../../utils/shiftValidator';
  */
 interface ShiftSummaryProps {
   shifts: WorkShiftRequest[];
+  periodStart?: string;  // "YYYY-MM-DD"
+  periodEnd?: string;    // "YYYY-MM-DD"
 }
 
-const ShiftSummary: React.FC<ShiftSummaryProps> = ({ shifts }) => {
+const ShiftSummary: React.FC<ShiftSummaryProps> = ({ shifts, periodStart, periodEnd }) => {
+  // 정산기간 필터링
+  const filteredShifts = (periodStart && periodEnd)
+    ? shifts.filter((s) => s.date >= periodStart && s.date <= periodEnd)
+    : shifts;
+  const outsideCount = shifts.length - filteredShifts.length;
   // 총 근무 시간 계산
   const calculateTotalWorkingMinutes = (): number => {
-    return shifts.reduce((total, shift) => {
+    return filteredShifts.reduce((total, shift) => {
       if (!shift.start_time || !shift.end_time) return total;
 
       const [startHour, startMin] = shift.start_time.split(':').map(Number);
@@ -37,7 +44,7 @@ const ShiftSummary: React.FC<ShiftSummaryProps> = ({ shifts }) => {
 
   // 야간 근무 포함 시프트 수
   const countNightShifts = (): number => {
-    return shifts.filter((shift) => {
+    return filteredShifts.filter((shift) => {
       if (!shift.start_time || !shift.end_time) return false;
 
       const [startHour] = shift.start_time.split(':').map(Number);
@@ -49,10 +56,10 @@ const ShiftSummary: React.FC<ShiftSummaryProps> = ({ shifts }) => {
 
   // 휴일 근무 시프트 수
   const countHolidayShifts = (): number => {
-    return shifts.filter((shift) => shift.is_holiday_work).length;
+    return filteredShifts.filter((shift) => shift.is_holiday_work).length;
   };
 
-  if (shifts.length === 0) {
+  if (filteredShifts.length === 0 && outsideCount === 0) {
     return null;
   }
 
@@ -61,14 +68,26 @@ const ShiftSummary: React.FC<ShiftSummaryProps> = ({ shifts }) => {
   const totalMins = totalMinutes % 60;
   const nightShifts = countNightShifts();
   const holidayShifts = countHolidayShifts();
-  const warnings: ShiftWarning[] = validateShifts(shifts);
+  const warnings: ShiftWarning[] = validateShifts(filteredShifts);
 
   // 주 52시간 초과 경고 (월 단위 환산: 52 * 4.345 = 226시간)
   const isOvertime = totalHours > 226;
 
   return (
     <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-      <h3 className="text-lg font-semibold text-blue-900 mb-3">근무 시간 요약</h3>
+      <h3 className="text-lg font-semibold text-blue-900 mb-1">
+        근무 시간 요약
+        {periodStart && periodEnd && (
+          <span className="text-sm font-normal text-blue-600 ml-2">
+            ({periodStart} ~ {periodEnd})
+          </span>
+        )}
+      </h3>
+      {outsideCount > 0 && (
+        <p className="text-xs text-amber-600 mb-3">
+          기간 외 시프트 {outsideCount}건은 계산에 반영되지 않습니다.
+        </p>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* 총 근무 시간 */}
@@ -87,7 +106,7 @@ const ShiftSummary: React.FC<ShiftSummaryProps> = ({ shifts }) => {
         {/* 총 시프트 수 */}
         <div className="bg-white p-3 rounded-md shadow-sm">
           <div className="text-sm text-gray-600 mb-1">총 시프트 수</div>
-          <div className="text-2xl font-bold text-gray-800">{shifts.length}일</div>
+          <div className="text-2xl font-bold text-gray-800">{filteredShifts.length}일</div>
         </div>
 
         {/* 야간 근무 */}

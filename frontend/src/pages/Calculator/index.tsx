@@ -25,6 +25,7 @@ import InsuranceOptions from '../../components/forms/InsuranceOptions';
 import InclusiveWageOptions from '../../components/forms/InclusiveWageOptions';
 import MonthlyWageSimulation from '../../components/forms/MonthlyWageSimulation';
 import TutorialOverlay from '../../components/Onboarding/TutorialOverlay';
+import PayPeriodSelector from '../../components/forms/PayPeriodSelector';
 
 const WIZARD_STEPS: WizardStep[] = [
   { id: 'employee', title: '근로자 정보', description: '고용형태, 사업장' },
@@ -180,12 +181,23 @@ export default function CalculatorPage() {
         );
       case 2:
         return (
-          <ShiftInput
-            onChange={actions.setWorkShifts}
-            initialShifts={state.input.workShifts}
-            calculationMonth={state.input.calculationMonth}
-            onCalculationMonthChange={actions.setCalculationMonth}
-          />
+          <div className="space-y-4">
+            <PayPeriodSelector
+              periodStart={state.input.periodStart}
+              periodEnd={state.input.periodEnd}
+              attributionMonth={state.input.attributionMonth}
+              onPeriodChange={actions.setPayPeriod}
+              onAttributionMonthChange={actions.setAttributionMonth}
+            />
+            <ShiftInput
+              onChange={actions.setWorkShifts}
+              initialShifts={state.input.workShifts}
+              calculationMonth={state.input.calculationMonth}
+              onCalculationMonthChange={actions.setCalculationMonth}
+              payPeriodStart={state.input.periodStart}
+              payPeriodEnd={state.input.periodEnd}
+            />
+          </div>
         );
       default:
         return null;
@@ -259,6 +271,15 @@ export default function CalculatorPage() {
 
               {/* 계산 결과 */}
               <Card title="계산 결과">
+                {/* 정산기간 배너 */}
+                <div className="mb-4 px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-700 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px]">date_range</span>
+                  <span>
+                    귀속월: {state.input.attributionMonth.replace('-', '년 ')}월
+                    <span className="text-blue-400 mx-2">|</span>
+                    정산 기간: {state.input.periodStart} ~ {state.input.periodEnd}
+                  </span>
+                </div>
                 <SalaryResult result={state.result.current} />
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <PDFExport

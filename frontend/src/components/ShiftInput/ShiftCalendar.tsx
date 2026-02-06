@@ -23,6 +23,8 @@ interface ShiftCalendarProps {
   onShiftUpdate?: (index: number, shift: WorkShiftRequest) => void;
   onBulkAdd?: (shifts: WorkShiftRequest[]) => void;
   initialMonth?: string;
+  periodStart?: string;  // "YYYY-MM-DD"
+  periodEnd?: string;    // "YYYY-MM-DD"
 }
 
 interface CalendarEvent {
@@ -41,6 +43,8 @@ export default function ShiftCalendar({
   onShiftUpdate,
   onBulkAdd,
   initialMonth,
+  periodStart,
+  periodEnd,
 }: ShiftCalendarProps) {
   const calendarRef = useRef<FullCalendar>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -67,16 +71,25 @@ export default function ShiftCalendar({
   // 이미 등록된 날짜 Set
   const existingDates = useMemo(() => new Set(shifts.map((s) => s.date)), [shifts]);
 
+  // 정산기간 내 여부 판단
+  const isInPeriod = useCallback((date: string) => {
+    if (!periodStart || !periodEnd) return true;
+    return date >= periodStart && date <= periodEnd;
+  }, [periodStart, periodEnd]);
+
   // 시프트를 캘린더 이벤트로 변환
   const events: CalendarEvent[] = shifts.map((shift, index) => {
+    const inPeriod = isInPeriod(shift.date);
     const isNightShift = shift.start_time >= '22:00' || shift.end_time <= '06:00';
     const isHoliday = shift.is_holiday_work;
+    const bg = !inPeriod ? '#D1D5DB' : isHoliday ? '#EF4444' : isNightShift ? '#6366F1' : '#3B82F6';
+    const border = !inPeriod ? '#9CA3AF' : isHoliday ? '#DC2626' : isNightShift ? '#4F46E5' : '#2563EB';
     return {
       id: `shift-${index}`,
       title: `${shift.start_time}~${shift.end_time}`,
       start: shift.date,
-      backgroundColor: isHoliday ? '#EF4444' : isNightShift ? '#6366F1' : '#3B82F6',
-      borderColor: isHoliday ? '#DC2626' : isNightShift ? '#4F46E5' : '#2563EB',
+      backgroundColor: bg,
+      borderColor: border,
       extendedProps: { index, shift },
     };
   });
@@ -197,6 +210,12 @@ export default function ShiftCalendar({
             <div className="w-3 h-3 rounded bg-red-500" />
             <span>휴일 근무</span>
           </div>
+          {periodStart && periodEnd && (
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded bg-gray-300" />
+              <span>기간 외</span>
+            </div>
+          )}
         </div>
 
         <FullCalendar

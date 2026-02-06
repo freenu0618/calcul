@@ -31,6 +31,9 @@ export interface CalculatorState {
     wageType: WageType;
     hourlyWage: number;
     calculationMonth: string;
+    periodStart: string;        // 정산기간 시작 "YYYY-MM-DD"
+    periodEnd: string;          // 정산기간 종료 "YYYY-MM-DD"
+    attributionMonth: string;   // 귀속월 "YYYY-MM"
     absencePolicy: AbsencePolicy;
     hoursMode: '174' | '209';
     contractSalary: number;
@@ -85,6 +88,8 @@ export type CalculatorAction =
   | { type: 'SET_WAGE_TYPE'; payload: WageType }
   | { type: 'SET_HOURLY_WAGE'; payload: number }
   | { type: 'SET_CALCULATION_MONTH'; payload: string }
+  | { type: 'SET_PAY_PERIOD'; payload: { periodStart: string; periodEnd: string } }
+  | { type: 'SET_ATTRIBUTION_MONTH'; payload: string }
   | { type: 'SET_ABSENCE_POLICY'; payload: AbsencePolicy }
   | { type: 'SET_HOURS_MODE'; payload: '174' | '209' }
   | { type: 'SET_CONTRACT_SALARY'; payload: number }
@@ -112,8 +117,26 @@ export type CalculatorAction =
   | { type: 'SET_SELECTED_EMPLOYEE_ID'; payload: string };
 
 // ============================================
+// 정산기간 헬퍼
+// ============================================
+
+function getDefaultPeriod() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth(); // 0-indexed
+  const firstDay = new Date(y, m, 1);
+  const lastDay = new Date(y, m + 1, 0);
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const ym = `${y}-${String(m + 1).padStart(2, '0')}`;
+  return { periodStart: fmt(firstDay), periodEnd: fmt(lastDay), attributionMonth: ym };
+}
+
+// ============================================
 // 초기 상태
 // ============================================
+
+const defaultPeriod = getDefaultPeriod();
 
 const initialState: CalculatorState = {
   input: {
@@ -132,6 +155,9 @@ const initialState: CalculatorState = {
     wageType: 'MONTHLY_FIXED',
     hourlyWage: 0,
     calculationMonth: '',
+    periodStart: defaultPeriod.periodStart,
+    periodEnd: defaultPeriod.periodEnd,
+    attributionMonth: defaultPeriod.attributionMonth,
     absencePolicy: 'STRICT',
     hoursMode: '174',
     contractSalary: 0,
@@ -190,6 +216,14 @@ function calculatorReducer(
       return { ...state, input: { ...state.input, hourlyWage: action.payload } };
     case 'SET_CALCULATION_MONTH':
       return { ...state, input: { ...state.input, calculationMonth: action.payload } };
+    case 'SET_PAY_PERIOD':
+      return { ...state, input: {
+        ...state.input,
+        periodStart: action.payload.periodStart,
+        periodEnd: action.payload.periodEnd,
+      } };
+    case 'SET_ATTRIBUTION_MONTH':
+      return { ...state, input: { ...state.input, attributionMonth: action.payload } };
     case 'SET_ABSENCE_POLICY':
       return { ...state, input: { ...state.input, absencePolicy: action.payload } };
     case 'SET_HOURS_MODE':
@@ -274,6 +308,10 @@ export function useCalculatorState() {
       dispatch({ type: 'SET_HOURLY_WAGE', payload: wage }), []),
     setCalculationMonth: useCallback((month: string) =>
       dispatch({ type: 'SET_CALCULATION_MONTH', payload: month }), []),
+    setPayPeriod: useCallback((periodStart: string, periodEnd: string) =>
+      dispatch({ type: 'SET_PAY_PERIOD', payload: { periodStart, periodEnd } }), []),
+    setAttributionMonth: useCallback((month: string) =>
+      dispatch({ type: 'SET_ATTRIBUTION_MONTH', payload: month }), []),
     setAbsencePolicy: useCallback((policy: AbsencePolicy) =>
       dispatch({ type: 'SET_ABSENCE_POLICY', payload: policy }), []),
     setHoursMode: useCallback((mode: '174' | '209') =>

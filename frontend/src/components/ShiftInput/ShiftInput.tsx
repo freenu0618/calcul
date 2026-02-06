@@ -23,10 +23,13 @@ interface ShiftInputProps {
   initialShifts?: WorkShiftRequest[];
   calculationMonth?: string;
   onCalculationMonthChange?: (month: string) => void;
+  payPeriodStart?: string;  // "YYYY-MM-DD"
+  payPeriodEnd?: string;    // "YYYY-MM-DD"
 }
 
 const ShiftInput: React.FC<ShiftInputProps> = ({
   onChange, initialShifts = [], calculationMonth = '', onCalculationMonthChange,
+  payPeriodStart, payPeriodEnd,
 }) => {
   const [shifts, setShifts] = useState<WorkShiftRequest[]>(initialShifts);
   // 모바일에서는 리스트 뷰 기본값 (터치 친화적)
@@ -72,7 +75,7 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
     setShifts(prev => [...prev, newShift]);
   }, []);
 
-  // 월간 템플릿 채우기: 선택한 기간의 평일에 프리셋 시프트 생성
+  // 월간 템플릿 채우기: 정산기간 또는 선택한 기간의 평일에 프리셋 시프트 생성
   const handleFillMonth = useCallback((presetKey: keyof typeof SHIFT_PRESETS | 'custom') => {
     const preset = presetKey === 'custom'
       ? { start: customStart, end: customEnd, break: 60, days: customDays }
@@ -86,18 +89,36 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
       return `${y}-${m}-${day}`;
     };
 
-    for (let day = periodStart; day <= Math.min(periodEnd, daysInMonth); day++) {
-      const date = new Date(year, month - 1, day);
-      const dow = date.getDay();
-      const isWorkday = dow >= 1 && dow <= Math.min(preset.days, 6);
-      if (isWorkday) {
-        newShifts.push({
-          date: formatLocalDate(date),
-          start_time: preset.start,
-          end_time: preset.end,
-          break_minutes: preset.break,
-          is_holiday_work: false,
-        });
+    // 정산기간이 설정되어 있으면 그 범위 사용, 아니면 기존 방식
+    if (payPeriodStart && payPeriodEnd) {
+      const cur = new Date(payPeriodStart);
+      const end = new Date(payPeriodEnd);
+      while (cur <= end) {
+        const dow = cur.getDay();
+        if (dow >= 1 && dow <= Math.min(preset.days, 6)) {
+          newShifts.push({
+            date: formatLocalDate(cur),
+            start_time: preset.start,
+            end_time: preset.end,
+            break_minutes: preset.break,
+            is_holiday_work: false,
+          });
+        }
+        cur.setDate(cur.getDate() + 1);
+      }
+    } else {
+      for (let day = periodStart; day <= Math.min(periodEnd, daysInMonth); day++) {
+        const date = new Date(year, month - 1, day);
+        const dow = date.getDay();
+        if (dow >= 1 && dow <= Math.min(preset.days, 6)) {
+          newShifts.push({
+            date: formatLocalDate(date),
+            start_time: preset.start,
+            end_time: preset.end,
+            break_minutes: preset.break,
+            is_holiday_work: false,
+          });
+        }
       }
     }
 
@@ -105,7 +126,7 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
     if (!calculationMonth) {
       onCalculationMonthChange?.(currentMonth);
     }
-  }, [currentMonth, calculationMonth, onCalculationMonthChange, periodStart, periodEnd, year, month, daysInMonth, customStart, customEnd, customDays]);
+  }, [currentMonth, calculationMonth, onCalculationMonthChange, periodStart, periodEnd, year, month, daysInMonth, customStart, customEnd, customDays, payPeriodStart, payPeriodEnd]);
 
   const handleUpdateShift = useCallback((index: number, updatedShift: WorkShiftRequest) => {
     setShifts(prev => {
@@ -146,16 +167,18 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* 월 선택 */}
-      <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
-        <label className="text-sm font-medium text-gray-700">계산 대상 월:</label>
-        <input
-          type="month"
-          value={currentMonth}
-          onChange={(e) => handleMonthChange(e.target.value)}
-          className="px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
+      {/* 월 선택 — 정산기간 미사용 시만 표시 */}
+      {!payPeriodStart && (
+        <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
+          <label className="text-sm font-medium text-gray-700">계산 대상 월:</label>
+          <input
+            type="month"
+            value={currentMonth}
+            onChange={(e) => handleMonthChange(e.target.value)}
+            className="px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      )}
 
       {/* 헤더 */}
       <div className="flex flex-wrap justify-between items-center gap-2">
@@ -203,28 +226,36 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
       <div className="bg-gray-50 p-3 rounded-lg space-y-3">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-gray-700">월간 템플릿 채우기</p>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-gray-500">기간:</span>
-            <select
-              value={periodStart}
-              onChange={(e) => setPeriodStart(Number(e.target.value))}
-              className="px-2 py-1 border border-gray-300 rounded text-sm"
-            >
-              {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
-                <option key={d} value={d}>{d}일</option>
-              ))}
-            </select>
-            <span className="text-gray-400">~</span>
-            <select
-              value={periodEnd}
-              onChange={(e) => setPeriodEnd(Number(e.target.value))}
-              className="px-2 py-1 border border-gray-300 rounded text-sm"
-            >
-              {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
-                <option key={d} value={d}>{d}일</option>
-              ))}
-            </select>
-          </div>
+          {/* 정산기간 미사용 시에만 일자 범위 선택 표시 */}
+          {!payPeriodStart && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-gray-500">기간:</span>
+              <select
+                value={periodStart}
+                onChange={(e) => setPeriodStart(Number(e.target.value))}
+                className="px-2 py-1 border border-gray-300 rounded text-sm"
+              >
+                {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
+                  <option key={d} value={d}>{d}일</option>
+                ))}
+              </select>
+              <span className="text-gray-400">~</span>
+              <select
+                value={periodEnd}
+                onChange={(e) => setPeriodEnd(Number(e.target.value))}
+                className="px-2 py-1 border border-gray-300 rounded text-sm"
+              >
+                {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
+                  <option key={d} value={d}>{d}일</option>
+                ))}
+              </select>
+            </div>
+          )}
+          {payPeriodStart && payPeriodEnd && (
+            <span className="text-xs text-gray-500">
+              정산 기간: {payPeriodStart} ~ {payPeriodEnd}
+            </span>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
           {Object.entries(SHIFT_PRESETS).map(([key, preset]) => (
@@ -278,7 +309,9 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
         )}
 
         <p className="text-xs text-gray-500">
-          * {periodStart}일 ~ {periodEnd}일 기간 내 근무일에 프리셋이 적용됩니다.
+          {payPeriodStart
+            ? `* 정산 기간(${payPeriodStart} ~ ${payPeriodEnd}) 내 근무일에 프리셋이 적용됩니다.`
+            : `* ${periodStart}일 ~ ${periodEnd}일 기간 내 근무일에 프리셋이 적용됩니다.`}
         </p>
       </div>
 
@@ -327,6 +360,8 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
           onShiftRemove={handleDeleteShift}
           onShiftUpdate={handleUpdateShift}
           initialMonth={currentMonth}
+          periodStart={payPeriodStart}
+          periodEnd={payPeriodEnd}
         />
       )}
 
@@ -370,8 +405,12 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
         </>
       )}
 
-      {/* 요약 */}
-      <ShiftSummary shifts={shifts} />
+      {/* 요약 — 정산기간 내 시프트만 집계 */}
+      <ShiftSummary
+        shifts={shifts}
+        periodStart={payPeriodStart}
+        periodEnd={payPeriodEnd}
+      />
 
       {/* 안내 */}
       {shifts.length > 0 && (

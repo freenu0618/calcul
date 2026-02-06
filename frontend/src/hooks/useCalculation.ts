@@ -75,14 +75,26 @@ export function useCalculation({
         }));
       const allAllowances = [...input.allowances, ...guaranteeAllowances];
 
+      // 정산 기간 내 시프트만 필터링
+      const filteredShifts = input.workShifts.filter(
+        (s) => s.date >= input.periodStart && s.date <= input.periodEnd
+      );
+      if (filteredShifts.length === 0 && input.workShifts.length > 0) {
+        onError('선택한 정산 기간에 근무시프트가 없습니다.');
+        return;
+      }
+
+      // 귀속월을 calculation_month로 전달 (설정값 우선)
+      const effectiveMonth = input.attributionMonth || input.calculationMonth;
+
       const response = await salaryApi.calculateSalary({
         employee: input.employee,
         base_salary: isMonthlyFixed(input.wageType) ? input.baseSalary : 0,
         allowances: allAllowances,
-        work_shifts: input.workShifts,
+        work_shifts: filteredShifts,
         wage_type: effectiveWageType,
         hourly_wage: isHourlyBased(input.wageType) ? input.hourlyWage : 0,
-        calculation_month: input.calculationMonth,
+        calculation_month: effectiveMonth,
         absence_policy: input.absencePolicy,
         hours_mode: input.hoursMode,
         insurance_options: input.insuranceOptions,
