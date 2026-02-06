@@ -15,6 +15,7 @@ interface AllowanceEditorProps {
   onAllowancesChange: (allowances: Allowance[]) => void;
   onRecalculate: () => void;
   isRecalculating?: boolean;
+  onRemoveGuarantee?: () => void;  // 계약보전수당 제거 콜백
 }
 
 const fmt = (n: number) => new Intl.NumberFormat('ko-KR').format(n);
@@ -161,6 +162,7 @@ export default function AllowanceEditor({
   onAllowancesChange,
   onRecalculate,
   isRecalculating,
+  onRemoveGuarantee,
 }: AllowanceEditorProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -245,11 +247,25 @@ export default function AllowanceEditor({
             />
           )}
           {guarantee && guarantee.amount > 0 && (
-            <LockedItem
-              label="계약보전수당"
-              amount={guarantee.amount}
-              formula="계약월급 - 실제계산액"
-            />
+            <div className="flex items-center justify-between py-2 px-3 bg-purple-50 border border-purple-100 rounded-lg">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-purple-700">계약보전수당</span>
+                <span className="text-xs bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded">자동</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-purple-700">{fmt(guarantee.amount)}원</span>
+                {onRemoveGuarantee && (
+                  <button
+                    type="button"
+                    onClick={() => { onRemoveGuarantee(); onRecalculate(); }}
+                    className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
+                    title="계약보전수당 제거 (계약월급 설정 해제)"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">close</span>
+                  </button>
+                )}
+              </div>
+            </div>
           )}
 
           {/* 편집 가능 항목 */}
