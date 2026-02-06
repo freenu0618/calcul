@@ -123,11 +123,11 @@ export default function PricingSection() {
         </div>
 
         {/* 결제 주기 토글 */}
-        <div className="flex justify-center mb-12">
+        <div className="flex justify-center mb-8 sm:mb-12">
           <div className="inline-flex items-center bg-gray-100 rounded-xl p-1">
             <button
               onClick={() => setBilling('monthly')}
-              className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${
+              className={`px-5 sm:px-6 py-3 sm:py-2.5 rounded-lg text-sm font-bold transition-all ${
                 billing === 'monthly' ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -135,7 +135,7 @@ export default function PricingSection() {
             </button>
             <button
               onClick={() => setBilling('annual')}
-              className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${
+              className={`px-5 sm:px-6 py-3 sm:py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${
                 billing === 'annual' ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -146,7 +146,7 @@ export default function PricingSection() {
         </div>
 
         {/* 3단 요금 카드 */}
-        <div className="grid md:grid-cols-3 gap-6 items-start">
+        <div className="grid md:grid-cols-3 gap-4 sm:gap-6 items-start">
           {plans.map((plan) => (
             <div
               key={plan.name}

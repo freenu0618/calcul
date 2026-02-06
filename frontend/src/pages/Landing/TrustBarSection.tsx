@@ -59,8 +59,8 @@ export default function TrustBarSection() {
           ))}
         </div>
 
-        {/* 법률명 나열 (권위 편향) */}
-        <p className="text-center text-xs text-text-sub">
+        {/* 법률명 나열 (권위 편향) - 모바일에서 숨김 */}
+        <p className="hidden sm:block text-center text-xs text-text-sub">
           {laws.join(' · ')}
         </p>
       </div>

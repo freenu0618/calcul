@@ -61,3 +61,12 @@ label {
 .form-input {
   @apply w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors;
 }
+
+/* 스크롤바 숨기기 (모바일 스와이프 카드) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

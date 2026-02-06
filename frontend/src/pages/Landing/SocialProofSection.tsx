@@ -35,10 +35,10 @@ export default function SocialProofSection() {
           이미 많은 사업장이 선택했습니다
         </h2>
 
-        {/* 후기 카드 */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        {/* 후기 카드 - 모바일: 가로 스와이프 / 데스크탑: 3열 그리드 */}
+        <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 mb-12 overflow-x-auto snap-x snap-mandatory pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
           {testimonials.map((t) => (
-            <div key={t.name} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div key={t.name} className="min-w-[280px] sm:min-w-[320px] md:min-w-0 snap-center bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex-shrink-0 md:flex-shrink">
               {/* 별점 */}
               <div className="flex gap-0.5 mb-4 text-yellow-400">
                 {[...Array(5)].map((_, i) => (

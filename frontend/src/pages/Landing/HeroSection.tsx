@@ -54,7 +54,7 @@ export default function HeroSection() {
             {!isAuthenticated && (
               <Link
                 to="/register"
-                className="h-14 px-8 rounded-xl bg-white border border-gray-200 text-text-main text-lg font-bold shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 flex items-center justify-center"
+                className="hidden sm:flex h-14 px-8 rounded-xl bg-white border border-gray-200 text-text-main text-lg font-bold shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 items-center justify-center"
               >
                 무료 회원가입
               </Link>
