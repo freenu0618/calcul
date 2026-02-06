@@ -200,6 +200,7 @@ export interface SalaryCalculationResponse {
   inclusive_wage_options?: InclusiveWageOptionsResponse;
   applied_wage_mode?: 'CONTRACT_SALARY' | 'ACTUAL_CALCULATION';
   contract_vs_actual_diff?: MoneyResponse;
+  contract_guarantee_allowance?: MoneyResponse;
   warnings: WarningItem[];
   calculation_metadata: {
     calculation_date: string;

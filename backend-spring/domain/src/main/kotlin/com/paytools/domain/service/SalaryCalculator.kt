@@ -34,7 +34,8 @@ data class SalaryCalculationResult(
     val inclusiveWageOptions: InclusiveWageOptions = InclusiveWageOptions.DISABLED,
     val inclusiveOvertimePay: Money = Money.ZERO,
     val appliedWageMode: String? = null,
-    val contractVsActualDiff: Money? = null
+    val contractVsActualDiff: Money? = null,
+    val contractGuaranteeAllowance: Money = Money.ZERO
 )
 
 /**
@@ -132,17 +133,17 @@ class SalaryCalculator {
         )
 
         // 4. HOURLY_BASED_MONTHLY: MAX(계약월급, 실제계산) 판정
-        val (finalBase, appliedWageMode, contractDiff) = resolveHourlyBasedMonthly(
+        val hourlyBasedResult = resolveHourlyBasedMonthly(
             normalizedType, baseCalcResult, weeklyHolidayResult, contractMonthlySalary
         )
 
-        // 5. 총 지급액
+        // 5. 총 지급액 (계약보전수당 포함)
         val totalGross = calculateTotalGross(
-            baseSalary = finalBase,
+            baseSalary = hourlyBasedResult.finalBase,
             allowances = allowances,
             overtimePay = overtimeResult.total() + inclusiveOvertimePay,
             weeklyHolidayPay = weeklyHolidayResult.weeklyHolidayPay
-        )
+        ) + hourlyBasedResult.guaranteeAllowance
 
         // 6. 보험/세금
         val taxableGross = calculateTaxableGross(totalGross, allowances)
@@ -156,7 +157,7 @@ class SalaryCalculator {
 
         return SalaryCalculationResult(
             employee = employee,
-            baseSalary = finalBase,
+            baseSalary = hourlyBasedResult.finalBase,
             allowances = allowances,
             regularWage = baseCalcResult.regularWage,
             hourlyWage = baseCalcResult.hourlyWage,
@@ -172,8 +173,9 @@ class SalaryCalculator {
             absenceResult = baseCalcResult.absenceResult,
             inclusiveWageOptions = inclusiveWageOptions,
             inclusiveOvertimePay = inclusiveOvertimePay,
-            appliedWageMode = appliedWageMode,
-            contractVsActualDiff = contractDiff
+            appliedWageMode = hourlyBasedResult.appliedWageMode,
+            contractVsActualDiff = hourlyBasedResult.contractDiff,
+            contractGuaranteeAllowance = hourlyBasedResult.guaranteeAllowance
         )
     }
 
@@ -272,19 +274,26 @@ class SalaryCalculator {
         return result to Money.ZERO
     }
 
+    /** HOURLY_BASED_MONTHLY 판정 결과 */
+    private data class HourlyBasedResult(
+        val finalBase: Money,
+        val appliedWageMode: String?,
+        val contractDiff: Money?,
+        val guaranteeAllowance: Money
+    )
+
     /**
      * Step 4: HOURLY_BASED_MONTHLY 계약월급 vs 실제계산 비교
      * MAX(계약월급, 실제시간×시급+주휴수당) 적용
-     *
-     * @return Triple(최종 기본급, 적용모드, 차액)
+     * 차액은 기본급에 합산하지 않고 계약보전수당으로 분리
      */
     private fun resolveHourlyBasedMonthly(
         normalizedType: WageType, baseCalcResult: BaseCalcResult,
         weeklyHolidayResult: WeeklyHolidayPayResult,
         contractMonthlySalary: Long?
-    ): Triple<Money, String?, Money?> {
+    ): HourlyBasedResult {
         if (normalizedType != WageType.HOURLY_BASED_MONTHLY || contractMonthlySalary == null) {
-            return Triple(baseCalcResult.effectiveBase, null, null)
+            return HourlyBasedResult(baseCalcResult.effectiveBase, null, null, Money.ZERO)
         }
 
         val contractSalary = Money.of(contractMonthlySalary)
@@ -293,14 +302,12 @@ class SalaryCalculator {
         val actualTotal = actualBase + weeklyHolidayPay
 
         return if (actualTotal > contractSalary) {
-            // 근무일 많은 달: 실제 계산이 더 높음 → 시급 기준
             val diff = actualTotal - contractSalary
-            Triple(actualBase, "ACTUAL_CALCULATION", diff)
+            HourlyBasedResult(actualBase, "ACTUAL_CALCULATION", diff, Money.ZERO)
         } else {
-            // 근무일 적은 달: 계약월급 보장 → 차액을 기본급에 추가
+            // 계약월급 보장 → 차액을 계약보전수당으로 분리 (기본급 유지)
             val diff = contractSalary - actualTotal
-            val adjustedBase = actualBase + diff
-            Triple(adjustedBase, "CONTRACT_SALARY", diff)
+            HourlyBasedResult(actualBase, "CONTRACT_SALARY", diff, diff)
         }
     }
 

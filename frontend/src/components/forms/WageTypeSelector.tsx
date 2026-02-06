@@ -2,7 +2,9 @@
  * 급여형태 3분류 선택기 컴포넌트
  * MONTHLY_FIXED / HOURLY_MONTHLY / HOURLY_BASED_MONTHLY
  */
+import { useState } from 'react';
 import type { WageType } from '../../types/salary';
+import WageTypeTooltip from './WageTypeTooltips';
 
 interface WageTypeSelectorProps {
   wageType: WageType;
@@ -39,7 +41,8 @@ export default function WageTypeSelector({
   wageType,
   onWageTypeChange,
 }: WageTypeSelectorProps) {
-  // 하위 호환: MONTHLY→MONTHLY_FIXED, HOURLY→HOURLY_MONTHLY
+  const [openTooltip, setOpenTooltip] = useState<WageType | null>(null);
+
   const normalized =
     wageType === 'MONTHLY'
       ? 'MONTHLY_FIXED'
@@ -64,9 +67,18 @@ export default function WageTypeSelector({
                   : 'border-gray-200 bg-white hover:border-gray-300'
               }`}
             >
-              <div className="text-lg mb-1">{opt.icon}</div>
+              <div className="flex items-start justify-between">
+                <span className="text-lg">{opt.icon}</span>
+                <WageTypeTooltip
+                  wageType={opt.value}
+                  isOpen={openTooltip === opt.value}
+                  onToggle={() =>
+                    setOpenTooltip(openTooltip === opt.value ? null : opt.value)
+                  }
+                />
+              </div>
               <p
-                className={`text-sm font-semibold ${isSelected ? 'text-blue-700' : 'text-gray-800'}`}
+                className={`text-sm font-semibold mt-1 ${isSelected ? 'text-blue-700' : 'text-gray-800'}`}
               >
                 {opt.label}
               </p>

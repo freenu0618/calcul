@@ -173,6 +173,9 @@ class SalaryController(
             warnings = emptyList(), // TODO: 경고 생성기 구현 필요
             appliedWageMode = result.appliedWageMode,
             contractVsActualDiff = result.contractVsActualDiff?.let { MoneyResponse.from(it) },
+            contractGuaranteeAllowance = if (result.contractGuaranteeAllowance > Money.ZERO) {
+                MoneyResponse.from(result.contractGuaranteeAllowance)
+            } else null,
             calculationMetadata = calculationMetadata
         )
     }

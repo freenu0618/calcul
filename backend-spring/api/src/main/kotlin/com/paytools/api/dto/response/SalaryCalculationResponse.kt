@@ -363,6 +363,9 @@ data class SalaryCalculationResponse(
     @Schema(description = "시급기반 월급제: 계약월급과 실제계산 차액")
     val contractVsActualDiff: MoneyResponse? = null,
 
+    @Schema(description = "시급기반 월급제: 계약보전수당 (계약월급 보장을 위한 차액)")
+    val contractGuaranteeAllowance: MoneyResponse? = null,
+
     @Schema(description = "계산 메타데이터")
     val calculationMetadata: Map<String, Any> = emptyMap()
 )

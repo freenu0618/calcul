@@ -63,9 +63,10 @@ const MonthlyWageSimulation: React.FC<MonthlyWageSimulationProps> = ({
         workDays++;
       }
 
-      // 주휴시간 계산 (주 단위 환산)
+      // 주휴시간 계산 (주 단위 환산, 1일 소정근로시간 반영)
       const weeksInMonth = workDays / scheduledWorkDays;
-      const weeklyHolidayHours = weeksInMonth * 8;
+      const dailyHolidayHours = Math.min(dailyWorkHours, 8);
+      const weeklyHolidayHours = weeksInMonth * dailyHolidayHours;
 
       // 유급시간 = 실근무 + 주휴
       const actualWorkHours = workDays * dailyWorkHours;

@@ -99,6 +99,7 @@ const CHART_COLORS = {
   weeklyHoliday: '#10b981', // emerald-500
   overtime: '#8b5cf6',      // violet-500
   allowance: '#06b6d4',     // cyan-500
+  guarantee: '#a855f7',     // purple-500 (계약보전수당)
   deduction: '#ef4444',     // red-500
   netPay: '#22c55e',        // green-500
 };
@@ -112,6 +113,7 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
   const isHourlyWage = wageType === 'HOURLY' || wageType === 'HOURLY_MONTHLY' || wageType === 'HOURLY_BASED_MONTHLY';
   const appliedWageMode = result.applied_wage_mode;
   const contractDiff = result.contract_vs_actual_diff;
+  const guaranteeAllowance = result.contract_guarantee_allowance;
 
   // 통상시급 (API에서 계산된 값 사용)
   const hourlyWage = gross_breakdown.hourly_wage?.amount || 0;
@@ -137,6 +139,9 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
       : []),
     ...((gross_breakdown.taxable_allowances.amount + gross_breakdown.non_taxable_allowances.amount) > 0
       ? [{ name: '기타수당', value: gross_breakdown.taxable_allowances.amount + gross_breakdown.non_taxable_allowances.amount, color: CHART_COLORS.allowance }]
+      : []),
+    ...(guaranteeAllowance && guaranteeAllowance.amount > 0
+      ? [{ name: '계약보전수당', value: guaranteeAllowance.amount, color: CHART_COLORS.guarantee }]
       : []),
   ];
 
@@ -327,6 +332,14 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
                 label="비과세수당"
                 sublabel="Non-taxable"
                 value={gross_breakdown.non_taxable_allowances.formatted}
+              />
+            )}
+            {guaranteeAllowance && guaranteeAllowance.amount > 0 && (
+              <DetailRow
+                label="계약보전수당"
+                sublabel="Contract Guarantee"
+                value={guaranteeAllowance.formatted}
+                formula="계약월급 보장을 위한 차액 보전 (계약월급 - 실제계산액)"
               />
             )}
           </AccordionSection>
