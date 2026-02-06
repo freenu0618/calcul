@@ -1,6 +1,7 @@
 package com.paytools.infrastructure.security
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -23,6 +24,9 @@ class SecurityConfig(
     // OAuth2SuccessHandler를 Optional로 주입 (환경변수 없을 시 null)
     @Autowired(required = false)
     private var oAuth2SuccessHandler: OAuth2SuccessHandler? = null
+
+    @Value("\${spring.profiles.active:local}")
+    private lateinit var activeProfile: String
 
     @Bean
     fun characterEncodingFilter(): CharacterEncodingFilter {
@@ -72,14 +76,22 @@ class SecurityConfig(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration().apply {
-            allowedOrigins = listOf(
-                "http://localhost:5173",      // Vite dev server
-                "http://localhost:3000",      // Alternative dev
-                "https://paytools.work",      // Production
-                "https://calcul-1b9.pages.dev" // Cloudflare Pages
-            )
+            // 프로덕션 환경에서는 localhost origin 제거
+            allowedOrigins = when (activeProfile) {
+                "prod" -> listOf(
+                    "https://paytools.work",      // Production
+                    "https://calcul-1b9.pages.dev" // Cloudflare Pages
+                )
+                else -> listOf(
+                    "http://localhost:5173",      // Vite dev server
+                    "http://localhost:3000",      // Alternative dev
+                    "https://paytools.work",      // Production
+                    "https://calcul-1b9.pages.dev" // Cloudflare Pages
+                )
+            }
             allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-            allowedHeaders = listOf("*")
+            // 와일드카드 대신 명시적 헤더 목록 사용 (보안 강화)
+            allowedHeaders = listOf("Authorization", "Content-Type", "X-Requested-With")
             allowCredentials = true
             maxAge = 3600
         }
