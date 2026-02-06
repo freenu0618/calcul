@@ -14,7 +14,7 @@ import Card from '../../components/common/Card';
 import { CalculatorIcon, EmptyState } from '../../components/illustrations';
 import EmployeeInfoForm from '../../components/forms/EmployeeInfoForm';
 import SalaryForm from '../../components/forms/SalaryForm';
-import { SalaryResult, AllowanceAdjustment } from '../../components/ResultDisplay';
+import { SalaryResult, AllowanceEditor } from '../../components/ResultDisplay';
 import PDFExport from '../../components/ResultDisplay/PDFExport';
 import { ShiftInput } from '../../components/ShiftInput';
 import { StepWizard, useWizard, type WizardStep } from '../../components/wizard';
@@ -248,6 +248,16 @@ export default function CalculatorPage() {
           {/* 계산 결과 */}
           {state.result.current ? (
             <div className="mt-8 space-y-4">
+              {/* 수당 편집 (결과 위) */}
+              <AllowanceEditor
+                result={state.result.current}
+                allowances={state.input.allowances}
+                onAllowancesChange={actions.setAllowances}
+                onRecalculate={() => setTimeout(calculate, 50)}
+                isRecalculating={state.ui.isLoading}
+              />
+
+              {/* 계산 결과 */}
               <Card title="계산 결과">
                 <SalaryResult result={state.result.current} />
                 <div className="mt-6 pt-6 border-t border-gray-200">
@@ -261,53 +271,6 @@ export default function CalculatorPage() {
                   />
                 </div>
               </Card>
-
-              {/* 계약총액제 - 수당 조정 */}
-              <AllowanceAdjustment
-                result={state.result.current}
-                onAdjustedResult={actions.setAdjustedResult}
-                initialContractAmount={state.input.contractSalary}
-                onApplyAllowances={(newAllowances) => {
-                  const converted = newAllowances.map((a) => ({
-                    name: a.name,
-                    amount: a.amount,
-                    is_taxable: a.isTaxable,
-                    is_includable_in_minimum_wage: false,
-                    is_fixed: true,
-                    is_included_in_regular_wage: false,
-                  }));
-                  actions.addAllowances(converted);
-                  setTimeout(() => calculate(), 100);
-                }}
-              />
-
-              {/* 조정된 실수령액 표시 */}
-              {state.result.adjusted &&
-                state.result.adjusted.additionalAllowances.length > 0 && (
-                  <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-lg p-4 text-white">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-green-100 text-sm">수당 추가 후 실수령액</p>
-                        <p className="text-2xl font-bold">
-                          {new Intl.NumberFormat('ko-KR').format(
-                            state.result.adjusted.adjustedNetPay
-                          )}
-                          원
-                        </p>
-                      </div>
-                      <div className="text-right text-sm">
-                        <p className="text-green-200">
-                          기존 대비 +
-                          {new Intl.NumberFormat('ko-KR').format(
-                            state.result.adjusted.adjustedNetPay -
-                              state.result.adjusted.originalNetPay
-                          )}
-                          원
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
               {/* 급여대장 저장 (로그인 사용자만) */}
               {isAuthenticated && (
