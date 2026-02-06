@@ -28,7 +28,7 @@ function isMonthlyFixed(wageType: WageType): boolean {
 interface UseCalculationProps {
   input: CalculatorState['input'];
   onSuccess: (result: any) => void;
-  onError: (error: string) => void;
+  onError: (error: string | null) => void;
   onLoadingChange: (loading: boolean) => void;
   clearAdjustedResult: () => void;
 }
