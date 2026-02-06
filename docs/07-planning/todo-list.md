@@ -1,7 +1,7 @@
 # 프로젝트 TODO 리스트
 
 **작성일**: 2026-01-22
-**마지막 업데이트**: 2026-02-01 (v1.6.0 - Phase 7.2, 7.6 사용량 제한 완료)
+**마지막 업데이트**: 2026-02-02 (v1.7.0 - Phase 7.3, 7.5 결제+이메일 완료)
 **기준 문서**: PROJECT_ANALYSIS_REPORT.md v2.2.0
 **프로젝트**: paytools.work (급여 계산기)
 
@@ -25,7 +25,7 @@
 | **Phase 4 (마케팅)** | **4** | **4** | **100%** | **✅ 완료** |
 | **Phase 5 (급여대장)** | **3** | **2** | **67%** | **✅ 핵심 완료** |
 | **Phase 6 (AI 챗봇)** | **6** | **6** | **100%** | **✅ 완료** |
-| **Phase 7 (요금제+결제)** | **6** | **2** | **33%** | 7.2, 7.6 완료 |
+| **Phase 7 (요금제+결제)** | **6** | **4** | **67%** | 7.2, 7.3, 7.5, 7.6 완료 |
 | **전체** | **57** | **46** | **81%** | |
 
 ---
@@ -610,14 +610,15 @@ backend-spring/
 > 기존 Phase 3의 나머지 항목
 
 ### 3.8.1 급여명세서 PDF 출력
-- **상태**: ✅ 완료 (2026-01-29)
+- **상태**: ✅ 완료 (2026-02-02 업데이트)
 - **우선순위**: 중간
 - **설명**:
-  - jsPDF 라이브러리 통합 ✅
+  - ~~jsPDF TTF 폰트 방식~~ → **html2canvas 방식**으로 전환 ✅
+  - 한글 폰트 완벽 지원 (시스템 폰트 사용) ✅
   - 근로기준법 시행령 제27조의2 준수 ✅
   - CSV 내보내기 기능 포함 ✅
 - **관련 파일**:
-  - `frontend/src/utils/pdfGenerator.ts` ✅
+  - `frontend/src/utils/pdfGenerator.ts` ✅ (html2canvas 방식)
   - `frontend/src/components/ResultDisplay/PDFExport.tsx` ✅
 
 ### 3.8.2 Excel/CSV 임포트/익스포트
@@ -966,21 +967,23 @@ react-markdown, remark-gfm
   - `api/controller/SalaryController.kt` ✅ (사용량 체크 추가)
 
 ### 7.3 백엔드 - Polar 연동
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-02-02)
 - **우선순위**: 높음
 - **설명**:
-  - Checkout URL 생성 API
-  - Polar 웹훅 처리 (구독 생성/갱신/취소)
-  - 결제 상태 동기화
+  - Checkout URL 생성 API ✅
+  - Polar 웹훅 처리 (구독 생성/갱신/취소) ✅
+  - 결제 상태 동기화 ✅
+  - 환불 API 구현 (리포트 생성 실패 시 자동 환불) ✅
 - **API 엔드포인트**:
-  - `GET /api/v1/subscription/me` - 구독 상태 조회
-  - `POST /api/v1/subscription/checkout` - Checkout URL 생성
-  - `POST /api/v1/subscription/webhook` - Polar 웹훅
-  - `GET /api/v1/subscription/usage` - 사용량 조회
+  - `GET /api/v1/subscription/me` - 구독 상태 조회 ✅
+  - `POST /api/v1/subscription/checkout` - Checkout URL 생성 ✅
+  - `POST /api/v1/subscription/webhook` - Polar 웹훅 ✅
+  - `GET /api/v1/subscription/usage` - 사용량 조회 ✅
 - **관련 파일**:
-  - `api/controller/SubscriptionController.kt` (신규)
-  - `api/service/SubscriptionService.kt` (신규)
-  - `api/service/PolarClient.kt` (신규)
+  - `api/controller/SubscriptionController.kt` ✅
+  - `api/service/SubscriptionService.kt` ✅
+  - `api/service/PolarService.kt` ✅ (Checkout, 환불 API)
+  - `api/service/PolarWebhookService.kt` ✅ (웹훅 서명 검증, 이벤트 처리)
 
 ### 7.4 프론트엔드
 - **상태**: ⬜ 대기
@@ -996,15 +999,18 @@ react-markdown, remark-gfm
   - `src/contexts/AuthContext.tsx` (수정)
 
 ### 7.5 이메일 발송 (Resend)
-- **상태**: ⬜ 대기
+- **상태**: ✅ 완료 (2026-02-02)
 - **우선순위**: 중간
 - **설명**:
-  - 결제 완료 영수증
-  - 구독 갱신 7일 전 알림
-  - 결제 실패 알림
+  - 결제 완료 이메일 발송 (구독 활성화 시 자동) ✅
+  - HTML 이메일 템플릿 (플랜명, 금액, 만료일 포함) ✅
+  - 이메일 주소 오입력 환불 불가 정책 명시 ✅
+  - 리포트 생성 실패 시 자동 환불 정책 ✅
 - **관련 파일**:
-  - `infrastructure/email/ResendEmailService.kt` (신규)
-  - `api/scheduler/SubscriptionScheduler.kt` (신규)
+  - `api/config/ResendConfig.kt` ✅ (신규)
+  - `api/service/ResendService.kt` ✅ (신규)
+  - `api/service/PolarWebhookService.kt` ✅ (결제 완료 시 이메일 발송)
+  - `frontend/src/pages/Landing/PricingSection.tsx` ✅ (환불 정책 안내 추가)
 
 ### 7.6 AI 사용량 DB 연동
 - **상태**: ✅ 완료 (2026-02-01)
@@ -1214,8 +1220,12 @@ Week 16 (Phase 7 - 요금제):
 | 2026-01-31 | **Phase 7 계획 확정**: 결제 서비스 Polar (4%+$0.40, MoR), 이메일 Resend, Free 플랜 제한 (직원 3명, AI 10회, 급여계산 5회), 6단계 구현 계획 수립 |
 | 2026-02-01 | **Phase 7.2 완료**: UsageService 사용량 추적, SalaryController 급여계산 제한, SubscriptionController 사용량 API |
 | 2026-02-01 | **Phase 7.6 완료**: AI 사용량 Spring DB 연동, LLM 기본값 OpenAI로 변경 (Groq Tool Calling 버그), 비로그인 챗봇 차단, 401 에러 메시지 개선, 대시보드 실제 사용량 표시 |
+| 2026-02-02 | **Phase 7.3 완료**: Polar 결제 연동 (Checkout, 웹훅 서명 검증, 구독 관리), 환불 API 구현 |
+| 2026-02-02 | **Phase 7.5 완료**: Resend 이메일 서비스 (결제 완료 알림), 이메일 오입력 환불 불가 정책 |
+| 2026-02-02 | **PDF html2canvas 전환**: jsPDF TTF 폰트 파싱 오류 해결, html2canvas 방식으로 한글 완벽 지원 |
+| 2026-02-02 | **GEO 최적화**: FAQSection + Schema.org FAQPage 마크업, 메타 태그 개선 |
 
 ---
 
 **작성자**: Claude Code
-**마지막 업데이트**: 2026-02-01 (Phase 7.2, 7.6 완료)
+**마지막 업데이트**: 2026-02-02 (Phase 7.3, 7.5 완료)

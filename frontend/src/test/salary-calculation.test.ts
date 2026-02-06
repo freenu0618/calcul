@@ -4,7 +4,7 @@
  * 이 프로젝트의 핵심 가치는 "법적 정확성"입니다.
  * 2026년 법령 기준으로 검증합니다.
  */
-import { describe, it, expect, beforeAll, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { salaryApi } from '../api/salaryApi';
 import type {
   SalaryCalculationRequest,
@@ -111,20 +111,16 @@ describe('급여 계산 핵심 로직 테스트', () => {
   });
 
   describe('2. 4대 보험 개별 계산 테스트', () => {
-    it('국민연금: 기준소득월액 하한(390,000원) 적용', async () => {
-      // Given: 월급 30만원 (하한 미만)
-      const lowSalary = 300000;
-
+    it('국민연금: 기준소득월액 하한(390,000원) 적용', () => {
+      // Given: 월급 30만원 (하한 미만) → 하한 적용
       // 국민연금 하한: 390,000원 × 4.75% = 18,525원
       const expectedPension = Math.round(390000 * 0.0475);
 
       expect(expectedPension).toBe(18525);
     });
 
-    it('국민연금: 기준소득월액 상한(5,900,000원) 적용', async () => {
-      // Given: 월급 700만원 (상한 초과)
-      const highSalary = 7000000;
-
+    it('국민연금: 기준소득월액 상한(5,900,000원) 적용', () => {
+      // Given: 월급 700만원 (상한 초과) → 상한 적용
       // 국민연금 상한: 5,900,000원 × 4.75% = 280,250원
       const expectedPension = Math.round(5900000 * 0.0475);
 

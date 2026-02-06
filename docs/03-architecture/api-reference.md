@@ -696,11 +696,98 @@ DRAFT ──확정──> CONFIRMED ──지급──> PAID
 
 ---
 
+---
+
+## 결제 및 구독 API
+
+### POST `/subscription/checkout`
+
+Polar Checkout URL 생성
+
+```json
+// Request
+{
+  "plan": "basic",
+  "successUrl": "https://paytools.work/dashboard?success=1"
+}
+
+// Response
+{
+  "success": true,
+  "checkoutUrl": "https://checkout.polar.sh/...",
+  "checkoutId": "checkout_xxx"
+}
+```
+
+### GET `/subscription/me`
+
+현재 사용자 구독 정보 조회
+
+```json
+// Response
+{
+  "tier": "BASIC",
+  "periodEnd": "2026-03-01",
+  "polarSubscriptionId": "sub_xxx",
+  "polarCustomerId": "cust_xxx"
+}
+```
+
+### GET `/subscription/usage`
+
+사용량 조회
+
+```json
+// Response
+{
+  "aiChats": 5,
+  "salaryCalcs": 3,
+  "limits": {
+    "aiChats": 10,
+    "salaryCalcs": 5
+  }
+}
+```
+
+### POST `/subscription/usage/increment`
+
+사용량 증가 (AI 챗봇, 급여계산에서 호출)
+
+```json
+// Request
+params: { "type": "AI_CHAT" | "SALARY_CALC" }
+
+// Response
+{
+  "allowed": true,
+  "remaining": 4
+}
+```
+
+### POST `/subscription/webhook`
+
+Polar 웹훅 처리 (Polar에서 호출)
+
+**지원 이벤트**:
+- `subscription.created` - 구독 생성 (Trial 포함)
+- `subscription.active` - 구독 활성화
+- `subscription.updated` - 구독 업데이트/업그레이드
+- `subscription.canceled` - 구독 취소
+- `subscription.revoked` - 구독 해지
+
+**웹훅 검증**: Standard Webhooks 스펙 (HMAC-SHA256)
+
+---
+
 ## 버전 정보
 
-- **API Version**: 1.3.0
+- **API Version**: 1.4.0
 - **적용 연도**: 2026년
-- **최종 업데이트**: 2026-01-28
+- **최종 업데이트**: 2026-02-02
+
+### 변경 이력 (v1.4.0)
+- 결제 및 구독 API 추가 (Polar 연동)
+- 사용량 조회/증가 API 추가
 
 ### 변경 이력 (v1.3.0)
 - PayrollEntryRequest에 계산 결과 필드 추가 (totalGross, netPay, overtimePay 등)
