@@ -2,7 +2,7 @@
  * 급여형태 상세 툴팁 컴포넌트
  * 각 급여형태에 대한 설명/예시를 팝오버로 표시
  */
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import type { WageType } from '../../types/salary';
 
 interface TooltipData {
