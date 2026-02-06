@@ -2,7 +2,7 @@
  * useSubscription - 구독/요금제 제한 관리 훅
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiClient } from '../api/client';
 
@@ -118,13 +118,18 @@ export function useSubscription(): SubscriptionState {
     }
   };
 
+  const hasLoaded = useRef(false);
+
   const refetch = async () => {
+    if (!isAuthenticated) return;
     setIsLoading(true);
     await Promise.all([fetchEmployeeCount(), fetchUsage()]);
     setIsLoading(false);
   };
 
   useEffect(() => {
+    if (!isAuthenticated || hasLoaded.current) return;
+    hasLoaded.current = true;
     refetch();
   }, [isAuthenticated]);
 

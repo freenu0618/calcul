@@ -64,17 +64,23 @@ export default function CalculatorPage() {
   // 3. 로그인 시 급여 기간 및 직원 목록 로드
   // ============================================
   useEffect(() => {
-    if (isAuthenticated) {
-      payrollApi
-        .getPeriods()
-        .then((data) => actions.setPeriods(data.periods || []))
-        .catch(() => {});
-      employeeApi
-        .getEmployees()
-        .then((data) => actions.setRegisteredEmployees(data.employees || []))
-        .catch(() => {});
-    }
-  }, [isAuthenticated, actions]);
+    if (!isAuthenticated) return;
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const [periodsData, empData] = await Promise.all([
+          payrollApi.getPeriods().catch(() => ({ periods: [] })),
+          employeeApi.getEmployees().catch(() => ({ employees: [] })),
+        ]);
+        if (!cancelled) {
+          actions.setPeriods(periodsData.periods || []);
+          actions.setRegisteredEmployees(empData.employees || []);
+        }
+      } catch { /* ignore */ }
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [isAuthenticated]); // actions 제거 — useCallback이므로 안정적
 
   // ============================================
   // 4. Wizard 설정

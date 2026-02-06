@@ -78,31 +78,38 @@ apiClient.interceptors.request.use(
   }
 );
 
-// 응답 인터셉터 (401, 429 에러 처리)
-apiClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response) {
-      console.error('API Error:', error.response.data);
+// 응답 인터셉터 (401, 429 에러 처리 + 429 지수 백오프 재시도)
+const MAX_RETRIES = 2;
+const RETRY_COUNT_KEY = '__retryCount';
 
-      // 401 Unauthorized - 토큰 만료 또는 유효하지 않음
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const config = error.config;
+
+    if (error.response) {
+      // 401 Unauthorized
       if (error.response.status === 401) {
         localStorage.removeItem('auth_token');
         window.location.href = '/login';
+        return Promise.reject(error);
       }
 
-      // 429 Too Many Requests - Rate Limiting
-      if (error.response.status === 429) {
-        const retryAfter = error.response.headers['retry-after'] || '60';
-        console.warn(`Rate limit exceeded. Retry after ${retryAfter} seconds.`);
-        error.message = `요청이 너무 많습니다. ${retryAfter}초 후 다시 시도해주세요.`;
+      // 429 Too Many Requests — 지수 백오프 재시도
+      if (error.response.status === 429 && config) {
+        const retryCount = config[RETRY_COUNT_KEY] || 0;
+        if (retryCount < MAX_RETRIES) {
+          config[RETRY_COUNT_KEY] = retryCount + 1;
+          const delay = Math.pow(2, retryCount + 1) * 1000;
+          console.warn(`429: ${config.url} — ${delay / 1000}초 후 재시도 (${retryCount + 1}/${MAX_RETRIES})`);
+          await new Promise((r) => setTimeout(r, delay));
+          return apiClient(config);
+        }
+        console.warn(`429: ${config.url} — 최대 재시도 초과`);
+        error.message = '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.';
       }
     } else if (error.request) {
       console.error('Network Error:', error.request);
-    } else {
-      console.error('Error:', error.message);
     }
     return Promise.reject(error);
   }
