@@ -3,15 +3,16 @@ import type { WorkShiftRequest } from '../../types/salary';
 import ShiftRow from './ShiftRow';
 import ShiftSummary from './ShiftSummary';
 import ShiftCalendar from './ShiftCalendar';
+import TimeStepper from '../common/TimeStepper';
 import { downloadShiftTemplate, parseShiftCsv, exportShiftsToCsv, readFileAsText } from '../../utils/excelHandler';
 
 /**
  * 시프트 프리셋 정의
  */
 const SHIFT_PRESETS = {
-  fulltime5: { name: '풀타임 (주5일)', start: '09:00', end: '18:00', break: 60, days: 5 },
-  fulltime4: { name: '풀타임 (주4일)', start: '09:00', end: '18:00', break: 60, days: 4 },
-  fulltime6: { name: '풀타임 (주6일)', start: '09:00', end: '18:00', break: 60, days: 6 },
+  fulltime5: { name: '주5일', start: '09:00', end: '18:00', break: 60, days: 5 },
+  fulltime4: { name: '주4일', start: '09:00', end: '18:00', break: 60, days: 4 },
+  fulltime6: { name: '주6일', start: '09:00', end: '18:00', break: 60, days: 6 },
   morning: { name: '오전조', start: '06:00', end: '15:00', break: 60, days: 5 },
   afternoon: { name: '오후조', start: '14:00', end: '23:00', break: 60, days: 5 },
   night: { name: '야간조', start: '22:00', end: '07:00', break: 60, days: 5 },
@@ -35,6 +36,10 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
   const [periodEnd, setPeriodEnd] = useState(31);
   const [csvError, setCsvError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [customStart, setCustomStart] = useState('09:00');
+  const [customEnd, setCustomEnd] = useState('18:00');
+  const [customDays, setCustomDays] = useState(5);
+  const [useCustomTime, setUseCustomTime] = useState(false);
 
   // 기본 월: 현재 월
   const currentMonth = calculationMonth || new Date().toISOString().slice(0, 7);
@@ -68,8 +73,10 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
   }, []);
 
   // 월간 템플릿 채우기: 선택한 기간의 평일에 프리셋 시프트 생성
-  const handleFillMonth = useCallback((presetKey: keyof typeof SHIFT_PRESETS) => {
-    const preset = SHIFT_PRESETS[presetKey];
+  const handleFillMonth = useCallback((presetKey: keyof typeof SHIFT_PRESETS | 'custom') => {
+    const preset = presetKey === 'custom'
+      ? { start: customStart, end: customEnd, break: 60, days: customDays }
+      : SHIFT_PRESETS[presetKey];
     const newShifts: WorkShiftRequest[] = [];
 
     const formatLocalDate = (d: Date): string => {
@@ -79,11 +86,9 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
       return `${y}-${m}-${day}`;
     };
 
-    // 선택한 기간 내에서만 채우기
     for (let day = periodStart; day <= Math.min(periodEnd, daysInMonth); day++) {
       const date = new Date(year, month - 1, day);
-      const dow = date.getDay(); // 0=일, 6=토
-      // preset.days: 4=월~목, 5=월~금, 6=월~토
+      const dow = date.getDay();
       const isWorkday = dow >= 1 && dow <= Math.min(preset.days, 6);
       if (isWorkday) {
         newShifts.push({
@@ -100,7 +105,7 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
     if (!calculationMonth) {
       onCalculationMonthChange?.(currentMonth);
     }
-  }, [currentMonth, calculationMonth, onCalculationMonthChange, periodStart, periodEnd, year, month, daysInMonth]);
+  }, [currentMonth, calculationMonth, onCalculationMonthChange, periodStart, periodEnd, year, month, daysInMonth, customStart, customEnd, customDays]);
 
   const handleUpdateShift = useCallback((index: number, updatedShift: WorkShiftRequest) => {
     setShifts(prev => {
@@ -232,7 +237,46 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
               {preset.name}
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => setUseCustomTime(!useCustomTime)}
+            className={`px-3 py-1.5 text-sm border rounded-md transition-colors ${
+              useCustomTime ? 'bg-blue-50 border-blue-400 text-blue-700' : 'bg-white border-gray-300 hover:bg-gray-100'
+            }`}
+          >
+            {useCustomTime ? '직접설정 ▲' : '직접설정 ▼'}
+          </button>
         </div>
+
+        {/* 커스텀 시간 설정 */}
+        {useCustomTime && (
+          <div className="bg-white border border-gray-200 rounded-lg p-3 space-y-3">
+            <div className="flex flex-wrap items-end gap-4">
+              <TimeStepper value={customStart} onChange={setCustomStart} label="출근" />
+              <TimeStepper value={customEnd} onChange={setCustomEnd} label="퇴근" />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">근무일</label>
+                <select
+                  value={customDays}
+                  onChange={(e) => setCustomDays(Number(e.target.value))}
+                  className="px-2 py-2 border border-gray-300 rounded-md text-sm"
+                >
+                  {[3, 4, 5, 6].map((d) => (
+                    <option key={d} value={d}>주{d}일</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleFillMonth('custom')}
+                className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+              >
+                적용
+              </button>
+            </div>
+          </div>
+        )}
+
         <p className="text-xs text-gray-500">
           * {periodStart}일 ~ {periodEnd}일 기간 내 근무일에 프리셋이 적용됩니다.
         </p>
