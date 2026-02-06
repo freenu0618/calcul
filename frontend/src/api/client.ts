@@ -78,7 +78,7 @@ apiClient.interceptors.request.use(
   }
 );
 
-// 응답 인터셉터 (401 에러 처리)
+// 응답 인터셉터 (401, 429 에러 처리)
 apiClient.interceptors.response.use(
   (response) => {
     return response;
@@ -90,8 +90,14 @@ apiClient.interceptors.response.use(
       // 401 Unauthorized - 토큰 만료 또는 유효하지 않음
       if (error.response.status === 401) {
         localStorage.removeItem('auth_token');
-        // 로그인 페이지로 리다이렉트는 AuthContext에서 처리
         window.location.href = '/login';
+      }
+
+      // 429 Too Many Requests - Rate Limiting
+      if (error.response.status === 429) {
+        const retryAfter = error.response.headers['retry-after'] || '60';
+        console.warn(`Rate limit exceeded. Retry after ${retryAfter} seconds.`);
+        error.message = `요청이 너무 많습니다. ${retryAfter}초 후 다시 시도해주세요.`;
       }
     } else if (error.request) {
       console.error('Network Error:', error.request);
