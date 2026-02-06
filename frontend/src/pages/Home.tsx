@@ -39,6 +39,7 @@ function Home() {
   const [calculationMonth, setCalculationMonth] = useState<string>('');
   const [absencePolicy, setAbsencePolicy] = useState<AbsencePolicy>('STRICT');
   const [hoursMode, setHoursMode] = useState<HoursMode>('174');
+  const [contractMonthlySalary, setContractMonthlySalary] = useState<number>(0);
   const [result, setResult] = useState<SalaryCalculationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -121,6 +122,8 @@ function Home() {
             onAbsencePolicyChange={setAbsencePolicy}
             hoursMode={hoursMode}
             onHoursModeChange={setHoursMode}
+            contractMonthlySalary={contractMonthlySalary}
+            onContractMonthlySalaryChange={setContractMonthlySalary}
           />
         );
       case 2:
