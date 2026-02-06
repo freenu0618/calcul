@@ -17,6 +17,7 @@ interface HourlyAutoCalcProps {
   hoursMode: HoursMode;
   allowances: Allowance[];
   onAllowancesChange: (allowances: Allowance[]) => void;
+  onOtherAllowanceChange?: (amount: number) => void;
 }
 
 const WEEKS_PER_MONTH = 4.345;
@@ -37,6 +38,7 @@ export default function HourlyAutoCalc({
   hoursMode,
   allowances,
   onAllowancesChange,
+  onOtherAllowanceChange,
 }: HourlyAutoCalcProps) {
   const [hourlyWage, setHourlyWage] = useState(hourlyWageProp || MIN_WAGE_2026);
   const weeklyHours = scheduledWorkDays * dailyWorkHours;
@@ -80,6 +82,7 @@ export default function HourlyAutoCalc({
 
     onBaseSalaryChange(calculatedBase);
     onHourlyWageChange(hourlyWage);
+    onOtherAllowanceChange?.(Math.max(0, otherAllowance));
 
     // 임의수당 자동 배치
     const idx = allowances.findIndex((a) => a.name === '직무수당(임의)');

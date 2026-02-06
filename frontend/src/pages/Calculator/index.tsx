@@ -135,6 +135,8 @@ export default function CalculatorPage() {
               onHoursModeChange={actions.setHoursMode}
               contractMonthlySalary={state.input.contractMonthlySalary}
               onContractMonthlySalaryChange={actions.setContractMonthlySalary}
+              guaranteeDistribution={state.input.guaranteeDistribution}
+              onGuaranteeDistributionChange={actions.setGuaranteeDistribution}
             />
             <InsuranceOptions
               options={state.input.insuranceOptions}

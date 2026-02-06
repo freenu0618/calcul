@@ -62,10 +62,23 @@ export function useCalculation({
       const weeklyHours = input.employee.scheduled_work_days * input.employee.daily_work_hours;
       const effectiveWageType = normalizeWageType(input.wageType);
 
+      // 보전수당 배분 항목을 allowances에 합류
+      const guaranteeAllowances = input.guaranteeDistribution
+        .filter((item) => item.amount > 0 && item.name)
+        .map((item) => ({
+          name: item.name,
+          amount: item.amount,
+          is_taxable: !item.isTaxFree,
+          is_includable_in_minimum_wage: false,
+          is_fixed: true,
+          is_included_in_regular_wage: false,
+        }));
+      const allAllowances = [...input.allowances, ...guaranteeAllowances];
+
       const response = await salaryApi.calculateSalary({
         employee: input.employee,
         base_salary: isMonthlyFixed(input.wageType) ? input.baseSalary : 0,
-        allowances: input.allowances,
+        allowances: allAllowances,
         work_shifts: input.workShifts,
         wage_type: effectiveWageType,
         hourly_wage: isHourlyBased(input.wageType) ? input.hourlyWage : 0,

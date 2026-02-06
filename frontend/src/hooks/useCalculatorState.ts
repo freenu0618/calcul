@@ -11,6 +11,7 @@ import type {
   InsuranceOptions as InsuranceOptionsType,
   InclusiveWageOptions as InclusiveWageOptionsType,
 } from '../types/salary';
+import type { GuaranteeDistributionItem } from '../components/forms/GuaranteeAllowanceDistribution';
 import { DEFAULT_INSURANCE_OPTIONS, DEFAULT_INCLUSIVE_WAGE_OPTIONS } from '../types/salary';
 import type { Employee, Allowance } from '../types/models';
 import type { PayrollPeriodResponse } from '../types/payroll';
@@ -34,6 +35,7 @@ export interface CalculatorState {
     hoursMode: '174' | '209';
     contractSalary: number;
     contractMonthlySalary: number;
+    guaranteeDistribution: GuaranteeDistributionItem[];
     insuranceOptions: InsuranceOptionsType;
     inclusiveWageOptions: InclusiveWageOptionsType;
   };
@@ -87,6 +89,7 @@ export type CalculatorAction =
   | { type: 'SET_HOURS_MODE'; payload: '174' | '209' }
   | { type: 'SET_CONTRACT_SALARY'; payload: number }
   | { type: 'SET_CONTRACT_MONTHLY_SALARY'; payload: number }
+  | { type: 'SET_GUARANTEE_DISTRIBUTION'; payload: GuaranteeDistributionItem[] }
   | { type: 'SET_INSURANCE_OPTIONS'; payload: InsuranceOptionsType }
   | { type: 'SET_INCLUSIVE_WAGE_OPTIONS'; payload: InclusiveWageOptionsType }
   | { type: 'RESET_INPUT' }
@@ -133,6 +136,7 @@ const initialState: CalculatorState = {
     hoursMode: '174',
     contractSalary: 0,
     contractMonthlySalary: 0,
+    guaranteeDistribution: [],
     insuranceOptions: DEFAULT_INSURANCE_OPTIONS,
     inclusiveWageOptions: DEFAULT_INCLUSIVE_WAGE_OPTIONS,
   },
@@ -181,7 +185,7 @@ function calculatorReducer(
     case 'SET_WORK_SHIFTS':
       return { ...state, input: { ...state.input, workShifts: action.payload } };
     case 'SET_WAGE_TYPE':
-      return { ...state, input: { ...state.input, wageType: action.payload } };
+      return { ...state, input: { ...state.input, wageType: action.payload, guaranteeDistribution: [] } };
     case 'SET_HOURLY_WAGE':
       return { ...state, input: { ...state.input, hourlyWage: action.payload } };
     case 'SET_CALCULATION_MONTH':
@@ -194,6 +198,8 @@ function calculatorReducer(
       return { ...state, input: { ...state.input, contractSalary: action.payload } };
     case 'SET_CONTRACT_MONTHLY_SALARY':
       return { ...state, input: { ...state.input, contractMonthlySalary: action.payload } };
+    case 'SET_GUARANTEE_DISTRIBUTION':
+      return { ...state, input: { ...state.input, guaranteeDistribution: action.payload } };
     case 'SET_INSURANCE_OPTIONS':
       return { ...state, input: { ...state.input, insuranceOptions: action.payload } };
     case 'SET_INCLUSIVE_WAGE_OPTIONS':
@@ -276,6 +282,8 @@ export function useCalculatorState() {
       dispatch({ type: 'SET_CONTRACT_SALARY', payload: salary }), []),
     setContractMonthlySalary: useCallback((salary: number) =>
       dispatch({ type: 'SET_CONTRACT_MONTHLY_SALARY', payload: salary }), []),
+    setGuaranteeDistribution: useCallback((items: GuaranteeDistributionItem[]) =>
+      dispatch({ type: 'SET_GUARANTEE_DISTRIBUTION', payload: items }), []),
     setInsuranceOptions: useCallback((options: InsuranceOptionsType) =>
       dispatch({ type: 'SET_INSURANCE_OPTIONS', payload: options }), []),
     setInclusiveWageOptions: useCallback((options: InclusiveWageOptionsType) =>

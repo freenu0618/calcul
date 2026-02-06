@@ -40,6 +40,7 @@ function Home() {
   const [absencePolicy, setAbsencePolicy] = useState<AbsencePolicy>('STRICT');
   const [hoursMode, setHoursMode] = useState<HoursMode>('174');
   const [contractMonthlySalary, setContractMonthlySalary] = useState<number>(0);
+  const [guaranteeDistribution, setGuaranteeDistribution] = useState<any[]>([]);
   const [result, setResult] = useState<SalaryCalculationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -124,6 +125,8 @@ function Home() {
             onHoursModeChange={setHoursMode}
             contractMonthlySalary={contractMonthlySalary}
             onContractMonthlySalaryChange={setContractMonthlySalary}
+            guaranteeDistribution={guaranteeDistribution}
+            onGuaranteeDistributionChange={setGuaranteeDistribution}
           />
         );
       case 2:

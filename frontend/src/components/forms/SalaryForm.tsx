@@ -2,6 +2,7 @@
  * 기본급 및 수당 입력 폼 컴포넌트
  * 3분류 WageType: MONTHLY_FIXED / HOURLY_MONTHLY / HOURLY_BASED_MONTHLY
  */
+import { useState } from 'react';
 import type { Allowance } from '../../types/models';
 import type { WageType, AbsencePolicy, HoursMode } from '../../types/salary';
 import WageTypeSelector from './WageTypeSelector';
@@ -9,6 +10,9 @@ import AllowanceList from './AllowanceList';
 import HourlyAutoCalc from './HourlyAutoCalc';
 import HoursModeSelector from './HoursModeSelector';
 import AbsencePolicySelector from './AbsencePolicySelector';
+import GuaranteeAllowanceDistribution, {
+  type GuaranteeDistributionItem,
+} from './GuaranteeAllowanceDistribution';
 
 interface SalaryFormProps {
   baseSalary: number;
@@ -27,6 +31,8 @@ interface SalaryFormProps {
   onHoursModeChange: (mode: HoursMode) => void;
   contractMonthlySalary: number;
   onContractMonthlySalaryChange: (value: number) => void;
+  guaranteeDistribution: GuaranteeDistributionItem[];
+  onGuaranteeDistributionChange: (items: GuaranteeDistributionItem[]) => void;
 }
 
 const fmt = (v: number): string => (v === 0 ? '' : v.toLocaleString('ko-KR'));
@@ -56,7 +62,10 @@ export default function SalaryForm({
   onHoursModeChange,
   contractMonthlySalary,
   onContractMonthlySalaryChange,
+  guaranteeDistribution,
+  onGuaranteeDistributionChange,
 }: SalaryFormProps) {
+  const [guaranteeAmount, setGuaranteeAmount] = useState(0);
   const normalized = normalize(wageType);
   const isMonthly = normalized === 'MONTHLY_FIXED';
   const isHourlyMonthly = normalized === 'HOURLY_MONTHLY';
@@ -89,18 +98,28 @@ export default function SalaryForm({
 
       {/* 시급기반 월급제: 시급 + 계약월급 + 법정 분해 */}
       {isHourlyBased && (
-        <HourlyAutoCalc
-          hourlyWage={hourlyWage}
-          onHourlyWageChange={onHourlyWageChange}
-          contractMonthlySalary={contractMonthlySalary}
-          onContractMonthlySalaryChange={onContractMonthlySalaryChange}
-          onBaseSalaryChange={onBaseSalaryChange}
-          scheduledWorkDays={scheduledWorkDays}
-          dailyWorkHours={dailyWorkHours}
-          hoursMode={hoursMode}
-          allowances={allowances}
-          onAllowancesChange={onAllowancesChange}
-        />
+        <>
+          <HourlyAutoCalc
+            hourlyWage={hourlyWage}
+            onHourlyWageChange={onHourlyWageChange}
+            contractMonthlySalary={contractMonthlySalary}
+            onContractMonthlySalaryChange={onContractMonthlySalaryChange}
+            onBaseSalaryChange={onBaseSalaryChange}
+            scheduledWorkDays={scheduledWorkDays}
+            dailyWorkHours={dailyWorkHours}
+            hoursMode={hoursMode}
+            allowances={allowances}
+            onAllowancesChange={onAllowancesChange}
+            onOtherAllowanceChange={setGuaranteeAmount}
+          />
+          {guaranteeAmount > 0 && (
+            <GuaranteeAllowanceDistribution
+              totalGuarantee={guaranteeAmount}
+              items={guaranteeDistribution}
+              onChange={onGuaranteeDistributionChange}
+            />
+          )}
+        </>
       )}
 
       {/* 통상시급 계산 기준 (월급제 전용) */}
