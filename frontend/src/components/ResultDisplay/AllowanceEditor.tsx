@@ -15,7 +15,8 @@ interface AllowanceEditorProps {
   onAllowancesChange: (allowances: Allowance[]) => void;
   onRecalculate: () => void;
   isRecalculating?: boolean;
-  onRemoveGuarantee?: () => void;  // 계약보전수당 제거 콜백
+  onRemoveGuarantee?: () => void;
+  contractMonthlySalary?: number;  // 계약월급 (차액 표시용)
 }
 
 const fmt = (n: number) => new Intl.NumberFormat('ko-KR').format(n);
@@ -163,6 +164,7 @@ export default function AllowanceEditor({
   onRecalculate,
   isRecalculating,
   onRemoveGuarantee,
+  contractMonthlySalary = 0,
 }: AllowanceEditorProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -272,6 +274,26 @@ export default function AllowanceEditor({
           {allowances.map((a, i) => (
             <EditableItem key={i} allowance={a} index={i} onEdit={handleEdit} onDelete={handleDelete} />
           ))}
+
+          {/* 계약월급 차액 안내 */}
+          {contractMonthlySalary > 0 && (() => {
+            const currentGross = gb.total.amount;
+            const diff = contractMonthlySalary - currentGross;
+            if (diff <= 0) return null;
+            return (
+              <div className="flex items-center justify-between py-2 px-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <div className="text-sm text-amber-700">
+                  계약월급까지 부족분
+                </div>
+                <div className="text-sm font-bold text-amber-700">
+                  {fmt(diff)}원
+                  <span className="text-xs font-normal ml-1">
+                    ({fmt(contractMonthlySalary)} - {fmt(currentGross)})
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* 빠른 추가 */}
           <div className="flex flex-wrap gap-2 pt-2">

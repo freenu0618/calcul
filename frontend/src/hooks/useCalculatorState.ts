@@ -260,7 +260,8 @@ function calculatorReducer(
       return {
         ...state,
         ui: { ...state.ui, error: action.payload, isLoading: false },
-        result: { current: null, adjusted: null },
+        // 기존 결과 유지 — 재계산 에러 시 이전 결과를 보존하여 깜빡임 방지
+        ...(action.payload ? {} : {}),
       };
     case 'SET_SAVE_STATUS':
       return { ...state, ui: { ...state.ui, saveStatus: action.payload } };

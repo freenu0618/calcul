@@ -265,9 +265,10 @@ export default function CalculatorPage() {
                 result={state.result.current}
                 allowances={state.input.allowances}
                 onAllowancesChange={actions.setAllowances}
-                onRecalculate={() => setTimeout(calculate, 50)}
+                onRecalculate={() => queueMicrotask(calculate)}
                 isRecalculating={state.ui.isLoading}
                 onRemoveGuarantee={() => actions.setContractMonthlySalary(0)}
+                contractMonthlySalary={state.input.contractMonthlySalary}
               />
 
               {/* 계산 결과 */}

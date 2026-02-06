@@ -2,7 +2,7 @@
  * 급여 계산 API 호출 커스텀 훅
  * 3분류 WageType 직접 전달 (isAutoHourlyMode 핵 제거)
  */
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import { salaryApi } from '../api';
 import type { CalculatorState } from './useCalculatorState';
 import type { WageType } from '../types/salary';
@@ -42,6 +42,9 @@ export function useCalculation({
 }: UseCalculationProps) {
   const lastRequestTimeRef = useRef<number>(0);
   const isCalculatingRef = useRef<boolean>(false);
+  // 항상 최신 input을 참조하기 위한 ref (클로저 stale 문제 방지)
+  const inputRef = useRef(input);
+  useEffect(() => { inputRef.current = input; }, [input]);
 
   const calculate = useCallback(async () => {
     if (isCalculatingRef.current) return;
@@ -55,15 +58,18 @@ export function useCalculation({
     isCalculatingRef.current = true;
     lastRequestTimeRef.current = now;
     onLoadingChange(true);
-    onError('');
+    onError(null);
     clearAdjustedResult();
 
+    // ref에서 최신 input 읽기 — 수당 변경 직후 호출해도 최신 값 사용
+    const currentInput = inputRef.current;
+
     try {
-      const weeklyHours = input.employee.scheduled_work_days * input.employee.daily_work_hours;
-      const effectiveWageType = normalizeWageType(input.wageType);
+      const weeklyHours = currentInput.employee.scheduled_work_days * currentInput.employee.daily_work_hours;
+      const effectiveWageType = normalizeWageType(currentInput.wageType);
 
       // 보전수당 배분 항목을 allowances에 합류
-      const guaranteeAllowances = input.guaranteeDistribution
+      const guaranteeAllowances = currentInput.guaranteeDistribution
         .filter((item) => item.amount > 0 && item.name)
         .map((item) => ({
           name: item.name,
@@ -73,37 +79,37 @@ export function useCalculation({
           is_fixed: true,
           is_included_in_regular_wage: false,
         }));
-      const allAllowances = [...input.allowances, ...guaranteeAllowances];
+      const allAllowances = [...currentInput.allowances, ...guaranteeAllowances];
 
       // 정산 기간 내 시프트만 필터링
-      const filteredShifts = input.workShifts.filter(
-        (s) => s.date >= input.periodStart && s.date <= input.periodEnd
+      const filteredShifts = currentInput.workShifts.filter(
+        (s) => s.date >= currentInput.periodStart && s.date <= currentInput.periodEnd
       );
-      if (filteredShifts.length === 0 && input.workShifts.length > 0) {
+      if (filteredShifts.length === 0 && currentInput.workShifts.length > 0) {
         onError('선택한 정산 기간에 근무시프트가 없습니다.');
         return;
       }
 
       // 귀속월을 calculation_month로 전달 (설정값 우선)
-      const effectiveMonth = input.attributionMonth || input.calculationMonth;
+      const effectiveMonth = currentInput.attributionMonth || currentInput.calculationMonth;
 
       const response = await salaryApi.calculateSalary({
-        employee: input.employee,
-        base_salary: isMonthlyFixed(input.wageType) ? input.baseSalary : 0,
+        employee: currentInput.employee,
+        base_salary: isMonthlyFixed(currentInput.wageType) ? currentInput.baseSalary : 0,
         allowances: allAllowances,
         work_shifts: filteredShifts,
         wage_type: effectiveWageType,
-        hourly_wage: isHourlyBased(input.wageType) ? input.hourlyWage : 0,
+        hourly_wage: isHourlyBased(currentInput.wageType) ? currentInput.hourlyWage : 0,
         calculation_month: effectiveMonth,
-        absence_policy: input.absencePolicy,
-        hours_mode: input.hoursMode,
-        insurance_options: input.insuranceOptions,
+        absence_policy: currentInput.absencePolicy,
+        hours_mode: currentInput.hoursMode,
+        insurance_options: currentInput.insuranceOptions,
         weekly_hours: weeklyHours,
         inclusive_wage_options:
-          isMonthlyFixed(input.wageType) ? input.inclusiveWageOptions : undefined,
+          isMonthlyFixed(currentInput.wageType) ? currentInput.inclusiveWageOptions : undefined,
         contract_monthly_salary:
           effectiveWageType === 'HOURLY_BASED_MONTHLY'
-            ? input.contractMonthlySalary
+            ? currentInput.contractMonthlySalary
             : undefined,
       });
 
@@ -112,7 +118,7 @@ export function useCalculation({
       if (typeof window.gtag !== 'undefined') {
         window.gtag('event', 'calculate_salary', {
           event_category: 'engagement',
-          employment_type: input.employee.employment_type,
+          employment_type: currentInput.employee.employment_type,
           wage_type: effectiveWageType,
         });
       }
@@ -130,7 +136,9 @@ export function useCalculation({
       onLoadingChange(false);
       isCalculatingRef.current = false;
     }
-  }, [input, onSuccess, onError, onLoadingChange, clearAdjustedResult]);
+  // input은 inputRef로 참조하므로 deps에서 제거 — stale closure 방지
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onSuccess, onError, onLoadingChange, clearAdjustedResult]);
 
   return { calculate };
 }
