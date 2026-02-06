@@ -109,7 +109,9 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
 
   // 급여 타입 및 계산 모드 확인
   const wageType = result.calculation_metadata?.wage_type || 'MONTHLY';
-  const isHourlyWage = wageType === 'HOURLY';
+  const isHourlyWage = wageType === 'HOURLY' || wageType === 'HOURLY_MONTHLY' || wageType === 'HOURLY_BASED_MONTHLY';
+  const appliedWageMode = result.applied_wage_mode;
+  const contractDiff = result.contract_vs_actual_diff;
 
   // 통상시급 (API에서 계산된 값 사용)
   const hourlyWage = gross_breakdown.hourly_wage?.amount || 0;
@@ -196,6 +198,35 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
             </div>
           </div>
         </div>
+
+        {/* 시급기반 월급제: 적용 모드 배지 */}
+        {appliedWageMode && (
+          <div className={`rounded-lg p-4 flex items-center justify-between ${
+            appliedWageMode === 'CONTRACT_SALARY'
+              ? 'bg-gray-50 border border-gray-200'
+              : 'bg-blue-50 border border-blue-200'
+          }`}>
+            <div className="flex items-center gap-3">
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
+                appliedWageMode === 'CONTRACT_SALARY'
+                  ? 'bg-gray-200 text-gray-800'
+                  : 'bg-blue-200 text-blue-800'
+              }`}>
+                {appliedWageMode === 'CONTRACT_SALARY' ? '계약월급 적용' : '실제계산 적용'}
+              </span>
+              <span className="text-sm text-gray-600">
+                {appliedWageMode === 'CONTRACT_SALARY'
+                  ? '계약월급이 실제 계산액보다 높아 계약월급 기준으로 지급'
+                  : '실제 계산액이 계약월급보다 높아 실제 계산 기준으로 지급'}
+              </span>
+            </div>
+            {contractDiff && (
+              <span className="text-sm font-medium text-gray-700">
+                차액: {contractDiff.formatted}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Warning Banner */}
         {warnings && warnings.length > 0 && (

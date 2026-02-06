@@ -1,14 +1,29 @@
 /**
  * 급여 계산 API 호출 커스텀 훅
- * handleCalculate 로직 분리 → useCallback 의존성 문제 해결
- *
- * 개선사항:
- * - 중복 요청 방지 (429 에러 해결)
- * - 1초 쿨다운 적용
+ * 3분류 WageType 직접 전달 (isAutoHourlyMode 핵 제거)
  */
 import { useCallback, useRef } from 'react';
 import { salaryApi } from '../api';
 import type { CalculatorState } from './useCalculatorState';
+import type { WageType } from '../types/salary';
+
+/** 하위 호환: MONTHLY→MONTHLY_FIXED, HOURLY→HOURLY_MONTHLY */
+function normalizeWageType(wageType: WageType): WageType {
+  if (wageType === 'MONTHLY') return 'MONTHLY_FIXED';
+  if (wageType === 'HOURLY') return 'HOURLY_MONTHLY';
+  return wageType;
+}
+
+/** 시급 기반 유형 여부 */
+function isHourlyBased(wageType: WageType): boolean {
+  const normalized = normalizeWageType(wageType);
+  return normalized === 'HOURLY_MONTHLY' || normalized === 'HOURLY_BASED_MONTHLY';
+}
+
+/** 월급제 고정 여부 */
+function isMonthlyFixed(wageType: WageType): boolean {
+  return normalizeWageType(wageType) === 'MONTHLY_FIXED';
+}
 
 interface UseCalculationProps {
   input: CalculatorState['input'];
@@ -25,22 +40,14 @@ export function useCalculation({
   onLoadingChange,
   clearAdjustedResult,
 }: UseCalculationProps) {
-  // 마지막 요청 시간 추적 (중복 요청 방지)
   const lastRequestTimeRef = useRef<number>(0);
   const isCalculatingRef = useRef<boolean>(false);
 
   const calculate = useCallback(async () => {
-    // 중복 요청 방지: 이미 계산 중이면 무시
-    if (isCalculatingRef.current) {
-      console.warn('이미 계산 중입니다. 잠시 후 다시 시도해주세요.');
-      return;
-    }
+    if (isCalculatingRef.current) return;
 
-    // 쿨다운 체크: 마지막 요청 후 1초 이내면 무시 (429 에러 방지)
     const now = Date.now();
-    const timeSinceLastRequest = now - lastRequestTimeRef.current;
-    if (timeSinceLastRequest < 1000) {
-      console.warn('너무 빠른 요청입니다. 1초 후 다시 시도해주세요.');
+    if (now - lastRequestTimeRef.current < 1000) {
       onError('잠시 후 다시 시도해주세요. (쿨다운: 1초)');
       return;
     }
@@ -52,40 +59,39 @@ export function useCalculation({
     clearAdjustedResult();
 
     try {
-      // 주 근무시간 계산
       const weeklyHours = input.employee.scheduled_work_days * input.employee.daily_work_hours;
-
-      // 시급 기반 자동 계산 모드 감지
-      const isAutoHourlyMode = input.wageType === 'MONTHLY' && input.hourlyWage > 0;
-      const effectiveWageType = isAutoHourlyMode ? 'HOURLY' : input.wageType;
+      const effectiveWageType = normalizeWageType(input.wageType);
 
       const response = await salaryApi.calculateSalary({
         employee: input.employee,
-        base_salary: effectiveWageType === 'MONTHLY' ? input.baseSalary : 0,
+        base_salary: isMonthlyFixed(input.wageType) ? input.baseSalary : 0,
         allowances: input.allowances,
         work_shifts: input.workShifts,
         wage_type: effectiveWageType,
-        hourly_wage: effectiveWageType === 'HOURLY' ? input.hourlyWage : 0,
+        hourly_wage: isHourlyBased(input.wageType) ? input.hourlyWage : 0,
         calculation_month: input.calculationMonth,
         absence_policy: input.absencePolicy,
         hours_mode: input.hoursMode,
         insurance_options: input.insuranceOptions,
         weekly_hours: weeklyHours,
         inclusive_wage_options:
-          input.wageType === 'MONTHLY' ? input.inclusiveWageOptions : undefined,
+          isMonthlyFixed(input.wageType) ? input.inclusiveWageOptions : undefined,
+        contract_monthly_salary:
+          effectiveWageType === 'HOURLY_BASED_MONTHLY'
+            ? input.contractMonthlySalary
+            : undefined,
       });
 
       onSuccess(response);
 
-      // Google Analytics 이벤트
       if (typeof window.gtag !== 'undefined') {
         window.gtag('event', 'calculate_salary', {
           event_category: 'engagement',
           employment_type: input.employee.employment_type,
+          wage_type: effectiveWageType,
         });
       }
     } catch (err) {
-      // 429 에러 처리
       if (err instanceof Error) {
         if (err.message.includes('429') || err.message.includes('Too Many Requests')) {
           onError('요청이 너무 많습니다. 1분 후 다시 시도해주세요.');

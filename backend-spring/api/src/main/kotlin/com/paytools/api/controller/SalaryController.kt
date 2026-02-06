@@ -92,7 +92,8 @@ class SalaryController(
             weeklyHours = request.employee.scheduledWorkDays * request.employee.dailyWorkHours,
             hoursMode = request.hoursMode.toValue(),
             insuranceOptions = request.insuranceOptions.toDomain(),
-            inclusiveWageOptions = request.inclusiveWageOptions.toDomain()
+            inclusiveWageOptions = request.inclusiveWageOptions.toDomain(),
+            contractMonthlySalary = request.contractMonthlySalary
         )
 
         // Domain Result → Response DTO 변환
@@ -170,6 +171,8 @@ class SalaryController(
             absenceBreakdown = absenceBreakdown,
             inclusiveWageOptions = inclusiveWageOptionsResponse,
             warnings = emptyList(), // TODO: 경고 생성기 구현 필요
+            appliedWageMode = result.appliedWageMode,
+            contractVsActualDiff = result.contractVsActualDiff?.let { MoneyResponse.from(it) },
             calculationMetadata = calculationMetadata
         )
     }

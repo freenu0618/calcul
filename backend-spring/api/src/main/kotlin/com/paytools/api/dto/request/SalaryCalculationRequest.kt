@@ -29,8 +29,12 @@ data class SalaryCalculationRequest(
     @field:Valid
     val workShifts: List<WorkShiftRequest> = emptyList(),
 
-    @Schema(description = "급여 형태 (MONTHLY=월급제, HOURLY=시급제)", example = "MONTHLY")
+    @Schema(description = "급여 형태 (MONTHLY, HOURLY, MONTHLY_FIXED, HOURLY_MONTHLY, HOURLY_BASED_MONTHLY)", example = "MONTHLY")
     val wageType: WageType = WageType.MONTHLY,
+
+    @Schema(description = "계약 월급 (시급기반 월급제에서 사용, HOURLY_BASED_MONTHLY)", example = "2200000")
+    @field:Min(0, message = "계약 월급은 0 이상이어야 합니다")
+    val contractMonthlySalary: Long? = null,
 
     @Schema(description = "시급 (시급제일 때 사용)", example = "10320")
     @field:Min(0, message = "시급은 0 이상이어야 합니다")

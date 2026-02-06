@@ -23,6 +23,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCalculatorState, useCalculation, usePayrollSave } from '../../hooks';
 import InsuranceOptions from '../../components/forms/InsuranceOptions';
 import InclusiveWageOptions from '../../components/forms/InclusiveWageOptions';
+import MonthlyWageSimulation from '../../components/forms/MonthlyWageSimulation';
 import TutorialOverlay from '../../components/Onboarding/TutorialOverlay';
 
 const WIZARD_STEPS: WizardStep[] = [
@@ -132,8 +133,8 @@ export default function CalculatorPage() {
               onAbsencePolicyChange={actions.setAbsencePolicy}
               hoursMode={state.input.hoursMode}
               onHoursModeChange={actions.setHoursMode}
-              contractSalary={state.input.contractSalary}
-              onContractSalaryChange={actions.setContractSalary}
+              contractMonthlySalary={state.input.contractMonthlySalary}
+              onContractMonthlySalaryChange={actions.setContractMonthlySalary}
             />
             <InsuranceOptions
               options={state.input.insuranceOptions}
@@ -146,7 +147,7 @@ export default function CalculatorPage() {
               isForigner={state.input.employee.is_foreigner}
               visaType={state.input.employee.visa_type}
             />
-            {state.input.wageType === 'MONTHLY' && (
+            {(state.input.wageType === 'MONTHLY_FIXED' || state.input.wageType === 'MONTHLY') && (
               <InclusiveWageOptions
                 options={state.input.inclusiveWageOptions}
                 onChange={actions.setInclusiveWageOptions}
@@ -156,6 +157,15 @@ export default function CalculatorPage() {
                     state.input.employee.daily_work_hours *
                     4.345
                 )}
+              />
+            )}
+            {state.input.wageType === 'HOURLY_BASED_MONTHLY' && (
+              <MonthlyWageSimulation
+                hourlyWage={state.input.hourlyWage}
+                contractMonthlySalary={state.input.contractMonthlySalary}
+                scheduledWorkDays={state.input.employee.scheduled_work_days}
+                dailyWorkHours={state.input.employee.daily_work_hours}
+                hoursMode={state.input.hoursMode}
               />
             )}
           </div>

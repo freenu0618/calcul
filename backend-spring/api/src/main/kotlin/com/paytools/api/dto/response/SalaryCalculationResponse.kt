@@ -357,6 +357,12 @@ data class SalaryCalculationResponse(
     @Schema(description = "경고 메시지 목록")
     val warnings: List<WarningResponse> = emptyList(),
 
+    @Schema(description = "시급기반 월급제: 적용 모드 (CONTRACT_SALARY 또는 ACTUAL_CALCULATION)")
+    val appliedWageMode: String? = null,
+
+    @Schema(description = "시급기반 월급제: 계약월급과 실제계산 차액")
+    val contractVsActualDiff: MoneyResponse? = null,
+
     @Schema(description = "계산 메타데이터")
     val calculationMetadata: Map<String, Any> = emptyMap()
 )

@@ -71,10 +71,14 @@ data class WorkContractEntity(
     companion object {
         const val MONTHLY = "MONTHLY"
         const val HOURLY = "HOURLY"
+        const val MONTHLY_FIXED = "MONTHLY_FIXED"
+        const val HOURLY_MONTHLY = "HOURLY_MONTHLY"
+        const val HOURLY_BASED_MONTHLY = "HOURLY_BASED_MONTHLY"
+        private val VALID_TYPES = listOf(MONTHLY, HOURLY, MONTHLY_FIXED, HOURLY_MONTHLY, HOURLY_BASED_MONTHLY)
     }
 
     init {
-        require(contractType in listOf(MONTHLY, HOURLY)) { "Invalid contract type: $contractType" }
+        require(contractType in VALID_TYPES) { "Invalid contract type: $contractType" }
         require(baseAmount > 0) { "Base amount must be positive" }
         require(scheduledHoursPerWeek in 1..52) { "Scheduled hours must be 1-52" }
         require(scheduledDaysPerWeek in 1..7) { "Scheduled days must be 1-7" }

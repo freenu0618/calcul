@@ -33,6 +33,7 @@ export interface CalculatorState {
     absencePolicy: AbsencePolicy;
     hoursMode: '174' | '209';
     contractSalary: number;
+    contractMonthlySalary: number;
     insuranceOptions: InsuranceOptionsType;
     inclusiveWageOptions: InclusiveWageOptionsType;
   };
@@ -85,6 +86,7 @@ export type CalculatorAction =
   | { type: 'SET_ABSENCE_POLICY'; payload: AbsencePolicy }
   | { type: 'SET_HOURS_MODE'; payload: '174' | '209' }
   | { type: 'SET_CONTRACT_SALARY'; payload: number }
+  | { type: 'SET_CONTRACT_MONTHLY_SALARY'; payload: number }
   | { type: 'SET_INSURANCE_OPTIONS'; payload: InsuranceOptionsType }
   | { type: 'SET_INCLUSIVE_WAGE_OPTIONS'; payload: InclusiveWageOptionsType }
   | { type: 'RESET_INPUT' }
@@ -124,12 +126,13 @@ const initialState: CalculatorState = {
     baseSalary: 2500000,
     allowances: [],
     workShifts: [],
-    wageType: 'MONTHLY',
+    wageType: 'MONTHLY_FIXED',
     hourlyWage: 0,
     calculationMonth: '',
     absencePolicy: 'STRICT',
     hoursMode: '174',
     contractSalary: 0,
+    contractMonthlySalary: 0,
     insuranceOptions: DEFAULT_INSURANCE_OPTIONS,
     inclusiveWageOptions: DEFAULT_INCLUSIVE_WAGE_OPTIONS,
   },
@@ -189,6 +192,8 @@ function calculatorReducer(
       return { ...state, input: { ...state.input, hoursMode: action.payload } };
     case 'SET_CONTRACT_SALARY':
       return { ...state, input: { ...state.input, contractSalary: action.payload } };
+    case 'SET_CONTRACT_MONTHLY_SALARY':
+      return { ...state, input: { ...state.input, contractMonthlySalary: action.payload } };
     case 'SET_INSURANCE_OPTIONS':
       return { ...state, input: { ...state.input, insuranceOptions: action.payload } };
     case 'SET_INCLUSIVE_WAGE_OPTIONS':
@@ -269,6 +274,8 @@ export function useCalculatorState() {
       dispatch({ type: 'SET_HOURS_MODE', payload: mode }), []),
     setContractSalary: useCallback((salary: number) =>
       dispatch({ type: 'SET_CONTRACT_SALARY', payload: salary }), []),
+    setContractMonthlySalary: useCallback((salary: number) =>
+      dispatch({ type: 'SET_CONTRACT_MONTHLY_SALARY', payload: salary }), []),
     setInsuranceOptions: useCallback((options: InsuranceOptionsType) =>
       dispatch({ type: 'SET_INSURANCE_OPTIONS', payload: options }), []),
     setInclusiveWageOptions: useCallback((options: InclusiveWageOptionsType) =>

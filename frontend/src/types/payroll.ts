@@ -5,8 +5,8 @@
 /** 급여 기간 상태 */
 export type PayrollStatus = 'DRAFT' | 'CONFIRMED' | 'PAID';
 
-/** 계약 유형 */
-export type ContractType = 'MONTHLY' | 'HOURLY';
+/** 계약 유형 (3분류 + 하위 호환) */
+export type ContractType = 'MONTHLY' | 'HOURLY' | 'MONTHLY_FIXED' | 'HOURLY_MONTHLY' | 'HOURLY_BASED_MONTHLY';
 
 /** 근무 계약 응답 */
 export interface WorkContractResponse {

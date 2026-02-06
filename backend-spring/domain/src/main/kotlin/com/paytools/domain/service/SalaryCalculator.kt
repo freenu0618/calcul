@@ -5,6 +5,7 @@ import com.paytools.domain.model.CompanySize
 import com.paytools.domain.model.Employee
 import com.paytools.domain.model.InclusiveWageOptions
 import com.paytools.domain.model.InsuranceOptions
+import com.paytools.domain.model.WageType
 import com.paytools.domain.model.WorkShift
 import com.paytools.domain.vo.Money
 import com.paytools.domain.vo.WorkingHours
@@ -31,14 +32,21 @@ data class SalaryCalculationResult(
     val calculationMonth: String = "",
     val absenceResult: AbsenceResult? = null,
     val inclusiveWageOptions: InclusiveWageOptions = InclusiveWageOptions.DISABLED,
-    val inclusiveOvertimePay: Money = Money.ZERO  // 포괄임금제 고정 연장수당
+    val inclusiveOvertimePay: Money = Money.ZERO,
+    val appliedWageMode: String? = null,
+    val contractVsActualDiff: Money? = null
 )
 
 /**
- * 급여 계산 오케스트레이터
+ * 급여 계산 오케스트레이터 (3분류 지원)
+ *
+ * 급여 유형:
+ * - MONTHLY_FIXED: 월급제 고정 (매월 동일, 결근만 공제)
+ * - HOURLY_MONTHLY: 시급제 월정산 (실제시간 × 시급)
+ * - HOURLY_BASED_MONTHLY: 시급기반 월급제 (MAX(계약월급, 실제계산))
  *
  * 계산 순서:
- * 1. 기본급 결정 (월급제: 고정급-결근공제 / 시급제: 시급×시간)
+ * 1. 기본급 결정 (유형별 분기)
  * 2. 통상시급 계산
  * 3. 연장/야간/휴일 수당 계산
  * 4. 주휴수당 계산 (개근 주만)
@@ -89,7 +97,8 @@ class SalaryCalculator {
         weeklyHours: Int = 40,
         hoursMode: String = "174",
         insuranceOptions: InsuranceOptions = InsuranceOptions.ALL_APPLY,
-        inclusiveWageOptions: InclusiveWageOptions = InclusiveWageOptions.DISABLED
+        inclusiveWageOptions: InclusiveWageOptions = InclusiveWageOptions.DISABLED,
+        contractMonthlySalary: Long? = null
     ): SalaryCalculationResult {
         // 0. 계산월 추론
         val effectiveMonth = if (calculationMonth.isEmpty() && workShifts.isNotEmpty()) {
@@ -99,115 +108,37 @@ class SalaryCalculator {
             calculationMonth
         }
 
-        var absenceResult: AbsenceResult? = null
         val isOver5 = employee.companySize == CompanySize.OVER_5
+        val normalizedType = WageType.normalize(WageType.valueOf(wageType))
 
-        val effectiveBase: Money
-        val hourlyWage: Money
-        val regularWage: Money
+        // 1. 유형별 기본급/통상시급 결정
+        val baseCalcResult = calculateBasePay(
+            normalizedType, employee, baseSalary, allowances, workShifts,
+            hourlyWageInput, effectiveMonth, absencePolicy, weeklyHours,
+            hoursMode, isOver5
+        )
 
-        // 시급제는 연장근로 계산을 먼저 수행하여 기본급에서 제외
-        val overtimeResultForHourly = if (wageType == "HOURLY") {
-            val hw = Money.of(hourlyWageInput)
-            overtimeCalculator.calculate(
-                workShifts = workShifts,
-                hourlyWage = hw,
-                companySize = employee.companySize,
-                scheduledWorkDays = employee.scheduledWorkDays
-            )
-        } else null
+        // 2. 연장/야간/휴일 수당
+        val (overtimeResult, inclusiveOvertimePay) = calculateOvertimePay(
+            normalizedType, inclusiveWageOptions, workShifts,
+            baseCalcResult.hourlyWage, employee, baseCalcResult.overtimeForHourly
+        )
 
-        if (wageType == "HOURLY") {
-            // 시급제: 기본급 = 소정근로시간 × 시급 (연장시간 제외)
-            val hw = Money.of(hourlyWageInput)
-
-            // 5인 이상: 휴일근무는 OvertimeCalculator에서 1.5배로 지급하므로 기본급에서 제외
-            // 5인 미만: 휴일가산 없으므로 모든 시간을 기본급에 포함
-            val shiftsForBasePay = if (isOver5) {
-                workShifts.filter { !it.isHolidayWork }
-            } else {
-                workShifts  // 5인 미만: 모든 시간 포함 (휴일가산 없음)
-            }
-
-            val totalMinutes = shiftsForBasePay.sumOf { it.calculateWorkingHours().toMinutes() }
-
-            // 연장근로 시간을 기본급에서 제외 (5인 이상만 연장수당이 별도 지급됨)
-            val overtimeMinutes = if (isOver5) {
-                overtimeResultForHourly?.overtimeHours?.toMinutes() ?: 0
-            } else {
-                0  // 5인 미만: 연장수당 없으므로 모든 시간을 기본급에 포함
-            }
-
-            val regularMinutes = totalMinutes - overtimeMinutes
-            val regularHours = BigDecimal(regularMinutes).divide(BigDecimal("60"), 10, RoundingMode.HALF_UP)
-            effectiveBase = (hw * regularHours).roundToWon()
-            hourlyWage = hw
-            regularWage = effectiveBase
-        } else {
-            // 월급제: 결근 공제
-            if (effectiveMonth.isNotEmpty() && workShifts.isNotEmpty()) {
-                absenceResult = absenceCalculator.calculate(
-                    workShifts = workShifts,
-                    scheduledWorkDays = employee.scheduledWorkDays,
-                    calculationMonth = effectiveMonth,
-                    baseSalary = baseSalary,
-                    absencePolicy = absencePolicy,
-                    isOver5 = isOver5
-                )
-                effectiveBase = baseSalary - absenceResult.totalDeduction
-            } else {
-                effectiveBase = baseSalary
-            }
-
-            regularWage = calculateRegularWage(baseSalary, allowances)
-            val monthlyHours = calculateMonthlyRegularHours(weeklyHours, hoursMode)
-            hourlyWage = calculateHourlyWage(regularWage, monthlyHours)
-        }
-
-        // 3. 연장/야간/휴일 수당
-        // 포괄임금제: 고정 연장수당으로 대체
-        val (overtimeResult, inclusiveOvertimePay) = if (inclusiveWageOptions.enabled && wageType == "MONTHLY") {
-            val fixedOvertimePay = inclusiveWageOptions.calculateMonthlyFixedOvertimePay()
-            // 야간/휴일은 별도 계산 (시간만 참고용)
-            val actualResult = overtimeCalculator.calculate(
-                workShifts = workShifts,
-                hourlyWage = hourlyWage,
-                companySize = employee.companySize,
-                scheduledWorkDays = employee.scheduledWorkDays
-            )
-            // 포괄임금제: 연장수당을 고정액으로 대체
-            val modifiedResult = OvertimeResult(
-                overtimePay = Money.ZERO,  // 연장수당은 고정액으로 별도 처리
-                nightPay = actualResult.nightPay,
-                holidayPay = actualResult.holidayPay,
-                overtimeHours = WorkingHours.fromMinutes(
-                    (inclusiveWageOptions.monthlyExpectedOvertimeHours * BigDecimal("60")).toInt()
-                ),
-                nightHours = actualResult.nightHours,
-                holidayHours = actualResult.holidayHours,
-                hourlyWage = hourlyWage
-            )
-            modifiedResult to fixedOvertimePay
-        } else {
-            val result = overtimeResultForHourly ?: overtimeCalculator.calculate(
-                workShifts = workShifts,
-                hourlyWage = hourlyWage,
-                companySize = employee.companySize,
-                scheduledWorkDays = employee.scheduledWorkDays
-            )
-            result to Money.ZERO
-        }
-
-        // 4. 주휴수당
+        // 3. 주휴수당
         val weeklyHolidayResult = weeklyHolidayCalculator.calculate(
             workShifts = workShifts,
-            hourlyWage = hourlyWage,
+            hourlyWage = baseCalcResult.hourlyWage,
             scheduledWorkDays = employee.scheduledWorkDays
         )
 
-        // 5. 총 지급액 (포괄임금제: 고정 연장수당 포함)
+        // 4. HOURLY_BASED_MONTHLY: MAX(계약월급, 실제계산) 판정
+        val (finalBase, appliedWageMode, contractDiff) = resolveHourlyBasedMonthly(
+            normalizedType, baseCalcResult, weeklyHolidayResult, contractMonthlySalary
+        )
+
+        // 5. 총 지급액
         val totalGross = calculateTotalGross(
-            baseSalary = effectiveBase,
+            baseSalary = finalBase,
             allowances = allowances,
             overtimePay = overtimeResult.total() + inclusiveOvertimePay,
             weeklyHolidayPay = weeklyHolidayResult.weeklyHolidayPay
@@ -217,9 +148,7 @@ class SalaryCalculator {
         val taxableGross = calculateTaxableGross(totalGross, allowances)
         val insuranceResult = insuranceCalculator.calculate(taxableGross, insuranceOptions)
         val taxResult = taxCalculator.calculate(
-            taxableGross,
-            employee.dependentsCount,
-            employee.childrenUnder20
+            taxableGross, employee.dependentsCount, employee.childrenUnder20
         )
 
         val totalDeductions = insuranceResult.total() + taxResult.total()
@@ -227,10 +156,10 @@ class SalaryCalculator {
 
         return SalaryCalculationResult(
             employee = employee,
-            baseSalary = effectiveBase,
+            baseSalary = finalBase,
             allowances = allowances,
-            regularWage = regularWage,
-            hourlyWage = hourlyWage,
+            regularWage = baseCalcResult.regularWage,
+            hourlyWage = baseCalcResult.hourlyWage,
             overtimeResult = overtimeResult,
             weeklyHolidayResult = weeklyHolidayResult,
             totalGross = totalGross,
@@ -240,10 +169,139 @@ class SalaryCalculator {
             netPay = netPay,
             wageType = wageType,
             calculationMonth = effectiveMonth,
-            absenceResult = absenceResult,
+            absenceResult = baseCalcResult.absenceResult,
             inclusiveWageOptions = inclusiveWageOptions,
-            inclusiveOvertimePay = inclusiveOvertimePay
+            inclusiveOvertimePay = inclusiveOvertimePay,
+            appliedWageMode = appliedWageMode,
+            contractVsActualDiff = contractDiff
         )
+    }
+
+    /** 유형별 기본급 계산 중간 결과 */
+    private data class BaseCalcResult(
+        val effectiveBase: Money,
+        val hourlyWage: Money,
+        val regularWage: Money,
+        val absenceResult: AbsenceResult?,
+        val overtimeForHourly: OvertimeResult?
+    )
+
+    /**
+     * Step 1: 유형별 기본급/통상시급 결정
+     */
+    private fun calculateBasePay(
+        normalizedType: WageType, employee: Employee, baseSalary: Money,
+        allowances: List<Allowance>, workShifts: List<WorkShift>,
+        hourlyWageInput: Int, effectiveMonth: String, absencePolicy: String,
+        weeklyHours: Int, hoursMode: String, isOver5: Boolean
+    ): BaseCalcResult = when (normalizedType) {
+
+        WageType.MONTHLY_FIXED -> {
+            // 월급제 고정: 결근 공제
+            var absResult: AbsenceResult? = null
+            val effBase: Money
+            if (effectiveMonth.isNotEmpty() && workShifts.isNotEmpty()) {
+                absResult = absenceCalculator.calculate(
+                    workShifts, employee.scheduledWorkDays, effectiveMonth,
+                    baseSalary, absencePolicy, isOver5
+                )
+                effBase = baseSalary - absResult.totalDeduction
+            } else {
+                effBase = baseSalary
+            }
+            val regWage = calculateRegularWage(baseSalary, allowances)
+            val monthlyHours = calculateMonthlyRegularHours(weeklyHours, hoursMode)
+            val hw = calculateHourlyWage(regWage, monthlyHours)
+            BaseCalcResult(effBase, hw, regWage, absResult, null)
+        }
+
+        WageType.HOURLY_MONTHLY, WageType.HOURLY_BASED_MONTHLY -> {
+            // 시급 기반: 소정근로시간 × 시급 (연장시간 제외)
+            val hw = Money.of(hourlyWageInput)
+            val overtimeForHourly = overtimeCalculator.calculate(
+                workShifts, hw, employee.companySize, employee.scheduledWorkDays
+            )
+
+            val shiftsForBasePay = if (isOver5) {
+                workShifts.filter { !it.isHolidayWork }
+            } else {
+                workShifts
+            }
+            val totalMinutes = shiftsForBasePay.sumOf { it.calculateWorkingHours().toMinutes() }
+            val overtimeMinutes = if (isOver5) overtimeForHourly.overtimeHours.toMinutes() else 0
+            val regularMinutes = totalMinutes - overtimeMinutes
+            val regularHours = BigDecimal(regularMinutes).divide(BigDecimal("60"), 10, RoundingMode.HALF_UP)
+            val effBase = (hw * regularHours).roundToWon()
+            BaseCalcResult(effBase, hw, effBase, null, overtimeForHourly)
+        }
+
+        else -> throw IllegalArgumentException("Unknown wage type: $normalizedType")
+    }
+
+    /**
+     * Step 2: 연장/야간/휴일 수당 (포괄임금제 분기 포함)
+     */
+    private fun calculateOvertimePay(
+        normalizedType: WageType,
+        inclusiveWageOptions: InclusiveWageOptions, workShifts: List<WorkShift>,
+        hourlyWage: Money, employee: Employee, overtimeForHourly: OvertimeResult?
+    ): Pair<OvertimeResult, Money> {
+        val isMonthlyFixed = normalizedType == WageType.MONTHLY_FIXED
+        if (inclusiveWageOptions.enabled && isMonthlyFixed) {
+            val fixedOvertimePay = inclusiveWageOptions.calculateMonthlyFixedOvertimePay()
+            val actualResult = overtimeCalculator.calculate(
+                workShifts, hourlyWage, employee.companySize, employee.scheduledWorkDays
+            )
+            val modifiedResult = OvertimeResult(
+                overtimePay = Money.ZERO,
+                nightPay = actualResult.nightPay,
+                holidayPay = actualResult.holidayPay,
+                overtimeHours = WorkingHours.fromMinutes(
+                    (inclusiveWageOptions.monthlyExpectedOvertimeHours * BigDecimal("60")).toInt()
+                ),
+                nightHours = actualResult.nightHours,
+                holidayHours = actualResult.holidayHours,
+                hourlyWage = hourlyWage
+            )
+            return modifiedResult to fixedOvertimePay
+        }
+
+        val result = overtimeForHourly ?: overtimeCalculator.calculate(
+            workShifts, hourlyWage, employee.companySize, employee.scheduledWorkDays
+        )
+        return result to Money.ZERO
+    }
+
+    /**
+     * Step 4: HOURLY_BASED_MONTHLY 계약월급 vs 실제계산 비교
+     * MAX(계약월급, 실제시간×시급+주휴수당) 적용
+     *
+     * @return Triple(최종 기본급, 적용모드, 차액)
+     */
+    private fun resolveHourlyBasedMonthly(
+        normalizedType: WageType, baseCalcResult: BaseCalcResult,
+        weeklyHolidayResult: WeeklyHolidayPayResult,
+        contractMonthlySalary: Long?
+    ): Triple<Money, String?, Money?> {
+        if (normalizedType != WageType.HOURLY_BASED_MONTHLY || contractMonthlySalary == null) {
+            return Triple(baseCalcResult.effectiveBase, null, null)
+        }
+
+        val contractSalary = Money.of(contractMonthlySalary)
+        val actualBase = baseCalcResult.effectiveBase
+        val weeklyHolidayPay = weeklyHolidayResult.weeklyHolidayPay
+        val actualTotal = actualBase + weeklyHolidayPay
+
+        return if (actualTotal > contractSalary) {
+            // 근무일 많은 달: 실제 계산이 더 높음 → 시급 기준
+            val diff = actualTotal - contractSalary
+            Triple(actualBase, "ACTUAL_CALCULATION", diff)
+        } else {
+            // 근무일 적은 달: 계약월급 보장 → 차액을 기본급에 추가
+            val diff = contractSalary - actualTotal
+            val adjustedBase = actualBase + diff
+            Triple(adjustedBase, "CONTRACT_SALARY", diff)
+        }
     }
 
     private fun calculateRegularWage(baseSalary: Money, allowances: List<Allowance>): Money {
@@ -256,10 +314,8 @@ class SalaryCalculator {
         (regularWage / monthlyHours).roundToWon()
 
     private fun calculateTotalGross(
-        baseSalary: Money,
-        allowances: List<Allowance>,
-        overtimePay: Money,
-        weeklyHolidayPay: Money
+        baseSalary: Money, allowances: List<Allowance>,
+        overtimePay: Money, weeklyHolidayPay: Money
     ): Money {
         val allowanceTotal = allowances.fold(Money.ZERO) { acc, a -> acc + a.amount }
         return baseSalary + allowanceTotal + overtimePay + weeklyHolidayPay

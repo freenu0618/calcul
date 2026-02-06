@@ -5,7 +5,12 @@
 
 export type EmploymentType = 'FULL_TIME' | 'PART_TIME';
 export type CompanySize = 'UNDER_5' | 'OVER_5';
-export type WageType = 'MONTHLY' | 'HOURLY';
+export type WageType =
+  | 'MONTHLY'               // 하위 호환 → MONTHLY_FIXED
+  | 'HOURLY'                // 하위 호환 → HOURLY_MONTHLY
+  | 'MONTHLY_FIXED'         // 월급제 고정
+  | 'HOURLY_MONTHLY'        // 시급제 월정산
+  | 'HOURLY_BASED_MONTHLY'; // 시급기반 월급제
 export type AbsencePolicy = 'STRICT' | 'MODERATE' | 'LENIENT';
 export type HoursMode = '174' | '209';
 
@@ -143,6 +148,7 @@ export interface SalaryCalculationRequest {
   insurance_options?: InsuranceOptions;
   weekly_hours?: number; // 주 근무시간 (기본 40)
   inclusive_wage_options?: InclusiveWageOptions; // 포괄임금제 옵션
+  contract_monthly_salary?: number; // 시급기반 월급제 계약 월급
 }
 
 export interface WorkSummaryResponse {
@@ -192,6 +198,8 @@ export interface SalaryCalculationResponse {
   work_summary?: WorkSummaryResponse;
   absence_breakdown?: AbsenceBreakdown;
   inclusive_wage_options?: InclusiveWageOptionsResponse;
+  applied_wage_mode?: 'CONTRACT_SALARY' | 'ACTUAL_CALCULATION';
+  contract_vs_actual_diff?: MoneyResponse;
   warnings: WarningItem[];
   calculation_metadata: {
     calculation_date: string;
