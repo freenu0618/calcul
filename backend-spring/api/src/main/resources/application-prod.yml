@@ -20,13 +20,16 @@ spring:
       connection-timeout: 30000
 
   jpa:
-    show-sql: false
+    show-sql: false  # 프로덕션에서는 SQL 로깅 비활성화
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false  # 프로덕션에서는 포맷 비활성화
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        generate_statistics: true  # 통계 수집 (성능 모니터링)
+        jdbc:
+          batch_size: 20  # 배치 insert 최적화
 
   flyway:
     enabled: true
@@ -40,8 +43,8 @@ logging:
     root: WARN
     com.paytools: INFO
     org.springframework.security: WARN
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql: TRACE
+    org.hibernate.SQL: WARN  # 프로덕션에서는 WARN (슬로우 쿼리만)
+    org.hibernate.stat: INFO  # 통계 정보는 INFO 레벨
 
 # Python 프록시 비활성화 (Spring Boot 전환 완료)
 python:

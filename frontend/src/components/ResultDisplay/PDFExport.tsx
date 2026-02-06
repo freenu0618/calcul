@@ -1,10 +1,13 @@
 /**
  * 급여명세서 PDF/CSV 내보내기 버튼 컴포넌트
+ *
+ * 성능 최적화:
+ * - html2canvas + jsPDF (350KB) → Dynamic Import로 번들 분리
+ * - 사용자가 버튼 클릭 시에만 라이브러리 로드
  */
 
 import { useState } from 'react';
 import type { SalaryCalculationResponse } from '../../types/salary';
-import { generatePayslipPdf, exportSalaryToCsv } from '../../utils/pdfGenerator';
 
 interface PDFExportProps {
   result: SalaryCalculationResponse;
@@ -22,6 +25,8 @@ export default function PDFExport({
   const handlePdfDownload = async () => {
     setIsGenerating(true);
     try {
+      // Dynamic Import: 사용자가 버튼 클릭 시에만 라이브러리 로드
+      const { generatePayslipPdf } = await import('../../utils/pdfGenerator');
       await generatePayslipPdf(result, employerName);
     } catch (error) {
       console.error('PDF 생성 실패:', error);
@@ -31,8 +36,10 @@ export default function PDFExport({
     }
   };
 
-  const handleCsvDownload = () => {
+  const handleCsvDownload = async () => {
     try {
+      // Dynamic Import: CSV도 동일하게 분리
+      const { exportSalaryToCsv } = await import('../../utils/pdfGenerator');
       exportSalaryToCsv(result);
     } catch (error) {
       console.error('CSV 내보내기 실패:', error);
