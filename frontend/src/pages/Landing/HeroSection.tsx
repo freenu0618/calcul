@@ -1,71 +1,70 @@
 /**
- * Hero Section - AI 채팅 통합 버전
+ * Hero Section - 호기심의 틈 + 손실 회피 + 프레이밍
  */
 
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import HeroChatBox from './HeroChatBox';
 
 export default function HeroSection() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <section className="relative pt-12 pb-20 lg:pt-24 lg:pb-32 overflow-hidden">
+    <section className="relative pt-16 pb-20 lg:pt-28 lg:pb-32 overflow-hidden">
+      {/* 배경 장식 */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3" />
+
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-          {/* Text Content */}
-          <div className="flex flex-col gap-6 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 self-center lg:self-start rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary ring-1 ring-inset ring-primary/20">
-              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-              2026년 최신 법령 적용
-            </div>
-
-            <h1 className="text-4xl font-black leading-[1.2] text-text-main sm:text-5xl lg:text-6xl tracking-tight">
-              급여 계산,<br className="hidden lg:block" />
-              이제{' '}
-              <span className="text-primary relative inline-block">
-                AI에게 물어보세요
-                <svg className="absolute -bottom-2 left-0 w-full h-3 text-primary/30" viewBox="0 0 100 10" preserveAspectRatio="none">
-                  <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" strokeWidth="3" />
-                </svg>
-              </span>
-            </h1>
-
-            <p className="text-lg font-normal text-text-sub leading-relaxed max-w-2xl mx-auto lg:mx-0">
-              복잡한 노동법, 4대보험, 수당 계산... <br className="sm:hidden" />
-              페이봇 AI가 즉시 답변해 드립니다.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start pt-2">
-              <Link
-                to={isAuthenticated ? '/dashboard' : '/register'}
-                className="h-12 px-8 rounded-xl bg-primary text-white text-base font-bold shadow-sm hover:bg-primary-600 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"
-              >
-                {isAuthenticated ? '대시보드로 이동' : '무료로 시작하기'}
-                <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
-              </Link>
-              <Link
-                to="/calculator"
-                className="h-12 px-8 rounded-xl bg-white border border-gray-200 text-text-main text-base font-bold shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 flex items-center justify-center"
-              >
-                계산기 바로 사용
-              </Link>
-            </div>
-
-            <div className="mt-4 flex items-center justify-center lg:justify-start gap-4 text-xs text-text-sub">
-              <div className="flex items-center gap-1">
-                <span className="material-symbols-outlined text-[18px] text-primary">check_circle</span>
-                직원 5명까지 무료
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="material-symbols-outlined text-[18px] text-primary">check_circle</span>
-                신용카드 불필요
-              </div>
-            </div>
+        <div className="max-w-3xl mx-auto text-center">
+          {/* 배지: 권위 편향 */}
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold text-primary ring-1 ring-inset ring-primary/20 mb-6">
+            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+            2026년 최신 법령 반영
           </div>
 
-          {/* AI 채팅 박스 */}
-          <HeroChatBox />
+          {/* 호기심의 틈: 질문형 헤드라인 */}
+          <h1 className="text-4xl font-black leading-[1.15] text-text-main sm:text-5xl lg:text-6xl tracking-tight mb-6">
+            우리 직원 실수령액,
+            <br />
+            <span className="text-primary">정확히 알고 계신가요?</span>
+          </h1>
+
+          {/* 손실 회피: 구체적 손실 금액 */}
+          <p className="text-lg text-text-sub leading-relaxed mb-2 max-w-2xl mx-auto">
+            급여 계산 실수 1건 = 평균 <strong className="text-text-main">23만원</strong> 과지급 또는 미지급
+          </p>
+          <p className="text-base text-text-sub mb-6">
+            4대보험 착오 신고 시 <strong className="text-red-600">최대 300만원</strong> 과태료 위험
+          </p>
+
+          {/* 프레이밍: 시간 프레임 */}
+          <p className="text-base text-text-sub mb-8 bg-primary/5 inline-block px-4 py-2 rounded-lg">
+            <strong className="text-primary">3분</strong>이면 정확한 실수령액, 4대보험, 소득세까지 한 번에
+          </p>
+
+          {/* CTA */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
+            <Link
+              to="/calculator"
+              className="h-14 px-8 rounded-xl bg-primary text-white text-lg font-bold shadow-lg hover:bg-primary-600 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              내 직원 실수령액 계산하기
+              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+            </Link>
+            {!isAuthenticated && (
+              <Link
+                to="/register"
+                className="h-14 px-8 rounded-xl bg-white border border-gray-200 text-text-main text-lg font-bold shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 flex items-center justify-center"
+              >
+                무료 회원가입
+              </Link>
+            )}
+          </div>
+
+          {/* 진입 장벽 제거 */}
+          <p className="text-sm text-text-sub">
+            가입 없이 바로 사용 · 완전 무료 · 신용카드 불필요
+          </p>
         </div>
       </div>
     </section>

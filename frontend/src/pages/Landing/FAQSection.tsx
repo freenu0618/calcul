@@ -1,68 +1,58 @@
 /**
- * FAQ Section - GEO 최적화 (Schema.org FAQPage 마크업 포함)
+ * FAQ Section - 반발감 해소 + 탈출 경로
+ * 전환 장벽이 높은 순서대로 질문 배치 (Schema.org FAQPage 마크업)
  */
 
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
-interface FAQItem {
-  question: string;
-  answer: string;
-}
+interface FAQItem { question: string; answer: string; }
 
 const faqs: FAQItem[] = [
   {
-    question: '주휴수당은 어떻게 계산하나요?',
+    question: '정말 무료인가요?',
     answer:
-      '주휴수당은 1주 소정근로시간이 15시간 이상이고, 소정근로일을 개근한 경우 지급됩니다. 계산식: (1주 소정근로시간 ÷ 40) × 8 × 통상시급. 예를 들어 주 40시간 근무, 시급 10,320원이면 주휴수당은 82,560원입니다. PayTools는 이를 자동으로 계산해드립니다.',
+      '네, 직원 5명까지는 완전 무료입니다. 급여 계산기, 4대보험·소득세 자동 계산, AI 노무 상담(월 10회)을 무료로 이용하실 수 있습니다. 신용카드 등록도 필요 없습니다.',
   },
   {
-    question: '4대보험료는 얼마나 공제되나요?',
+    question: '계산 결과를 믿을 수 있나요?',
     answer:
-      '2026년 기준 4대보험 근로자 부담률: 국민연금 4.75%, 건강보험 3.595%, 장기요양보험(건강보험료의 13.14%), 고용보험 0.9%입니다. 월급 300만원 기준 약 28만원이 공제됩니다. PayTools는 최신 요율을 자동 반영합니다.',
+      '181개의 실제 급여 케이스로 검증했으며, 근로기준법·최저임금법·국민연금법·건강보험법·고용보험법·소득세법·근로자퇴직급여보장법·산재보험법 등 8개 법률을 정밀 반영합니다. 매년 법령 변경 시 즉시 업데이트됩니다.',
   },
   {
-    question: '연장근로수당 계산 방법이 궁금해요',
+    question: '내 데이터는 안전한가요?',
     answer:
-      '연장근로수당은 1주 40시간(또는 1일 8시간)을 초과한 근로에 대해 통상시급의 1.5배를 지급합니다. 야간근로(22시~06시)는 추가로 0.5배, 휴일근로는 1.5배(8시간 이내) 또는 2.0배(8시간 초과)가 가산됩니다.',
+      'SSL 암호화 통신, 데이터베이스 암호화 저장, 개인정보보호법 준수 등 엔터프라이즈급 보안을 적용하고 있습니다. 급여 데이터는 서버에 안전하게 보관되며, 원하시면 언제든 삭제할 수 있습니다.',
   },
   {
-    question: 'PayTools는 무료인가요?',
+    question: '직원 수가 늘어나면 어떻게 되나요?',
     answer:
-      '네, 직원 3명까지는 완전 무료입니다. 무제한 계산, PDF 급여명세서가 필요하시면 Basic 플랜($9.99/월)을, 엑셀 내보내기와 AI 법령 검색이 필요하시면 Pro 플랜($14.99/월)을 추천드립니다. 3일 무료 체험도 가능합니다.',
+      'Free 플랜(5명)에서 Basic 플랜(20명)이나 Pro 플랜(무제한)으로 업그레이드하시면 됩니다. 기존 데이터는 모두 유지되며, 언제든 플랜을 변경할 수 있습니다.',
   },
   {
-    question: '최저임금 미달 여부를 확인할 수 있나요?',
+    question: '기존 엑셀 데이터를 가져올 수 있나요?',
     answer:
-      '네, PayTools는 2026년 최저임금(시급 10,320원)을 기준으로 자동 검증합니다. 산입범위(기본급, 고정수당)와 제외항목(식대, 교통비 등)을 정확히 구분하여 최저임금 위반 여부를 알려드립니다.',
+      'Basic 플랜 이상에서 Excel/CSV 내보내기를 지원합니다. 기존 엑셀 데이터 가져오기(import) 기능은 현재 개발 중이며, 곧 제공될 예정입니다.',
   },
   {
-    question: '5인 미만 사업장도 사용할 수 있나요?',
+    question: '법률이 바뀌면 자동으로 반영되나요?',
     answer:
-      '물론입니다. PayTools는 5인 미만/이상 사업장을 구분하여 계산합니다. 5인 미만은 연장·야간·휴일 가산수당 적용이 다르며, 해고예고수당 등 일부 규정이 다릅니다. 사업장 규모를 선택하시면 자동으로 반영됩니다.',
+      '네, 매년 1월 변경되는 최저임금, 4대보험 요율, 소득세율 등을 즉시 업데이트합니다. 2026년 연금개혁(국민연금 4.75%)도 이미 반영되어 있습니다.',
   },
 ];
 
-// Schema.org FAQPage 구조화 데이터
 const faqSchema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: faqs.map((faq) => ({
+  mainEntity: faqs.map((f) => ({
     '@type': 'Question',
-    name: faq.question,
-    acceptedAnswer: {
-      '@type': 'Answer',
-      text: faq.answer,
-    },
+    name: f.question,
+    acceptedAnswer: { '@type': 'Answer', text: f.answer },
   })),
 };
 
 export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  const toggle = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
 
   return (
     <>
@@ -70,38 +60,33 @@ export default function FAQSection() {
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
 
-      <section className="py-20 lg:py-28 bg-white" id="faq">
+      <section className="py-20 lg:py-28 bg-background-light" id="faq">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-text-main sm:text-4xl mb-4">
               자주 묻는 질문
             </h2>
-            <p className="text-lg text-text-sub">
-              급여 계산에 대해 궁금한 점을 확인하세요
+            <p className="text-text-sub">
+              궁금한 점이 있으시면 확인해 보세요
             </p>
           </div>
 
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <div
-                key={index}
-                className="border border-gray-200 rounded-xl overflow-hidden"
-              >
+          <div className="space-y-3">
+            {faqs.map((faq, i) => (
+              <div key={i} className="border border-gray-200 rounded-xl overflow-hidden bg-white">
                 <button
-                  onClick={() => toggle(index)}
-                  className="w-full px-6 py-5 text-left flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors"
-                  aria-expanded={openIndex === index}
+                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                  className="w-full px-6 py-5 text-left flex justify-between items-center hover:bg-gray-50 transition-colors"
+                  aria-expanded={openIndex === i}
                 >
-                  <span className="font-semibold text-text-main pr-4">
-                    {faq.question}
-                  </span>
-                  <span className="material-symbols-outlined text-gray-500 flex-shrink-0">
-                    {openIndex === index ? 'expand_less' : 'expand_more'}
+                  <span className="font-semibold text-text-main pr-4">{faq.question}</span>
+                  <span className="material-symbols-outlined text-gray-400 flex-shrink-0">
+                    {openIndex === i ? 'expand_less' : 'expand_more'}
                   </span>
                 </button>
-                {openIndex === index && (
-                  <div className="px-6 py-5 bg-white">
-                    <p className="text-text-sub leading-relaxed">{faq.answer}</p>
+                {openIndex === i && (
+                  <div className="px-6 pb-5">
+                    <p className="text-text-sub leading-relaxed text-sm">{faq.answer}</p>
                   </div>
                 )}
               </div>

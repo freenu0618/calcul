@@ -1,6 +1,6 @@
 /**
- * Pricing Section - 요금제 안내
- * pricing-policy.md 기준 (2026-01-28)
+ * Pricing Section - 미끼 효과 + 중앙 무대 + 앵커링 + 프레이밍
+ * Polar 결제 연동 유지
  */
 
 import { useState } from 'react';
@@ -10,99 +10,80 @@ import { paymentApi, type PlanType } from '../../api/paymentApi';
 
 type BillingCycle = 'monthly' | 'annual';
 
-interface PricingPlan {
+interface Plan {
   name: string;
-  description: string;
+  desc: string;
   monthlyPrice: number | null;
   annualPrice: number | null;
   employees: string;
   features: string[];
+  excluded?: string[];
   cta: string;
   ctaLink: string;
   popular?: boolean;
-  disabled?: boolean;
-  trial?: string;
-  planId?: PlanType;  // Polar product mapping
+  planId?: PlanType;
   annualPlanId?: PlanType;
+  daily?: string;
 }
 
-// 가격은 USD (Polar 결제 기준)
-const plans: PricingPlan[] = [
+const plans: Plan[] = [
   {
     name: 'Free',
-    description: '소규모 사업장 시작',
+    desc: '소규모 사업장 시작',
     monthlyPrice: 0,
     annualPrice: 0,
-    employees: '3명',
+    employees: '5명',
     features: [
-      '월 5회 급여 계산',
+      '급여 계산기',
+      'AI 노무 상담 (월 10회)',
       '4대보험 + 소득세 자동 계산',
-      '연장/야간/휴일 수당',
-      '주휴수당 비례 계산',
     ],
+    excluded: ['급여대장 관리', '급여명세서 PDF'],
     cta: '무료로 시작',
     ctaLink: '/register',
   },
   {
     name: 'Basic',
-    description: '성장하는 사업장',
+    desc: '성장하는 사업장',
     monthlyPrice: 9.99,
     annualPrice: 99.99,
-    employees: '10명',
+    employees: '20명',
     features: [
-      '무제한 급여 계산',
-      'Free 플랜의 모든 기능',
+      '급여 계산기 무제한',
+      'AI 노무 상담 무제한',
       '급여대장 관리',
-      'PDF 급여명세서',
+      '급여명세서 PDF',
+      'Excel/CSV 내보내기',
       '이메일 지원',
     ],
     cta: '3일 무료 체험',
     ctaLink: '/register',
     popular: true,
-    trial: '3일 무료',
     planId: 'basic',
     annualPlanId: 'basic_annual',
+    daily: '하루 330원',
   },
   {
     name: 'Pro',
-    description: '전문적인 관리',
+    desc: '전문적인 관리',
     monthlyPrice: 14.99,
     annualPrice: 149.99,
-    employees: '30명',
+    employees: '무제한',
     features: [
-      'Basic 플랜의 모든 기능',
-      'AI 노무 상담',
-      'Excel 내보내기',
-      '우선 지원',
+      'Basic 전체 기능',
+      '다중 사업장',
       '맞춤 리포트',
+      '우선 지원',
     ],
     cta: '시작하기',
     ctaLink: '/register',
     planId: 'pro',
     annualPlanId: 'pro_annual',
   },
-  {
-    name: 'Enterprise',
-    description: '대규모 사업장',
-    monthlyPrice: null,
-    annualPrice: null,
-    employees: '30명+',
-    features: [
-      'Pro 플랜의 모든 기능',
-      '무제한 직원',
-      '전담 매니저',
-      'API 연동',
-      'SLA 보장',
-    ],
-    cta: '문의하기',
-    ctaLink: '/contact',
-    disabled: true,
-  },
 ];
 
-function formatPrice(price: number): string {
-  // USD 소수점 2자리 포맷
-  return price % 1 === 0 ? price.toString() : price.toFixed(2);
+function fmtPrice(p: number) {
+  return p % 1 === 0 ? p.toString() : p.toFixed(2);
 }
 
 export default function PricingSection() {
@@ -110,64 +91,44 @@ export default function PricingSection() {
   const [billing, setBilling] = useState<BillingCycle>('monthly');
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
-  const handlePayment = async (plan: PricingPlan) => {
-    if (!isAuthenticated) {
-      window.location.href = '/register';
-      return;
-    }
-
-    const planId = billing === 'annual' ? plan.annualPlanId : plan.planId;
-    if (!planId) return;
-
+  const handlePayment = async (plan: Plan) => {
+    if (!isAuthenticated) { window.location.href = '/register'; return; }
+    const id = billing === 'annual' ? plan.annualPlanId : plan.planId;
+    if (!id) return;
     setLoadingPlan(plan.name);
-    try {
-      await paymentApi.redirectToCheckout(planId);
-    } catch (error) {
-      console.error('결제 오류:', error);
-      alert('결제 페이지 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
-      setLoadingPlan(null);
-    }
+    try { await paymentApi.redirectToCheckout(id); }
+    catch { alert('결제 연결 실패. 잠시 후 다시 시도해주세요.'); setLoadingPlan(null); }
   };
 
-  const getPrice = (plan: PricingPlan): string => {
+  const getPrice = (plan: Plan) => {
     if (plan.monthlyPrice === null) return '문의';
     if (plan.monthlyPrice === 0) return '0';
-
-    if (billing === 'annual' && plan.annualPrice) {
-      const monthlyEquivalent = Math.floor(plan.annualPrice / 12);
-      return formatPrice(monthlyEquivalent);
-    }
-    return formatPrice(plan.monthlyPrice);
-  };
-
-  const getAnnualSavings = (plan: PricingPlan): number | null => {
-    if (!plan.monthlyPrice || !plan.annualPrice) return null;
-    const fullYearPrice = plan.monthlyPrice * 12;
-    return fullYearPrice - plan.annualPrice;
+    if (billing === 'annual' && plan.annualPrice)
+      return fmtPrice(Math.floor(plan.annualPrice / 12));
+    return fmtPrice(plan.monthlyPrice);
   };
 
   return (
-    <section className="py-20 lg:py-28 bg-gray-50" id="pricing">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-12">
+    <section className="py-20 lg:py-28 bg-white" id="pricing">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-2xl mx-auto mb-4">
           <h2 className="text-3xl font-bold text-text-main sm:text-4xl mb-4">
-            합리적인 요금제
+            합리적인 가격으로 시작하세요
           </h2>
-          <p className="text-lg text-text-sub">
-            사업장 규모에 맞는 최적의 플랜을 선택하세요
+          {/* 앵커링: 노무사 비용 비교 */}
+          <p className="text-text-sub">
+            노무사 월 <s className="text-red-400">30~50만원</s> &rarr;
+            페이툴즈는 <strong className="text-primary">월 $9.99</strong>부터
           </p>
         </div>
 
-        {/* Billing Toggle */}
+        {/* 결제 주기 토글 */}
         <div className="flex justify-center mb-12">
-          <div className="inline-flex items-center bg-white rounded-xl p-1 shadow-sm border border-gray-200">
+          <div className="inline-flex items-center bg-gray-100 rounded-xl p-1">
             <button
               onClick={() => setBilling('monthly')}
               className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${
-                billing === 'monthly'
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                billing === 'monthly' ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               월간 결제
@@ -175,117 +136,77 @@ export default function PricingSection() {
             <button
               onClick={() => setBilling('annual')}
               className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${
-                billing === 'annual'
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                billing === 'annual' ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               연간 결제
-              <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
-                2개월 무료
-              </span>
+              <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">2개월 무료</span>
             </button>
           </div>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* 3단 요금 카드 */}
+        <div className="grid md:grid-cols-3 gap-6 items-start">
           {plans.map((plan) => (
             <div
               key={plan.name}
               className={`relative bg-white rounded-2xl p-6 flex flex-col ${
                 plan.popular
-                  ? 'border-2 border-primary shadow-lg ring-1 ring-primary/20'
+                  ? 'border-2 border-primary shadow-xl ring-1 ring-primary/20 md:-mt-4 md:pb-10'
                   : 'border border-gray-200 shadow-sm'
               }`}
             >
-              {/* Popular Badge */}
               {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-bold px-4 py-1 rounded-full">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-bold px-4 py-1 rounded-full">
                   가장 인기
                 </div>
               )}
 
-              {/* Trial Badge */}
-              {plan.trial && (
-                <div className="absolute top-4 right-4 bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">
-                  {plan.trial}
-                </div>
-              )}
-
-              {/* Plan Header */}
-              <div className="mb-6">
+              <div className="mb-5">
                 <h3 className="text-lg font-bold text-text-main mb-1">{plan.name}</h3>
-                <p className="text-sm text-text-sub">{plan.description}</p>
+                <p className="text-sm text-text-sub">{plan.desc}</p>
               </div>
 
-              {/* Price */}
-              <div className="mb-6">
+              <div className="mb-5">
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl font-black text-text-main">
-                    {plan.monthlyPrice === null ? '' : '$'}
-                    {getPrice(plan)}
+                    {plan.monthlyPrice !== null ? '$' : ''}{getPrice(plan)}
                   </span>
-                  {plan.monthlyPrice !== null && (
-                    <span className="text-sm text-text-sub">/월</span>
-                  )}
+                  {plan.monthlyPrice !== null && <span className="text-sm text-text-sub">/월</span>}
                 </div>
-                {plan.trial && billing === 'monthly' && (
-                  <p className="text-xs text-green-600 font-medium mt-1">
-                    3일 무료 체험 후 자동 결제
-                  </p>
+                {/* 프레이밍: 일 단위 */}
+                {plan.daily && (
+                  <p className="text-xs text-primary font-medium mt-1">{plan.daily}</p>
                 )}
-                {billing === 'annual' && getAnnualSavings(plan) && (
-                  <p className="text-xs text-green-600 font-medium mt-1">
-                    연 ${formatPrice(getAnnualSavings(plan)!)} 절약
-                  </p>
-                )}
-                <p className="text-sm text-primary font-bold mt-2">
-                  직원 {plan.employees}까지
-                </p>
+                <p className="text-sm text-primary font-bold mt-2">직원 {plan.employees}까지</p>
               </div>
 
-              {/* Features */}
-              <ul className="space-y-3 mb-8 flex-1">
-                {plan.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-sm text-text-sub">
-                    <span className="material-symbols-outlined text-primary text-[18px] mt-0.5">
-                      check_circle
-                    </span>
-                    <span>{feature}</span>
+              <ul className="space-y-2.5 mb-6 flex-1">
+                {plan.features.map((f, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-text-sub">
+                    <span className="material-symbols-outlined text-primary text-[18px] mt-0.5">check_circle</span>
+                    {f}
+                  </li>
+                ))}
+                {plan.excluded?.map((f, i) => (
+                  <li key={`ex-${i}`} className="flex items-start gap-2 text-sm text-gray-400 line-through">
+                    <span className="material-symbols-outlined text-gray-300 text-[18px] mt-0.5">cancel</span>
+                    {f}
                   </li>
                 ))}
               </ul>
 
-              {/* CTA Button */}
-              {plan.disabled ? (
-                <button
-                  disabled
-                  className="w-full h-11 rounded-xl bg-gray-100 text-gray-500 font-bold cursor-not-allowed"
-                >
-                  {plan.cta}
-                </button>
-              ) : plan.planId ? (
+              {plan.planId ? (
                 <button
                   onClick={() => handlePayment(plan)}
                   disabled={loadingPlan === plan.name}
-                  className={`w-full h-11 rounded-xl font-bold transition-colors flex items-center justify-center ${
+                  className={`w-full h-11 rounded-xl font-bold transition-colors ${
                     plan.popular
                       ? 'bg-primary text-white hover:bg-primary-600 disabled:bg-primary/50'
                       : 'bg-gray-100 text-text-main hover:bg-gray-200 disabled:bg-gray-50'
                   }`}
                 >
-                  {loadingPlan === plan.name ? (
-                    <span className="flex items-center gap-2">
-                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      처리 중...
-                    </span>
-                  ) : (
-                    plan.cta
-                  )}
+                  {loadingPlan === plan.name ? '처리 중...' : plan.cta}
                 </button>
               ) : (
                 <Link
@@ -303,19 +224,10 @@ export default function PricingSection() {
           ))}
         </div>
 
-        {/* Footer Note */}
-        <div className="text-center text-sm text-text-sub mt-8 space-y-2">
-          <p>
-            <span className="text-amber-600 font-medium">※ 결제 시 입력한 이메일로 리포트가 발송됩니다.</span>{' '}
-            이메일 주소 오입력으로 인한 미수신은 환불 대상이 아닙니다.
-          </p>
-          <p>
-            리포트 생성 오류 발생 시 자동 전액 환불됩니다.{' '}
-            <Link to="/terms" className="text-primary hover:underline">
-              환불 정책 보기
-            </Link>
-          </p>
-        </div>
+        {/* 보답 기대: 무료 체험 안내 */}
+        <p className="text-center text-sm text-text-sub mt-8">
+          모든 유료 플랜은 <strong>3일 무료 체험</strong> 후 결제됩니다. 체험 기간 중 언제든 취소 가능.
+        </p>
       </div>
     </section>
   );
