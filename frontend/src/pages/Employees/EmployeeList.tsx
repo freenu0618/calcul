@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { employeeApi } from '../../api/employeeApi';
 import type { EmployeeResponse } from '../../types/employee';
+import { exportEmployeeListXlsx } from '../../utils/excelExport';
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState<EmployeeResponse[]>([]);
@@ -74,13 +75,24 @@ export default function EmployeeList() {
             <h1 className="text-2xl font-bold text-text-main">직원 관리</h1>
             <p className="text-text-sub mt-1">등록된 직원: {employees.length}명</p>
           </div>
-          <Link
-            to="/employees/new"
-            className="px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-600 transition-colors flex items-center gap-2"
-          >
-            <span className="material-symbols-outlined">person_add</span>
-            직원 등록
-          </Link>
+          <div className="flex gap-2">
+            {employees.length > 0 && (
+              <button
+                onClick={() => exportEmployeeListXlsx(employees)}
+                className="px-4 py-3 border border-gray-200 text-text-main rounded-xl font-bold hover:bg-gray-50 transition-colors flex items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-lg">download</span>
+                Excel
+              </button>
+            )}
+            <Link
+              to="/employees/new"
+              className="px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-600 transition-colors flex items-center gap-2"
+            >
+              <span className="material-symbols-outlined">person_add</span>
+              직원 등록
+            </Link>
+          </div>
         </div>
 
         {/* 검색 */}

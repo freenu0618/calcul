@@ -42,8 +42,8 @@ export default function PainPointsSection() {
 
         {/* 전환 문구 */}
         <p className="text-center text-text-sub">
-          <strong className="text-text-main">10인 이하 사업장의 78%</strong>가
-          급여 계산에 어려움을 겪고 있습니다.
+          노무사 없이 급여를 직접 관리하는 <strong className="text-text-main">소규모 사업장</strong>이라면,
+          정확한 계산기가 필요합니다.
         </p>
       </div>
     </section>

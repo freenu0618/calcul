@@ -7,6 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { payrollApi } from '../../api/payrollApi';
 import type { PayrollPeriodResponse } from '../../types/payroll';
 import { formatNumber } from '../../utils/formatters';
+import { exportPayrollSummaryXlsx } from '../../utils/excelExport';
 
 const STATUS_LABELS: Record<string, { text: string; className: string }> = {
   DRAFT: { text: '작성중', className: 'bg-gray-100 text-gray-700' },
@@ -68,13 +69,24 @@ export default function PayrollList() {
           <h1 className="text-2xl font-bold text-gray-900">급여대장</h1>
           <p className="text-gray-600 mt-1">월별 급여 내역을 관리합니다</p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
-        >
-          <span className="material-symbols-outlined">add</span>
-          새 급여 기간
-        </button>
+        <div className="flex gap-2">
+          {periods.length > 0 && (
+            <button
+              onClick={() => exportPayrollSummaryXlsx(periods)}
+              className="flex items-center gap-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <span className="material-symbols-outlined text-lg">download</span>
+              Excel
+            </button>
+          )}
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+          >
+            <span className="material-symbols-outlined">add</span>
+            새 급여 기간
+          </button>
+        </div>
       </div>
 
       {error && (

@@ -38,8 +38,8 @@ function useCountUp(target: number, duration = 1500) {
 }
 
 const stats = [
-  { target: 2847, suffix: '건', label: '이번 달 급여 계산' },
-  { target: 181, suffix: '개', label: '테스트 케이스 통과' },
+  { target: 2026, suffix: '년', label: '최신 법령 반영' },
+  { target: 20, suffix: '개', label: '검증 테스트 통과' },
   { target: 8, suffix: '개', label: '법률 · 규정 반영' },
 ];
 

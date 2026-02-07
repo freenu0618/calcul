@@ -62,12 +62,20 @@ export function usePayrollSave({
       setTimeout(() => onSaveStatusChange('idle'), 3000);
     } catch (err: unknown) {
       onSaveStatusChange('error');
-      const msg = err instanceof Error ? err.message : '';
+      // axios 에러에서 백엔드 응답 메시지 추출
+      let msg = '';
+      if (err && typeof err === 'object' && 'response' in err) {
+        const resp = (err as { response?: { data?: { error?: { message?: string } } } }).response;
+        msg = resp?.data?.error?.message || '';
+      }
+      if (!msg && err instanceof Error) msg = err.message;
 
       if (msg.includes('이미') || msg.includes('존재')) {
-        onSaveError('이미 해당 직원의 급여가 등록되어 있습니다.');
+        onSaveError('이미 해당 직원의 급여가 등록되어 있습니다. 기존 엔트리를 삭제 후 다시 시도하세요.');
       } else if (msg.includes('확정')) {
         onSaveError('확정된 급여 기간은 수정할 수 없습니다.');
+      } else if (msg.includes('찾을 수 없')) {
+        onSaveError(msg);
       } else {
         onSaveError(msg || '저장에 실패했습니다.');
       }

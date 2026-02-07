@@ -6,9 +6,9 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 const valueProps = [
-  { icon: 'schedule', text: '매달 2시간 급여 업무 시간 절약' },
-  { icon: 'savings', text: '노무사 비용 월 30만원 절약' },
-  { icon: 'shield', text: '계산 실수로 인한 과태료 위험 제거' },
+  { icon: 'schedule', text: '급여 계산 시간 대폭 단축' },
+  { icon: 'calculate', text: '4대보험·소득세 자동 계산' },
+  { icon: 'shield', text: '법령 기반 정확한 계산으로 실수 방지' },
 ];
 
 export default function ConversionCTASection() {

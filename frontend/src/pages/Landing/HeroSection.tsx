@@ -29,12 +29,12 @@ export default function HeroSection() {
             <span className="text-primary">정확히 알고 계신가요?</span>
           </h1>
 
-          {/* 손실 회피: 구체적 손실 금액 */}
+          {/* 문제 제기: 정확한 계산의 중요성 */}
           <p className="text-lg text-text-sub leading-relaxed mb-2 max-w-2xl mx-auto">
-            급여 계산 실수 1건 = 평균 <strong className="text-text-main">23만원</strong> 과지급 또는 미지급
+            4대보험·소득세·주휴수당, <strong className="text-text-main">수작업 계산은 실수가 잦습니다</strong>
           </p>
           <p className="text-base text-text-sub mb-6">
-            4대보험 착오 신고 시 <strong className="text-red-600">최대 300만원</strong> 과태료 위험
+            잘못된 신고는 <strong className="text-red-600">과태료 부과</strong> 사유가 될 수 있습니다
           </p>
 
           {/* 프레이밍: 시간 프레임 */}

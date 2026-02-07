@@ -10,6 +10,7 @@ import type { PayrollLedgerResponse, PayrollEntryResponse, PayrollStatus } from 
 import type { EmployeeResponse } from '../../types/employee';
 import type { WorkShiftRequest } from '../../types/salary';
 import { formatNumber } from '../../utils/formatters';
+import { exportPayrollDetailXlsx } from '../../utils/excelExport';
 import MonthlyTemplate from '../../components/ShiftInput/MonthlyTemplate';
 
 const STATUS_LABELS: Record<string, { text: string; className: string; icon: string }> = {
@@ -211,8 +212,17 @@ export default function PayrollDetail() {
           </div>
         </div>
 
-        {/* 상태 변경 버튼 */}
+        {/* 상태 변경 + 내보내기 버튼 */}
         <div className="flex gap-2">
+          {entries.length > 0 && (
+            <button
+              onClick={() => exportPayrollDetailXlsx(period, entries)}
+              className="flex items-center gap-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            >
+              <span className="material-symbols-outlined text-lg">download</span>
+              Excel
+            </button>
+          )}
           {isDraft && entries.length > 0 && (
             <button
               onClick={() => handleStatusChange('CONFIRMED')}
