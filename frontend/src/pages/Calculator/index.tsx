@@ -210,11 +210,12 @@ export default function CalculatorPage() {
   return (
     <>
       <Helmet>
-        <title>급여 계산기 | paytools - 4대보험, 소득세 자동 계산</title>
-        <meta
-          name="description"
-          content="기본급, 수당, 4대보험, 소득세를 자동 계산. 2026년 최신 세율 적용."
-        />
+        <title>급여 계산기 | PayTools - 4대보험, 소득세 자동 계산</title>
+        <meta name="description" content="기본급, 수당, 4대보험, 소득세를 자동 계산. 2026년 최신 세율 적용." />
+        <link rel="canonical" href="https://paytools.work/calculator" />
+        <meta property="og:title" content="급여 계산기 - 4대보험, 소득세 자동 계산" />
+        <meta property="og:description" content="기본급, 수당, 4대보험, 소득세를 자동 계산. 2026년 최신 세율 적용." />
+        <meta property="og:url" content="https://paytools.work/calculator" />
       </Helmet>
 
       <TutorialOverlay />

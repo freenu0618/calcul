@@ -4,9 +4,16 @@
 
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
+import PageHelmet from '../components/common/PageHelmet';
 
 const Contact = () => {
   return (
+    <>
+    <PageHelmet
+      title="연락처 - 문의하기"
+      description="PayTools 급여 계산기에 대한 문의사항, 버그 리포트, 개선 제안은 이메일로 연락해 주세요."
+      path="/contact"
+    />
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">연락처</h1>
@@ -73,6 +80,7 @@ const Contact = () => {
         </div>
       </div>
     </MainLayout>
+    </>
   );
 };
 

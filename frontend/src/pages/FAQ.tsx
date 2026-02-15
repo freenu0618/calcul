@@ -227,8 +227,12 @@ const FAQ = () => {
   return (
     <>
       <Helmet>
-        <title>자주 묻는 질문 (FAQ) | 급여 계산기</title>
+        <title>자주 묻는 질문 (FAQ) | PayTools 급여 계산기</title>
         <meta name="description" content="급여 계산, 4대 보험, 소득세, 연장수당, 최저임금, 법적 권리에 대한 30개의 자주 묻는 질문과 답변을 확인하세요." />
+        <link rel="canonical" href="https://paytools.work/faq" />
+        <meta property="og:title" content="자주 묻는 질문 (FAQ) - 급여 계산기" />
+        <meta property="og:description" content="급여 계산, 4대 보험, 소득세, 연장수당, 최저임금에 대한 30개의 FAQ." />
+        <meta property="og:url" content="https://paytools.work/faq" />
         <script type="application/ld+json">
           {JSON.stringify(faqSchemaData)}
         </script>

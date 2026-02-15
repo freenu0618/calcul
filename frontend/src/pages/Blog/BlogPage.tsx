@@ -5,6 +5,7 @@
 import { Link } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
+import PageHelmet from '../../components/common/PageHelmet';
 import { blogPostPreviews } from '../../data/blogPosts';
 
 const BlogPage = () => {
@@ -12,6 +13,12 @@ const BlogPage = () => {
   const categories = Array.from(new Set(posts.map(post => post.category)));
 
   return (
+    <>
+    <PageHelmet
+      title="급여 계산 블로그 - 근로법·세법 최신 소식"
+      description="급여 계산, 4대보험, 소득세, 연장수당, 최저임금 등 근로 관련 최신 소식과 실무 가이드를 제공합니다."
+      path="/blog"
+    />
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
@@ -82,6 +89,7 @@ const BlogPage = () => {
         </div>
       </div>
     </MainLayout>
+    </>
   );
 };
 

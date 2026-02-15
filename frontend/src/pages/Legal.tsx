@@ -5,9 +5,16 @@
 import { Link } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
+import PageHelmet from '../components/common/PageHelmet';
 
 const Legal = () => {
   return (
+    <>
+    <PageHelmet
+      title="근로기준법 핵심 조항 - 법률 정보"
+      description="급여 계산에 필요한 근로기준법, 최저임금법, 소득세법의 핵심 조항을 쉽게 정리했습니다."
+      path="/legal"
+    />
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">근로기준법 핵심 조항</h1>
@@ -146,6 +153,7 @@ const Legal = () => {
         </div>
       </div>
     </MainLayout>
+    </>
   );
 };
 

@@ -4,9 +4,16 @@
 
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
+import PageHelmet from '../components/common/PageHelmet';
 
 const Privacy = () => {
   return (
+    <>
+    <PageHelmet
+      title="개인정보처리방침"
+      description="PayTools 급여 계산기의 개인정보처리방침입니다. 개인정보 수집, 쿠키 사용, 데이터 보관 정책을 안내합니다."
+      path="/privacy"
+    />
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">개인정보처리방침</h1>
@@ -77,6 +84,7 @@ const Privacy = () => {
         </Card>
       </div>
     </MainLayout>
+    </>
   );
 };
 

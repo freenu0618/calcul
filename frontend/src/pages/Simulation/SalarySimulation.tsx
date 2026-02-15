@@ -38,7 +38,12 @@ export default function SalarySimulation() {
   return (
     <>
       <Helmet>
-        <title>급여 구조 시뮬레이션 | Paytools</title>
+        <title>급여 구조 시뮬레이션 | PayTools</title>
+        <meta name="description" content="같은 총 급여액에서 기본급과 수당 배분에 따른 인건비 차이를 비교 시뮬레이션합니다." />
+        <link rel="canonical" href="https://paytools.work/simulation" />
+        <meta property="og:title" content="급여 구조 시뮬레이션" />
+        <meta property="og:description" content="기본급·수당 배분에 따른 인건비 차이 비교 시뮬레이션." />
+        <meta property="og:url" content="https://paytools.work/simulation" />
       </Helmet>
       <MainLayout>
         <div className="max-w-6xl mx-auto px-4 py-8">

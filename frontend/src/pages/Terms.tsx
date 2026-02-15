@@ -4,9 +4,16 @@
 
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
+import PageHelmet from '../components/common/PageHelmet';
 
 const Terms = () => {
   return (
+    <>
+    <PageHelmet
+      title="이용약관"
+      description="PayTools 급여 계산기 이용약관입니다. 서비스 이용, 면책 조항, 저작권 등의 권리와 의무를 안내합니다."
+      path="/terms"
+    />
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">이용약관</h1>
@@ -90,6 +97,7 @@ const Terms = () => {
         </Card>
       </div>
     </MainLayout>
+    </>
   );
 };
 

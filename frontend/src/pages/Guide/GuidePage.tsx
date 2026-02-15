@@ -5,6 +5,7 @@
 import { Link } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
+import PageHelmet from '../../components/common/PageHelmet';
 import { InsuranceIcon, TaxIcon, OvertimeIcon, GuideIcon } from '../../components/illustrations';
 
 const GuidePage = () => {
@@ -30,6 +31,12 @@ const GuidePage = () => {
   ];
 
   return (
+    <>
+    <PageHelmet
+      title="급여 계산 완전 가이드 - 4대보험·소득세·수당"
+      description="한국 근로기준법과 세법에 따른 급여 계산의 모든 것. 4대보험, 소득세, 연장·야간·휴일 수당 계산법을 상세히 안내합니다."
+      path="/guide"
+    />
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <div className="mb-8 flex items-center gap-4">
@@ -180,6 +187,7 @@ const GuidePage = () => {
         </div>
       </div>
     </MainLayout>
+    </>
   );
 };
 

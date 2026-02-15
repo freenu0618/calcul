@@ -5,6 +5,7 @@
 import { Link } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
+import PageHelmet from '../../components/common/PageHelmet';
 
 const ExamplesPage = () => {
   const examples = [
@@ -35,6 +36,12 @@ const ExamplesPage = () => {
   ];
 
   return (
+    <>
+    <PageHelmet
+      title="급여 계산 사례 - 풀타임·파트타임·교대근무"
+      description="다양한 근무 형태별 실제 급여 계산 사례. 풀타임, 파트타임, 교대근무의 4대보험, 소득세, 실수령액 계산 과정을 확인하세요."
+      path="/examples"
+    />
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
@@ -104,6 +111,7 @@ const ExamplesPage = () => {
         </div>
       </div>
     </MainLayout>
+    </>
   );
 };
 

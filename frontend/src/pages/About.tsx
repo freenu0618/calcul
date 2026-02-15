@@ -5,9 +5,16 @@
 import { Link } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
+import PageHelmet from '../components/common/PageHelmet';
 
 const About = () => {
   return (
+    <>
+    <PageHelmet
+      title="서비스 소개 - 급여 계산 자동화"
+      description="PayTools는 한국 근로기준법에 따른 정확한 실수령액 계산 서비스입니다. 4대보험, 소득세, 가산수당을 자동 계산합니다."
+      path="/about"
+    />
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">서비스 소개</h1>
@@ -123,6 +130,7 @@ const About = () => {
         </div>
       </div>
     </MainLayout>
+    </>
   );
 };
 
