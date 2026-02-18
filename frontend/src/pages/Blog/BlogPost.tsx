@@ -50,6 +50,7 @@ const BlogPost = () => {
         <title>{post.title} | 급여계산기</title>
         <meta name="description" content={post.excerpt} />
         <meta name="keywords" content={post.keywords.join(', ')} />
+        <link rel="canonical" href={`https://paytools.work/blog/${post.id}`} />
 
         {/* Open Graph */}
         <meta property="og:title" content={post.title} />

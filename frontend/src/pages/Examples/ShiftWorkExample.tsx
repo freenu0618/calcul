@@ -33,6 +33,10 @@ const ShiftWorkExample = () => {
         <title>교대근무 근로자 급여 계산 사례 (3교대) | 급여계산기</title>
         <meta name="description" content="야간근무를 포함한 3교대 근로자의 연장·야간·휴일 수당 계산 사례. 복합 가산수당 계산 방법을 확인하세요." />
         <meta name="keywords" content="교대근무 급여, 야간수당, 휴일근로, 3교대, 가산수당 계산" />
+        <link rel="canonical" href="https://paytools.work/examples/shift-work" />
+        <meta property="og:title" content="교대근무 근로자 급여 계산 사례" />
+        <meta property="og:description" content="야간근무를 포함한 3교대 근로자의 연장·야간·휴일 수당 계산 사례." />
+        <meta property="og:url" content="https://paytools.work/examples/shift-work" />
       </Helmet>
 
       <div className="max-w-4xl mx-auto">

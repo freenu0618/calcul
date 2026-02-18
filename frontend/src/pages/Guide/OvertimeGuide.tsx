@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
+import PageHelmet from '../../components/common/PageHelmet';
 
 // GA 타입 선언
 declare global {
@@ -27,6 +28,12 @@ const OvertimeGuide = () => {
   }, []);
 
   return (
+    <>
+    <PageHelmet
+      title="연장·야간·휴일 수당 계산법 | 가산수당 가이드"
+      description="근로기준법에 따른 연장·야간·휴일 수당 계산 방법. 통상시급 산정, 가산율 적용, 중복 가산 등을 상세히 안내합니다."
+      path="/guide/overtime"
+    />
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
@@ -322,6 +329,7 @@ const OvertimeGuide = () => {
         </div>
       </div>
     </MainLayout>
+    </>
   );
 };
 

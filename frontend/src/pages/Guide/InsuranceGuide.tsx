@@ -32,6 +32,10 @@ const InsuranceGuide = () => {
       <Helmet>
         <title>4대 보험 이해하기 | 2026년 요율 및 계산 방법 | 급여 계산기</title>
         <meta name="description" content="국민연금, 건강보험, 장기요양보험, 고용보험의 2026년 요율과 계산 방법을 상세히 안내합니다. 상·하한 기준소득월액, 공제 계산 예시 포함." />
+        <link rel="canonical" href="https://paytools.work/guide/insurance" />
+        <meta property="og:title" content="4대 보험 이해하기 | 2026년 요율 및 계산 방법" />
+        <meta property="og:description" content="국민연금, 건강보험, 장기요양보험, 고용보험의 2026년 요율과 계산 방법을 상세히 안내합니다." />
+        <meta property="og:url" content="https://paytools.work/guide/insurance" />
       </Helmet>
 
       <MainLayout>

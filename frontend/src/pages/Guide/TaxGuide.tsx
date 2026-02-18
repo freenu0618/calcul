@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
+import PageHelmet from '../../components/common/PageHelmet';
 
 // GA 타입 선언
 declare global {
@@ -27,6 +28,12 @@ const TaxGuide = () => {
   }, []);
 
   return (
+    <>
+    <PageHelmet
+      title="소득세 계산법 | 간이세액표 활용 가이드"
+      description="근로소득세 간이세액표와 부양가족 공제를 활용한 소득세 계산 방법. 2026년 세율, 원천징수 방법을 상세히 안내합니다."
+      path="/guide/tax"
+    />
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
@@ -261,6 +268,7 @@ const TaxGuide = () => {
         </div>
       </div>
     </MainLayout>
+    </>
   );
 };
 

@@ -54,7 +54,11 @@ function ReverseCalculator() {
     <>
       <Helmet>
         <title>실수령액 역산 계산기 | 월급 역산</title>
-        <meta name="description" content="원하는 실수령액을 입력하면 필요한 기본급을 역산합니다." />
+        <meta name="description" content="원하는 실수령액을 입력하면 필요한 기본급을 역산합니다. 4대보험, 소득세를 고려한 정확한 역산 계산." />
+        <link rel="canonical" href="https://paytools.work/reverse-calculator" />
+        <meta property="og:title" content="실수령액 역산 계산기" />
+        <meta property="og:description" content="원하는 실수령액을 입력하면 필요한 기본급을 역산합니다." />
+        <meta property="og:url" content="https://paytools.work/reverse-calculator" />
       </Helmet>
       <MainLayout>
         <div className="max-w-2xl mx-auto">

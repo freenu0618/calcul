@@ -72,9 +72,9 @@ const About = () => {
           <div className="prose max-w-none">
             <h4 className="font-semibold text-gray-900 mb-3">백엔드</h4>
             <ul className="list-disc list-inside space-y-2 text-gray-700 mb-4">
-              <li><strong>Python:</strong> 도메인 주도 설계(DDD) 적용</li>
-              <li><strong>FastAPI:</strong> 고성능 REST API</li>
-              <li><strong>Decimal:</strong> 정확한 금액 계산</li>
+              <li><strong>Kotlin + Spring Boot:</strong> 도메인 주도 설계(DDD) 적용</li>
+              <li><strong>JPA + PostgreSQL:</strong> 안정적인 데이터 관리</li>
+              <li><strong>BigDecimal:</strong> 정확한 금액 계산</li>
             </ul>
             <h4 className="font-semibold text-gray-900 mb-3">프론트엔드</h4>
             <ul className="list-disc list-inside space-y-2 text-gray-700">
