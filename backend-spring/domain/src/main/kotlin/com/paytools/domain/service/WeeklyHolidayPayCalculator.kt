@@ -42,8 +42,14 @@ class WeeklyHolidayPayCalculator {
     fun calculate(
         workShifts: List<WorkShift>,
         hourlyWage: Money,
-        scheduledWorkDays: Int = 5
+        scheduledWorkDays: Int = 5,
+        contractWeeklyHours: Int = 0
     ): WeeklyHolidayPayResult {
+        // 시프트 없음 + 계약시간 있음 → 계약 기반 전일 출근 계산
+        if (workShifts.isEmpty() && contractWeeklyHours > 0) {
+            return calculateFromContract(hourlyWage, scheduledWorkDays, contractWeeklyHours)
+        }
+
         // 1. 주별 평균 근로시간 계산
         val avgWeeklyHours = calculateAverageWeeklyHours(workShifts)
         val weeklyHoursDecimal = avgWeeklyHours.toDecimalHours()
@@ -107,6 +113,42 @@ class WeeklyHolidayPayCalculator {
             hourlyWage = hourlyWage,
             isProportional = isProportional,
             calculation = calculation
+        )
+    }
+
+    /**
+     * 계약 소정근로시간 기반 주휴수당 계산 (시프트 미입력 시)
+     * 전일 출근 가정: 4.345주 전체 개근
+     */
+    private fun calculateFromContract(
+        hourlyWage: Money,
+        scheduledWorkDays: Int,
+        contractWeeklyHours: Int
+    ): WeeklyHolidayPayResult {
+        val weeklyHoursDecimal = BigDecimal(contractWeeklyHours)
+        if (weeklyHoursDecimal < MINIMUM_WEEKLY_HOURS) {
+            return WeeklyHolidayPayResult(
+                weeklyHolidayPay = Money.ZERO,
+                weeklyHours = WorkingHours.fromMinutes(contractWeeklyHours * 60),
+                dailyAvgHours = weeklyHoursDecimal.divide(BigDecimal(scheduledWorkDays), 10, java.math.RoundingMode.HALF_UP),
+                hourlyWage = hourlyWage,
+                isProportional = contractWeeklyHours < 40,
+                calculation = "주 ${contractWeeklyHours}시간 미만 15시간 - 주휴수당 없음"
+            )
+        }
+        val dailyHours = weeklyHoursDecimal.divide(BigDecimal(scheduledWorkDays), 10, java.math.RoundingMode.HALF_UP)
+        val weeklyHolidayHours = dailyHours.min(HOLIDAY_HOURS)
+        val monthlyPay = (hourlyWage * weeklyHolidayHours * WEEKS_PER_MONTH).roundToWon()
+        val calc = "min(${dailyHours.setScale(1, java.math.RoundingMode.HALF_UP)}h, 8h) = " +
+            "${weeklyHolidayHours.setScale(1, java.math.RoundingMode.HALF_UP)}h × " +
+            "${hourlyWage.amount.toInt()}원 × ${WEEKS_PER_MONTH}주 (계약기준)"
+        return WeeklyHolidayPayResult(
+            weeklyHolidayPay = monthlyPay,
+            weeklyHours = WorkingHours.fromMinutes(contractWeeklyHours * 60),
+            dailyAvgHours = dailyHours,
+            hourlyWage = hourlyWage,
+            isProportional = dailyHours < HOLIDAY_HOURS,
+            calculation = calc
         )
     }
 

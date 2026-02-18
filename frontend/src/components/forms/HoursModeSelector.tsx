@@ -72,6 +72,11 @@ export default function HoursModeSelector({
           </span>
         )}
       </p>
+      {calcMode === 'included' && (
+        <p className="text-xs text-amber-600 mt-1">
+          209시간: 기본급에 주휴수당이 포함된 것으로 간주하여 주휴수당을 별도 계산하지 않습니다.
+        </p>
+      )}
     </div>
   );
 }

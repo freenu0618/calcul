@@ -125,12 +125,24 @@ class SalaryCalculator {
             baseCalcResult.hourlyWage, employee, baseCalcResult.overtimeForHourly
         )
 
-        // 3. 주휴수당
-        val weeklyHolidayResult = weeklyHolidayCalculator.calculate(
-            workShifts = workShifts,
-            hourlyWage = baseCalcResult.hourlyWage,
-            scheduledWorkDays = employee.scheduledWorkDays
-        )
+        // 3. 주휴수당 (209모드: 기본급에 포함이므로 별도 계산 안 함)
+        val weeklyHolidayResult = if (hoursMode == "209" && normalizedType == WageType.MONTHLY_FIXED) {
+            WeeklyHolidayPayResult(
+                weeklyHolidayPay = Money.ZERO,
+                weeklyHours = WorkingHours.fromMinutes(employee.weeklyContractHours * 60),
+                dailyAvgHours = java.math.BigDecimal(employee.dailyWorkHours),
+                hourlyWage = baseCalcResult.hourlyWage,
+                isProportional = false,
+                calculation = "209시간 모드: 주휴수당이 기본급에 포함됨"
+            )
+        } else {
+            weeklyHolidayCalculator.calculate(
+                workShifts = workShifts,
+                hourlyWage = baseCalcResult.hourlyWage,
+                scheduledWorkDays = employee.scheduledWorkDays,
+                contractWeeklyHours = employee.weeklyContractHours
+            )
+        }
 
         // 4. HOURLY_BASED_MONTHLY: MAX(계약월급, 실제계산) 판정
         val hourlyBasedResult = resolveHourlyBasedMonthly(

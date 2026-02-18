@@ -57,6 +57,9 @@ class AbsenceCalculator {
         )
 
         private val WEEKDAY_MAP = mapOf(
+            1 to (0..0),  // 월
+            2 to (0..1),  // 월~화
+            3 to (0..2),  // 월~수
             4 to (0..3),  // 월~목
             5 to (0..4),  // 월~금
             6 to (0..5),  // 월~토

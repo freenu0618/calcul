@@ -179,9 +179,21 @@ export default function CalculatorPage() {
             )}
           </div>
         );
-      case 2:
+      case 2: {
+        const isMonthlyFixed = state.input.wageType === 'MONTHLY_FIXED' || state.input.wageType === 'MONTHLY';
         return (
           <div className="space-y-4">
+            {isMonthlyFixed && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm font-medium text-blue-800 mb-1">
+                  월급제 안내
+                </p>
+                <p className="text-xs text-blue-700">
+                  시프트를 입력하지 않으면 <strong>정상 출근(전일 개근)</strong>으로 계산됩니다.
+                  연장/야간/휴일근로가 있는 경우에만 해당 시프트를 입력하세요.
+                </p>
+              </div>
+            )}
             <PayPeriodSelector
               periodStart={state.input.periodStart}
               periodEnd={state.input.periodEnd}
@@ -199,6 +211,7 @@ export default function CalculatorPage() {
             />
           </div>
         );
+      }
       default:
         return null;
     }
