@@ -177,6 +177,9 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
           value={employee.scheduled_work_days}
           onChange={(e) => handleChange('scheduled_work_days', parseInt(e.target.value))}
         >
+          <option value={1}>주 1일</option>
+          <option value={2}>주 2일</option>
+          <option value={3}>주 3일</option>
           <option value={4}>주 4일</option>
           <option value={5}>주 5일</option>
           <option value={6}>주 6일</option>
@@ -204,7 +207,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
           value={employee.daily_work_hours}
           onChange={(e) => handleChange('daily_work_hours', parseInt(e.target.value))}
         >
-          {[4, 5, 6, 7, 8, 9, 10, 11, 12].map((h) => (
+          {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((h) => (
             <option key={h} value={h}>{h}시간</option>
           ))}
         </select>

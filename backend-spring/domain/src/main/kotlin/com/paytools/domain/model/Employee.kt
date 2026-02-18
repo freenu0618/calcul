@@ -31,8 +31,12 @@ data class Employee(
     val employmentType: EmploymentType,
     val companySize: CompanySize,
     val scheduledWorkDays: Int = 5,
+    val dailyWorkHours: Int = 8,
     val id: UUID = UUID.randomUUID()
 ) {
+    /** 주 소정근로시간 = 주 소정근로일 × 1일 소정근로시간 */
+    val weeklyContractHours: Int get() = scheduledWorkDays * dailyWorkHours
+
     init {
         require(dependentsCount >= 0) { "Dependents count cannot be negative: $dependentsCount" }
         require(childrenUnder20 >= 0) { "Children under 20 cannot be negative: $childrenUnder20" }
@@ -40,6 +44,7 @@ data class Employee(
             "Children under 20 ($childrenUnder20) cannot exceed dependents count ($dependentsCount)"
         }
         require(scheduledWorkDays in 1..7) { "Scheduled work days must be between 1 and 7: $scheduledWorkDays" }
+        require(dailyWorkHours in 1..24) { "Daily work hours must be between 1 and 24: $dailyWorkHours" }
     }
 
     fun isFullTime(): Boolean = employmentType == EmploymentType.FULL_TIME

@@ -46,7 +46,8 @@ class OvertimeCalculator {
         workShifts: List<WorkShift>,
         hourlyWage: Money,
         companySize: CompanySize,
-        scheduledWorkDays: Int = 5
+        scheduledWorkDays: Int = 5,
+        dailyWorkHours: Int = DAILY_REGULAR_HOURS
     ): OvertimeResult {
         // 5인 미만 사업장: 연장/야간/휴일 수당 의무 없음 (근로기준법 미적용)
         if (companySize == CompanySize.UNDER_5) {
@@ -61,7 +62,7 @@ class OvertimeCalculator {
             )
         }
 
-        val (overtimeHours, overtimePay) = calculateOvertime(workShifts, hourlyWage, scheduledWorkDays)
+        val (overtimeHours, overtimePay) = calculateOvertime(workShifts, hourlyWage, scheduledWorkDays, dailyWorkHours)
         val (nightHours, nightPay) = calculateNightWork(workShifts, hourlyWage)
         val (holidayHours, holidayPay) = calculateHolidayWork(workShifts, hourlyWage, companySize)
 
@@ -79,12 +80,13 @@ class OvertimeCalculator {
     private fun calculateOvertime(
         workShifts: List<WorkShift>,
         hourlyWage: Money,
-        scheduledWorkDays: Int
+        scheduledWorkDays: Int,
+        dailyWorkHours: Int = DAILY_REGULAR_HOURS
     ): Pair<WorkingHours, Money> {
         val weeklyGroups = groupByWeek(workShifts)
         var totalOvertimeMinutes = 0
 
-        val scheduledWeeklyHours = scheduledWorkDays * DAILY_REGULAR_HOURS
+        val scheduledWeeklyHours = scheduledWorkDays * dailyWorkHours
         val weeklyLimitMinutes = minOf(scheduledWeeklyHours, WEEKLY_REGULAR_HOURS) * 60
 
         for (weekShifts in weeklyGroups) {
@@ -97,7 +99,7 @@ class OvertimeCalculator {
                 val shiftMinutes = shift.calculateWorkingHours().toMinutes()
 
                 if (i < scheduledWorkDays) {
-                    val dailyLimit = DAILY_REGULAR_HOURS * 60
+                    val dailyLimit = dailyWorkHours * 60
                     if (shiftMinutes > dailyLimit) {
                         scheduledMinutes += dailyLimit
                         excessMinutes += shiftMinutes - dailyLimit

@@ -55,7 +55,8 @@ class SalaryController(
             childrenUnder20 = request.employee.childrenUnder20,
             employmentType = request.employee.employmentType,
             companySize = request.employee.companySize,
-            scheduledWorkDays = request.employee.scheduledWorkDays
+            scheduledWorkDays = request.employee.scheduledWorkDays,
+            dailyWorkHours = request.employee.dailyWorkHours
         )
 
         val allowances = request.allowances.map { allowanceReq ->

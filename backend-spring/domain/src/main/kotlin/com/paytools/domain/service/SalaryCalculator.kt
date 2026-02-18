@@ -221,7 +221,8 @@ class SalaryCalculator {
             // 시급 기반: 소정근로시간 × 시급 (연장시간 제외)
             val hw = Money.of(hourlyWageInput)
             val overtimeForHourly = overtimeCalculator.calculate(
-                workShifts, hw, employee.companySize, employee.scheduledWorkDays
+                workShifts, hw, employee.companySize, employee.scheduledWorkDays,
+                employee.dailyWorkHours
             )
 
             val shiftsForBasePay = if (isOver5) {
@@ -252,7 +253,8 @@ class SalaryCalculator {
         if (inclusiveWageOptions.enabled && isMonthlyFixed) {
             val fixedOvertimePay = inclusiveWageOptions.calculateMonthlyFixedOvertimePay()
             val actualResult = overtimeCalculator.calculate(
-                workShifts, hourlyWage, employee.companySize, employee.scheduledWorkDays
+                workShifts, hourlyWage, employee.companySize, employee.scheduledWorkDays,
+                employee.dailyWorkHours
             )
             val modifiedResult = OvertimeResult(
                 overtimePay = Money.ZERO,
@@ -269,7 +271,8 @@ class SalaryCalculator {
         }
 
         val result = overtimeForHourly ?: overtimeCalculator.calculate(
-            workShifts, hourlyWage, employee.companySize, employee.scheduledWorkDays
+            workShifts, hourlyWage, employee.companySize, employee.scheduledWorkDays,
+            employee.dailyWorkHours
         )
         return result to Money.ZERO
     }
