@@ -19,6 +19,7 @@ import HeroSection from './HeroSection';
 import TrustBarSection from './TrustBarSection';
 import PainPointsSection from './PainPointsSection';
 import SolutionSection from './SolutionSection';
+import HowItWorksSection from './HowItWorksSection';
 import LiveDemoSection from './LiveDemoSection';
 import SocialProofSection from './SocialProofSection';
 import PricingSection from './PricingSection';
@@ -52,6 +53,7 @@ export default function LandingPage() {
         <TrustBarSection />
         <PainPointsSection />
         <SolutionSection />
+        <HowItWorksSection />
         <LiveDemoSection />
         <SocialProofSection />
         <PricingSection />
