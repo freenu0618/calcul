@@ -7,7 +7,7 @@
  * - useCallback 의존성 11개 → 0개 (모두 useReducer actions로 통합)
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
@@ -26,6 +26,7 @@ import InclusiveWageOptions from '../../components/forms/InclusiveWageOptions';
 import MonthlyWageSimulation from '../../components/forms/MonthlyWageSimulation';
 import TutorialOverlay from '../../components/Onboarding/TutorialOverlay';
 import PayPeriodSelector from '../../components/forms/PayPeriodSelector';
+import UpgradeModal from '../../components/UpgradeModal';
 
 const WIZARD_STEPS: WizardStep[] = [
   { id: 'employee', title: '근로자 정보', description: '고용형태, 사업장' },
@@ -35,6 +36,7 @@ const WIZARD_STEPS: WizardStep[] = [
 
 export default function CalculatorPage() {
   const { isAuthenticated } = useAuth();
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   // ============================================
   // 1. 상태 관리 (useReducer 통합)
@@ -82,6 +84,11 @@ export default function CalculatorPage() {
     load();
     return () => { cancelled = true; };
   }, [isAuthenticated]); // actions 제거 — useCallback이므로 안정적
+
+  // 플랜 한도 에러 감지 → 업그레이드 모달 표시
+  useEffect(() => {
+    if (state.ui.error?.includes('플랜')) setShowUpgrade(true);
+  }, [state.ui.error]);
 
   // ============================================
   // 4. Wizard 설정
@@ -232,6 +239,7 @@ export default function CalculatorPage() {
       </Helmet>
 
       <TutorialOverlay />
+      <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} reason="salary_calc" />
 
       <MainLayout>
         <div className="max-w-4xl mx-auto">

@@ -2,10 +2,11 @@
  * 채팅창 컴포넌트 (모달/위젯 공용)
  */
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useChat } from '../../hooks/useChat';
 import type { ChatMessage } from '../../hooks/useChat';
 import ChatInput from './ChatInput';
+import UpgradeModal from '../UpgradeModal';
 
 interface ChatWindowProps {
   onClose?: () => void;
@@ -64,6 +65,12 @@ function formatBody(text: string) {
 export default function ChatWindow({ onClose, isModal = false }: ChatWindowProps) {
   const { messages, isLoading, error, sendMessage, stopGeneration, clearMessages } = useChat();
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [showUpgrade, setShowUpgrade] = useState(false);
+
+  // AI 상담 한도 에러 감지
+  useEffect(() => {
+    if (error?.includes('업그레이드') || error?.includes('횟수')) setShowUpgrade(true);
+  }, [error]);
 
   useEffect(() => {
     if (messagesContainerRef.current) {
@@ -82,6 +89,7 @@ export default function ChatWindow({ onClose, isModal = false }: ChatWindowProps
 
   return (
     <div className="flex flex-col h-full">
+      <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} reason="ai_chat" />
       {/* 헤더 */}
       <div className={`flex items-center justify-between px-5 ${isModal ? 'py-4' : 'py-3'} bg-gradient-to-r from-primary to-blue-600 text-white`}>
         <div className="flex items-center gap-3">

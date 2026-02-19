@@ -3,17 +3,22 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { employeeApi } from '../../api/employeeApi';
 import type { EmployeeResponse } from '../../types/employee';
 import { exportEmployeeListXlsx } from '../../utils/excelExport';
+import { useSubscription } from '../../hooks/useSubscription';
+import UpgradeModal from '../../components/UpgradeModal';
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState<EmployeeResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchName, setSearchName] = useState('');
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const { canAddEmployee } = useSubscription();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadEmployees();
@@ -67,6 +72,7 @@ export default function EmployeeList() {
       <Helmet>
         <title>직원 관리 - paytools</title>
       </Helmet>
+      <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} reason="employees" />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* 헤더 */}
@@ -85,13 +91,13 @@ export default function EmployeeList() {
                 Excel
               </button>
             )}
-            <Link
-              to="/employees/new"
+            <button
+              onClick={() => canAddEmployee() ? navigate('/employees/new') : setShowUpgrade(true)}
               className="px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-600 transition-colors flex items-center gap-2"
             >
               <span className="material-symbols-outlined">person_add</span>
               직원 등록
-            </Link>
+            </button>
           </div>
         </div>
 
