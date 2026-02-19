@@ -31,25 +31,25 @@ input[type="number"],
 input[type="date"],
 input[type="time"],
 select {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-primary/5 transition-all duration-200;
 }
 
 /* 버튼 기본 스타일 */
 button {
-  @apply px-4 py-2 rounded-md font-medium transition-colors;
+  @apply px-4 py-2 rounded-md font-medium transition-all duration-200;
 }
 
 .btn-primary {
-  @apply bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800;
+  @apply bg-gradient-to-r from-primary to-primary-600 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
 }
 
 .btn-secondary {
-  @apply bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400;
+  @apply bg-gray-100 text-gray-800 border border-gray-200 hover:border-primary/30 hover:bg-gray-50 active:bg-gray-200;
 }
 
 /* 카드 스타일 */
 .card {
-  @apply bg-white rounded-lg shadow-md p-6;
+  @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
 }
 
 /* 폼 레이블 */

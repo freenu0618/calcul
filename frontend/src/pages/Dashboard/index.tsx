@@ -9,6 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useChat } from '../../contexts/ChatContext';
 import { useSubscription } from '../../hooks/useSubscription';
 import RecentPayroll from './RecentPayroll';
+import PayrollTrendChart from './PayrollTrendChart';
 
 // 아이콘 컴포넌트
 const icons = {
@@ -106,9 +107,9 @@ export default function DashboardPage() {
                   <Link
                     key={action.title}
                     to={action.href}
-                    className="group bg-white p-6 rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all"
+                    className="group bg-white p-6 rounded-xl border border-gray-200 hover:border-primary/30 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
                   >
-                    <div className={`w-12 h-12 ${colorClasses[action.color]} rounded-lg flex items-center justify-center mb-4`}>
+                    <div className={`w-12 h-12 ${colorClasses[action.color]} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200`}>
                       {action.icon}
                     </div>
                     <h3 className="font-semibold text-gray-900 mb-1">{action.title}</h3>
@@ -118,9 +119,9 @@ export default function DashboardPage() {
                   <button
                     key={action.title}
                     onClick={action.onClick}
-                    className="group bg-white p-6 rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all text-left"
+                    className="group bg-white p-6 rounded-xl border border-gray-200 hover:border-primary/30 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 text-left"
                   >
-                    <div className={`w-12 h-12 ${colorClasses[action.color]} rounded-lg flex items-center justify-center mb-4`}>
+                    <div className={`w-12 h-12 ${colorClasses[action.color]} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200`}>
                       {action.icon}
                     </div>
                     <h3 className="font-semibold text-gray-900 mb-1">{action.title}</h3>
@@ -129,6 +130,13 @@ export default function DashboardPage() {
                 )
               )}
             </div>
+          </div>
+
+          {/* 인건비 추이 */}
+          <div className="mb-8 bg-white rounded-xl border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">인건비 추이</h2>
+            <p className="text-xs text-gray-400 mb-2">월별 총지급액 · 실수령액 변동</p>
+            <PayrollTrendChart />
           </div>
 
           {/* 최근 활동 */}

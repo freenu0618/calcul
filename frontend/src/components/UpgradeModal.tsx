@@ -67,8 +67,8 @@ export default function UpgradeModal({ isOpen, onClose, reason }: UpgradeModalPr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 animate-slide-in">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={onClose} />
+      <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 animate-slide-in border border-white/50">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
           <span className="material-symbols-outlined">close</span>
         </button>
@@ -124,7 +124,7 @@ export default function UpgradeModal({ isOpen, onClose, reason }: UpgradeModalPr
         <button
           onClick={handleUpgrade}
           disabled={isLoading}
-          className="w-full py-3 bg-primary hover:bg-primary-600 text-white font-bold rounded-xl transition-colors disabled:bg-gray-300"
+          className="w-full py-3 bg-gradient-to-r from-primary to-primary-600 text-white font-bold rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50"
         >
           {isLoading ? '결제 페이지 이동 중...' : !recommendPro ? '3일 무료 체험 시작하기' : 'Pro 플랜 시작하기'}
         </button>

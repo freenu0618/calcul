@@ -150,10 +150,10 @@ export default function PricingSection() {
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative bg-white rounded-2xl p-6 flex flex-col ${
+              className={`relative bg-white rounded-2xl p-6 flex flex-col transition-all duration-200 ${
                 plan.popular
-                  ? 'border-2 border-primary shadow-xl ring-1 ring-primary/20 md:-mt-4 md:pb-10'
-                  : 'border border-gray-200 shadow-sm'
+                  ? 'border-2 border-primary shadow-xl ring-1 ring-primary/20 md:-mt-4 md:pb-10 md:scale-105'
+                  : 'border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-primary/20'
               }`}
             >
               {plan.popular && (
@@ -200,9 +200,9 @@ export default function PricingSection() {
                 <button
                   onClick={() => handlePayment(plan)}
                   disabled={loadingPlan === plan.name}
-                  className={`w-full h-11 rounded-xl font-bold transition-colors ${
+                  className={`w-full h-11 rounded-xl font-bold transition-all duration-200 ${
                     plan.popular
-                      ? 'bg-primary text-white hover:bg-primary-600 disabled:bg-primary/50'
+                      ? 'bg-gradient-to-r from-primary to-primary-600 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50'
                       : 'bg-gray-100 text-text-main hover:bg-gray-200 disabled:bg-gray-50'
                   }`}
                 >
@@ -211,9 +211,9 @@ export default function PricingSection() {
               ) : (
                 <Link
                   to={isAuthenticated ? '/dashboard' : plan.ctaLink}
-                  className={`w-full h-11 rounded-xl font-bold transition-colors flex items-center justify-center ${
+                  className={`w-full h-11 rounded-xl font-bold transition-all duration-200 flex items-center justify-center ${
                     plan.popular
-                      ? 'bg-primary text-white hover:bg-primary-600'
+                      ? 'bg-gradient-to-r from-primary to-primary-600 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'
                       : 'bg-gray-100 text-text-main hover:bg-gray-200'
                   }`}
                 >

@@ -58,8 +58,10 @@ export default function SocialProofSection() {
 
         <div className="grid md:grid-cols-3 gap-6 mb-16">
           {trustFacts.map((f) => (
-            <div key={f.label} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
-              <span className="material-symbols-outlined text-primary text-[40px] mb-3 block">{f.icon}</span>
+            <div key={f.label} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+              <div className="w-16 h-16 mx-auto mb-3 bg-gradient-to-br from-primary/10 to-primary/20 rounded-2xl flex items-center justify-center">
+                <span className="material-symbols-outlined text-primary text-[32px]">{f.icon}</span>
+              </div>
               <p className="text-2xl sm:text-3xl font-bold text-text-main mb-1">{f.number}</p>
               <p className="text-sm font-medium text-text-main mb-2">{f.label}</p>
               <p className="text-xs text-text-sub">{f.detail}</p>
@@ -74,7 +76,7 @@ export default function SocialProofSection() {
 
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           {targetUsers.map((u) => (
-            <div key={u.title} className="flex items-start gap-4 bg-white rounded-xl p-5 border border-gray-100">
+            <div key={u.title} className="flex items-start gap-4 bg-white rounded-xl p-5 border border-gray-100 hover:shadow-md hover:border-primary/20 transition-all duration-200">
               <span className="material-symbols-outlined text-primary text-[28px] mt-0.5 flex-shrink-0">{u.icon}</span>
               <div>
                 <p className="font-semibold text-text-main mb-1">{u.title}</p>

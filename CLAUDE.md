@@ -265,9 +265,9 @@ git push -u origin feature/기능명
 ### 프론트엔드 (완료, Cloudflare Pages 배포됨)
 - [x] React 19 + Vite + TypeScript 프로젝트
 - [x] Tailwind CSS 설정 및 기본 스타일
-- [x] 마케팅 랜딩페이지 (7개 섹션)
+- [x] 마케팅 랜딩페이지 (12개 섹션, DataValueSection 포함)
 - [x] 급여 계산기 페이지 (/calculator)
-- [x] 대시보드 페이지 (/dashboard)
+- [x] 대시보드 페이지 (/dashboard, 인건비 추이 차트 포함)
 - [x] 로그인/회원가입 페이지
 - [x] 직원 관리 페이지 (/employees)
 - [x] 급여대장 페이지 (/payroll, /payroll/:id)
@@ -277,12 +277,22 @@ git push -u origin feature/기능명
 - [x] 인증 API 연동 완료 (회원가입/로그인)
 - [x] Cloudflare Pages 배포 완료 (https://paytools.work)
 
+### UI/UX 디자인 시스템
+- [x] 전역 카드/버튼 인터랙션 통일 (hover lift + shadow + gradient CTA)
+- [x] 글래스모피즘 모달 (backdrop-blur-md + bg-white/95)
+- [x] Pricing 카드 스타일 강화 (인기 플랜 scale-105 + gradient CTA)
+- [x] 대시보드 인건비 추이 차트 (LineChart 컴포넌트 활용)
+- [x] 랜딩페이지 "데이터 누적 가치" 섹션 (DataValueSection)
+- [x] UpgradeModal (이용 한도 도달 시 Polar 결제 연동)
+- [x] 서비스 사용 가이드 (/guide/how-to-use, WageType 의사결정 도우미)
+
 ### 향후 개발 계획
 - [x] 근무자 등록 시스템 (Phase 3.5) ✅ 완료
 - [x] 급여대장 기능 (Phase 5) ✅ 핵심 완료 (PDF/엑셀 출력 미구현)
 - [ ] AI 노무 챗봇 - Python 마이크로서비스 (Phase 6)
 - [ ] 급여명세서 PDF 출력
 - [ ] E2E 테스트 추가
+- [ ] 백엔드 급여 분석 API (월별 집계, 직원별 추이)
 
 ## 중요 알림
 

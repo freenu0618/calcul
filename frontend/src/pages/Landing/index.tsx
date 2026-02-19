@@ -8,10 +8,11 @@
  * 4. 해결책 — 피드포워드 + 시각적 계층
  * 5. 계산 미리보기 — 아하 모먼트 + 호기심의 틈
  * 6. 사회적 증거 — 밴드웨건 + 후광 효과
- * 7. 요금제 — 미끼 효과 + 중앙 무대 + 앵커링
- * 8. 전환 CTA — 보답 기대 + 손실 회피 + 결핍
- * 9. FAQ — 반발감 해소 + 탈출 경로
- * 10. 최종 CTA — 피크엔드 규칙
+ * 7. 데이터 누적 가치 — 쓸수록 쌓이는 자산 인식
+ * 8. 요금제 — 미끼 효과 + 중앙 무대 + 앵커링
+ * 9. 전환 CTA — 보답 기대 + 손실 회피 + 결핍
+ * 10. FAQ — 반발감 해소 + 탈출 경로
+ * 11. 최종 CTA — 피크엔드 규칙
  */
 
 import { Helmet } from 'react-helmet-async';
@@ -22,6 +23,7 @@ import SolutionSection from './SolutionSection';
 import HowItWorksSection from './HowItWorksSection';
 import LiveDemoSection from './LiveDemoSection';
 import SocialProofSection from './SocialProofSection';
+import DataValueSection from './DataValueSection';
 import PricingSection from './PricingSection';
 import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
@@ -56,6 +58,7 @@ export default function LandingPage() {
         <HowItWorksSection />
         <LiveDemoSection />
         <SocialProofSection />
+        <DataValueSection />
         <PricingSection />
         <ConversionCTASection />
         <FAQSection />
