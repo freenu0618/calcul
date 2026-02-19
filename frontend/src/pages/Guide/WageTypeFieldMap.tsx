@@ -40,13 +40,13 @@ export default function WageTypeFieldMap() {
       </p>
 
       {/* Desktop table */}
-      <div className="hidden md:block overflow-x-auto">
+      <div className="hidden md:block overflow-x-auto border border-gray-200 rounded-xl">
         <table className="w-full border-collapse">
           <thead>
-            <tr>
+            <tr className="border-b border-gray-200 bg-gray-50">
               <th className="text-left text-sm font-medium text-gray-500 py-3 px-4 w-1/4">필드</th>
               {COLUMNS.map((col) => (
-                <th key={col.key} className="text-center py-3 px-4">
+                <th key={col.key} className="text-center py-3 px-4 border-l border-gray-200">
                   <div className="flex items-center justify-center gap-1.5">
                     <span className="material-symbols-outlined text-[18px]">{col.icon}</span>
                     <span className="text-sm font-bold">{col.title}</span>
@@ -57,10 +57,10 @@ export default function WageTypeFieldMap() {
           </thead>
           <tbody>
             {FIELD_ROWS.map((row, i) => (
-              <tr key={i} className={i % 2 === 0 ? 'bg-gray-50/50' : ''}>
+              <tr key={i} className={`border-b border-gray-100 ${i % 2 === 0 ? 'bg-gray-50/50' : ''}`}>
                 <td className="text-sm text-gray-700 py-3 px-4 font-medium">{row.label}</td>
                 {COLUMNS.map((col) => (
-                  <td key={col.key} className="text-center py-3 px-4">
+                  <td key={col.key} className="text-center py-3 px-4 border-l border-gray-100">
                     <CellContent value={row[col.key]} />
                   </td>
                 ))}
