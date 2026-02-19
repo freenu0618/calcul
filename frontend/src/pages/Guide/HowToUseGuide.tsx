@@ -1,6 +1,6 @@
 /**
  * 서비스 사용 가이드 페이지 (/guide/how-to-use)
- * 급여유형별 사용법 + 의사결정 도우미
+ * 의사결정 도우미 + 급여유형 가이드 + 필드 비교 + 시나리오 + FAQ
  */
 
 import { Link } from 'react-router-dom';
@@ -8,6 +8,9 @@ import MainLayout from '../../components/layout/MainLayout';
 import PageHelmet from '../../components/common/PageHelmet';
 import WageTypeDecisionHelper from './WageTypeDecisionHelper';
 import WageTypeGuideCards from './WageTypeGuideCards';
+import WageTypeFieldMap from './WageTypeFieldMap';
+import QuickStartScenarios from './QuickStartScenarios';
+import GuideFAQ from './GuideFAQ';
 
 export default function HowToUseGuide() {
   return (
@@ -28,28 +31,35 @@ export default function HowToUseGuide() {
 
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              PayTools 사용 가이드
-            </h1>
-            <p className="text-gray-600">
-              급여유형에 맞는 사용법을 확인하고 정확한 실수령액을 계산하세요.
-            </p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">PayTools 사용 가이드</h1>
+            <p className="text-gray-600">급여유형에 맞는 사용법을 확인하고 정확한 실수령액을 계산하세요.</p>
           </div>
 
-          {/* Decision Helper */}
+          {/* 1. Decision Helper */}
           <section className="mb-10">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-              어떤 급여유형을 선택해야 하나요?
-            </h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">어떤 급여유형을 선택해야 하나요?</h2>
             <WageTypeDecisionHelper />
           </section>
 
-          {/* Wage Type Guides */}
+          {/* 2. Wage Type Guides */}
           <section className="mb-10">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-              급여유형별 사용법
-            </h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">급여유형별 사용법</h2>
             <WageTypeGuideCards />
+          </section>
+
+          {/* 3. Field Comparison */}
+          <section className="mb-10">
+            <WageTypeFieldMap />
+          </section>
+
+          {/* 4. Quick Start Scenarios */}
+          <section className="mb-10">
+            <QuickStartScenarios />
+          </section>
+
+          {/* 5. FAQ */}
+          <section className="mb-10">
+            <GuideFAQ />
           </section>
 
           {/* Common Tips */}
