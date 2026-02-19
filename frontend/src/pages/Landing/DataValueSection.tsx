@@ -8,25 +8,22 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const timeline = [
   {
-    month: '1개월',
-    icon: 'calculate',
-    title: '정확한 급여 계산',
+    month: '1개월', icon: 'calculate', title: '정확한 급여 계산',
     desc: '4대보험·소득세·주휴수당 자동 계산으로 실수 없는 급여 관리',
     color: 'from-blue-500 to-blue-600',
+    bars: [30, 0, 0, 0, 0, 0], barColor: 'bg-blue-400/40',
   },
   {
-    month: '6개월',
-    icon: 'trending_up',
-    title: '인건비 추이 파악',
+    month: '6개월', icon: 'trending_up', title: '인건비 추이 파악',
     desc: '월별 인건비 변동, 직원별 급여 이력을 한눈에 분석',
     color: 'from-primary to-primary-600',
+    bars: [30, 45, 40, 55, 50, 65], barColor: 'bg-primary/40',
   },
   {
-    month: '1년',
-    icon: 'verified_user',
-    title: '완벽한 증빙 자료',
+    month: '1년', icon: 'verified_user', title: '완벽한 증빙 자료',
     desc: '세무신고·노무감사 대비 연간 급여 기록 자동 확보',
     color: 'from-violet-500 to-violet-600',
+    bars: [30, 45, 40, 55, 50, 65, 60, 75, 70, 85, 80, 95], barColor: 'bg-violet-400/40',
   },
 ];
 
@@ -70,7 +67,13 @@ export default function DataValueSection() {
                   </span>
                 </div>
                 <h3 className="text-lg font-bold text-text-main mb-2">{item.title}</h3>
-                <p className="text-sm text-text-sub leading-relaxed">{item.desc}</p>
+                <p className="text-sm text-text-sub leading-relaxed mb-4">{item.desc}</p>
+                {/* 데이터 누적 시각화 바 */}
+                <div className="flex items-end gap-0.5 h-6">
+                  {item.bars.map((h, j) => (
+                    <div key={j} className={`flex-1 ${item.barColor} rounded-t transition-all`} style={{ height: `${h}%` }} />
+                  ))}
+                </div>
               </div>
               {/* 연결 화살표 (모바일 숨김) */}
               {i < timeline.length - 1 && (
