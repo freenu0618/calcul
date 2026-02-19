@@ -125,7 +125,7 @@ export function useCalculation({
     } catch (err) {
       if (err instanceof Error) {
         if (err.message.includes('429') || err.message.includes('Too Many Requests')) {
-          onError('요청이 너무 많습니다. 1분 후 다시 시도해주세요.');
+          onError('무료 플랜의 급여 계산 한도에 도달했습니다. 무제한 계산이 필요하시면 플랜을 업그레이드해주세요.');
         } else {
           onError(err.message);
         }

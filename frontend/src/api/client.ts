@@ -106,7 +106,7 @@ apiClient.interceptors.response.use(
           return apiClient(config);
         }
         console.warn(`429: ${config.url} — 최대 재시도 초과`);
-        error.message = '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.';
+        error.message = '무료 플랜의 이용 한도에 도달했습니다. 더 많은 기능이 필요하시면 플랜 업그레이드를 확인해주세요.';
       }
     } else if (error.request) {
       console.error('Network Error:', error.request);

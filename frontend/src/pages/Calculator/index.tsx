@@ -265,9 +265,14 @@ export default function CalculatorPage() {
 
           {/* 에러 메시지 */}
           {state.ui.error && (
-            <div className="mt-6 bg-red-50 border-l-4 border-red-400 p-4 text-red-700">
-              <p className="font-medium">오류</p>
+            <div className={`mt-6 border-l-4 p-4 ${state.ui.error.includes('플랜') ? 'bg-amber-50 border-amber-400 text-amber-800' : 'bg-red-50 border-red-400 text-red-700'}`}>
+              <p className="font-medium">{state.ui.error.includes('플랜') ? '이용 한도 도달' : '오류'}</p>
               <p className="text-sm">{state.ui.error}</p>
+              {state.ui.error.includes('플랜') && (
+                <a href="/#pricing" className="inline-block mt-2 text-sm font-bold text-primary hover:underline">
+                  요금제 확인하기 →
+                </a>
+              )}
             </div>
           )}
 
