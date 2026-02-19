@@ -20,7 +20,8 @@ export default function AbsencePolicySelector({
 }: AbsencePolicySelectorProps) {
   return (
     <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-      <p className="text-sm font-semibold text-gray-800 mb-3">결근 공제 정책</p>
+      <p className="text-sm font-semibold text-gray-800 mb-1">결근 공제 정책</p>
+      <p className="text-xs text-orange-600 mb-3">결근 발생 시 급여에서 공제되는 방식을 선택합니다</p>
       <div className="space-y-2">
         {OPTIONS.map((opt) => (
           <label key={opt.value} className="flex items-start cursor-pointer">

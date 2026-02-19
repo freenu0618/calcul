@@ -152,30 +152,48 @@ const Navigation = () => {
       {/* 모바일 메뉴 */}
       {isMenuOpen && (
         <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setIsMenuOpen(false)}
-                className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  isActive(item.path)
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
+          <div className="px-2 pt-2 pb-3 bg-white border-t">
+            {/* 내 서비스 */}
+            {isAuthenticated && (
+              <>
+                <p className="px-3 pt-2 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">내 서비스</p>
+                {navItems.filter(i => ['/dashboard', '/employees', '/payroll'].includes(i.path)).map((item) => (
+                  <Link key={item.path} to={item.path} onClick={() => setIsMenuOpen(false)}
+                    className={`block px-3 py-2 rounded-md text-base font-medium ${isActive(item.path) ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}>
+                    {item.label}
+                  </Link>
+                ))}
+              </>
+            )}
+
+            {/* 도구 */}
+            <p className="px-3 pt-3 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">도구</p>
+            {navItems.filter(i => ['/calculator', '/simulation'].includes(i.path)).map((item) => (
+              <Link key={item.path} to={item.path} onClick={() => setIsMenuOpen(false)}
+                className={`block px-3 py-2 rounded-md text-base font-medium ${isActive(item.path) ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}>
+                {item.label}
+              </Link>
+            ))}
+
+            {/* 정보 */}
+            <p className="px-3 pt-3 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">정보</p>
+            {navItems.filter(i => ['/guide', '/#pricing'].includes(i.path)).map((item) => (
+              <Link key={item.path} to={item.path} onClick={() => setIsMenuOpen(false)}
+                className={`block px-3 py-2 rounded-md text-base font-medium ${isActive(item.path) ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}>
                 {item.label}
               </Link>
             ))}
 
             {/* 모바일 AI 채팅 버튼 */}
-            <button
-              onClick={() => { setIsChatOpen(true); setIsMenuOpen(false); }}
-              className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-base font-medium bg-gradient-to-r from-primary to-blue-600 text-white"
-            >
-              <span>🤖</span>
-              <span>AI 상담</span>
-            </button>
+            <div className="mt-2">
+              <button
+                onClick={() => { setIsChatOpen(true); setIsMenuOpen(false); }}
+                className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-base font-medium bg-gradient-to-r from-primary to-blue-600 text-white"
+              >
+                <span>🤖</span>
+                <span>AI 상담</span>
+              </button>
+            </div>
 
             {/* 모바일 인증 버튼 */}
             <div className="border-t border-gray-200 pt-2 mt-2">

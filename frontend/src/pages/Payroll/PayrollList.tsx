@@ -5,9 +5,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { payrollApi } from '../../api/payrollApi';
+import { useToast } from '../../components/common/Toast';
 import type { PayrollPeriodResponse } from '../../types/payroll';
 import { formatNumber } from '../../utils/formatters';
 import { exportPayrollSummaryXlsx } from '../../utils/excelExport';
+import PageLoader from '../../components/common/PageLoader';
 
 const STATUS_LABELS: Record<string, { text: string; className: string }> = {
   DRAFT: { text: '작성중', className: 'bg-gray-100 text-gray-700' },
@@ -17,6 +19,7 @@ const STATUS_LABELS: Record<string, { text: string; className: string }> = {
 
 export default function PayrollList() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [periods, setPeriods] = useState<PayrollPeriodResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,17 +52,11 @@ export default function PayrollList() {
       setShowCreateModal(false);
       navigate(`/payroll/${response.id}`);
     } catch (err: any) {
-      alert(err.response?.data?.message || '급여 기간 생성에 실패했습니다.');
+      showToast('error', err.response?.data?.message || '급여 기간 생성에 실패했습니다.');
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500" />
-      </div>
-    );
-  }
+  if (isLoading) return <PageLoader />;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -101,13 +98,21 @@ export default function PayrollList() {
           <span className="material-symbols-outlined text-6xl text-gray-300">
             description
           </span>
-          <p className="mt-4 text-gray-500">등록된 급여 기간이 없습니다</p>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="mt-4 text-primary-600 hover:underline"
-          >
-            새 급여 기간 만들기
-          </button>
+          <p className="mt-4 text-gray-500 font-medium">등록된 급여 기간이 없습니다</p>
+          <p className="text-sm text-gray-400 mt-1">
+            직원을 먼저 등록하면 급여대장을 만들 수 있습니다
+          </p>
+          <div className="flex items-center justify-center gap-3 mt-4">
+            <Link to="/employees" className="text-sm text-gray-500 hover:underline">
+              직원 등록하기
+            </Link>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="text-primary-600 hover:underline font-medium"
+            >
+              새 급여 기간 만들기
+            </button>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">

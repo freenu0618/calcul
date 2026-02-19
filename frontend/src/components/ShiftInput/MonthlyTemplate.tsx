@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useToast } from '../common/Toast';
 import type { WorkShiftRequest } from '../../types/salary';
 
 interface MonthlyTemplateProps {
@@ -31,6 +32,7 @@ const TIME_PRESETS = [
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`);
 
 export default function MonthlyTemplate({ year, month, onApply, onYearMonthChange }: MonthlyTemplateProps) {
+  const { showToast } = useToast();
   // 내부 년/월 상태 (직접 선택 가능)
   const [selectedYear, setSelectedYear] = useState(year);
   const [selectedMonth, setSelectedMonth] = useState(month);
@@ -119,7 +121,7 @@ export default function MonthlyTemplate({ year, month, onApply, onYearMonthChang
   const handleApply = () => {
     const shifts = generateShifts();
     if (shifts.length === 0) {
-      alert('선택된 요일이 없습니다.');
+      showToast('warning', '선택된 요일이 없습니다.');
       return;
     }
     onApply(shifts);

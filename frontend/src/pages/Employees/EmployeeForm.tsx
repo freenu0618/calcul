@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { employeeApi } from '../../api/employeeApi';
 import type { EmployeeRequest, EmployeeResponse, VisaType } from '../../types/employee';
+import Breadcrumb from '../../components/common/Breadcrumb';
 
 const VISA_OPTIONS: { value: VisaType; label: string }[] = [
   { value: 'E-9', label: 'E-9 (비전문취업)' },
@@ -159,6 +160,11 @@ export default function EmployeeForm() {
       </Helmet>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
+        <Breadcrumb items={[
+          { label: '대시보드', to: '/dashboard' },
+          { label: '직원 관리', to: '/employees' },
+          { label: isEdit ? '수정' : '등록' },
+        ]} />
         <h1 className="text-2xl font-bold text-text-main mb-8">
           {isEdit ? '직원 정보 수정' : '새 직원 등록'}
         </h1>
@@ -283,8 +289,8 @@ export default function EmployeeForm() {
                   className="form-input"
                   min="0"
                 />
-                <p className="text-xs text-text-sub mt-1">
-                  법정: 4h→30분, 8h→60분
+                <p className="text-xs text-blue-600 mt-1">
+                  근무시간 변경 시 법정 휴게시간이 자동 적용됩니다
                 </p>
               </FormField>
             </div>

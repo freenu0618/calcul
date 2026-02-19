@@ -7,6 +7,7 @@
  */
 
 import { useState, useCallback, useMemo, useRef } from 'react';
+import { useToast } from '../common/Toast';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -46,6 +47,7 @@ export default function ShiftCalendar({
   periodStart,
   periodEnd,
 }: ShiftCalendarProps) {
+  const { showToast } = useToast();
   const calendarRef = useRef<FullCalendar>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
@@ -140,7 +142,7 @@ export default function ShiftCalendar({
       // 이미 등록된 날짜 제외
       const newShifts = templateShifts.filter((s) => !existingDates.has(s.date));
       if (newShifts.length === 0) {
-        alert('모든 날짜에 이미 시프트가 등록되어 있습니다.');
+        showToast('info', '모든 날짜에 이미 시프트가 등록되어 있습니다.');
         return;
       }
       if (onBulkAdd) {
@@ -149,7 +151,7 @@ export default function ShiftCalendar({
         newShifts.forEach((shift) => onShiftAdd(shift));
       }
       setShowTemplate(false);
-      alert(`${newShifts.length}개의 시프트가 추가되었습니다.`);
+      showToast('success', `${newShifts.length}개의 시프트가 추가되었습니다.`);
     },
     [existingDates, onBulkAdd, onShiftAdd]
   );

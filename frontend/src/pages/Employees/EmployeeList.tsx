@@ -10,6 +10,8 @@ import type { EmployeeResponse } from '../../types/employee';
 import { exportEmployeeListXlsx } from '../../utils/excelExport';
 import { useSubscription } from '../../hooks/useSubscription';
 import UpgradeModal from '../../components/UpgradeModal';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
+import PageLoader from '../../components/common/PageLoader';
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState<EmployeeResponse[]>([]);
@@ -17,6 +19,7 @@ export default function EmployeeList() {
   const [error, setError] = useState<string | null>(null);
   const [searchName, setSearchName] = useState('');
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const { canAddEmployee } = useSubscription();
   const navigate = useNavigate();
 
@@ -56,15 +59,20 @@ export default function EmployeeList() {
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`정말 ${name} 직원을 삭제하시겠습니까?`)) return;
+  const handleDelete = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await employeeApi.deleteEmployee(id);
-      setEmployees(employees.filter((e) => e.id !== id));
+      await employeeApi.deleteEmployee(deleteTarget.id);
+      setEmployees(employees.filter((e) => e.id !== deleteTarget.id));
     } catch (err) {
       setError('삭제에 실패했습니다.');
       console.error(err);
     }
+    setDeleteTarget(null);
   };
 
   return (
@@ -73,6 +81,15 @@ export default function EmployeeList() {
         <title>직원 관리 - paytools</title>
       </Helmet>
       <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} reason="employees" />
+      <ConfirmDialog
+        isOpen={!!deleteTarget}
+        title="직원 삭제"
+        message={`정말 ${deleteTarget?.name} 직원을 삭제하시겠습니까?`}
+        confirmLabel="삭제"
+        variant="danger"
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* 헤더 */}
@@ -141,7 +158,7 @@ export default function EmployeeList() {
 
         {/* 로딩 */}
         {loading ? (
-          <div className="text-center py-12 text-text-sub">불러오는 중...</div>
+          <PageLoader minHeight="min-h-[200px]" />
         ) : employees.length === 0 ? (
           <EmptyState />
         ) : (
@@ -157,7 +174,8 @@ function EmptyState() {
     <div className="text-center py-16 bg-white rounded-xl border border-gray-100">
       <span className="material-symbols-outlined text-6xl text-gray-300 mb-4">group_off</span>
       <h3 className="text-lg font-semibold text-text-main mb-2">등록된 직원이 없습니다</h3>
-      <p className="text-text-sub mb-6">첫 번째 직원을 등록해보세요.</p>
+      <p className="text-text-sub mb-2">직원을 등록하면 급여 계산과 급여대장 관리가 가능합니다</p>
+      <p className="text-sm text-gray-400 mb-6">첫 번째 직원을 등록해보세요.</p>
       <Link
         to="/employees/new"
         className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-600 transition-colors"

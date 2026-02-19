@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useToast } from '../../components/common/Toast';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import { useAuth } from '../../contexts/AuthContext';
@@ -22,6 +23,7 @@ const planInfo: Record<SubscriptionTier, { name: string; price: string; color: s
 
 export default function MyPage() {
   const { user, token, logout, refreshUser } = useAuth();
+  const { showToast } = useToast();
   const { tier, tierLabel, usage, limits } = useSubscription();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,10 +49,10 @@ export default function MyPage() {
       if (result.success && result.data?.portalUrl) {
         window.open(result.data.portalUrl, '_blank');
       } else {
-        alert(result.message || '구독 관리 페이지를 열 수 없습니다.');
+        showToast('error', result.message || '구독 관리 페이지를 열 수 없습니다.');
       }
     } catch {
-      alert('오류가 발생했습니다.');
+      showToast('error', '오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }
@@ -73,10 +75,10 @@ export default function MyPage() {
       if (result.success && result.data?.checkoutUrl) {
         window.location.href = result.data.checkoutUrl;
       } else {
-        alert(result.message || '결제 페이지를 열 수 없습니다.');
+        showToast('error', result.message || '결제 페이지를 열 수 없습니다.');
       }
     } catch {
-      alert('오류가 발생했습니다.');
+      showToast('error', '오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }

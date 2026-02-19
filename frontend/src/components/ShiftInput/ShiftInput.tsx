@@ -263,6 +263,7 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
               key={key}
               type="button"
               onClick={() => handleFillMonth(key as keyof typeof SHIFT_PRESETS)}
+              title={`${preset.start}~${preset.end} | 휴게 ${preset.break}분 | 주${preset.days}일`}
               className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:border-gray-400 transition-colors"
             >
               {preset.name}
@@ -349,7 +350,16 @@ const ShiftInput: React.FC<ShiftInputProps> = ({
             템플릿 다운로드
           </button>
         </div>
-        {csvError && <span className="text-sm text-red-500">{csvError}</span>}
+        {csvError && (
+          <div className="flex items-center gap-2 px-3 py-2 bg-red-50 border border-red-200 rounded-md">
+            <span className="material-symbols-outlined text-red-500 text-[18px]">error</span>
+            <div>
+              <p className="text-sm font-medium text-red-700">CSV 가져오기 실패</p>
+              <p className="text-xs text-red-600">{csvError}</p>
+              <p className="text-xs text-gray-500 mt-0.5">형식: 날짜,시작,종료,휴게(분),휴일여부</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 캘린더 뷰 */}

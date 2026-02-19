@@ -6,12 +6,16 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { payrollApi } from '../../api/payrollApi';
 import { employeeApi } from '../../api/employeeApi';
+import { useToast } from '../../components/common/Toast';
 import type { PayrollLedgerResponse, PayrollEntryResponse, PayrollStatus } from '../../types/payroll';
 import type { EmployeeResponse } from '../../types/employee';
 import type { WorkShiftRequest } from '../../types/salary';
 import { formatNumber } from '../../utils/formatters';
 import { exportPayrollDetailXlsx } from '../../utils/excelExport';
 import MonthlyTemplate from '../../components/ShiftInput/MonthlyTemplate';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
+import Breadcrumb from '../../components/common/Breadcrumb';
+import PageLoader from '../../components/common/PageLoader';
 
 const STATUS_LABELS: Record<string, { text: string; className: string; icon: string }> = {
   DRAFT: { text: '작성중', className: 'bg-gray-100 text-gray-700', icon: 'edit_note' },
@@ -22,6 +26,7 @@ const STATUS_LABELS: Record<string, { text: string; className: string; icon: str
 export default function PayrollDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [ledger, setLedger] = useState<PayrollLedgerResponse | null>(null);
   const [employees, setEmployees] = useState<EmployeeResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,6 +34,7 @@ export default function PayrollDetail() {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState('');
   const [baseSalary, setBaseSalary] = useState('');
   const [workShifts, setWorkShifts] = useState<WorkShiftRequest[]>([]);
+  const [confirmAction, setConfirmAction] = useState<{ type: 'entry' | 'period'; entryId?: number } | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -58,7 +64,7 @@ export default function PayrollDetail() {
       const updated = await payrollApi.updatePeriodStatus(Number(id), { status: newStatus });
       setLedger({ ...ledger, period: { ...ledger.period, status: updated.status } });
     } catch (err: any) {
-      alert(err.response?.data?.message || '상태 변경에 실패했습니다.');
+      showToast('error', err.response?.data?.message || '상태 변경에 실패했습니다.');
     }
   };
 
@@ -127,7 +133,7 @@ export default function PayrollDetail() {
       setShowAddModal(false);
       resetAddForm();
     } catch (err: any) {
-      alert(err.response?.data?.message || '직원 추가에 실패했습니다.');
+      showToast('error', err.response?.data?.message || '직원 추가에 실패했습니다.');
     }
   };
 
@@ -137,26 +143,30 @@ export default function PayrollDetail() {
     setWorkShifts([]);
   };
 
-  const handleRemoveEntry = async (entryId: number) => {
-    if (!id || !confirm('이 직원의 급여 정보를 삭제하시겠습니까?')) return;
-    try {
-      await payrollApi.removeEntry(Number(id), entryId);
-      // 서버에서 갱신된 총액을 포함한 전체 데이터 재로드
-      await loadData(Number(id));
-    } catch (err: any) {
-      alert(err.response?.data?.message || '삭제에 실패했습니다.');
-    }
+  const handleRemoveEntry = (entryId: number) => {
+    if (!id) return;
+    setConfirmAction({ type: 'entry', entryId });
   };
 
-  const handleDeletePeriod = async () => {
+  const handleDeletePeriod = () => {
     if (!id) return;
-    if (!confirm('이 급여대장을 삭제하시겠습니까?\n모든 급여 데이터가 삭제됩니다.')) return;
+    setConfirmAction({ type: 'period' });
+  };
+
+  const executeConfirm = async () => {
+    if (!id || !confirmAction) return;
     try {
-      await payrollApi.deletePeriod(Number(id));
-      navigate('/payroll');
+      if (confirmAction.type === 'entry' && confirmAction.entryId) {
+        await payrollApi.removeEntry(Number(id), confirmAction.entryId);
+        await loadData(Number(id));
+      } else if (confirmAction.type === 'period') {
+        await payrollApi.deletePeriod(Number(id));
+        navigate('/payroll');
+      }
     } catch (err: any) {
-      alert(err.response?.data?.message || '삭제에 실패했습니다.');
+      showToast('error', err.response?.data?.message || '삭제에 실패했습니다.');
     }
+    setConfirmAction(null);
   };
 
   const handleApplyTemplate = (shifts: WorkShiftRequest[]) => {
@@ -168,13 +178,7 @@ export default function PayrollDetail() {
     (emp) => !ledger?.entries.some((e) => e.employee_id === emp.id)
   );
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500" />
-      </div>
-    );
-  }
+  if (isLoading) return <PageLoader />;
 
   if (!ledger) {
     return (
@@ -193,6 +197,12 @@ export default function PayrollDetail() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
+      <Breadcrumb items={[
+        { label: '대시보드', to: '/dashboard' },
+        { label: '급여대장', to: '/payroll' },
+        { label: `${period.year}년 ${period.month}월` },
+      ]} />
+
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
@@ -332,6 +342,16 @@ export default function PayrollDetail() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!confirmAction}
+        title={confirmAction?.type === 'period' ? '급여대장 삭제' : '직원 급여 삭제'}
+        message={confirmAction?.type === 'period' ? '이 급여대장을 삭제하시겠습니까? 모든 급여 데이터가 삭제됩니다.' : '이 직원의 급여 정보를 삭제하시겠습니까?'}
+        confirmLabel="삭제"
+        variant="danger"
+        onConfirm={executeConfirm}
+        onCancel={() => setConfirmAction(null)}
+      />
 
       {/* 직원 추가 모달 */}
       {showAddModal && (

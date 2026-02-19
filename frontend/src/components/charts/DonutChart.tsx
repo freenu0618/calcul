@@ -86,20 +86,20 @@ export default function DonutChart({
         )}
       </div>
 
-      {/* 범례 */}
-      <div className="mt-4 space-y-2">
+      {/* 범례 - 모바일 세로 배치 */}
+      <div className="mt-4 space-y-2 w-full">
         {data.map((item, index) => (
-          <div key={index} className="flex items-center justify-between gap-4 text-sm">
-            <div className="flex items-center gap-2">
+          <div key={index} className="flex items-center justify-between gap-3 text-sm">
+            <div className="flex items-center gap-2 min-w-0">
               <div
-                className="w-3 h-3 rounded-sm"
+                className="w-3 h-3 rounded-sm flex-shrink-0"
                 style={{ backgroundColor: item.color }}
               />
-              <span className={textColors.name}>{item.name}</span>
+              <span className={`${textColors.name} truncate`}>{item.name}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className={`font-medium ${textColors.amount}`}>{formatMoney(item.value)}</span>
-              <span className={`text-xs ${textColors.percent}`}>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <span className={`font-medium whitespace-nowrap ${textColors.amount}`}>{formatMoney(item.value)}</span>
+              <span className={`text-xs whitespace-nowrap ${textColors.percent}`}>
                 ({((item.value / total) * 100).toFixed(1)}%)
               </span>
             </div>

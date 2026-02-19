@@ -52,6 +52,15 @@ export default function WageTypeSelector({
 
   return (
     <div className="bg-gray-50 p-4 rounded-lg">
+      {/* 급여 형태 가이드 */}
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
+        <p className="text-xs font-semibold text-amber-800 mb-1">어떤 유형을 선택할까요?</p>
+        <ul className="text-xs text-amber-700 space-y-0.5">
+          <li>계약서에 <strong>"월 OOO만원"</strong> → 월급제</li>
+          <li>계약서에 <strong>"시급 OO,OOO원"</strong> → 시급제</li>
+          <li>계약서에 <strong>"시급 기준 월 OOO만원"</strong> → 시급기반 월급제</li>
+        </ul>
+      </div>
       <p className="text-sm font-medium text-gray-700 mb-3">급여 형태</p>
       <div className="grid grid-cols-3 gap-2">
         {WAGE_TYPE_OPTIONS.map((opt) => {

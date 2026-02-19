@@ -13,6 +13,20 @@ import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import { API_CONFIG } from '../../config/api.config';
 
+function getPasswordStrength(pw: string) {
+  if (!pw) return { level: 0, label: '', color: '' };
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+  if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) score++;
+  const levels = [
+    { level: 1, label: '약함', color: 'bg-red-500' },
+    { level: 2, label: '보통', color: 'bg-amber-500' },
+    { level: 3, label: '강함', color: 'bg-green-500' },
+  ] as const;
+  return levels[Math.min(score, 2)] ?? levels[0];
+}
+
 const Register = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
@@ -44,7 +58,7 @@ const Register = () => {
 
     try {
       await register(email, password, fullName);
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : '회원가입에 실패했습니다.';
       setError(message);
@@ -88,14 +102,29 @@ const Register = () => {
                 required
               />
 
-              <Input
-                label="비밀번호"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="최소 8자 이상"
-                required
-              />
+              <div>
+                <Input
+                  label="비밀번호"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="최소 8자 이상"
+                  required
+                />
+                {password && (() => {
+                  const s = getPasswordStrength(password);
+                  return (
+                    <div className="mt-1.5 flex items-center gap-2">
+                      <div className="flex gap-1 flex-1">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className={`h-1.5 flex-1 rounded-full ${i <= s.level ? s.color : 'bg-gray-200'}`} />
+                        ))}
+                      </div>
+                      <span className="text-xs text-gray-500">{s.label}</span>
+                    </div>
+                  );
+                })()}
+              </div>
 
               <Input
                 label="비밀번호 확인"

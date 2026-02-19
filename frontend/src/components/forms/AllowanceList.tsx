@@ -3,6 +3,7 @@
  */
 import type { Allowance } from '../../types/models';
 import Button from '../common/Button';
+import { ALLOWANCE_PRESETS } from './AllowancePresets';
 
 interface AllowanceListProps {
   allowances: Allowance[];
@@ -53,9 +54,27 @@ export default function AllowanceList({
     <div>
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-md font-medium text-gray-800">수당 목록</h4>
-        <Button variant="secondary" onClick={addAllowance} type="button">
-          + 수당 추가
-        </Button>
+        <div className="flex items-center gap-2">
+          <select
+            onChange={(e) => {
+              const preset = ALLOWANCE_PRESETS[Number(e.target.value)];
+              if (preset) {
+                onAllowancesChange([...allowances, { ...preset.defaults, amount: 0 }]);
+                e.target.value = '';
+              }
+            }}
+            className="text-sm border border-gray-300 rounded-md px-2 py-1.5"
+            defaultValue=""
+          >
+            <option value="" disabled>프리셋 추가</option>
+            {ALLOWANCE_PRESETS.map((p, i) => (
+              <option key={i} value={i}>{p.label}</option>
+            ))}
+          </select>
+          <Button variant="secondary" onClick={addAllowance} type="button">
+            + 직접 추가
+          </Button>
+        </div>
       </div>
 
       {allowances.length === 0 ? (

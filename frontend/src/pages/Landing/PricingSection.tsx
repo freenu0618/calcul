@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../components/common/Toast';
 import { paymentApi, type PlanType } from '../../api/paymentApi';
 
 type BillingCycle = 'monthly' | 'annual';
@@ -88,6 +89,7 @@ function fmtPrice(p: number) {
 
 export default function PricingSection() {
   const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
   const [billing, setBilling] = useState<BillingCycle>('monthly');
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
@@ -97,7 +99,7 @@ export default function PricingSection() {
     if (!id) return;
     setLoadingPlan(plan.name);
     try { await paymentApi.redirectToCheckout(id); }
-    catch { alert('결제 연결 실패. 잠시 후 다시 시도해주세요.'); setLoadingPlan(null); }
+    catch { showToast('error', '결제 연결 실패. 잠시 후 다시 시도해주세요.'); setLoadingPlan(null); }
   };
 
   const getPrice = (plan: Plan) => {

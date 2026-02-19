@@ -7,6 +7,7 @@
  */
 
 import { useState } from 'react';
+import { useToast } from '../common/Toast';
 import type { SalaryCalculationResponse } from '../../types/salary';
 
 interface PDFExportProps {
@@ -20,6 +21,7 @@ export default function PDFExport({
   employerName = 'PayTools 사업장',
   variant = 'default',
 }: PDFExportProps) {
+  const { showToast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handlePdfDownload = async () => {
@@ -30,7 +32,7 @@ export default function PDFExport({
       await generatePayslipPdf(result, employerName);
     } catch (error) {
       console.error('PDF 생성 실패:', error);
-      alert('PDF 생성에 실패했습니다.');
+      showToast('error', 'PDF 생성에 실패했습니다.');
     } finally {
       setIsGenerating(false);
     }
@@ -43,7 +45,7 @@ export default function PDFExport({
       exportSalaryToCsv(result);
     } catch (error) {
       console.error('CSV 내보내기 실패:', error);
-      alert('CSV 내보내기에 실패했습니다.');
+      showToast('error', 'CSV 내보내기에 실패했습니다.');
     }
   };
 
