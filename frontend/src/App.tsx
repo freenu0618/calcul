@@ -41,6 +41,7 @@ const About = lazy(() => import('./pages/About'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Contact = lazy(() => import('./pages/Contact'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 const ReverseCalculator = lazy(() => import('./pages/ReverseCalculator'));
 const SalarySimulation = lazy(() => import('./pages/Simulation'));
 const PaymentSuccess = lazy(() => import('./pages/Payment/PaymentSuccess'));
@@ -153,6 +154,9 @@ function App() {
                     <Route path="/privacy" element={<Privacy />} />
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/contact" element={<Contact />} />
+
+                    {/* 404 - Soft 404 방지 (noindex 메타태그 포함) */}
+                    <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Suspense>
               </main>
