@@ -209,7 +209,36 @@ async function main() {
   }
 }
 
+/** Fallback: meta 태그만 교체 (Puppeteer 사용 불가 시) */
+function fallbackMetaOnly() {
+  console.log('⚠️ Puppeteer 사용 불가 - meta 태그 프리렌더링으로 대체');
+  const META_ROUTES = [
+    { path: '', title: '급여계산기 - 4대보험 주휴수당 자동계산 | PayTools', description: '4대보험, 소득세, 주휴수당, 연장·야간·휴일 수당 자동 계산. 2026년 최신 법령 반영.' },
+    ...ROUTES.map(r => ({ path: r, title: `PayTools`, description: '급여 계산 자동화 서비스' })),
+  ];
+  const template = readFileSync(join(DIST, 'index.html'), 'utf-8');
+  const BASE_URL = 'https://paytools.work';
+  let count = 0;
+  for (const route of META_ROUTES) {
+    const url = `${BASE_URL}${route.path}`;
+    let html = template
+      .replace(/<title>[^<]*<\/title>/, `<title>${route.title}</title>`)
+      .replace(/<meta name="description" content="[^"]*"/, `<meta name="description" content="${route.description}"`)
+      .replace(/<!-- canonical[^>]*-->/, `<link rel="canonical" href="${url}" />`);
+    const dir = route.path ? join(DIST, route.path) : DIST;
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, 'index.html'), html);
+    count++;
+  }
+  console.log(`✅ Meta 프리렌더링 완료: ${count}개 페이지`);
+}
+
 main().catch((err) => {
-  console.error('프리렌더링 실패:', err);
-  process.exit(1);
+  console.error('Puppeteer 프리렌더링 실패:', err.message);
+  try {
+    fallbackMetaOnly();
+  } catch (fbErr) {
+    console.error('Fallback도 실패:', fbErr.message);
+    process.exit(1);
+  }
 });
