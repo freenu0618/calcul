@@ -1,18 +1,12 @@
 import { StrictMode } from 'react'
-import { createRoot, hydrateRoot } from 'react-dom/client'
+import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
-const root = document.getElementById('root')!;
-const app = (
+// 프리렌더링 HTML은 Googlebot(JS 미실행)용으로만 존재
+// 실제 사용자는 항상 createRoot로 풀 렌더링
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
-  </StrictMode>
-);
-
-// 프리렌더링된 HTML이 있으면 hydrate, 없으면 새로 렌더
-if (root.hasAttribute('data-prerendered')) {
-  hydrateRoot(root, app);
-} else {
-  createRoot(root).render(app);
-}
+  </StrictMode>,
+)
