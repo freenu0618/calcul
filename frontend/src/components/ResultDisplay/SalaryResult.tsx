@@ -17,10 +17,10 @@ interface SalaryResultProps {
 
 // 차트 색상 팔레트
 const CHART_COLORS = {
-    baseSalary: '#3b82f6',      // blue-500 (기본급)
+    baseSalary: '#0dba7d',      // primary (기본급)
     weeklyHoliday: '#10b981',   // emerald-500 (주휴수당)
-    overtime: '#8b5cf6',        // violet-500 (연장수당)
-    allowance: '#06b6d4',       // cyan-500 (기타수당)
+    overtime: '#06b6d4',        // cyan-500 (연장/야간)
+    allowance: '#14b8a6',       // teal-500 (기타수당)
     deduction: '#ef4444',       // red-500 (공제)
     netPay: '#22c55e',          // green-500 (실수령)
 };

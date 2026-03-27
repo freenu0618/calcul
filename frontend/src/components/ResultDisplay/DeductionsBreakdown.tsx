@@ -26,8 +26,8 @@ export default function DeductionsBreakdown({ breakdown, taxableIncome }: Deduct
     const estimatedTaxable = taxableIncome || Math.round(insurance.national_pension.amount / (RATES.pension / 100));
 
     return (
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <h4 className="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">
+        <div className="bg-red-50 rounded-lg border border-red-200 p-4">
+            <h4 className="text-lg font-semibold text-gray-900 mb-4 border-b border-red-200 pb-2">
                 공제 내역
             </h4>
 

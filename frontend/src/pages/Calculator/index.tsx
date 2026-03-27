@@ -302,160 +302,182 @@ export default function CalculatorPage() {
             </div>
           </div>
 
-          {/* Step Wizard Form */}
-          <Card>
-            <StepWizard
-              steps={WIZARD_STEPS}
-              currentStep={wizard.currentStep}
-              onStepClick={wizard.goToStep}
-              onPrev={wizard.prevStep}
-              onNext={handleNext}
-              isFirstStep={wizard.isFirstStep}
-              isLastStep={wizard.isLastStep}
-              completeLabel={state.ui.isLoading ? '계산 중...' : '급여 계산하기'}
-              isNextDisabled={state.ui.isLoading || !canProceed()}
-            >
-              {renderStepContent()}
-            </StepWizard>
-          </Card>
-
-          {/* 에러 메시지 */}
-          {state.ui.error && (
-            <div className={`mt-6 border-l-4 p-4 ${state.ui.error.includes('플랜') ? 'bg-amber-50 border-amber-400 text-amber-800' : 'bg-red-50 border-red-400 text-red-700'}`}>
-              <p className="font-medium">{state.ui.error.includes('플랜') ? '이용 한도 도달' : '오류'}</p>
-              <p className="text-sm">{state.ui.error}</p>
-              {state.ui.error.includes('플랜') && (
-                <a href="/#pricing" className="inline-block mt-2 text-sm font-bold text-primary hover:underline">
-                  요금제 확인하기 →
-                </a>
-              )}
-            </div>
-          )}
-
-          {/* 계산 결과 */}
-          {state.result.current ? (
-            <div className="mt-8 space-y-4">
-              {/* 수당 편집 (결과 위) */}
-              <AllowanceEditor
-                result={state.result.current}
-                allowances={state.input.allowances}
-                onAllowancesChange={actions.setAllowances}
-                onRecalculate={() => queueMicrotask(calculate)}
-                isRecalculating={state.ui.isLoading}
-                onRemoveGuarantee={() => actions.setContractMonthlySalary(0)}
-                contractMonthlySalary={state.input.contractMonthlySalary}
-              />
-
-              {/* 계산 결과 */}
-              <Card title="계산 결과">
-                {/* 법령 기준 배지 */}
-                <div className="mb-3">
-                  <div className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full border border-green-200">
-                    <span>✅</span> 2026년 법령 기준 반영 (최저시급 10,320원 / 국민연금 4.75%)
-                  </div>
-                </div>
-                {/* 정산기간 배너 */}
-                <div className="mb-4 px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-700 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px]">date_range</span>
-                  <span>
-                    귀속월: {state.input.attributionMonth.replace('-', '년 ')}월
-                    <span className="text-blue-400 mx-2">|</span>
-                    정산 기간: {state.input.periodStart} ~ {state.input.periodEnd}
-                  </span>
-                </div>
-                <SalaryResult result={state.result.current} />
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <PDFExport
-                    result={state.result.current}
-                    employerName={
-                      state.input.employee.name
-                        ? `${state.input.employee.name} 급여명세서`
-                        : undefined
-                    }
-                  />
-                </div>
+          {/* 데스크톱: 2컬럼 레이아웃 / 모바일: 단일 컬럼 */}
+          <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+            {/* 좌측: 입력 폼 */}
+            <div>
+              {/* Step Wizard Form */}
+              <Card>
+                <StepWizard
+                  steps={WIZARD_STEPS}
+                  currentStep={wizard.currentStep}
+                  onStepClick={wizard.goToStep}
+                  onPrev={wizard.prevStep}
+                  onNext={handleNext}
+                  isFirstStep={wizard.isFirstStep}
+                  isLastStep={wizard.isLastStep}
+                  completeLabel={state.ui.isLoading ? '계산 중...' : '급여 계산하기'}
+                  isNextDisabled={state.ui.isLoading || !canProceed()}
+                >
+                  {renderStepContent()}
+                </StepWizard>
               </Card>
 
-              {/* 급여대장 저장 (로그인 사용자만) */}
-              {isAuthenticated && (
-                <Card title="급여대장에 저장">
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <select
-                        value={state.payroll.selectedPeriodId}
-                        onChange={(e) => actions.setSelectedPeriodId(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg"
-                      >
-                        <option value="">급여 기간 선택</option>
-                        {state.payroll.periods.map((p) => (
-                          <option key={p.id} value={p.id} disabled={p.status !== 'DRAFT'}>
-                            {p.year}년 {p.month}월{' '}
-                            {p.status !== 'DRAFT'
-                              ? `(${p.status === 'CONFIRMED' ? '확정' : '지급완료'})`
-                              : ''}
-                          </option>
-                        ))}
-                      </select>
-                      <select
-                        value={state.payroll.selectedEmployeeId}
-                        onChange={(e) => actions.setSelectedEmployeeId(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg"
-                      >
-                        <option value="">직원 선택</option>
-                        {state.payroll.registeredEmployees.map((emp) => (
-                          <option key={emp.id} value={emp.id}>
-                            {emp.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <button
-                      onClick={saveToPayroll}
-                      disabled={
-                        !state.payroll.selectedPeriodId ||
-                        !state.payroll.selectedEmployeeId ||
-                        state.ui.saveStatus === 'saving'
-                      }
-                      className="w-full py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300"
-                    >
-                      {state.ui.saveStatus === 'saving'
-                        ? '저장 중...'
-                        : state.ui.saveStatus === 'success'
-                        ? '✓ 저장됨'
-                        : '급여대장에 저장'}
-                    </button>
-                    {state.payroll.registeredEmployees.length === 0 && (
-                      <p className="text-sm text-amber-600">
-                        등록된 직원이 없습니다. 먼저 직원을 등록해주세요.
-                      </p>
-                    )}
-                    {state.payroll.periods.filter((p) => p.status === 'DRAFT').length === 0 &&
-                      state.payroll.periods.length > 0 && (
-                        <p className="text-sm text-amber-600">
-                          저장 가능한 급여 기간이 없습니다. 급여대장에서 새 기간을 만들거나
-                          기존 기간을 수정 상태로 변경해주세요.
-                        </p>
-                      )}
-                  </div>
-                  {state.ui.saveStatus === 'error' && (
-                    <p className="mt-2 text-sm text-red-500">{state.ui.saveError}</p>
+              {/* 에러 메시지 */}
+              {state.ui.error && (
+                <div className={`mt-6 border-l-4 p-4 ${state.ui.error.includes('플랜') ? 'bg-amber-50 border-amber-400 text-amber-800' : 'bg-red-50 border-red-400 text-red-700'}`}>
+                  <p className="font-medium">{state.ui.error.includes('플랜') ? '이용 한도 도달' : '오류'}</p>
+                  <p className="text-sm">{state.ui.error}</p>
+                  {state.ui.error.includes('플랜') && (
+                    <a href="/#pricing" className="inline-block mt-2 text-sm font-bold text-primary hover:underline">
+                      요금제 확인하기 →
+                    </a>
                   )}
+                </div>
+              )}
+
+              {/* 모바일 전용: 결과 영역 (lg 미만에서만 표시) */}
+              <div className="lg:hidden">
+                {state.result.current ? (
+                  <div className="mt-8 space-y-4">
+                    <AllowanceEditor
+                      result={state.result.current}
+                      allowances={state.input.allowances}
+                      onAllowancesChange={actions.setAllowances}
+                      onRecalculate={() => queueMicrotask(calculate)}
+                      isRecalculating={state.ui.isLoading}
+                      onRemoveGuarantee={() => actions.setContractMonthlySalary(0)}
+                      contractMonthlySalary={state.input.contractMonthlySalary}
+                    />
+                    <Card title="계산 결과">
+                      <div className="mb-3">
+                        <div className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full border border-green-200">
+                          <span>✅</span> 2026년 법령 기준 반영 (최저시급 10,320원 / 국민연금 4.75%)
+                        </div>
+                      </div>
+                      <div className="mb-4 px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-700 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[18px]">date_range</span>
+                        <span>
+                          귀속월: {state.input.attributionMonth.replace('-', '년 ')}월
+                          <span className="text-blue-400 mx-2">|</span>
+                          정산 기간: {state.input.periodStart} ~ {state.input.periodEnd}
+                        </span>
+                      </div>
+                      <SalaryResult result={state.result.current} />
+                      <div className="mt-6 pt-6 border-t border-gray-200">
+                        <PDFExport
+                          result={state.result.current}
+                          employerName={state.input.employee.name ? `${state.input.employee.name} 급여명세서` : undefined}
+                        />
+                      </div>
+                    </Card>
+                    {isAuthenticated && (
+                      <Card title="급여대장에 저장">
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-2 gap-3">
+                            <select value={state.payroll.selectedPeriodId} onChange={(e) => actions.setSelectedPeriodId(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg">
+                              <option value="">급여 기간 선택</option>
+                              {state.payroll.periods.map((p) => (
+                                <option key={p.id} value={p.id} disabled={p.status !== 'DRAFT'}>
+                                  {p.year}년 {p.month}월{p.status !== 'DRAFT' ? `(${p.status === 'CONFIRMED' ? '확정' : '지급완료'})` : ''}
+                                </option>
+                              ))}
+                            </select>
+                            <select value={state.payroll.selectedEmployeeId} onChange={(e) => actions.setSelectedEmployeeId(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg">
+                              <option value="">직원 선택</option>
+                              {state.payroll.registeredEmployees.map((emp) => (<option key={emp.id} value={emp.id}>{emp.name}</option>))}
+                            </select>
+                          </div>
+                          <button onClick={saveToPayroll} disabled={!state.payroll.selectedPeriodId || !state.payroll.selectedEmployeeId || state.ui.saveStatus === 'saving'} className="w-full py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300">
+                            {state.ui.saveStatus === 'saving' ? '저장 중...' : state.ui.saveStatus === 'success' ? '✓ 저장됨' : '급여대장에 저장'}
+                          </button>
+                        </div>
+                        {state.ui.saveStatus === 'error' && <p className="mt-2 text-sm text-red-500">{state.ui.saveError}</p>}
+                      </Card>
+                    )}
+                  </div>
+                ) : (
+                  !state.ui.error && !state.ui.isLoading && (
+                    <div className="mt-8">
+                      <Card>
+                        <EmptyState type="no-result" message="위 정보를 입력하고 계산하면 결과가 여기에 표시됩니다" />
+                      </Card>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* 우측: 실시간 결과 (데스크톱 전용, sticky) */}
+            <div className="hidden lg:block lg:sticky lg:top-8">
+              {state.result.current ? (
+                <div className="space-y-4">
+                  <AllowanceEditor
+                    result={state.result.current}
+                    allowances={state.input.allowances}
+                    onAllowancesChange={actions.setAllowances}
+                    onRecalculate={() => queueMicrotask(calculate)}
+                    isRecalculating={state.ui.isLoading}
+                    onRemoveGuarantee={() => actions.setContractMonthlySalary(0)}
+                    contractMonthlySalary={state.input.contractMonthlySalary}
+                  />
+                  <Card title="계산 결과">
+                    <div className="mb-3">
+                      <div className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full border border-green-200">
+                        <span>✅</span> 2026년 법령 기준 반영 (최저시급 10,320원 / 국민연금 4.75%)
+                      </div>
+                    </div>
+                    <div className="mb-4 px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-700 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-[18px]">date_range</span>
+                      <span>
+                        귀속월: {state.input.attributionMonth.replace('-', '년 ')}월
+                        <span className="text-blue-400 mx-2">|</span>
+                        정산 기간: {state.input.periodStart} ~ {state.input.periodEnd}
+                      </span>
+                    </div>
+                    <SalaryResult result={state.result.current} />
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <PDFExport
+                        result={state.result.current}
+                        employerName={state.input.employee.name ? `${state.input.employee.name} 급여명세서` : undefined}
+                      />
+                    </div>
+                  </Card>
+                  {isAuthenticated && (
+                    <Card title="급여대장에 저장">
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                          <select value={state.payroll.selectedPeriodId} onChange={(e) => actions.setSelectedPeriodId(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg">
+                            <option value="">급여 기간 선택</option>
+                            {state.payroll.periods.map((p) => (
+                              <option key={p.id} value={p.id} disabled={p.status !== 'DRAFT'}>
+                                {p.year}년 {p.month}월{p.status !== 'DRAFT' ? `(${p.status === 'CONFIRMED' ? '확정' : '지급완료'})` : ''}
+                              </option>
+                            ))}
+                          </select>
+                          <select value={state.payroll.selectedEmployeeId} onChange={(e) => actions.setSelectedEmployeeId(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg">
+                            <option value="">직원 선택</option>
+                            {state.payroll.registeredEmployees.map((emp) => (<option key={emp.id} value={emp.id}>{emp.name}</option>))}
+                          </select>
+                        </div>
+                        <button onClick={saveToPayroll} disabled={!state.payroll.selectedPeriodId || !state.payroll.selectedEmployeeId || state.ui.saveStatus === 'saving'} className="w-full py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300">
+                          {state.ui.saveStatus === 'saving' ? '저장 중...' : state.ui.saveStatus === 'success' ? '✓ 저장됨' : '급여대장에 저장'}
+                        </button>
+                      </div>
+                      {state.ui.saveStatus === 'error' && <p className="mt-2 text-sm text-red-500">{state.ui.saveError}</p>}
+                    </Card>
+                  )}
+                </div>
+              ) : (
+                <Card>
+                  <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400">
+                    <span className="material-symbols-outlined text-5xl mb-3 text-gray-300">calculate</span>
+                    <p className="text-sm">입력하시면 여기에 결과가 표시됩니다</p>
+                  </div>
                 </Card>
               )}
             </div>
-          ) : (
-            !state.ui.error &&
-            !state.ui.isLoading && (
-              <div className="mt-8">
-                <Card>
-                  <EmptyState
-                    type="no-result"
-                    message="위 정보를 입력하고 계산하면 결과가 여기에 표시됩니다"
-                  />
-                </Card>
-              </div>
-            )
-          )}
+          </div>
         </div>
       </MainLayout>
     </>

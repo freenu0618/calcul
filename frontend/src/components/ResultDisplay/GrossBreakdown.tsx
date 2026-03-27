@@ -15,8 +15,8 @@ export default function GrossBreakdown({ breakdown }: GrossBreakdownProps) {
     const hourlyWage = breakdown.hourly_wage.amount;
 
     return (
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <h4 className="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">
+        <div className="bg-emerald-50 rounded-lg border border-emerald-200 p-4">
+            <h4 className="text-lg font-semibold text-gray-900 mb-4 border-b border-emerald-200 pb-2">
                 지급 내역
             </h4>
 

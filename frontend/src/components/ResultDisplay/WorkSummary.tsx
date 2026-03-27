@@ -19,7 +19,7 @@ export default function WorkSummary({ summary, absence }: WorkSummaryProps) {
   return (
     <div className="space-y-4">
       {/* 근무 요약 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <div className="bg-blue-50 rounded-lg border border-blue-200 p-4">
         <h3 className="text-sm font-semibold text-gray-700 mb-3">
           근무 요약 ({summary.calculation_month})
         </h3>

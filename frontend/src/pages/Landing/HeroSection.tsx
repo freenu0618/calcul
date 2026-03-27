@@ -65,6 +65,18 @@ export default function HeroSection() {
             </p>
           </div>
 
+          {/* 모바일 전용: 숫자 카드 */}
+          <div className="lg:hidden mt-8 grid grid-cols-2 gap-3">
+            <div className="bg-white/80 backdrop-blur rounded-xl p-4 text-center border border-gray-200">
+              <p className="text-2xl font-bold text-primary">3분</p>
+              <p className="text-xs text-gray-500">계산 완료</p>
+            </div>
+            <div className="bg-white/80 backdrop-blur rounded-xl p-4 text-center border border-gray-200">
+              <p className="text-2xl font-bold text-primary">181개</p>
+              <p className="text-xs text-gray-500">테스트 검증</p>
+            </div>
+          </div>
+
           {/* 우측: 대시보드 일러스트 */}
           <div className="hidden lg:flex justify-center">
             <div className="relative w-full max-w-md">
