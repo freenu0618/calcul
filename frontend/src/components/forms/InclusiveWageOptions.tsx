@@ -60,14 +60,17 @@ export default function InclusiveWageOptions({
     <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex items-start gap-2 cursor-pointer">
             <input
               type="checkbox"
               checked={options.enabled}
               onChange={(e) => handleChange('enabled', e.target.checked)}
-              className="w-4 h-4 text-amber-600 rounded focus:ring-amber-500"
+              className="w-4 h-4 text-amber-600 rounded focus:ring-amber-500 mt-0.5"
             />
-            <span className="text-sm font-semibold text-gray-800">포괄임금제 적용</span>
+            <div>
+              <span className="text-sm font-semibold text-gray-800">포괄임금제 적용</span>
+              <p className="text-xs text-gray-500 mt-0.5">(기본급에 야근수당이 이미 포함된 급여 방식. 근로계약서에 "포괄임금"이라고 적혀있으면 해당됩니다)</p>
+            </div>
           </label>
           <Tooltip
             content={
@@ -94,6 +97,7 @@ export default function InclusiveWageOptions({
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 연장수당 시간당 금액
               </label>
+              <p className="text-xs text-gray-500 mt-0.5 mb-1">(매달 고정으로 야근하기로 한 시간의 시간당 수당)</p>
               <input
                 type="number"
                 value={options.fixed_overtime_hourly_rate || ''}
@@ -101,14 +105,12 @@ export default function InclusiveWageOptions({
                 placeholder="10500"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
-              <p className="mt-1 text-xs text-gray-500">
-                예: 10,500원/시간
-              </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 월 예정 연장시간
               </label>
+              <p className="text-xs text-gray-500 mt-0.5 mb-1">(매달 고정으로 야근하기로 한 시간, 최대 52시간)</p>
               <input
                 type="number"
                 value={options.monthly_expected_overtime_hours || ''}
@@ -118,9 +120,6 @@ export default function InclusiveWageOptions({
                 max="52"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
-              <p className="mt-1 text-xs text-gray-500">
-                계약서상 예정 연장시간 (최대 52시간)
-              </p>
             </div>
           </div>
 

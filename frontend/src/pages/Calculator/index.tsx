@@ -254,6 +254,54 @@ export default function CalculatorPage() {
             </div>
           </div>
 
+          {/* 법령 기준 배지 */}
+          <div className="mb-4">
+            <div className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full border border-green-200">
+              <span>✅</span> 2026년 법령 기준 반영 (최저시급 10,320원 / 국민연금 4.75%)
+            </div>
+          </div>
+
+          {/* 예시로 채우기 버튼 */}
+          <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+            <p className="text-xs text-gray-500 mb-2">💡 예시로 채우기:</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  actions.setEmployee({ ...state.input.employee, name: '홍길동', employment_type: 'FULL_TIME', company_size: 'OVER_5', scheduled_work_days: 5, daily_work_hours: 8, dependents_count: 1, children_under_20: 0 });
+                  actions.setWageType('MONTHLY_FIXED');
+                  actions.setBaseSalary(2500000);
+                }}
+                className="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-md hover:bg-blue-50 hover:border-blue-400 transition-colors"
+              >
+                월급 250만원 정규직
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  actions.setEmployee({ ...state.input.employee, name: '김파트', employment_type: 'PART_TIME', company_size: 'OVER_5', scheduled_work_days: 5, daily_work_hours: 8, dependents_count: 1, children_under_20: 0 });
+                  actions.setWageType('HOURLY_MONTHLY');
+                  actions.setHourlyWage(10320);
+                }}
+                className="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-md hover:bg-blue-50 hover:border-blue-400 transition-colors"
+              >
+                시급 10,320원 파트타임
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  actions.setEmployee({ ...state.input.employee, name: '이포괄', employment_type: 'FULL_TIME', company_size: 'OVER_5', scheduled_work_days: 5, daily_work_hours: 8, dependents_count: 1, children_under_20: 0 });
+                  actions.setWageType('MONTHLY_FIXED');
+                  actions.setBaseSalary(3000000);
+                  actions.setInclusiveWageOptions({ enabled: true, fixed_overtime_hourly_rate: 15000, monthly_expected_overtime_hours: 20 });
+                }}
+                className="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-md hover:bg-blue-50 hover:border-blue-400 transition-colors"
+              >
+                포괄임금 300만원
+              </button>
+            </div>
+          </div>
+
           {/* Step Wizard Form */}
           <Card>
             <StepWizard
@@ -300,6 +348,12 @@ export default function CalculatorPage() {
 
               {/* 계산 결과 */}
               <Card title="계산 결과">
+                {/* 법령 기준 배지 */}
+                <div className="mb-3">
+                  <div className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full border border-green-200">
+                    <span>✅</span> 2026년 법령 기준 반영 (최저시급 10,320원 / 국민연금 4.75%)
+                  </div>
+                </div>
                 {/* 정산기간 배너 */}
                 <div className="mb-4 px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-700 flex items-center gap-2">
                   <span className="material-symbols-outlined text-[18px]">date_range</span>

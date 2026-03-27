@@ -172,6 +172,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
             <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
           </Tooltip>
         </div>
+        <p className="text-xs text-gray-500 mt-0.5 mb-1">(일주일에 일하기로 한 날수, 보통 5일)</p>
         <select
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           value={employee.scheduled_work_days}
@@ -202,6 +203,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
             <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
           </Tooltip>
         </div>
+        <p className="text-xs text-gray-500 mt-0.5 mb-1">(하루에 일하기로 약속한 시간, 보통 8시간)</p>
         <select
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           value={employee.daily_work_hours}

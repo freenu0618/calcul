@@ -82,6 +82,7 @@ export default function SalaryForm({
       {isHourlyMonthly && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">시급</label>
+          <p className="text-xs text-gray-500 mt-0.5 mb-1">(1시간 일할 때 받는 금액, 2026년 최저시급: 10,320원)</p>
           <input
             type="text"
             inputMode="numeric"
@@ -90,9 +91,6 @@ export default function SalaryForm({
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="10,320"
           />
-          <p className="mt-1 text-xs text-gray-500">
-            2026년 최저시급: {fmt(10320)}원
-          </p>
         </div>
       )}
 
@@ -139,6 +137,7 @@ export default function SalaryForm({
           <label className="block text-sm font-medium text-gray-700 mb-1">
             기본급 (월)
           </label>
+          <p className="text-xs text-gray-500 mt-0.5 mb-1">(매달 고정으로 받는 급여, 세금 공제 전 금액)</p>
           <input
             type="text"
             inputMode="numeric"

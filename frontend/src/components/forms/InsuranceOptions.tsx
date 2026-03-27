@@ -122,52 +122,64 @@ export default function InsuranceOptions({
 
       <div className="grid grid-cols-2 gap-3">
         {/* 국민연금 */}
-        <label className="flex items-center gap-2 text-sm cursor-pointer">
+        <label className="flex items-start gap-2 text-sm cursor-pointer">
           <input
             type="checkbox"
             checked={options.apply_national_pension}
             onChange={(e) => handleChange('apply_national_pension', e.target.checked)}
-            className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+            className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500 mt-0.5"
           />
-          <span className={is60OrOlder && options.apply_national_pension ? 'text-amber-600' : ''}>
-            국민연금 {is60OrOlder && <span className="text-xs">(60세+)</span>}
-          </span>
+          <div>
+            <span className={is60OrOlder && options.apply_national_pension ? 'text-amber-600' : ''}>
+              국민연금 {is60OrOlder && <span className="text-xs">(60세+)</span>}
+            </span>
+            <p className="text-xs text-gray-500 mt-0.5">(노후 대비, 월급의 4.75%)</p>
+          </div>
         </label>
 
         {/* 건강보험 */}
-        <label className="flex items-center gap-2 text-sm cursor-pointer">
+        <label className="flex items-start gap-2 text-sm cursor-pointer">
           <input
             type="checkbox"
             checked={options.apply_health_insurance}
             onChange={(e) => handleChange('apply_health_insurance', e.target.checked)}
-            className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+            className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500 mt-0.5"
           />
-          <span>건강보험</span>
+          <div>
+            <span>건강보험</span>
+            <p className="text-xs text-gray-500 mt-0.5">(병원비 지원, 월급의 3.595%)</p>
+          </div>
         </label>
 
         {/* 장기요양보험 */}
-        <label className={`flex items-center gap-2 text-sm ${!options.apply_health_insurance ? 'opacity-50' : 'cursor-pointer'}`}>
+        <label className={`flex items-start gap-2 text-sm ${!options.apply_health_insurance ? 'opacity-50' : 'cursor-pointer'}`}>
           <input
             type="checkbox"
             checked={options.apply_long_term_care}
             onChange={(e) => handleChange('apply_long_term_care', e.target.checked)}
             disabled={!options.apply_health_insurance}
-            className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500 disabled:opacity-50"
+            className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500 disabled:opacity-50 mt-0.5"
           />
-          <span>장기요양보험</span>
+          <div>
+            <span>장기요양보험</span>
+            <p className="text-xs text-gray-500 mt-0.5">(노인 돌봄, 건강보험의 13.14%)</p>
+          </div>
         </label>
 
         {/* 고용보험 */}
-        <label className="flex items-center gap-2 text-sm cursor-pointer">
+        <label className="flex items-start gap-2 text-sm cursor-pointer">
           <input
             type="checkbox"
             checked={options.apply_employment_insurance}
             onChange={(e) => handleChange('apply_employment_insurance', e.target.checked)}
-            className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+            className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500 mt-0.5"
           />
-          <span className={isUnder15Hours && options.apply_employment_insurance ? 'text-amber-600' : ''}>
-            고용보험 {isUnder15Hours && <span className="text-xs">(&lt;15h)</span>}
-          </span>
+          <div>
+            <span className={isUnder15Hours && options.apply_employment_insurance ? 'text-amber-600' : ''}>
+              고용보험 {isUnder15Hours && <span className="text-xs">(&lt;15h)</span>}
+            </span>
+            <p className="text-xs text-gray-500 mt-0.5">(실업급여 대비, 월급의 0.9%)</p>
+          </div>
         </label>
       </div>
 

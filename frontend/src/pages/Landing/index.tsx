@@ -33,14 +33,14 @@ export default function LandingPage() {
   return (
     <>
       <Helmet>
-        <title>급여계산기 - 4대보험 주휴수당 자동계산 | PayTools</title>
+        <title>2026년 최저임금 실수령액 계산기 - 4대보험 주휴수당 자동계산 | PayTools</title>
         <meta
           name="description"
-          content="4대보험, 소득세, 주휴수당, 연장·야간·휴일 수당 자동 계산. 2026년 최신 법령 반영. 8개 법률 기반 정확한 계산. 직원 5명까지 무료."
+          content="2026년 최저임금 10,320원 기준 실수령액 자동 계산. 4대보험, 소득세, 주휴수당, 연장·야간·휴일 수당 자동 계산. 2026년 최신 법령 반영. 8개 법률 기반 정확한 계산. 직원 5명까지 무료."
         />
-        <meta name="keywords" content="급여계산기,4대보험계산기,주휴수당계산,연장근로수당,실수령액계산,급여명세서" />
+        <meta name="keywords" content="2026년최저임금,최저시급10320원,급여계산기,4대보험계산기,주휴수당계산,연장근로수당,실수령액계산,급여명세서" />
         <link rel="canonical" href="https://paytools.work" />
-        <meta property="og:title" content="급여계산기 - 4대보험 주휴수당 자동계산 | PayTools" />
+        <meta property="og:title" content="2026년 최저임금 실수령액 계산기 - 4대보험 주휴수당 자동계산 | PayTools" />
         <meta property="og:description" content="4대보험, 소득세, 주휴수당 자동 계산. 2026년 최신 법령 반영." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://paytools.work" />
