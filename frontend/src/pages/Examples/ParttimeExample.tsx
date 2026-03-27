@@ -165,21 +165,21 @@ const ParttimeExample = () => {
                   <tbody className="divide-y">
                     <tr>
                       <td className="px-4 py-2">국민연금</td>
-                      <td className="px-4 py-2 text-right">4.5%</td>
-                      <td className="px-4 py-2 text-right font-mono">807,127 × 4.5%</td>
-                      <td className="px-4 py-2 text-right font-semibold">36,321원</td>
+                      <td className="px-4 py-2 text-right">4.75%</td>
+                      <td className="px-4 py-2 text-right font-mono">807,127 × 4.75%</td>
+                      <td className="px-4 py-2 text-right font-semibold">38,339원</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2">건강보험</td>
-                      <td className="px-4 py-2 text-right">3.545%</td>
-                      <td className="px-4 py-2 text-right font-mono">807,127 × 3.545%</td>
-                      <td className="px-4 py-2 text-right font-semibold">28,613원</td>
+                      <td className="px-4 py-2 text-right">3.595%</td>
+                      <td className="px-4 py-2 text-right font-mono">807,127 × 3.595%</td>
+                      <td className="px-4 py-2 text-right font-semibold">29,016원</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2">장기요양보험</td>
-                      <td className="px-4 py-2 text-right">12.95%</td>
-                      <td className="px-4 py-2 text-right font-mono">28,613 × 12.95%</td>
-                      <td className="px-4 py-2 text-right font-semibold">3,705원</td>
+                      <td className="px-4 py-2 text-right">13.14%</td>
+                      <td className="px-4 py-2 text-right font-mono">29,016 × 13.14%</td>
+                      <td className="px-4 py-2 text-right font-semibold">3,813원</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2">고용보험</td>
@@ -246,15 +246,15 @@ const ParttimeExample = () => {
               <div className="space-y-2">
                 <div className="flex justify-between text-gray-700">
                   <span>국민연금</span>
-                  <span className="font-semibold">36,321원</span>
+                  <span className="font-semibold">38,339원</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>건강보험</span>
-                  <span className="font-semibold">28,613원</span>
+                  <span className="font-semibold">29,016원</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>장기요양보험</span>
-                  <span className="font-semibold">3,705원</span>
+                  <span className="font-semibold">3,813원</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>고용보험</span>
@@ -270,7 +270,7 @@ const ParttimeExample = () => {
                 </div>
                 <div className="border-t pt-2 flex justify-between text-lg font-bold">
                   <span>총 공제액</span>
-                  <span className="text-red-600">83,438원</span>
+                  <span className="text-red-600">85,967원</span>
                 </div>
               </div>
             </div>
@@ -279,10 +279,10 @@ const ParttimeExample = () => {
             <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg">
               <div className="flex justify-between items-center">
                 <span className="text-xl font-bold text-gray-900">실수령액</span>
-                <span className="text-4xl font-bold text-blue-600">723,689원</span>
+                <span className="text-4xl font-bold text-blue-600">721,160원</span>
               </div>
               <p className="text-sm text-gray-600 mt-2">
-                공제율: 10.4% (총 지급액 대비)
+                공제율: 10.7% (총 지급액 대비)
               </p>
             </div>
           </div>

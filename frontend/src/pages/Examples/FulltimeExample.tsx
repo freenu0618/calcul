@@ -158,21 +158,21 @@ const FulltimeExample = () => {
                   <tbody className="divide-y">
                     <tr>
                       <td className="px-4 py-2">국민연금</td>
-                      <td className="px-4 py-2 text-right">4.5%</td>
-                      <td className="px-4 py-2 text-right font-mono">2,700,000 × 4.5%</td>
-                      <td className="px-4 py-2 text-right font-semibold">121,500원</td>
+                      <td className="px-4 py-2 text-right">4.75%</td>
+                      <td className="px-4 py-2 text-right font-mono">2,700,000 × 4.75%</td>
+                      <td className="px-4 py-2 text-right font-semibold">128,250원</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2">건강보험</td>
-                      <td className="px-4 py-2 text-right">3.545%</td>
-                      <td className="px-4 py-2 text-right font-mono">2,700,000 × 3.545%</td>
-                      <td className="px-4 py-2 text-right font-semibold">95,715원</td>
+                      <td className="px-4 py-2 text-right">3.595%</td>
+                      <td className="px-4 py-2 text-right font-mono">2,700,000 × 3.595%</td>
+                      <td className="px-4 py-2 text-right font-semibold">97,065원</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2">장기요양보험</td>
-                      <td className="px-4 py-2 text-right">12.95%</td>
-                      <td className="px-4 py-2 text-right font-mono">95,715 × 12.95%</td>
-                      <td className="px-4 py-2 text-right font-semibold">12,395원</td>
+                      <td className="px-4 py-2 text-right">13.14%</td>
+                      <td className="px-4 py-2 text-right font-mono">97,065 × 13.14%</td>
+                      <td className="px-4 py-2 text-right font-semibold">12,754원</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2">고용보험</td>
@@ -243,15 +243,15 @@ const FulltimeExample = () => {
               <div className="space-y-2">
                 <div className="flex justify-between text-gray-700">
                   <span>국민연금</span>
-                  <span className="font-semibold">121,500원</span>
+                  <span className="font-semibold">128,250원</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>건강보험</span>
-                  <span className="font-semibold">95,715원</span>
+                  <span className="font-semibold">97,065원</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>장기요양보험</span>
-                  <span className="font-semibold">12,395원</span>
+                  <span className="font-semibold">12,754원</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>고용보험</span>
@@ -267,7 +267,7 @@ const FulltimeExample = () => {
                 </div>
                 <div className="border-t pt-2 flex justify-between text-lg font-bold">
                   <span>총 공제액</span>
-                  <span className="text-red-600">316,236원</span>
+                  <span className="text-red-600">324,695원</span>
                 </div>
               </div>
             </div>
@@ -276,10 +276,10 @@ const FulltimeExample = () => {
             <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg">
               <div className="flex justify-between items-center">
                 <span className="text-xl font-bold text-gray-900">실수령액</span>
-                <span className="text-4xl font-bold text-blue-600">2,383,764원</span>
+                <span className="text-4xl font-bold text-blue-600">2,375,305원</span>
               </div>
               <p className="text-sm text-gray-600 mt-2">
-                공제율: 11.7% (총 지급액 대비)
+                공제율: 12.0% (총 지급액 대비)
               </p>
             </div>
           </div>
