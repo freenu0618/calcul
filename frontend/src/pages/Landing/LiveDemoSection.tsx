@@ -19,7 +19,7 @@ function estimateIncomeTax(monthly: number): number {
 
 /** 간이 실수령액 계산 (랜딩페이지용, 2026년 요율) */
 function quickCalc(gross: number) {
-  const pension = Math.min(Math.round(gross * 0.0475), 302575);   // 4.75%, 상한 637만×4.75%
+  const pension = Math.min(Math.round(gross * 0.0475), 280250);   // 4.75%, 상한 590만×4.75%
   const health = Math.round(gross * 0.03595);                     // 3.595%
   const longTermCare = Math.round(health * 0.1314);               // 건강보험료 × 13.14%
   const employment = Math.round(gross * 0.009);
