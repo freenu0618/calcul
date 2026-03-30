@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
 import PageHelmet from '../../components/common/PageHelmet';
+import AdBanner from '../../components/common/AdBanner';
 
 // GA 타입 선언
 declare global {
@@ -246,7 +247,10 @@ const TaxGuide = () => {
           </div>
         </Card>
 
-        <div className="mt-8 bg-blue-50 border-l-4 border-blue-400 p-4">
+        {/* 광고 배너 */}
+        <AdBanner slot="4567890123" format="auto" className="mt-8 mb-4" />
+
+        <div className="mt-4 bg-blue-50 border-l-4 border-blue-400 p-4">
           <h3 className="font-semibold text-blue-900 mb-2">관련 가이드</h3>
           <ul className="space-y-2">
             <li>
