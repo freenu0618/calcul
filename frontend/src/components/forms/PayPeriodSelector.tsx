@@ -118,8 +118,9 @@ export default function PayPeriodSelector({
       {/* 날짜 입력 + 귀속월 */}
       <div className="flex flex-wrap items-end gap-3">
         <div>
-          <label className="block text-xs text-gray-500 mb-1">시작일</label>
+          <label htmlFor="period-start-input" className="block text-xs text-gray-500 mb-1">시작일</label>
           <input
+            id="period-start-input"
             type="date"
             value={periodStart}
             onChange={(e) => handleStartChange(e.target.value)}
@@ -128,8 +129,9 @@ export default function PayPeriodSelector({
         </div>
         <span className="text-gray-400 pb-1.5">~</span>
         <div>
-          <label className="block text-xs text-gray-500 mb-1">종료일</label>
+          <label htmlFor="period-end-input" className="block text-xs text-gray-500 mb-1">종료일</label>
           <input
+            id="period-end-input"
             type="date"
             value={periodEnd}
             onChange={(e) => handleEndChange(e.target.value)}
@@ -137,17 +139,19 @@ export default function PayPeriodSelector({
           />
         </div>
         <div className="relative">
-          <label className="flex items-center gap-1 text-xs text-gray-500 mb-1">
+          <label htmlFor="attribution-month-select" className="flex items-center gap-1 text-xs text-gray-500 mb-1">
             귀속월
             <button
               type="button"
               onClick={() => setShowTooltip(!showTooltip)}
+              aria-label="귀속월 도움말"
               className="text-gray-400 hover:text-blue-500"
             >
               <span className="material-symbols-outlined text-[16px]">info</span>
             </button>
           </label>
           <select
+            id="attribution-month-select"
             value={attributionMonth}
             onChange={(e) => onAttributionMonthChange(e.target.value)}
             className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"

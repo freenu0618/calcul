@@ -117,8 +117,9 @@ export default function HourlyAutoCalc({
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">시급</label>
+          <label htmlFor="hourly-auto-wage-input" className="block text-sm font-medium text-gray-700 mb-1">시급</label>
           <input
+            id="hourly-auto-wage-input"
             type="text"
             inputMode="numeric"
             value={fmt(hourlyWage)}
@@ -131,10 +132,11 @@ export default function HourlyAutoCalc({
           </p>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="contract-monthly-salary-input" className="block text-sm font-medium text-gray-700 mb-1">
             계약 월급
           </label>
           <input
+            id="contract-monthly-salary-input"
             type="text"
             inputMode="numeric"
             value={fmt(contractMonthlySalary)}

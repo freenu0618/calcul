@@ -72,7 +72,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
       {/* 로그인 사용자: 저장된 근무자 불러오기 */}
       {isAuthenticated && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-          <label className="block text-sm font-medium text-blue-900 mb-2">
+          <label htmlFor="saved-employee-select" className="block text-sm font-medium text-blue-900 mb-2">
             <span className="material-symbols-outlined text-[16px] align-middle mr-1">person_search</span>
             저장된 근무자 불러오기
           </label>
@@ -80,6 +80,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
             <p className="text-sm text-blue-600">불러오는 중...</p>
           ) : savedEmployees.length > 0 ? (
             <select
+              id="saved-employee-select"
               className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               value={selectedEmployeeId}
               onChange={(e) => handleEmployeeSelect(e.target.value)}
@@ -118,17 +119,18 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
 
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="employment-type-select" className="block text-sm font-medium text-gray-700">
             고용 형태
           </label>
           <Tooltip
             content="정규직: 주 40시간 이상 근무. 시간제: 주 40시간 미만 단시간 근로자. 4대보험 가입 기준이 다릅니다."
             position="right"
           >
-            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+            <span aria-label="고용 형태 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
           </Tooltip>
         </div>
         <select
+          id="employment-type-select"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           value={employee.employment_type}
           onChange={(e) => handleChange('employment_type', e.target.value as EmploymentType)}
@@ -140,17 +142,18 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
 
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="company-size-select" className="block text-sm font-medium text-gray-700">
             사업장 규모
           </label>
           <Tooltip
             content="5인 이상: 휴일근로 8시간 초과 시 2배 가산. 5인 미만: 1.5배 가산. 근로기준법 적용 범위가 다릅니다."
             position="right"
           >
-            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+            <span aria-label="사업장 규모 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
           </Tooltip>
         </div>
         <select
+          id="company-size-select"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           value={employee.company_size}
           onChange={(e) => handleChange('company_size', e.target.value as CompanySize)}
@@ -162,18 +165,19 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
 
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="scheduled-work-days-select" className="block text-sm font-medium text-gray-700">
             주 소정근로일 (계약)
           </label>
           <Tooltip
             content="근로계약서에 명시된 주간 근무일 수. 개근 여부 판단 기준이며, 실제 근무일이 소정근로일 이상이면 주휴수당이 발생합니다."
             position="right"
           >
-            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+            <span aria-label="주 소정근로일 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
           </Tooltip>
         </div>
         <p className="text-xs text-gray-500 mt-0.5 mb-1">(일주일에 일하기로 한 날수, 보통 5일)</p>
         <select
+          id="scheduled-work-days-select"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           value={employee.scheduled_work_days}
           onChange={(e) => handleChange('scheduled_work_days', parseInt(e.target.value))}
@@ -193,18 +197,19 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
 
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="daily-work-hours-select" className="block text-sm font-medium text-gray-700">
             1일 소정근로시간
           </label>
           <Tooltip
             content="근로계약서에 명시된 하루 근무시간. 주 소정근로시간과 통상시급 계산에 사용됩니다."
             position="right"
           >
-            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+            <span aria-label="1일 소정근로시간 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
           </Tooltip>
         </div>
         <p className="text-xs text-gray-500 mt-0.5 mb-1">(하루에 일하기로 약속한 시간, 보통 8시간)</p>
         <select
+          id="daily-work-hours-select"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           value={employee.daily_work_hours}
           onChange={(e) => handleChange('daily_work_hours', parseInt(e.target.value))}
@@ -217,17 +222,18 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
 
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="dependents-count-input" className="block text-sm font-medium text-gray-700">
             부양가족 수 (본인 포함)
           </label>
           <Tooltip
             content="본인을 포함한 부양가족 수. 소득세 간이세액표 적용에 사용됩니다. 부양가족이 많을수록 세금이 줄어듭니다."
             position="right"
           >
-            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+            <span aria-label="부양가족 수 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
           </Tooltip>
         </div>
         <input
+          id="dependents-count-input"
           type="number"
           value={employee.dependents_count}
           onChange={(e) => handleChange('dependents_count', parseInt(e.target.value) || 0)}
@@ -240,17 +246,18 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
 
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="children-under-20-input" className="block text-sm font-medium text-gray-700">
             20세 이하 자녀 수
           </label>
           <Tooltip
             content="만 20세 이하 자녀 수. 자녀세액공제 적용에 사용됩니다. 부양가족 수를 초과할 수 없습니다."
             position="right"
           >
-            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+            <span aria-label="20세 이하 자녀 수 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
           </Tooltip>
         </div>
         <input
+          id="children-under-20-input"
           type="number"
           value={employee.children_under_20}
           onChange={(e) => handleChange('children_under_20', parseInt(e.target.value) || 0)}
@@ -263,17 +270,18 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
       {/* 만 나이 (60세 이상 국민연금 제외 안내용) */}
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="employee-age-input" className="block text-sm font-medium text-gray-700">
             만 나이 (선택)
           </label>
           <Tooltip
             content="만 60세 이상은 국민연금 의무가입 대상이 아닙니다. 만 18세 미만은 고용보험 가입 제외될 수 있습니다."
             position="right"
           >
-            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+            <span aria-label="만 나이 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
           </Tooltip>
         </div>
         <input
+          id="employee-age-input"
           type="number"
           value={employee.age || ''}
           onChange={(e) => handleChange('age', parseInt(e.target.value) || 0)}
@@ -293,6 +301,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
       <div className="flex items-center gap-3">
         <label className="flex items-center gap-2 cursor-pointer">
           <input
+            id="is-foreigner-checkbox"
             type="checkbox"
             checked={employee.is_foreigner || false}
             onChange={(e) => {
@@ -310,10 +319,11 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
       {/* 체류자격 (외국인만) */}
       {employee.is_foreigner && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="visa-type-select" className="block text-sm font-medium text-gray-700 mb-1">
             체류자격
           </label>
           <select
+            id="visa-type-select"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             value={employee.visa_type || ''}
             onChange={(e) => handleChange('visa_type', e.target.value as VisaType)}

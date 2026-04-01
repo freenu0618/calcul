@@ -81,9 +81,10 @@ export default function SalaryForm({
       {/* 시급 입력 (시급제 월정산) */}
       {isHourlyMonthly && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">시급</label>
+          <label htmlFor="hourly-wage-input" className="block text-sm font-medium text-gray-700 mb-1">시급</label>
           <p className="text-xs text-gray-500 mt-0.5 mb-1">(1시간 일할 때 받는 금액, 2026년 최저시급: 10,320원)</p>
           <input
+            id="hourly-wage-input"
             type="text"
             inputMode="numeric"
             value={fmt(hourlyWage)}
@@ -134,11 +135,12 @@ export default function SalaryForm({
       {/* 기본급 직접 입력 (월급제 고정) */}
       {isMonthly && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="base-salary-input" className="block text-sm font-medium text-gray-700 mb-1">
             기본급 (월)
           </label>
           <p className="text-xs text-gray-500 mt-0.5 mb-1">(매달 고정으로 받는 급여, 세금 공제 전 금액)</p>
           <input
+            id="base-salary-input"
             type="text"
             inputMode="numeric"
             value={fmt(baseSalary)}
