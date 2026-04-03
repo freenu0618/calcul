@@ -29,6 +29,9 @@ const InsuranceGuide = lazy(() => import('./pages/Guide/InsuranceGuide'));
 const TaxGuide = lazy(() => import('./pages/Guide/TaxGuide'));
 const OvertimeGuide = lazy(() => import('./pages/Guide/OvertimeGuide'));
 const HowToUseGuide = lazy(() => import('./pages/Guide/HowToUseGuide'));
+const SeveranceGuide = lazy(() => import('./pages/Guide/SeveranceGuide'));
+const AnnualLeaveGuide = lazy(() => import('./pages/Guide/AnnualLeaveGuide'));
+const WeeklyHolidayGuide = lazy(() => import('./pages/Guide/WeeklyHolidayGuide'));
 const FAQ = lazy(() => import('./pages/FAQ'));
 const ExamplesPage = lazy(() => import('./pages/Examples/ExamplesPage'));
 const FulltimeExample = lazy(() => import('./pages/Examples/FulltimeExample'));
@@ -119,6 +122,9 @@ function App() {
                     <Route path="/guide/tax" element={<TaxGuide />} />
                     <Route path="/guide/overtime" element={<OvertimeGuide />} />
                     <Route path="/guide/how-to-use" element={<HowToUseGuide />} />
+                    <Route path="/guide/severance" element={<SeveranceGuide />} />
+                    <Route path="/guide/annual-leave" element={<AnnualLeaveGuide />} />
+                    <Route path="/guide/weekly-holiday" element={<WeeklyHolidayGuide />} />
 
                     {/* FAQ */}
                     <Route path="/faq" element={<FAQ />} />

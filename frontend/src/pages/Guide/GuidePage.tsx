@@ -29,6 +29,24 @@ const lawGuides = [
     description: '근로기준법에 따른 가산수당 계산 방법과 통상시급의 개념을 이해합니다.',
     icon: <OvertimeIcon size="sm" />,
   },
+  {
+    title: '퇴직금 계산 가이드',
+    path: '/guide/severance',
+    description: '2026년 기준 퇴직금 계산법, 평균임금 산정 방법, 구체적인 계산 예시를 확인하세요.',
+    icon: <span className="material-symbols-outlined text-[40px] text-amber-600">savings</span>,
+  },
+  {
+    title: '연차수당 완벽 가이드',
+    path: '/guide/annual-leave',
+    description: '연차 발생 기준, 연차수당 계산법, 미사용 연차 처리 방법을 상세히 안내합니다.',
+    icon: <span className="material-symbols-outlined text-[40px] text-green-600">event_available</span>,
+  },
+  {
+    title: '주휴수당 완벽 가이드',
+    path: '/guide/weekly-holiday',
+    description: '주휴수당 개념, 발생 조건, 파트타임 계산법을 2026년 기준으로 정리했습니다.',
+    icon: <span className="material-symbols-outlined text-[40px] text-purple-600">weekend</span>,
+  },
 ];
 
 const wageTypes = [
