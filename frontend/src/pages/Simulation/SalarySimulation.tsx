@@ -3,14 +3,65 @@
  * - 같은 총 급여액에서 기본급/수당 배분에 따른 인건비 차이 비교
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
 import Input from '../../components/common/Input';
+import Button from '../../components/common/Button';
 import { simulationApi } from '../../api/simulationApi';
 import type { SimulationCompareResponse, SimulationCompareRequest } from '../../types/simulation';
 import { DEFAULT_SIMULATION_REQUEST } from '../../types/simulation';
+
+const SCENARIO_PRESETS: Array<{ label: string; description: string; values: SimulationCompareRequest }> = [
+  {
+    label: '기본 사무직',
+    description: '주 40시간 · 연장 없음',
+    values: {
+      monthly_total: 2500000,
+      weekly_hours: 40,
+      expected_overtime_hours: 0,
+      expected_night_hours: 0,
+      expected_holiday_hours: 0,
+      base_salary_ratio_a: 1.0,
+      base_salary_ratio_b: 0.6,
+    },
+  },
+  {
+    label: '매장/서비스직',
+    description: '연장·휴일근로 반영',
+    values: {
+      monthly_total: 2800000,
+      weekly_hours: 40,
+      expected_overtime_hours: 12,
+      expected_night_hours: 4,
+      expected_holiday_hours: 8,
+      base_salary_ratio_a: 1.0,
+      base_salary_ratio_b: 0.6,
+    },
+  },
+  {
+    label: '교대근무',
+    description: '야간·휴일근로 비중 높음',
+    values: {
+      monthly_total: 3200000,
+      weekly_hours: 40,
+      expected_overtime_hours: 10,
+      expected_night_hours: 16,
+      expected_holiday_hours: 8,
+      base_salary_ratio_a: 1.0,
+      base_salary_ratio_b: 0.7,
+    },
+  },
+];
+
+const STRUCTURE_PRESETS = [
+  { label: '100% vs 60%', a: 1.0, b: 0.6 },
+  { label: '90% vs 70%', a: 0.9, b: 0.7 },
+  { label: '80% vs 50%', a: 0.8, b: 0.5 },
+];
+
+const currency = new Intl.NumberFormat('ko-KR');
 
 export default function SalarySimulation() {
   const [request, setRequest] = useState<SimulationCompareRequest>(DEFAULT_SIMULATION_REQUEST);
@@ -20,6 +71,22 @@ export default function SalarySimulation() {
 
   const handleChange = (field: keyof SimulationCompareRequest, value: number) => {
     setRequest(prev => ({ ...prev, [field]: value }));
+  };
+
+  const applyPreset = (preset: SimulationCompareRequest) => {
+    setRequest(preset);
+    setResult(null);
+    setError(null);
+  };
+
+  const applyStructurePreset = (a: number, b: number) => {
+    setRequest(prev => ({
+      ...prev,
+      base_salary_ratio_a: a,
+      base_salary_ratio_b: b,
+    }));
+    setResult(null);
+    setError(null);
   };
 
   const handleSimulate = useCallback(async () => {
@@ -34,6 +101,24 @@ export default function SalarySimulation() {
       setIsLoading(false);
     }
   }, [request]);
+
+  const summary = useMemo(() => {
+    if (!result) return null;
+
+    const aCost = result.plan_a.annual_employer_cost.amount;
+    const bCost = result.plan_b.annual_employer_cost.amount;
+    const cheaperPlan = aCost <= bCost ? result.plan_a : result.plan_b;
+    const monthlyDiff = Math.round(Math.abs(result.difference.annual_cost_diff.amount) / 12);
+    const overtimeGap = Math.abs(result.difference.overtime_pay_diff.amount);
+    const severanceGap = Math.abs(result.difference.severance_pay_diff.amount);
+
+    return {
+      cheaperPlan,
+      monthlyDiff,
+      overtimeGap,
+      severanceGap,
+    };
+  }, [result]);
 
   return (
     <>
@@ -52,8 +137,46 @@ export default function SalarySimulation() {
             같은 총 급여액에서 기본급/수당 배분에 따른 인건비 차이를 비교합니다.
           </p>
 
+          <div className="mb-6 grid gap-4 lg:grid-cols-2">
+            <Card>
+              <h2 className="text-lg font-semibold mb-3">빠른 시나리오</h2>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {SCENARIO_PRESETS.map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => applyPreset(preset.values)}
+                    className="rounded-lg border border-gray-200 p-4 text-left transition hover:border-primary-500 hover:bg-primary-50"
+                  >
+                    <p className="font-semibold text-gray-900">{preset.label}</p>
+                    <p className="mt-1 text-sm text-gray-500">{preset.description}</p>
+                  </button>
+                ))}
+              </div>
+            </Card>
+
+            <Card>
+              <h2 className="text-lg font-semibold mb-3">비교 템플릿</h2>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {STRUCTURE_PRESETS.map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => applyStructurePreset(preset.a, preset.b)}
+                    className="rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-primary-500 hover:text-primary-700"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-sm text-gray-600 leading-6">
+                기본급 비율이 높을수록 통상시급·연장수당·퇴직금·연차수당 기준이 함께 올라갑니다.
+                여러 비율을 빠르게 비교해 사업장 구조에 맞는 안을 검토해보세요.
+              </p>
+            </Card>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* 입력 폼 */}
             <Card className="lg:col-span-1">
               <h2 className="text-lg font-semibold mb-4">시뮬레이션 조건</h2>
 
@@ -128,17 +251,20 @@ export default function SalarySimulation() {
                   />
                 </div>
 
-                <button
+                <div className="rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-900">
+                  비교 포인트: 총 급여를 유지한 채 기본급 비율만 바꾸면 연장·야간·휴일수당과 퇴직금 기준이 어떻게 달라지는지 바로 확인할 수 있습니다.
+                </div>
+
+                <Button
                   onClick={handleSimulate}
                   disabled={isLoading}
-                  className="w-full py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 disabled:opacity-50"
+                  className="w-full py-3"
                 >
                   {isLoading ? '계산 중...' : '시뮬레이션 실행'}
-                </button>
+                </Button>
               </div>
             </Card>
 
-            {/* 결과 표시 */}
             <div className="lg:col-span-2 space-y-6">
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -146,21 +272,41 @@ export default function SalarySimulation() {
                 </div>
               )}
 
-              {result && (
+              {result && summary && (
                 <>
-                  {/* 비교표 */}
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <Card className="bg-green-50 border border-green-200">
+                      <p className="text-sm text-green-700 mb-1">연간 인건비가 더 낮은 안</p>
+                      <p className="text-xl font-semibold text-green-900">{summary.cheaperPlan.name}</p>
+                    </Card>
+                    <Card className="bg-slate-50 border border-slate-200">
+                      <p className="text-sm text-slate-600 mb-1">월 환산 인건비 차이</p>
+                      <p className="text-xl font-semibold text-slate-900">약 {currency.format(summary.monthlyDiff)}원</p>
+                    </Card>
+                    <Card className="bg-amber-50 border border-amber-200">
+                      <p className="text-sm text-amber-700 mb-1">퇴직금 기준 차이</p>
+                      <p className="text-xl font-semibold text-amber-900">{currency.format(summary.severanceGap)}원</p>
+                    </Card>
+                  </div>
+
+                  <Card className="bg-blue-50 border-blue-200">
+                    <h2 className="text-lg font-semibold mb-2 text-blue-900">핵심 해석</h2>
+                    <p className="text-blue-800 leading-7">
+                      {summary.cheaperPlan.name}이 연간 인건비 기준으로 더 유리합니다. 다만 연장수당 차이는 {currency.format(summary.overtimeGap)}원,
+                      퇴직금 기준 차이는 {currency.format(summary.severanceGap)}원 수준이므로 비용 절감과 법적/운영상 안정성 사이의 균형을 함께 보시는 게 좋습니다.
+                    </p>
+                  </Card>
+
                   <Card>
                     <h2 className="text-lg font-semibold mb-4">급여 구조 비교</h2>
                     <ComparisonTable result={result} />
                   </Card>
 
-                  {/* 차이 분석 */}
                   <Card>
                     <h2 className="text-lg font-semibold mb-4">차이 분석</h2>
                     <DifferenceAnalysis result={result} />
                   </Card>
 
-                  {/* 추천 의견 */}
                   <Card className="bg-blue-50 border-blue-200">
                     <h2 className="text-lg font-semibold mb-2 text-blue-900">추천 의견</h2>
                     <p className="text-blue-800">{result.recommendation}</p>
