@@ -230,11 +230,11 @@ export default function CalculatorPage() {
   return (
     <>
       <Helmet>
-        <title>급여 계산기 - 2026년 최저임금·실수령액·4대보험 자동 계산 | PayTools</title>
-        <meta name="description" content="기본급, 수당, 4대보험, 소득세, 주휴수당까지 자동 계산하세요. 2026년 최저임금 10,320원과 최신 요율을 반영한 실수령액 계산기입니다." />
+        <title>급여 계산기 - 2026년 실수령액·4대보험·주휴수당 자동 계산 | PayTools</title>
+        <meta name="description" content="기본급, 각종 수당, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당까지 자동 계산하세요. 2026년 최저임금 10,320원과 최신 요율을 반영한 무료 실수령액 계산기입니다." />
         <link rel="canonical" href="https://paytools.work/calculator" />
-        <meta property="og:title" content="급여 계산기 - 4대보험, 소득세 자동 계산" />
-        <meta property="og:description" content="기본급, 수당, 4대보험, 소득세를 자동 계산. 2026년 최신 세율 적용." />
+        <meta property="og:title" content="급여 계산기 - 2026년 실수령액·4대보험 자동 계산 | PayTools" />
+        <meta property="og:description" content="기본급, 수당, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 한 번에 계산하는 2026년 기준 급여 계산기입니다." />
         <meta property="og:url" content="https://paytools.work/calculator" />
       </Helmet>
 

@@ -53,11 +53,11 @@ function ReverseCalculator() {
   return (
     <>
       <Helmet>
-        <title>실수령액 역산 계산기 | 월급 역산</title>
-        <meta name="description" content="원하는 실수령액을 입력하면 필요한 기본급을 역산합니다. 4대보험, 소득세를 고려한 정확한 역산 계산." />
+        <title>실수령액 역산 계산기 - 목표 월급에 맞는 세전 급여 계산 | PayTools</title>
+        <meta name="description" content="원하는 실수령액을 입력하면 필요한 세전 월급과 기본급을 역산합니다. 4대보험, 소득세, 지방소득세를 반영한 2026년 기준 월급 역산 계산기입니다." />
         <link rel="canonical" href="https://paytools.work/reverse-calculator" />
-        <meta property="og:title" content="실수령액 역산 계산기" />
-        <meta property="og:description" content="원하는 실수령액을 입력하면 필요한 기본급을 역산합니다." />
+        <meta property="og:title" content="실수령액 역산 계산기 - 목표 월급에 맞는 세전 급여 계산 | PayTools" />
+        <meta property="og:description" content="목표 실수령액에 맞춰 필요한 세전 월급을 역산하세요. 4대보험과 소득세를 반영한 무료 월급 역산 계산기입니다." />
         <meta property="og:url" content="https://paytools.work/reverse-calculator" />
       </Helmet>
       <MainLayout>
