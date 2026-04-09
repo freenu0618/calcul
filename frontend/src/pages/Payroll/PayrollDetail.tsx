@@ -11,7 +11,7 @@ import type { PayrollLedgerResponse, PayrollEntryResponse, PayrollStatus } from 
 import type { EmployeeResponse } from '../../types/employee';
 import type { WorkShiftRequest } from '../../types/salary';
 import { formatNumber } from '../../utils/formatters';
-import { exportPayrollDetailXlsx } from '../../utils/excelExport';
+// excelExport는 버튼 클릭 시 동적 로드 (279KB xlsx 번들 초기 로딩 제외)
 import MonthlyTemplate from '../../components/ShiftInput/MonthlyTemplate';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import Breadcrumb from '../../components/common/Breadcrumb';
@@ -226,7 +226,10 @@ export default function PayrollDetail() {
         <div className="flex gap-2">
           {entries.length > 0 && (
             <button
-              onClick={() => exportPayrollDetailXlsx(period, entries)}
+              onClick={async () => {
+                const { exportPayrollDetailXlsx } = await import('../../utils/excelExport');
+                exportPayrollDetailXlsx(period, entries);
+              }}
               className="flex items-center gap-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
             >
               <span className="material-symbols-outlined text-lg">download</span>

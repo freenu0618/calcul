@@ -8,7 +8,7 @@ import { payrollApi } from '../../api/payrollApi';
 import { useToast } from '../../components/common/Toast';
 import type { PayrollPeriodResponse } from '../../types/payroll';
 import { formatNumber } from '../../utils/formatters';
-import { exportPayrollSummaryXlsx } from '../../utils/excelExport';
+// excelExport는 버튼 클릭 시 동적 로드 (279KB xlsx 번들 초기 로딩 제외)
 import PageLoader from '../../components/common/PageLoader';
 
 const STATUS_LABELS: Record<string, { text: string; className: string }> = {
@@ -69,7 +69,10 @@ export default function PayrollList() {
         <div className="flex gap-2">
           {periods.length > 0 && (
             <button
-              onClick={() => exportPayrollSummaryXlsx(periods)}
+              onClick={async () => {
+                const { exportPayrollSummaryXlsx } = await import('../../utils/excelExport');
+                exportPayrollSummaryXlsx(periods);
+              }}
               className="flex items-center gap-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <span className="material-symbols-outlined text-lg">download</span>

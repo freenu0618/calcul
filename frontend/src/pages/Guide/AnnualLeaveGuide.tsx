@@ -79,7 +79,7 @@ const AnnualLeaveGuide = () => {
             </div>
           </Card>
 
-          <AdBanner className="my-6" />
+          <AdBanner slot="7890123456" className="my-6" />
 
           {/* 연차 발생 기준 */}
           <Card title="연차 발생 기준" className="mt-6">
@@ -393,7 +393,7 @@ const AnnualLeaveGuide = () => {
             </div>
           </Card>
 
-          <AdBanner className="my-6" />
+          <AdBanner slot="7890123456" className="my-6" />
 
           {/* 관련 링크 */}
           <div className="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">

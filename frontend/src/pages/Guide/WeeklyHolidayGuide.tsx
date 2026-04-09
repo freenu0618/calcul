@@ -79,7 +79,7 @@ const WeeklyHolidayGuide = () => {
             </div>
           </Card>
 
-          <AdBanner className="my-6" />
+          <AdBanner slot="9012345678" className="my-6" />
 
           {/* 주휴수당 발생 조건 */}
           <Card title="주휴수당 발생 조건" className="mt-6">
@@ -429,7 +429,7 @@ const WeeklyHolidayGuide = () => {
             </div>
           </Card>
 
-          <AdBanner className="my-6" />
+          <AdBanner slot="9012345678" className="my-6" />
 
           {/* 관련 링크 */}
           <div className="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">

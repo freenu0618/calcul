@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { employeeApi } from '../../api/employeeApi';
 import type { EmployeeResponse } from '../../types/employee';
-import { exportEmployeeListXlsx } from '../../utils/excelExport';
+// excelExport는 버튼 클릭 시 동적 로드 (279KB xlsx 번들 초기 로딩 제외)
 import { useSubscription } from '../../hooks/useSubscription';
 import UpgradeModal from '../../components/UpgradeModal';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
@@ -101,7 +101,10 @@ export default function EmployeeList() {
           <div className="flex gap-2">
             {employees.length > 0 && (
               <button
-                onClick={() => exportEmployeeListXlsx(employees)}
+                onClick={async () => {
+                  const { exportEmployeeListXlsx } = await import('../../utils/excelExport');
+                  exportEmployeeListXlsx(employees);
+                }}
                 className="px-4 py-3 border border-gray-200 text-text-main rounded-xl font-bold hover:bg-gray-50 transition-colors flex items-center gap-1"
               >
                 <span className="material-symbols-outlined text-lg">download</span>

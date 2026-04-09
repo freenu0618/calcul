@@ -85,7 +85,7 @@ const SeveranceGuide = () => {
             </div>
           </Card>
 
-          <AdBanner className="my-6" />
+          <AdBanner slot="8901234567" className="my-6" />
 
           {/* 평균임금 계산 */}
           <Card title="평균임금 계산 방법" className="mt-6">
@@ -391,7 +391,7 @@ const SeveranceGuide = () => {
             </div>
           </Card>
 
-          <AdBanner className="my-6" />
+          <AdBanner slot="8901234567" className="my-6" />
 
           {/* 관련 링크 */}
           <div className="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
