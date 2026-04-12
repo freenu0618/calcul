@@ -290,6 +290,26 @@ export default function CalculatorPage() {
               <button
                 type="button"
                 onClick={() => {
+                  actions.setEmployee({
+                    ...state.input.employee,
+                    name: '야간알바',
+                    employment_type: 'PART_TIME',
+                    company_size: 'UNDER_5',
+                    scheduled_work_days: 3,
+                    daily_work_hours: 6,
+                    dependents_count: 0,
+                    children_under_20: 0,
+                  });
+                  actions.setWageType('HOURLY_MONTHLY');
+                  actions.setHourlyWage(12000);
+                }}
+                className="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-md hover:bg-blue-50 hover:border-blue-400 transition-colors"
+              >
+                시급 12,000원 야간 알바
+              </button>
+              <button
+                type="button"
+                onClick={() => {
                   actions.setEmployee({ ...state.input.employee, name: '이포괄', employment_type: 'FULL_TIME', company_size: 'OVER_5', scheduled_work_days: 5, daily_work_hours: 8, dependents_count: 1, children_under_20: 0 });
                   actions.setWageType('MONTHLY_FIXED');
                   actions.setBaseSalary(3000000);
