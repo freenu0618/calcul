@@ -228,12 +228,15 @@ const FAQ = () => {
   return (
     <>
       <Helmet>
-        <title>자주 묻는 질문 (FAQ) | PayTools 급여 계산기</title>
-        <meta name="description" content="급여 계산, 4대 보험, 소득세, 연장수당, 최저임금, 법적 권리에 대한 30개의 자주 묻는 질문과 답변을 확인하세요." />
+        <title>2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 질문 모음 | PayTools</title>
+        <meta name="description" content="2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 연장·야간·휴일수당, 근로자 권리에 대한 자주 묻는 질문 30가지를 한 번에 확인하세요." />
         <link rel="canonical" href="https://paytools.work/faq" />
-        <meta property="og:title" content="자주 묻는 질문 (FAQ) - 급여 계산기" />
-        <meta property="og:description" content="급여 계산, 4대 보험, 소득세, 연장수당, 최저임금에 대한 30개의 FAQ." />
+        <meta property="og:title" content="2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 | PayTools" />
+        <meta property="og:description" content="2026년 급여 계산과 4대보험, 주휴수당, 최저임금, 근로자 권리까지 자주 묻는 질문을 정리한 FAQ 페이지입니다." />
         <meta property="og:url" content="https://paytools.work/faq" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="2026년 급여 계산 FAQ | PayTools" />
+        <meta name="twitter:description" content="실수령액, 4대보험, 주휴수당, 최저임금 관련 질문을 한 번에 확인하세요." />
         <script type="application/ld+json">
           {JSON.stringify(faqSchemaData)}
         </script>

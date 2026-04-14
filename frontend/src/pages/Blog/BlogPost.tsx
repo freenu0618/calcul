@@ -47,20 +47,21 @@ const BlogPost = () => {
   return (
     <MainLayout>
       <Helmet>
-        <title>{post.title} | 급여계산기</title>
+        <title>{`${post.title} | PayTools 급여 계산 가이드`}</title>
         <meta name="description" content={post.excerpt} />
         <meta name="keywords" content={post.keywords.join(', ')} />
         <link rel="canonical" href={`https://paytools.work/blog/${post.id}`} />
 
         {/* Open Graph */}
-        <meta property="og:title" content={post.title} />
+        <meta property="og:title" content={`${post.title} | PayTools`} />
         <meta property="og:description" content={post.excerpt} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={`https://paytools.work/blog/${post.id}`} />
+        <meta property="og:site_name" content="PayTools" />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={post.title} />
+        <meta name="twitter:title" content={`${post.title} | PayTools`} />
         <meta name="twitter:description" content={post.excerpt} />
 
         {/* Article Meta */}
