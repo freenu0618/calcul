@@ -34,20 +34,32 @@ export default function ConversionCTASection() {
         </div>
 
         {/* CTA */}
-        <Link
-          to={isAuthenticated ? '/calculator' : '/register'}
-          className="inline-flex items-center gap-2 h-14 px-10 bg-primary text-white text-lg font-bold rounded-xl shadow-lg hover:bg-primary-600 hover:-translate-y-0.5 transition-all duration-200"
-        >
-          {isAuthenticated ? '계산기 사용하기' : '무료로 시작하기'}
-          <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
-        </Link>
+        <div className="flex flex-col items-center gap-3">
+          <Link
+            to={isAuthenticated ? '/calculator' : '/register'}
+            className="inline-flex items-center gap-2 h-14 px-10 bg-primary text-white text-lg font-bold rounded-xl shadow-lg hover:bg-primary-600 hover:-translate-y-0.5 transition-all duration-200"
+          >
+            {isAuthenticated ? '계산기 사용하기' : '무료로 시작하기'}
+            <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+          </Link>
+
+          {!isAuthenticated && (
+            <Link
+              to="/calculator"
+              className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary-600 transition-colors"
+            >
+              가입 없이 계산기 먼저 써보기
+              <span className="material-symbols-outlined text-[18px]">open_in_new</span>
+            </Link>
+          )}
+        </div>
 
         {/* 결핍 + 탈출 경로 */}
         <p className="text-sm text-text-sub mt-4">
           무료 플랜은 직원 5명까지 · 신용카드 불필요 · 1분 가입
         </p>
         <p className="text-xs text-gray-400 mt-2">
-          언제든 해지 가능 · 약정 없음
+          계산기로 먼저 확인하고, 필요할 때만 가입하시면 됩니다
         </p>
       </div>
     </section>
