@@ -33,21 +33,21 @@ export default function LandingPage() {
   return (
     <>
       <Helmet>
-        <title>2026년 최저임금 월 환산액·실수령액 계산기 | 4대보험·주휴수당·급여명세서 | PayTools</title>
+        <title>2026 급여 계산기 | 월급·알바 실수령액, 4대보험·주휴수당 | PayTools</title>
         <meta
           name="description"
-          content="2026년 최저임금 10,320원 기준 월 환산액과 실수령액을 자동 계산하세요. 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당까지 한 번에 계산하고 급여명세서와 급여대장 관리까지 이어집니다. 직원 5명까지 무료."
+          content="2026년 최저임금 10,320원 기준 월급, 알바 시급, 연장·야간·휴일수당, 4대보험, 소득세, 주휴수당까지 한 번에 계산하세요. 월 환산액과 실수령액 확인 후 급여명세서와 급여대장 관리까지 이어집니다. 직원 5명까지 무료."
         />
-        <meta name="keywords" content="2026년최저임금,최저시급10320원,급여계산기,4대보험계산기,주휴수당계산,연장근로수당,실수령액계산,급여명세서,급여대장" />
+        <meta name="keywords" content="2026년최저임금,최저시급10320원,급여계산기,알바급여계산기,월급실수령액,4대보험계산기,주휴수당계산,연장근로수당,실수령액계산,급여명세서,급여대장" />
         <link rel="canonical" href="https://paytools.work" />
-        <meta property="og:title" content="2026년 최저임금 실수령액 계산기 - 4대보험·주휴수당 자동계산 | PayTools" />
-        <meta property="og:description" content="2026년 최저임금 10,320원, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당까지 자동 계산하고 급여 관리까지 이어지는 무료 도구입니다." />
+        <meta property="og:title" content="2026 급여 계산기 - 월급·알바 실수령액, 4대보험·주휴수당 | PayTools" />
+        <meta property="og:description" content="월급, 알바 시급, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당까지 자동 계산하고 급여 관리까지 이어지는 무료 도구입니다." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://paytools.work" />
         <meta property="og:site_name" content="PayTools" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="2026년 급여계산기 - 4대보험·주휴수당 자동계산 | PayTools" />
-        <meta name="twitter:description" content="2026년 최저임금과 4대보험, 소득세, 주휴수당을 한 번에 계산하세요. 직원 5명까지 무료." />
+        <meta name="twitter:title" content="2026 급여 계산기 - 월급·알바 실수령액 | PayTools" />
+        <meta name="twitter:description" content="2026년 월급, 알바 시급, 4대보험, 소득세, 주휴수당을 한 번에 계산하세요. 직원 5명까지 무료." />
       </Helmet>
 
       <div className="overflow-hidden">

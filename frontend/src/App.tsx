@@ -17,11 +17,11 @@ import { ChatWidget } from './components/Chat';
 
 // 핵심 페이지는 즉시 로드
 import LandingPage from './pages/Landing';
-import CalculatorPage from './pages/Calculator';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 
 // 나머지 페이지는 Lazy Loading
+const CalculatorPage = lazy(() => import('./pages/Calculator'));
 const DashboardPage = lazy(() => import('./pages/Dashboard'));
 const OAuthCallback = lazy(() => import('./pages/Auth/OAuthCallback'));
 const GuidePage = lazy(() => import('./pages/Guide/GuidePage'));

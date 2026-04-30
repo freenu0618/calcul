@@ -27,7 +27,7 @@ export default function StepIndicator({
   return (
     <div className="w-full">
       {/* 데스크톱 버전 */}
-      <div className="hidden sm:flex items-center justify-between">
+      <div className="hidden lg:flex items-center justify-between gap-3">
         {steps.map((step, index) => (
           <div key={step.id} className="flex items-center flex-1">
             {/* 스텝 원 */}
@@ -59,12 +59,12 @@ export default function StepIndicator({
             </button>
 
             {/* 스텝 정보 */}
-            <div className="ml-3 min-w-0 flex-1">
-              <p className={`text-sm font-medium ${index <= currentStep ? 'text-gray-900' : 'text-gray-400'}`}>
+            <div className="ml-3 min-w-0 flex-1 max-w-[10rem] xl:max-w-none">
+              <p className={`text-sm font-medium break-keep ${index <= currentStep ? 'text-gray-900' : 'text-gray-400'}`}>
                 {step.title}
               </p>
               {step.description && (
-                <p className="text-xs text-gray-500 truncate">{step.description}</p>
+                <p className="text-xs text-gray-500 leading-4 break-keep">{step.description}</p>
               )}
             </div>
 
@@ -80,8 +80,8 @@ export default function StepIndicator({
         ))}
       </div>
 
-      {/* 모바일 버전 */}
-      <div className="sm:hidden">
+      {/* 모바일/태블릿 버전 */}
+      <div className="lg:hidden">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-900">
             {currentStep + 1}단계: {steps[currentStep].title}

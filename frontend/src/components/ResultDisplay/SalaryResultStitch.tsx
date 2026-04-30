@@ -171,28 +171,30 @@ export default function SalaryResultStitch({ result }: SalaryResultStitchProps) 
         </div>
 
         {/* Hero Stats Card - 실수령액 + 도넛 차트 */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-6 sm:p-8 shadow-sm text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-10 -mt-10 blur-2xl" />
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-5 sm:p-8 shadow-sm text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 sm:w-40 sm:h-40 bg-white/5 rounded-full -mr-10 -mt-10 blur-2xl" />
+          <div className="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-6">
             {/* 실수령액 텍스트 */}
-            <div className="text-center lg:text-left z-10">
-              <p className="text-blue-100 text-sm font-medium uppercase tracking-wider mb-2">
-                이번 달 실수령액 (Net Pay)
+            <div className="text-left z-10 min-w-0 flex-1">
+              <p className="text-blue-100 text-xs sm:text-sm font-medium uppercase tracking-wider mb-2 break-keep">
+                이번 달 실수령액 (NET PAY)
               </p>
-              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
+              <h2 className="text-[clamp(2.5rem,8vw,4.5rem)] leading-[0.95] font-bold tracking-tight mb-4 break-all sm:break-keep">
                 {net_pay.formatted}
               </h2>
-              <div className="flex items-center gap-2 text-sm text-blue-100">
-                <span>{result.employee_name} | 지급예정일: {payDateStr}</span>
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-blue-100">
+                <span className="break-keep">{result.employee_name}</span>
+                <span className="hidden sm:inline">|</span>
+                <span className="break-keep">지급예정일: {payDateStr}</span>
               </div>
-              <div className="flex items-center gap-1 text-green-300 font-medium text-sm mt-2">
+              <div className="flex flex-wrap items-center gap-1 text-green-300 font-medium text-sm mt-2">
                 <Icon name="verified" className="text-[16px]" />
-                2026년 법령 적용
+                <span className="break-keep">2026년 법령 적용</span>
               </div>
             </div>
 
             {/* 실수령 vs 공제 도넛 차트 */}
-            <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+            <div className="bg-white/10 backdrop-blur rounded-xl p-3 sm:p-4 w-full xl:w-auto xl:min-w-[260px] max-w-full self-center">
               <DonutChart
                 data={netVsDeductionData}
                 centerLabel="실수령"

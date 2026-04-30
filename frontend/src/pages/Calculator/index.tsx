@@ -87,7 +87,9 @@ export default function CalculatorPage() {
 
   // 플랜 한도 에러 감지 → 업그레이드 모달 표시
   useEffect(() => {
-    if (state.ui.error?.includes('플랜')) setShowUpgrade(true);
+    if (!state.ui.error?.includes('플랜')) return;
+    const timer = window.setTimeout(() => setShowUpgrade(true), 0);
+    return () => window.clearTimeout(timer);
   }, [state.ui.error]);
 
   // ============================================
@@ -224,6 +226,8 @@ export default function CalculatorPage() {
     }
   };
 
+  const showDesktopSplitLayout = wizard.currentStep === WIZARD_STEPS.length - 1 || !!state.result.current;
+
   // ============================================
   // 6. 렌더링
   // ============================================
@@ -322,8 +326,8 @@ export default function CalculatorPage() {
             </div>
           </div>
 
-          {/* 데스크톱: 2컬럼 레이아웃 / 모바일: 단일 컬럼 */}
-          <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+          {/* 기본은 단일 컬럼, 마지막 단계/결과에서만 데스크톱 2컬럼 */}
+          <div className={showDesktopSplitLayout ? 'xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(380px,460px)] xl:gap-8 xl:items-start' : ''}>
             {/* 좌측: 입력 폼 */}
             <div>
               {/* Step Wizard Form */}
@@ -356,8 +360,8 @@ export default function CalculatorPage() {
                 </div>
               )}
 
-              {/* 모바일 전용: 결과 영역 (lg 미만에서만 표시) */}
-              <div className="lg:hidden">
+              {/* 모바일/단일컬럼 전용: 결과 영역 */}
+              <div className={showDesktopSplitLayout ? 'xl:hidden' : ''}>
                 {state.result.current ? (
                   <div className="mt-8 space-y-4">
                     <AllowanceEditor
@@ -428,8 +432,8 @@ export default function CalculatorPage() {
               </div>
             </div>
 
-            {/* 우측: 실시간 결과 (데스크톱 전용, sticky) */}
-            <div className="hidden lg:block lg:sticky lg:top-8">
+            {/* 우측: 실시간 결과 (마지막 단계/결과에서만 데스크톱 2컬럼) */}
+            <div className="hidden xl:block xl:sticky xl:top-8">
               {state.result.current ? (
                 <div className="space-y-4">
                   <AllowanceEditor

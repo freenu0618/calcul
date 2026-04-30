@@ -20,9 +20,9 @@ interface DonutChartProps {
 }
 
 const SIZE_CONFIG = {
-  sm: { outer: 60, inner: 40, width: 150, height: 150 },
-  md: { outer: 80, inner: 55, width: 200, height: 200 },
-  lg: { outer: 100, inner: 70, width: 250, height: 250 },
+  sm: { outer: 60, inner: 40, width: 150, height: 150, mobileOuter: 52, mobileInner: 34, mobileWidth: 132, mobileHeight: 132 },
+  md: { outer: 80, inner: 55, width: 200, height: 200, mobileOuter: 68, mobileInner: 46, mobileWidth: 176, mobileHeight: 176 },
+  lg: { outer: 100, inner: 70, width: 250, height: 250, mobileOuter: 88, mobileInner: 60, mobileWidth: 220, mobileHeight: 220 },
 };
 
 const formatMoney = (value: number | undefined) =>
@@ -36,7 +36,12 @@ export default function DonutChart({
   darkMode = false,
 }: DonutChartProps) {
   const config = SIZE_CONFIG[size];
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
   const total = data.reduce((sum, item) => sum + item.value, 0);
+  const chartWidth = isMobile ? config.mobileWidth : config.width;
+  const chartHeight = isMobile ? config.mobileHeight : config.height;
+  const outerRadius = isMobile ? config.mobileOuter : config.outer;
+  const innerRadius = isMobile ? config.mobileInner : config.inner;
 
   // 다크모드/라이트모드 텍스트 색상
   const textColors = darkMode
@@ -44,16 +49,16 @@ export default function DonutChart({
     : { label: 'text-gray-500', value: 'text-gray-900', name: 'text-gray-600', amount: 'text-gray-900', percent: 'text-gray-400' };
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative" style={{ width: config.width, height: config.height }}>
+    <div className="flex flex-col items-center w-full max-w-full overflow-hidden">
+      <div className="relative mx-auto max-w-full" style={{ width: chartWidth, height: chartHeight }}>
         <ResponsiveContainer>
           <PieChart>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
-              innerRadius={config.inner}
-              outerRadius={config.outer}
+              innerRadius={innerRadius}
+              outerRadius={outerRadius}
               dataKey="value"
               stroke="none"
             >
@@ -80,16 +85,16 @@ export default function DonutChart({
               <span className={`text-xs ${textColors.label}`}>{centerLabel}</span>
             )}
             {centerValue && (
-              <span className={`text-sm font-bold ${textColors.value}`}>{centerValue}</span>
+              <span className={`text-center text-xs sm:text-sm font-bold leading-tight break-keep ${textColors.value}`}>{centerValue}</span>
             )}
           </div>
         )}
       </div>
 
       {/* 범례 - 모바일 세로 배치 */}
-      <div className="mt-4 space-y-2 w-full">
+      <div className="mt-4 space-y-2 w-full max-w-full overflow-hidden">
         {data.map((item, index) => (
-          <div key={index} className="flex items-center justify-between gap-3 text-sm">
+          <div key={index} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3 text-sm min-w-0">
             <div className="flex items-center gap-2 min-w-0">
               <div
                 className="w-3 h-3 rounded-sm flex-shrink-0"
@@ -97,8 +102,8 @@ export default function DonutChart({
               />
               <span className={`${textColors.name} truncate`}>{item.name}</span>
             </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <span className={`font-medium whitespace-nowrap ${textColors.amount}`}>{formatMoney(item.value)}</span>
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+              <span className={`font-medium break-all sm:whitespace-nowrap ${textColors.amount}`}>{formatMoney(item.value)}</span>
               <span className={`text-xs whitespace-nowrap ${textColors.percent}`}>
                 ({((item.value / total) * 100).toFixed(1)}%)
               </span>

@@ -13,8 +13,33 @@ interface ShareButtonsProps {
   variant?: 'default' | 'stitch'; // UI 스타일 변형
 }
 
+interface KakaoSharePayload {
+  objectType: 'feed';
+  content: {
+    title: string;
+    description: string;
+    imageUrl: string;
+    link: {
+      mobileWebUrl: string;
+      webUrl: string;
+    };
+  };
+}
+
+interface KakaoSdk {
+  Link?: {
+    sendDefault: (payload: KakaoSharePayload) => void;
+  };
+}
+
+const getKakaoSdk = (): KakaoSdk | undefined => {
+  if (typeof window === 'undefined') return undefined;
+  return (window as Window & { Kakao?: KakaoSdk }).Kakao;
+};
+
 export function ShareButtons({ url, title, description, captureTargetId, variant = 'default' }: ShareButtonsProps) {
   const [showToast, setShowToast] = useState(false);
+  const kakaoAvailable = !!getKakaoSdk()?.Link;
   const [toastMessage, setToastMessage] = useState('');
   const [isCapturing, setIsCapturing] = useState(false);
 
@@ -41,7 +66,7 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
           content_type: 'salary_result',
         });
       }
-    } catch (err) {
+    } catch {
       showToastMessage('이미지 저장에 실패했습니다');
     } finally {
       setIsCapturing(false);
@@ -78,8 +103,9 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
 
   const handleKakaoShare = () => {
     // KakaoTalk 공유 (Kakao SDK 필요)
-    if (typeof window !== 'undefined' && (window as any).Kakao) {
-      (window as any).Kakao.Link.sendDefault({
+    const kakao = getKakaoSdk();
+    if (kakao?.Link) {
+      kakao.Link.sendDefault({
         objectType: 'feed',
         content: {
           title,
@@ -161,7 +187,7 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
           className="flex items-center justify-center gap-2 h-14 rounded-xl bg-[#FEE500] text-[#191919] text-base font-bold hover:bg-[#FEE500]/90 transition-colors shadow-lg shadow-yellow-500/10"
         >
           <span className="material-symbols-outlined text-[20px]">chat_bubble</span>
-          카카오톡 공유
+          {kakaoAvailable ? '카카오톡 공유' : '카카오톡 링크 복사'}
         </button>
         {/* 저장 버튼 */}
         <button
@@ -220,12 +246,12 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
         <button
           onClick={handleKakaoShare}
           className="flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 rounded-lg transition-colors"
-          aria-label="카카오톡으로 공유"
+          aria-label={kakaoAvailable ? '카카오톡으로 공유' : '카카오톡 링크 복사'}
         >
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 3c5.799 0 10.5 3.664 10.5 8.185 0 4.52-4.701 8.184-10.5 8.184a13.5 13.5 0 0 1-1.727-.11l-4.408 2.883c-.501.265-.678.236-.472-.413l.892-3.678c-2.88-1.46-4.785-3.99-4.785-6.866C1.5 6.665 6.201 3 12 3z"/>
           </svg>
-          <span>카카오톡</span>
+          <span>{kakaoAvailable ? '카카오톡 공유' : '카카오톡 링크 복사'}</span>
         </button>
 
         <button

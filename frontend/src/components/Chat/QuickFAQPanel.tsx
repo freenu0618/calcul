@@ -3,7 +3,7 @@
  * 정적 답변으로 AI API 호출 없이 즉시 응답
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 interface FAQItem {
@@ -57,6 +57,18 @@ interface Props {
 
 export default function QuickFAQPanel({ onClose }: Props) {
   const [selected, setSelected] = useState<FAQItem | null>(null);
+  const [query, setQuery] = useState('');
+
+  const filteredItems = useMemo(() => {
+    const keyword = query.trim().toLowerCase();
+    if (!keyword) return FAQ_ITEMS;
+
+    return FAQ_ITEMS.filter((item) =>
+      [item.keyword, item.question, item.answer].some((value) =>
+        value.toLowerCase().includes(keyword)
+      )
+    );
+  }, [query]);
 
   return (
     <div className="flex flex-col h-full">
@@ -71,8 +83,8 @@ export default function QuickFAQPanel({ onClose }: Props) {
             <p className="text-blue-100 text-sm">자주 묻는 질문</p>
           </div>
         </div>
-        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg transition-colors" aria-label="FAQ 패널 닫기">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -82,25 +94,43 @@ export default function QuickFAQPanel({ onClose }: Props) {
       <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
         {!selected ? (
           <div className="space-y-3">
-            <p className="text-sm text-text-sub text-center mb-4">
-              궁금한 키워드를 선택해보세요
+            <p className="text-sm text-text-sub text-center">
+              궁금한 키워드를 선택하거나 검색해보세요
             </p>
-            {FAQ_ITEMS.map((item) => (
-              <button
-                key={item.keyword}
-                onClick={() => setSelected(item)}
-                className="w-full flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-primary/40 hover:shadow-sm transition-all text-left"
-              >
-                <span className="text-2xl">{item.icon}</span>
-                <div>
-                  <p className="font-semibold text-text-main text-sm">{item.keyword}</p>
-                  <p className="text-xs text-text-sub">{item.question}</p>
-                </div>
-                <span className="material-symbols-outlined text-gray-400 ml-auto text-[18px]">
-                  chevron_right
-                </span>
-              </button>
-            ))}
+            <label className="block">
+              <span className="sr-only">FAQ 검색</span>
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="예: 최저임금, 주휴수당, 4대보험"
+                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-text-main placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                aria-label="FAQ 검색"
+              />
+            </label>
+            {filteredItems.length > 0 ? (
+              filteredItems.map((item) => (
+                <button
+                  key={item.keyword}
+                  onClick={() => setSelected(item)}
+                  className="w-full flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-primary/40 hover:shadow-sm transition-all text-left"
+                  aria-label={`${item.keyword} FAQ 보기`}
+                >
+                  <span className="text-2xl">{item.icon}</span>
+                  <div>
+                    <p className="font-semibold text-text-main text-sm">{item.keyword}</p>
+                    <p className="text-xs text-text-sub">{item.question}</p>
+                  </div>
+                  <span className="material-symbols-outlined text-gray-400 ml-auto text-[18px]">
+                    chevron_right
+                  </span>
+                </button>
+              ))
+            ) : (
+              <div className="rounded-xl border border-dashed border-gray-200 bg-white px-4 py-6 text-center text-sm text-text-sub">
+                검색 결과가 없습니다. 다른 키워드로 다시 찾아보세요.
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
@@ -124,6 +154,13 @@ export default function QuickFAQPanel({ onClose }: Props) {
               <span className="material-symbols-outlined text-[16px]">arrow_back</span>
               다른 질문 보기
             </button>
+            <Link
+              to="/calculator"
+              className="flex items-center justify-center gap-1 text-sm text-text-sub hover:text-primary transition-colors mx-auto"
+            >
+              계산기로 바로 확인하기
+              <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+            </Link>
           </div>
         )}
       </div>

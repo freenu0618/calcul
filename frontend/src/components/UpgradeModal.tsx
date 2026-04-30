@@ -67,9 +67,15 @@ export default function UpgradeModal({ isOpen, onClose, reason }: UpgradeModalPr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={onClose} />
-      <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 animate-slide-in border border-white/50">
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={onClose} aria-hidden="true" />
+      <div
+        className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 animate-slide-in border border-white/50"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="upgrade-modal-title"
+        aria-describedby="upgrade-modal-description"
+      >
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600" aria-label="업그레이드 안내 닫기">
           <span className="material-symbols-outlined">close</span>
         </button>
 
@@ -78,8 +84,8 @@ export default function UpgradeModal({ isOpen, onClose, reason }: UpgradeModalPr
           <div className="w-16 h-16 mx-auto mb-3 bg-amber-50 rounded-full flex items-center justify-center">
             <span className="material-symbols-outlined text-amber-500 text-[32px]">{info.icon}</span>
           </div>
-          <h2 className="text-xl font-bold text-gray-900">{info.title}</h2>
-          <p className="text-sm text-gray-600 mt-1">{info.desc}</p>
+          <h2 id="upgrade-modal-title" className="text-xl font-bold text-gray-900">{info.title}</h2>
+          <p id="upgrade-modal-description" className="text-sm text-gray-600 mt-1">{info.desc}</p>
         </div>
 
         {/* 현재 사용량 */}
