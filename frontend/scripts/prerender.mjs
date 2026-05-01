@@ -75,10 +75,13 @@ function startServer() {
       const url = new URL(req.url, BASE);
       let filePath = join(DIST, url.pathname);
 
-      // 디렉토리면 index.html 시도
+      // 확장자가 없으면 /path.html 또는 /path/index.html 시도
       if (!extname(filePath)) {
+        const htmlPath = `${filePath}.html`;
         const indexPath = join(filePath, 'index.html');
-        if (existsSync(indexPath)) {
+        if (existsSync(htmlPath)) {
+          filePath = htmlPath;
+        } else if (existsSync(indexPath)) {
           filePath = indexPath;
         } else {
           // SPA 폴백
@@ -178,12 +181,13 @@ async function main() {
       const processed = postProcess(html);
 
       // 저장 경로 결정
-      const dir = route === '/'
-        ? DIST
-        : join(DIST, route);
-      const filePath = join(dir, route === '/' ? 'index.html' : 'index.html');
+      // Cloudflare Pages는 /path/index.html만 있으면 /path → /path/로 308 리다이렉트합니다.
+      // SEO canonical과 _redirects의 non-trailing-slash 정책을 맞추기 위해 /path.html로 저장합니다.
+      const filePath = route === '/'
+        ? join(DIST, 'index.html')
+        : join(DIST, `${route}.html`);
 
-      mkdirSync(dir, { recursive: true });
+      mkdirSync(dirname(filePath), { recursive: true });
       writeFileSync(filePath, processed, 'utf-8');
 
       // 콘텐츠 크기 확인 (body 전체에서 root div 내부 텍스트 추출)
