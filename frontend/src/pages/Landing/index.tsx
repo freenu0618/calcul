@@ -29,6 +29,52 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
+const landingStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'PayTools',
+    url: 'https://paytools.work',
+    inLanguage: 'ko-KR',
+    description:
+      '2026년 한국 급여 계산, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 계산하는 웹 기반 급여 계산 서비스입니다.',
+    potentialAction: {
+      '@type': 'UseAction',
+      target: 'https://paytools.work/calculator',
+      name: '무료 급여 계산기 사용',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'PayTools 급여 계산기',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    url: 'https://paytools.work/calculator',
+    inLanguage: 'ko-KR',
+    description:
+      '월급, 알바 시급, 4대보험, 소득세, 주휴수당과 연장·야간·휴일수당을 2026년 기준으로 계산하는 무료 급여 계산기입니다.',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'KRW',
+      description: '직원 5명까지 무료로 급여 계산과 기본 관리 기능을 사용할 수 있습니다.',
+    },
+    featureList: [
+      '2026년 최저임금 기준 급여 계산',
+      '4대보험 및 소득세 자동 계산',
+      '주휴수당 계산',
+      '연장·야간·휴일수당 계산',
+      '실수령액 역산 계산',
+      '급여명세서 및 급여대장 관리',
+    ],
+    audience: {
+      '@type': 'Audience',
+      audienceType: '소규모 사업장, HR 담당자, 노무사, 근로자',
+    },
+  },
+];
+
 export default function LandingPage() {
   return (
     <>
@@ -45,9 +91,14 @@ export default function LandingPage() {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://paytools.work" />
         <meta property="og:site_name" content="PayTools" />
+        <meta property="og:image" content="https://paytools.work/og-image.svg" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="2026 급여 계산기 - 월급·알바 실수령액 | PayTools" />
         <meta name="twitter:description" content="2026년 월급, 알바 시급, 4대보험, 소득세, 주휴수당을 한 번에 계산하세요. 직원 5명까지 무료." />
+        <meta name="twitter:image" content="https://paytools.work/og-image.svg" />
+        <script type="application/ld+json">
+          {JSON.stringify(landingStructuredData)}
+        </script>
       </Helmet>
 
       <div className="overflow-hidden">
