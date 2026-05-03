@@ -91,13 +91,14 @@ const Legal = () => {
               사용자는 최저임금의 적용을 받는 근로자에게 최저임금액 이상의 임금을 지급하여야 한다.
             </p>
             <p className="text-gray-700 mb-4">
-              <strong>2026년 최저임금:</strong> 시급 10,320원 (월 환산액 1,795,680원)
+              <strong>2026년 최저임금:</strong> 시급 10,320원 (주 40시간·주휴시간 포함 209시간 기준 월 환산액 2,156,880원)
             </p>
             <h4 className="font-semibold text-gray-900 mt-4 mb-2">주요 내용</h4>
             <ul className="list-disc list-inside space-y-2 text-gray-700">
               <li>모든 근로자는 최저임금 이상 받을 권리가 있음</li>
               <li>최저임금 미달 시 사용자는 형사 처벌 대상</li>
-              <li>수습 기간(3개월 이내)은 최저임금의 90% 적용 가능</li>
+              <li>수습 기간(3개월 이내)은 요건 충족 시 최저임금의 90% 적용 가능</li>
+              <li>PayTools 174시간 모드는 주휴수당을 별도 계산하고, 209시간 모드는 주휴수당 포함 월 환산 기준에 맞춤</li>
             </ul>
           </div>
         </Card>
