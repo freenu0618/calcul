@@ -4,6 +4,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import PageHelmet from '../../components/common/PageHelmet';
 import WageTypeDecisionHelper from './WageTypeDecisionHelper';
@@ -11,6 +12,49 @@ import WageTypeGuideCards from './WageTypeGuideCards';
 import WageTypeFieldMap from './WageTypeFieldMap';
 import QuickStartScenarios from './QuickStartScenarios';
 import GuideFAQ from './GuideFAQ';
+
+const HOW_TO_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'PayTools 급여 계산기 사용법',
+  description: '월급제, 시급제, 시급기반 월급제 중 내 상황에 맞는 급여유형을 선택하고 실수령액을 계산하는 절차입니다.',
+  totalTime: 'PT3M',
+  supply: [
+    { '@type': 'HowToSupply', name: '기본급 또는 시급' },
+    { '@type': 'HowToSupply', name: '근무일·근무시간 또는 시프트 정보' },
+    { '@type': 'HowToSupply', name: '부양가족 수와 4대보험 적용 여부' },
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: '급여유형 선택',
+      text: '매달 같은 기본급이면 월급제, 시급 계약이면 시급제, 시급 계약이지만 월 보장액이 있으면 시급기반 월급제를 선택합니다.',
+      url: 'https://paytools.work/guide/how-to-use#decision-helper',
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: '근무시간 입력',
+      text: '월급제는 월 기준시간을 확인하고, 시급제는 시프트 또는 월간 템플릿으로 실제 근무시간을 입력합니다.',
+      url: 'https://paytools.work/guide/how-to-use#wage-type-guides',
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: '수당과 공제 조건 확인',
+      text: '과세·비과세 수당, 통상임금 포함 여부, 4대보험과 부양가족 조건을 확인합니다.',
+      url: 'https://paytools.work/guide/how-to-use#field-map',
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: '계산 결과 검토',
+      text: '지급 총액, 4대보험, 소득세, 지방소득세, 실수령액을 확인하고 필요한 경우 수당을 수정한 뒤 재계산합니다.',
+      url: 'https://paytools.work/calculator',
+    },
+  ],
+};
 
 export default function HowToUseGuide() {
   return (
@@ -20,6 +64,9 @@ export default function HowToUseGuide() {
         description="PayTools 급여 계산기를 급여유형별로 어떻게 사용하는지 안내합니다. 월급제, 시급제, 시급기반 월급제 사용법."
         path="/guide/how-to-use"
       />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(HOW_TO_SCHEMA)}</script>
+      </Helmet>
       <MainLayout>
         <div className="max-w-4xl mx-auto">
           {/* Breadcrumb */}
@@ -36,19 +83,19 @@ export default function HowToUseGuide() {
           </div>
 
           {/* 1. Decision Helper */}
-          <section className="mb-10">
+          <section id="decision-helper" className="mb-10">
             <h2 className="text-xl font-bold text-gray-900 mb-4">어떤 급여유형을 선택해야 하나요?</h2>
             <WageTypeDecisionHelper />
           </section>
 
           {/* 2. Wage Type Guides */}
-          <section className="mb-10">
+          <section id="wage-type-guides" className="mb-10">
             <h2 className="text-xl font-bold text-gray-900 mb-4">급여유형별 사용법</h2>
             <WageTypeGuideCards />
           </section>
 
           {/* 3. Field Comparison */}
-          <section className="mb-10">
+          <section id="field-map" className="mb-10">
             <WageTypeFieldMap />
           </section>
 
