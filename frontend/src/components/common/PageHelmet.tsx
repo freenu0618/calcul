@@ -29,6 +29,7 @@ export default function PageHelmet({
     <Helmet>
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
+      <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
       <link rel="canonical" href={url} />
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content="PayTools" />
