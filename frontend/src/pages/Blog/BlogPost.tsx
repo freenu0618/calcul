@@ -9,13 +9,6 @@ import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
 import { blogPosts } from '../../data/blogPosts';
 
-// GA 타입 선언
-declare global {
-  interface Window {
-    gtag: (command: string, ...args: any[]) => void;
-  }
-}
-
 const BlogPost = () => {
   const { postId } = useParams<{ postId: string }>();
 
@@ -44,43 +37,111 @@ const BlogPost = () => {
     .filter(Boolean)
     .slice(0, 3);
 
+  const canonicalUrl = `https://paytools.work/blog/${post.id}`;
+  const ogImageUrl = 'https://paytools.work/og-image.svg';
+  const articleStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.excerpt,
+    image: ogImageUrl,
+    url: canonicalUrl,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': canonicalUrl,
+    },
+    datePublished: post.date,
+    dateModified: post.date,
+    inLanguage: 'ko-KR',
+    articleSection: post.category,
+    keywords: post.keywords.join(', '),
+    author: {
+      '@type': 'Organization',
+      name: post.author,
+      url: 'https://paytools.work/about',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'PayTools',
+      url: 'https://paytools.work',
+      logo: {
+        '@type': 'ImageObject',
+        url: ogImageUrl,
+      },
+    },
+  };
+  const breadcrumbStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '홈',
+        item: 'https://paytools.work',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: '블로그',
+        item: 'https://paytools.work/blog',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: post.title,
+        item: canonicalUrl,
+      },
+    ],
+  };
+
   return (
     <MainLayout>
       <Helmet>
         <title>{`${post.title} | PayTools 급여 계산 가이드`}</title>
         <meta name="description" content={post.excerpt} />
         <meta name="keywords" content={post.keywords.join(', ')} />
-        <link rel="canonical" href={`https://paytools.work/blog/${post.id}`} />
+        <link rel="canonical" href={canonicalUrl} />
 
         {/* Open Graph */}
         <meta property="og:title" content={`${post.title} | PayTools`} />
         <meta property="og:description" content={post.excerpt} />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content={`https://paytools.work/blog/${post.id}`} />
+        <meta property="og:url" content={canonicalUrl} />
         <meta property="og:site_name" content="PayTools" />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:locale" content="ko_KR" />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${post.title} | PayTools`} />
         <meta name="twitter:description" content={post.excerpt} />
+        <meta name="twitter:image" content={ogImageUrl} />
 
         {/* Article Meta */}
         <meta property="article:published_time" content={post.date} />
+        <meta property="article:modified_time" content={post.date} />
         <meta property="article:author" content={post.author} />
         <meta property="article:section" content={post.category} />
         {post.keywords.map(keyword => (
           <meta key={keyword} property="article:tag" content={keyword} />
         ))}
+        <script type="application/ld+json">
+          {JSON.stringify(articleStructuredData)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbStructuredData)}
+        </script>
       </Helmet>
 
       <article className="max-w-4xl mx-auto">
         {/* 브레드크럼 */}
-        <nav className="mb-6 text-sm text-gray-600">
+        <nav className="mb-6 text-sm text-gray-600" aria-label="블로그 탐색 경로">
           <Link to="/" className="hover:text-blue-600">홈</Link>
-          <span className="mx-2">/</span>
+          <span className="mx-2" aria-hidden="true">/</span>
           <Link to="/blog" className="hover:text-blue-600">블로그</Link>
-          <span className="mx-2">/</span>
-          <span className="text-gray-900">{post.title}</span>
+          <span className="mx-2" aria-hidden="true">/</span>
+          <span className="text-gray-900" aria-current="page">{post.title}</span>
         </nav>
 
         {/* 포스트 헤더 */}
