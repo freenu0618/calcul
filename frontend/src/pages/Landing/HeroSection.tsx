@@ -72,8 +72,8 @@ export default function HeroSection() {
               <p className="text-xs text-gray-500">계산 완료</p>
             </div>
             <div className="bg-white/80 backdrop-blur rounded-xl p-4 text-center border border-gray-200">
-              <p className="text-2xl font-bold text-primary">181개</p>
-              <p className="text-xs text-gray-500">테스트 검증</p>
+              <p className="text-2xl font-bold text-primary">20개</p>
+              <p className="text-xs text-gray-500">급여 케이스 검증</p>
             </div>
           </div>
 

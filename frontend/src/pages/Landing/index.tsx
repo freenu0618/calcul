@@ -29,6 +29,57 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
+const payrollCalculationHowTo = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'PayTools로 2026년 급여 실수령액 계산하는 방법',
+  description:
+    '급여유형을 선택하고 근무시간, 수당, 4대보험 조건을 입력해 월급·알바 실수령액을 확인하는 3분 계산 흐름입니다.',
+  totalTime: 'PT3M',
+  inLanguage: 'ko-KR',
+  tool: [
+    {
+      '@type': 'HowToTool',
+      name: 'PayTools 급여 계산기',
+    },
+  ],
+  supply: [
+    { '@type': 'HowToSupply', name: '기본급 또는 시급' },
+    { '@type': 'HowToSupply', name: '근무일·근무시간 또는 시프트 정보' },
+    { '@type': 'HowToSupply', name: '4대보험 적용 여부와 부양가족 수' },
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: '급여유형 선택',
+      text: '월급제, 시급제, 시급기반 월급제 중 실제 계약 방식에 맞는 급여유형을 선택합니다.',
+      url: 'https://paytools.work/calculator',
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: '근무시간과 수당 입력',
+      text: '기본급 또는 시급, 소정근로일, 일 근무시간, 연장·야간·휴일근로와 과세·비과세 수당을 입력합니다.',
+      url: 'https://paytools.work/calculator',
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: '공제 조건 확인',
+      text: '국민연금, 건강보험, 장기요양보험, 고용보험, 소득세 계산에 필요한 적용 조건과 부양가족 수를 확인합니다.',
+      url: 'https://paytools.work/guide/insurance',
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: '실수령액과 급여명세서 검토',
+      text: '지급 총액, 공제 총액, 실수령액을 확인하고 필요한 경우 급여명세서 PDF 또는 급여대장 저장 흐름으로 이어갑니다.',
+      url: 'https://paytools.work/calculator',
+    },
+  ],
+};
+
 const landingStructuredData = [
   {
     '@context': 'https://schema.org',
@@ -72,6 +123,19 @@ const landingStructuredData = [
       '@type': 'Audience',
       audienceType: '소규모 사업장, HR 담당자, 노무사, 근로자',
     },
+  },
+  payrollCalculationHowTo,
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '홈',
+        item: 'https://paytools.work',
+      },
+    ],
   },
 ];
 

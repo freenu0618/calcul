@@ -77,25 +77,38 @@ export default function FAQSection() {
           </div>
 
           <div className="space-y-3">
-            {faqs.map((faq, i) => (
-              <div key={i} className="border border-gray-200 rounded-xl overflow-hidden bg-white">
-                <button
-                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                  className="w-full px-4 sm:px-6 py-5 sm:py-5 min-h-[56px] text-left flex justify-between items-center hover:bg-gray-50 transition-colors"
-                  aria-expanded={openIndex === i}
-                >
-                  <span className="font-semibold text-text-main pr-4">{faq.question}</span>
-                  <span className="material-symbols-outlined text-gray-400 flex-shrink-0">
-                    {openIndex === i ? 'expand_less' : 'expand_more'}
-                  </span>
-                </button>
-                {openIndex === i && (
-                  <div className="px-6 pb-5">
-                    <p className="text-text-sub leading-relaxed text-sm">{faq.answer}</p>
-                  </div>
-                )}
-              </div>
-            ))}
+            {faqs.map((faq, i) => {
+              const isOpen = openIndex === i;
+              const triggerId = `landing-faq-trigger-${i}`;
+              const panelId = `landing-faq-panel-${i}`;
+
+              return (
+                <div key={i} className="border border-gray-200 rounded-xl overflow-hidden bg-white">
+                  <button
+                    id={triggerId}
+                    onClick={() => setOpenIndex(isOpen ? null : i)}
+                    className="w-full px-4 sm:px-6 py-5 sm:py-5 min-h-[56px] text-left flex justify-between items-center hover:bg-gray-50 transition-colors"
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                  >
+                    <span className="font-semibold text-text-main pr-4">{faq.question}</span>
+                    <span className="material-symbols-outlined text-gray-400 flex-shrink-0" aria-hidden="true">
+                      {isOpen ? 'expand_less' : 'expand_more'}
+                    </span>
+                  </button>
+                  {isOpen && (
+                    <div
+                      id={panelId}
+                      role="region"
+                      aria-labelledby={triggerId}
+                      className="px-6 pb-5"
+                    >
+                      <p className="text-text-sub leading-relaxed text-sm">{faq.answer}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
