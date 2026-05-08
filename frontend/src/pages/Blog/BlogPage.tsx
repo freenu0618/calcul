@@ -3,14 +3,82 @@
  */
 
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
 import PageHelmet from '../../components/common/PageHelmet';
-import { blogPostPreviews } from '../../data/blogPosts';
+import { blogPosts, blogPostPreviews } from '../../data/blogPosts';
 
 const BlogPage = () => {
   const posts = blogPostPreviews;
   const categories = Array.from(new Set(posts.map(post => post.category)));
+  const blogStructuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Blog',
+      name: 'PayTools 급여 계산 블로그',
+      description: '2026년 급여 계산, 4대보험, 소득세, 최저임금, 주휴수당, 연장·야간·휴일수당 실무 가이드입니다.',
+      url: 'https://paytools.work/blog',
+      inLanguage: 'ko-KR',
+      publisher: {
+        '@type': 'Organization',
+        name: 'PayTools',
+        url: 'https://paytools.work',
+        logo: 'https://paytools.work/og-image.svg',
+      },
+      blogPost: posts.map((post) => ({
+        '@type': 'BlogPosting',
+        headline: post.title,
+        description: post.excerpt,
+        url: `https://paytools.work/blog/${post.id}`,
+        datePublished: post.date,
+        dateModified: post.date,
+        inLanguage: 'ko-KR',
+        author: {
+          '@type': 'Organization',
+          name: blogPosts[post.id]?.author ?? 'PayTools',
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'PayTools',
+          url: 'https://paytools.work',
+        },
+        keywords: blogPosts[post.id]?.keywords.join(', '),
+        mainEntityOfPage: `https://paytools.work/blog/${post.id}`,
+      })),
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'PayTools 급여 계산 블로그 글 목록',
+      url: 'https://paytools.work/blog',
+      numberOfItems: posts.length,
+      itemListElement: posts.map((post, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: post.title,
+        url: `https://paytools.work/blog/${post.id}`,
+      })),
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: '홈',
+          item: 'https://paytools.work',
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: '블로그',
+          item: 'https://paytools.work/blog',
+        },
+      ],
+    },
+  ];
 
   return (
     <>
@@ -19,6 +87,11 @@ const BlogPage = () => {
       description="급여 계산, 4대보험, 소득세, 연장수당, 최저임금 등 근로 관련 최신 소식과 실무 가이드를 제공합니다."
       path="/blog"
     />
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify(blogStructuredData)}
+      </script>
+    </Helmet>
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
