@@ -2,6 +2,7 @@
  * 역산 계산기 페이지 (실수령액 → 필요 기본급)
  */
 import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
@@ -19,6 +20,121 @@ function ReverseCalculator() {
   const [result, setResult] = useState<ReverseSalaryResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const reverseCalculatorStructuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: '실수령액 역산 계산기',
+      alternateName: '목표 실수령액 세전 월급 계산기',
+      url: 'https://paytools.work/reverse-calculator',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Web',
+      inLanguage: 'ko-KR',
+      isAccessibleForFree: true,
+      description:
+        '목표 월 실수령액을 입력하면 2026년 4대보험, 소득세, 지방소득세를 반영해 필요한 세전 월급과 기본급을 추정하는 무료 역산 계산기입니다.',
+      keywords:
+        '실수령액 역산 계산기, 세전 월급 계산, 목표 월급 계산기, 4대보험 공제, 소득세 계산, 월급 실수령액',
+      featureList: [
+        '목표 실수령액 기준 필요 세전 급여 추정',
+        '국민연금·건강보험·장기요양·고용보험 반영',
+        '소득세와 지방소득세 공제 반영',
+        '부양가족 수와 사업장 규모 조건 반영',
+      ],
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'KRW',
+      },
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'PayTools',
+        url: 'https://paytools.work',
+      },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'HowTo',
+      name: '목표 실수령액에 맞는 세전 월급 계산 방법',
+      description:
+        '원하는 월 실수령액, 부양가족 수, 사업장 규모를 입력해 4대보험과 세금을 반영한 필요 세전 급여를 확인하는 방법입니다.',
+      totalTime: 'PT2M',
+      inLanguage: 'ko-KR',
+      tool: [{ '@type': 'HowToTool', name: 'PayTools 실수령액 역산 계산기' }],
+      step: [
+        {
+          '@type': 'HowToStep',
+          position: 1,
+          name: '목표 실수령액 입력',
+          text: '매달 실제로 받고 싶은 금액을 원 단위로 입력합니다.',
+          url: 'https://paytools.work/reverse-calculator',
+        },
+        {
+          '@type': 'HowToStep',
+          position: 2,
+          name: '공제 조건 선택',
+          text: '본인 포함 부양가족 수, 20세 이하 자녀 수, 사업장 규모와 고용형태를 선택합니다.',
+          url: 'https://paytools.work/reverse-calculator',
+        },
+        {
+          '@type': 'HowToStep',
+          position: 3,
+          name: '필요 세전 급여 확인',
+          text: '역산 결과의 필요 월 기본급, 실제 실수령액 오차, 4대보험과 세금 공제 내역을 확인합니다.',
+          url: 'https://paytools.work/reverse-calculator',
+        },
+      ],
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: '실수령액 역산 계산기는 무엇을 계산하나요?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: '원하는 월 실수령액을 기준으로 4대보험, 소득세, 지방소득세를 차감했을 때 필요한 세전 월급과 기본급을 추정합니다.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '부양가족 수를 왜 입력해야 하나요?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: '근로소득 간이세액표에서 부양가족 수와 20세 이하 자녀 수는 소득세 원천징수액에 영향을 줄 수 있어 역산 정확도를 높이는 조건입니다.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '역산 결과를 실제 급여 계약에 그대로 써도 되나요?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: '계산 결과는 참고용 추정치입니다. 실제 급여 계약, 비과세 수당, 공제 예외, 회사 정책은 노무사 또는 세무 전문가와 확인하는 것이 안전합니다.',
+          },
+        },
+      ],
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: '홈',
+          item: 'https://paytools.work',
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: '실수령액 역산 계산기',
+          item: 'https://paytools.work/reverse-calculator',
+        },
+      ],
+    },
+  ];
 
   const handleCalculate = useCallback(async () => {
     setIsLoading(true);
@@ -59,6 +175,12 @@ function ReverseCalculator() {
         <meta property="og:title" content="실수령액 역산 계산기 - 목표 월급에 맞는 세전 급여 계산 | PayTools" />
         <meta property="og:description" content="목표 실수령액에 맞춰 필요한 세전 월급을 역산하세요. 4대보험과 소득세를 반영한 무료 월급 역산 계산기입니다." />
         <meta property="og:url" content="https://paytools.work/reverse-calculator" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://paytools.work/og-image.svg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <script type="application/ld+json">
+          {JSON.stringify(reverseCalculatorStructuredData)}
+        </script>
       </Helmet>
       <MainLayout>
         <div className="max-w-2xl mx-auto">
@@ -160,6 +282,15 @@ function ReverseCalculator() {
                 {isLoading ? '계산 중...' : '역산 계산하기'}
               </button>
             </div>
+          </Card>
+
+          <Card title="역산 전에 확인할 조건" className="mt-4">
+            <ul className="space-y-2 text-sm text-gray-700 list-disc list-inside">
+              <li>실수령액은 4대보험, 소득세, 지방소득세를 공제한 뒤의 예상 수령액입니다.</li>
+              <li>비과세 식대, 상여, 수당 구조가 있으면 실제 급여명세서와 차이가 날 수 있습니다.</li>
+              <li>정방향 계산이 필요하면 <Link to="/calculator" className="text-purple-600 hover:underline font-medium">급여 계산기</Link>에서 지급 항목별 공제 내역을 확인하세요.</li>
+              <li>공제 기준이 헷갈리면 <Link to="/guide/insurance" className="text-purple-600 hover:underline font-medium">4대보험 가이드</Link>와 <Link to="/guide/tax" className="text-purple-600 hover:underline font-medium">소득세 가이드</Link>를 함께 참고하세요.</li>
+            </ul>
           </Card>
 
           {error && (
