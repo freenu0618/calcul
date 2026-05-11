@@ -11,7 +11,7 @@ import Card from '../../components/common/Card';
 // GA 타입 선언
 declare global {
   interface Window {
-    gtag: (command: string, ...args: any[]) => void;
+    gtag: (command: string, ...args: unknown[]) => void;
   }
 }
 

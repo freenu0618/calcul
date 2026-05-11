@@ -12,9 +12,102 @@ import AdBanner from '../../components/common/AdBanner';
 // GA 타입 선언
 declare global {
   interface Window {
-    gtag: (command: string, ...args: any[]) => void;
+    gtag: (command: string, ...args: unknown[]) => void;
   }
 }
+
+const insuranceGuideStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: '4대 보험 이해하기: 2026년 요율 및 계산 방법',
+    description:
+      '국민연금, 건강보험, 장기요양보험, 고용보험의 2026년 근로자 부담 요율과 급여 공제 계산 방법을 정리한 PayTools 가이드입니다.',
+    inLanguage: 'ko-KR',
+    mainEntityOfPage: 'https://paytools.work/guide/insurance',
+    dateModified: '2026-05-12',
+    author: {
+      '@type': 'Organization',
+      name: 'PayTools',
+      url: 'https://paytools.work',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'PayTools',
+      url: 'https://paytools.work',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://paytools.work/og-image.svg',
+      },
+    },
+    about: [
+      '국민연금',
+      '건강보험',
+      '장기요양보험',
+      '고용보험',
+      '급여 공제',
+      '2026년 4대보험 요율',
+    ],
+    audience: {
+      '@type': 'Audience',
+      audienceType: '소규모 사업장, HR 담당자, 급여 담당자, 근로자',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: '2026년 4대보험 근로자 부담 요율은 얼마인가요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'PayTools 기준 2026년 근로자 부담 요율은 국민연금 4.75%, 건강보험 3.595%, 장기요양보험은 건강보험료의 13.14%, 고용보험 0.9%입니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '4대보험은 급여에서 어떻게 공제되나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '일반적으로 국민연금, 건강보험, 장기요양보험, 고용보험 근로자 부담분이 급여에서 공제됩니다. 실제 적용 여부와 기준소득월액, 사업장 조건에 따라 금액이 달라질 수 있습니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '월급 실수령액을 빠르게 확인하려면 어디서 계산하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'PayTools 급여 계산기에서 기본급, 수당, 근무시간, 부양가족 수와 보험 적용 조건을 입력하면 4대보험과 소득세를 반영한 예상 실수령액을 확인할 수 있습니다.',
+        },
+      },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '홈',
+        item: 'https://paytools.work',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: '가이드',
+        item: 'https://paytools.work/guide',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: '4대 보험 이해하기',
+        item: 'https://paytools.work/guide/insurance',
+      },
+    ],
+  },
+];
 
 const InsuranceGuide = () => {
   // GA4 이벤트 전송
@@ -37,6 +130,10 @@ const InsuranceGuide = () => {
         <meta property="og:title" content="4대 보험 이해하기 | 2026년 요율 및 계산 방법" />
         <meta property="og:description" content="국민연금, 건강보험, 장기요양보험, 고용보험의 2026년 요율과 계산 방법을 상세히 안내합니다." />
         <meta property="og:url" content="https://paytools.work/guide/insurance" />
+        <meta property="og:type" content="article" />
+        <script type="application/ld+json">
+          {JSON.stringify(insuranceGuideStructuredData)}
+        </script>
       </Helmet>
 
       <MainLayout>
