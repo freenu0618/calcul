@@ -34,6 +34,126 @@ const WIZARD_STEPS: WizardStep[] = [
   { id: 'shift', title: '근무시프트', description: '근무시간 입력' },
 ];
 
+const calculatorStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'PayTools 급여 계산기',
+    alternateName: ['2026년 급여 실수령액 계산기', '4대보험 주휴수당 계산기'],
+    url: 'https://paytools.work/calculator',
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Web',
+    inLanguage: 'ko-KR',
+    isAccessibleForFree: true,
+    description:
+      '2026년 최저임금, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 반영해 월급과 알바 급여 실수령액을 계산하는 무료 급여 계산기입니다.',
+    keywords:
+      '급여 계산기, 월급 실수령액 계산기, 알바 급여 계산기, 4대보험 계산기, 주휴수당 계산, 연장근로수당, 2026년 최저임금',
+    featureList: [
+      '월급제·시급제·시급기반 월급제 계산',
+      '국민연금·건강보험·장기요양·고용보험 공제 반영',
+      '소득세와 지방소득세 자동 계산',
+      '주휴수당과 연장·야간·휴일수당 계산',
+      '급여명세서 PDF와 급여대장 관리 흐름 지원',
+    ],
+    audience: {
+      '@type': 'Audience',
+      audienceType: '소규모 사업장, HR 담당자, 근로자, 아르바이트생',
+    },
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'KRW',
+    },
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'PayTools',
+      url: 'https://paytools.work',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'PayTools에서 월급 실수령액 계산하는 방법',
+    description:
+      '근로자 정보, 급여와 수당, 근무시간을 입력해 2026년 기준 공제액과 실수령액을 확인하는 3단계 계산 흐름입니다.',
+    totalTime: 'PT3M',
+    inLanguage: 'ko-KR',
+    tool: [{ '@type': 'HowToTool', name: 'PayTools 급여 계산기' }],
+    step: [
+      {
+        '@type': 'HowToStep',
+        position: 1,
+        name: '근로자 정보 입력',
+        text: '고용형태, 사업장 규모, 소정근로일과 일 근무시간을 입력합니다.',
+        url: 'https://paytools.work/calculator',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 2,
+        name: '급여와 수당 입력',
+        text: '월급 또는 시급, 과세·비과세 수당, 4대보험 적용 조건을 입력합니다.',
+        url: 'https://paytools.work/calculator',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 3,
+        name: '근무시간과 결과 확인',
+        text: '정산 기간과 시프트를 확인한 뒤 지급 총액, 공제 총액, 실수령액을 검토합니다.',
+        url: 'https://paytools.work/calculator',
+      },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'PayTools 급여 계산기는 어떤 공제를 반영하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '2026년 기준 국민연금, 건강보험, 장기요양보험, 고용보험, 소득세와 지방소득세를 반영해 실수령액을 추정합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '알바 급여와 주휴수당도 계산할 수 있나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '네. 시급제와 시프트 입력을 지원하며 주 15시간 이상 등 조건에 따라 주휴수당과 가산수당을 함께 확인할 수 있습니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '계산 결과를 최종 급여 지급 기준으로 써도 되나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '계산 결과는 참고용 추정치입니다. 실제 지급, 비과세 항목, 회사별 공제, 분쟁 판단은 노무사 또는 세무 전문가와 확인하는 것이 안전합니다.',
+        },
+      },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '홈',
+        item: 'https://paytools.work',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: '급여 계산기',
+        item: 'https://paytools.work/calculator',
+      },
+    ],
+  },
+];
+
 export default function CalculatorPage() {
   const { isAuthenticated } = useAuth();
   const [showUpgrade, setShowUpgrade] = useState(false);
@@ -240,6 +360,17 @@ export default function CalculatorPage() {
         <meta property="og:title" content="급여 계산기 - 2026년 실수령액·4대보험 자동 계산 | PayTools" />
         <meta property="og:description" content="기본급, 수당, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 한 번에 계산하는 2026년 기준 급여 계산기입니다." />
         <meta property="og:url" content="https://paytools.work/calculator" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://paytools.work/og-image.svg" />
+        <meta property="og:image:alt" content="PayTools 급여 계산기 결과 미리보기" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="급여 계산기 - 2026년 실수령액 자동 계산 | PayTools" />
+        <meta name="twitter:description" content="4대보험, 소득세, 주휴수당, 가산수당을 반영해 월급과 알바 급여 실수령액을 계산하세요." />
+        <meta name="twitter:image" content="https://paytools.work/og-image.svg" />
+        <meta name="twitter:image:alt" content="PayTools 급여 계산기 결과 미리보기" />
+        <script type="application/ld+json">
+          {JSON.stringify(calculatorStructuredData)}
+        </script>
       </Helmet>
 
       <TutorialOverlay />

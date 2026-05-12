@@ -13,6 +13,7 @@ interface PageHelmetProps {
   description: string;
   path: string;
   image?: string;
+  imageAlt?: string;
 }
 
 export default function PageHelmet({
@@ -20,6 +21,7 @@ export default function PageHelmet({
   description,
   path,
   image = DEFAULT_IMAGE,
+  imageAlt = 'PayTools 급여 계산기 미리보기 이미지',
 }: PageHelmetProps) {
   const url = `${BASE_URL}${path}`;
   const fullTitle = title.includes('PayTools') ? title : `${title} | PayTools`;
@@ -37,11 +39,13 @@ export default function PageHelmet({
       <meta property="og:description" content={description} />
       <meta property="og:url" content={url} />
       <meta property="og:image" content={imageUrl} />
+      <meta property="og:image:alt" content={imageAlt} />
       <meta property="og:locale" content="ko_KR" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={imageUrl} />
+      <meta name="twitter:image:alt" content={imageAlt} />
     </Helmet>
   );
 }
