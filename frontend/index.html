@@ -41,12 +41,15 @@
     <meta name="twitter:description" content="4대보험, 소득세, 가산수당 자동 계산. 직원 5명까지 무료." />
     <meta name="twitter:image" content="https://paytools.work/og-image.svg" />
 
-    <!-- Favicon -->
+    <!-- Favicon / PWA -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <!-- Theme Color (모바일 브라우저) -->
     <meta name="theme-color" content="#1e3fae" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)" />
 
     <!-- Google Fonts: Material Symbols + Public Sans + Noto Sans KR -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -66,6 +69,21 @@
       "logo": "https://paytools.work/favicon.svg",
       "description": "급여 계산 자동화 서비스. 4대보험, 소득세, 가산수당을 정확하게 계산합니다.",
       "foundingDate": "2026",
+      "areaServed": "KR",
+      "knowsAbout": [
+        "2026년 최저임금",
+        "4대보험 계산",
+        "소득세 간이세액표",
+        "주휴수당",
+        "연장·야간·휴일수당",
+        "실수령액 역산"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "url": "https://paytools.work/contact",
+        "contactType": "customer support",
+        "availableLanguage": "ko-KR"
+      },
       "sameAs": []
     }
     </script>
@@ -82,6 +100,12 @@
       "operatingSystem": "All",
       "browserRequirements": "Requires JavaScript",
       "softwareVersion": "1.0.0",
+      "inLanguage": "ko-KR",
+      "isAccessibleForFree": true,
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "소규모 사업장, HR 담당자, 노무사, 급여 담당자"
+      },
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -93,7 +117,20 @@
         "소득세 간이세액표 기반 계산",
         "연장·야간·휴일 수당 자동 계산",
         "주휴수당 비례 계산",
-        "PDF 급여명세서 발송"
+        "PDF 급여명세서 발송",
+        "목표 실수령액 기준 세전 월급 역산"
+      ],
+      "potentialAction": [
+        {
+          "@type": "UseAction",
+          "name": "급여 계산하기",
+          "target": "https://paytools.work/calculator"
+        },
+        {
+          "@type": "UseAction",
+          "name": "실수령액 역산하기",
+          "target": "https://paytools.work/reverse-calculator"
+        }
       ]
     }
     </script>

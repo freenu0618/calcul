@@ -1,0 +1,52 @@
+{
+  "name": "PayTools — 2026 급여 계산기",
+  "short_name": "PayTools",
+  "description": "2026년 최저임금, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 계산하는 한국 급여 계산 도구입니다.",
+  "id": "/",
+  "start_url": "/?utm_source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3fae",
+  "lang": "ko-KR",
+  "dir": "ltr",
+  "orientation": "portrait-primary",
+  "categories": ["finance", "business", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "급여 계산기",
+      "short_name": "급여계산",
+      "description": "월급·시급제 급여와 4대보험·소득세 공제를 계산합니다.",
+      "url": "/calculator?utm_source=pwa_shortcut",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "실수령액 역산 계산기",
+      "short_name": "역산계산",
+      "description": "목표 실수령액에 필요한 세전 월급을 역산합니다.",
+      "url": "/reverse-calculator?utm_source=pwa_shortcut",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "급여 가이드",
+      "short_name": "가이드",
+      "description": "4대보험, 소득세, 주휴수당, 가산수당 설명을 확인합니다.",
+      "url": "/guide?utm_source=pwa_shortcut",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}
