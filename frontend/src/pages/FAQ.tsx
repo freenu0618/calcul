@@ -23,6 +23,26 @@ interface FAQItem {
   answer: string;
 }
 
+interface CategorySummary {
+  title: string;
+  description: string;
+}
+
+const categorySummaries: CategorySummary[] = [
+  {
+    title: '4대 보험·실수령액 핵심',
+    description: '근로자 부담 보험료와 간이세액표 원천징수를 함께 계산해야 월급에서 실제로 받는 실수령액을 확인할 수 있습니다.',
+  },
+  {
+    title: '주휴수당·최저임금 확인',
+    description: '주 15시간 이상 근무하고 소정근로일을 개근했다면 주휴수당 대상이며, 2026년 최저임금과 월 환산액 기준도 같이 점검해야 합니다.',
+  },
+  {
+    title: '연장·야간·휴일수당 기준',
+    description: '통상시급을 기준으로 연장·야간·휴일 가산율을 더해 계산하며, 중복되는 시간대는 가산분을 합산해 판단합니다.',
+  },
+];
+
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
@@ -211,6 +231,8 @@ const FAQ = () => {
     ? faqData
     : faqData.filter(item => item.category === selectedCategory);
 
+  const getItemId = (index: number) => `faq-answer-${selectedCategory.replace(/\s+/g, '-')}-${index}`;
+
   // FAQPage 구조화된 데이터 (schema.org)
   const faqSchemaData = {
     "@context": "https://schema.org",
@@ -256,6 +278,23 @@ const FAQ = () => {
             </div>
           </div>
 
+          <section className="mb-8 rounded-2xl border border-blue-100 bg-blue-50/70 p-5" aria-labelledby="faq-summary-title">
+            <h2 id="faq-summary-title" className="text-xl font-bold text-gray-900 mb-3">
+              급여 계산 FAQ 한눈에 보기
+            </h2>
+            <p className="text-sm text-gray-700 mb-4">
+              PayTools FAQ는 2026년 기준 실수령액, 4대보험, 소득세, 주휴수당, 최저임금, 연장·야간·휴일수당을 빠르게 확인하도록 정리했습니다.
+            </p>
+            <div className="grid gap-3 md:grid-cols-3">
+              {categorySummaries.map((summary) => (
+                <div key={summary.title} className="rounded-xl bg-white p-4 shadow-sm">
+                  <h3 className="text-sm font-bold text-blue-700 mb-2">{summary.title}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">{summary.description}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
         {/* 카테고리 필터 */}
         <div className="mb-6 flex flex-wrap gap-2">
           {categories.map((category) => (
@@ -275,44 +314,52 @@ const FAQ = () => {
 
         {/* FAQ 목록 (아코디언) */}
         <div className="space-y-4">
-          {filteredFAQ.map((item, index) => (
-            <Card key={index}>
-              <button
-                onClick={() => handleToggle(index, item.question)}
-                className="w-full text-left"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-start mb-2">
-                      <span className="inline-block px-2 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded mr-3">
-                        {item.category}
-                      </span>
+          {filteredFAQ.map((item, index) => {
+            const answerId = getItemId(index);
+            const isExpanded = expandedIndex === index;
+
+            return (
+              <Card key={index}>
+                <button
+                  onClick={() => handleToggle(index, item.question)}
+                  className="w-full text-left"
+                  aria-expanded={isExpanded}
+                  aria-controls={answerId}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-start mb-2">
+                        <span className="inline-block px-2 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded mr-3">
+                          {item.category}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Q. {item.question}
+                      </h3>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Q. {item.question}
-                    </h3>
+                    <svg
+                      className={`w-6 h-6 text-gray-500 transition-transform ml-4 flex-shrink-0 ${
+                        isExpanded ? 'transform rotate-180' : ''
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
                   </div>
-                  <svg
-                    className={`w-6 h-6 text-gray-500 transition-transform ml-4 flex-shrink-0 ${
-                      expandedIndex === index ? 'transform rotate-180' : ''
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </button>
-              {expandedIndex === index && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <p className="text-gray-700">
+                </button>
+                <div
+                  id={answerId}
+                  className={`mt-4 pt-4 border-t border-gray-200 ${isExpanded ? 'block' : 'hidden'}`}
+                >
+                  <p className="text-gray-700 leading-relaxed">
                     A. {item.answer}
                   </p>
                 </div>
-              )}
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
 
         {/* 추가 도움말 */}
