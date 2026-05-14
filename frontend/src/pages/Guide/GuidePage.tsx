@@ -5,6 +5,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
 import PageHelmet from '../../components/common/PageHelmet';
@@ -55,6 +56,92 @@ const wageTypes = [
   { label: '시급기반 월급제', desc: '시급 + 월급 보장', icon: 'verified', color: 'bg-purple-50 border-purple-200' },
 ];
 
+const guideStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'PayTools 급여 계산 가이드',
+    url: 'https://paytools.work/guide',
+    inLanguage: 'ko-KR',
+    description:
+      'PayTools 사용법, 급여유형 선택, 4대보험, 소득세, 연장·야간·휴일수당, 퇴직금, 연차수당, 주휴수당 계산 가이드를 모은 허브 페이지입니다.',
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'PayTools',
+      url: 'https://paytools.work',
+    },
+    mainEntity: {
+      '@type': 'ItemList',
+      name: '급여 계산 가이드 목록',
+      numberOfItems: lawGuides.length + 1,
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: '급여유형별 PayTools 사용법',
+          url: 'https://paytools.work/guide/how-to-use',
+          description: '월급제, 시급제, 시급기반 월급제 중 어떤 입력 흐름을 선택해야 하는지 안내합니다.',
+        },
+        ...lawGuides.map((guide, index) => ({
+          '@type': 'ListItem',
+          position: index + 2,
+          name: guide.title,
+          url: `https://paytools.work${guide.path}`,
+          description: guide.description,
+        })),
+      ],
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: '처음 급여를 계산할 때 어떤 가이드부터 보면 되나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '먼저 급여유형별 사용법에서 월급제, 시급제, 시급기반 월급제 중 내 계약에 맞는 입력 방식을 고른 뒤 급여 계산기로 이동하는 것을 권장합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '4대보험과 소득세는 따로 봐야 하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '월급 실수령액은 4대보험과 소득세·지방소득세를 함께 반영해야 하므로, 개념은 각각의 가이드에서 확인하고 실제 금액은 급여 계산기에서 함께 계산하는 것이 좋습니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '가이드 내용만으로 최종 급여 지급 판단을 해도 되나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '아니요. PayTools 가이드는 참고용 정보입니다. 실제 지급, 분쟁, 예외 공제, 회사별 정책은 노무사 또는 세무 전문가와 검토하는 것이 안전합니다.',
+        },
+      },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '홈',
+        item: 'https://paytools.work',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: '가이드',
+        item: 'https://paytools.work/guide',
+      },
+    ],
+  },
+];
+
 const GuidePage = () => (
   <>
     <PageHelmet
@@ -62,6 +149,9 @@ const GuidePage = () => (
       description="PayTools 사용법과 한국 근로기준법에 따른 급여 계산의 모든 것을 알아보세요."
       path="/guide"
     />
+    <Helmet>
+      <script type="application/ld+json">{JSON.stringify(guideStructuredData)}</script>
+    </Helmet>
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <div className="mb-8 flex items-center gap-4">
