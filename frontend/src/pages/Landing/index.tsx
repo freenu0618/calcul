@@ -83,6 +83,38 @@ const payrollCalculationHowTo = {
 const landingStructuredData = [
   {
     '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'PayTools 2026 급여 계산기 랜딩 페이지',
+    url: 'https://paytools.work',
+    inLanguage: 'ko-KR',
+    description:
+      '2026년 최저임금, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 함께 확인하려는 사업장과 근로자를 위한 PayTools 대표 페이지입니다.',
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'PayTools',
+      url: 'https://paytools.work',
+    },
+    about: [
+      '2026년 급여 계산',
+      '월급 실수령액 계산',
+      '알바 시급과 주휴수당',
+      '4대보험 공제액',
+      '연장·야간·휴일수당',
+    ],
+    primaryEntity: {
+      '@type': 'SoftwareApplication',
+      name: 'PayTools 급여 계산기',
+      url: 'https://paytools.work/calculator',
+      applicationCategory: 'FinanceApplication',
+    },
+    potentialAction: {
+      '@type': 'UseAction',
+      name: '무료 급여 계산기 사용',
+      target: 'https://paytools.work/calculator',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'PayTools',
     url: 'https://paytools.work',
@@ -125,6 +157,36 @@ const landingStructuredData = [
     },
   },
   payrollCalculationHowTo,
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'PayTools는 어떤 급여 계산에 적합한가요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '월급제, 시급제, 시급기반 월급제 근로자의 예상 실수령액, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 함께 확인할 때 적합합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '2026년 최저임금 기준을 반영하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '네. PayTools는 2026년 최저시급 10,320원과 월 환산액 2,156,880원 정보를 기준 콘텐츠에 반영하고, 급여 계산 흐름에서 최신 4대보험 기준을 함께 안내합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '계산 결과는 법적 판단으로 사용할 수 있나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '아니요. 계산 결과는 참고용 추정치이며, 실제 지급, 분쟁, 예외 공제, 회사별 정책은 노무사 또는 세무 전문가 검토가 필요합니다.',
+        },
+      },
+    ],
+  },
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
