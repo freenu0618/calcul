@@ -6,8 +6,10 @@ import { useState, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
+import PageHelmet from '../components/common/PageHelmet';
 import EmployeeInfoForm from '../components/forms/EmployeeInfoForm';
 import SalaryForm from '../components/forms/SalaryForm';
+import type { GuaranteeDistributionItem } from '../components/forms/GuaranteeAllowanceDistribution';
 import { SalaryResult } from '../components/ResultDisplay';
 import { ShiftInput } from '../components/ShiftInput';
 import { StepWizard, useWizard, type WizardStep } from '../components/wizard';
@@ -19,6 +21,113 @@ const WIZARD_STEPS: WizardStep[] = [
   { id: 'employee', title: '근로자 정보', description: '고용형태, 사업장' },
   { id: 'salary', title: '급여/수당', description: '기본급, 수당 입력' },
   { id: 'shift', title: '근무시프트', description: '근무시간 입력' },
+];
+
+const homeStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'PayTools 급여 계산기',
+    alternateName: ['한국 급여 계산기', '4대보험 실수령액 계산기'],
+    url: 'https://paytools.work',
+    inLanguage: 'ko-KR',
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Web',
+    isAccessibleForFree: true,
+    description:
+      '2026년 최저임금, 4대보험, 소득세, 연장·야간·휴일수당을 반영해 월급과 시급제 근로자의 예상 실수령액을 계산하는 무료 웹앱입니다.',
+    featureList: [
+      '월급제·시급제·시급기반 월급제 계산',
+      '2026년 4대보험 근로자 부담액 계산',
+      '소득세와 지방소득세 추정',
+      '연장·야간·휴일근로 가산수당 계산',
+      '주휴수당과 근무시프트 입력 지원',
+    ],
+    audience: {
+      '@type': 'Audience',
+      audienceType: '소규모 사업장, HR 담당자, 급여 담당자, 아르바이트·근로자',
+    },
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'KRW',
+    },
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'PayTools',
+      url: 'https://paytools.work',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'PayTools로 월급 실수령액 계산하는 방법',
+    description: '근로자 정보, 급여·수당, 근무시프트를 입력해 예상 실수령액을 확인하는 3단계 흐름입니다.',
+    totalTime: 'PT3M',
+    tool: [{ '@type': 'HowToTool', name: 'PayTools 급여 계산기' }],
+    step: [
+      {
+        '@type': 'HowToStep',
+        position: 1,
+        name: '근로자 정보 입력',
+        text: '고용형태, 사업장 규모, 소정근로일과 일 근무시간을 입력합니다.',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 2,
+        name: '급여와 수당 입력',
+        text: '월급 또는 시급, 기본급, 통상임금 포함 수당, 급여유형을 선택합니다.',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 3,
+        name: '근무시프트와 계산월 확인',
+        text: '계산월과 실제 근무시간을 입력해 4대보험, 소득세, 가산수당이 반영된 예상 실수령액을 확인합니다.',
+      },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'PayTools 급여 계산기는 무료인가요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '네. 기본 급여 계산과 실수령액 확인은 무료로 사용할 수 있으며, 직원 관리와 저장 기능은 플랜에 따라 확장됩니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '2026년 4대보험 요율이 반영되어 있나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '서비스 계산 기준으로 국민연금 4.75%, 건강보험 3.595%, 장기요양보험 건강보험료의 13.14%, 고용보험 0.9%를 반영합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '계산 결과를 최종 급여 지급 기준으로 사용해도 되나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '계산 결과는 참고용 추정치입니다. 비과세 수당, 회사별 공제, 예외 정책, 분쟁 가능성이 있는 사안은 노무사 또는 세무 전문가와 검토하는 것이 안전합니다.',
+        },
+      },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '홈',
+        item: 'https://paytools.work',
+      },
+    ],
+  },
 ];
 
 function Home() {
@@ -40,7 +149,7 @@ function Home() {
   const [absencePolicy, setAbsencePolicy] = useState<AbsencePolicy>('STRICT');
   const [hoursMode, setHoursMode] = useState<HoursMode>('174');
   const [contractMonthlySalary, setContractMonthlySalary] = useState<number>(0);
-  const [guaranteeDistribution, setGuaranteeDistribution] = useState<any[]>([]);
+  const [guaranteeDistribution, setGuaranteeDistribution] = useState<GuaranteeDistributionItem[]>([]);
   const [result, setResult] = useState<SalaryCalculationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -145,9 +254,13 @@ function Home() {
 
   return (
     <>
+      <PageHelmet
+        title="한국 근로기준법 급여 계산기 - 2026년 4대보험 실수령액"
+        description="기본급, 수당, 4대보험, 소득세, 연장·야간·휴일수당을 자동 계산해 2026년 기준 예상 실수령액을 확인하세요."
+        path=""
+      />
       <Helmet>
-        <title>한국 근로기준법 급여 계산기 | 2026년 4대보험 실수령액</title>
-        <meta name="description" content="기본급, 수당, 4대보험, 소득세를 자동 계산. 2026년 최신 세율 적용." />
+        <script type="application/ld+json">{JSON.stringify(homeStructuredData)}</script>
       </Helmet>
 
       <MainLayout>
