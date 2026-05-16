@@ -21,6 +21,7 @@ import TrustBarSection from './TrustBarSection';
 import PainPointsSection from './PainPointsSection';
 import SolutionSection from './SolutionSection';
 import HowItWorksSection from './HowItWorksSection';
+import DecisionRouteSection from './DecisionRouteSection';
 import LiveDemoSection from './LiveDemoSection';
 import SocialProofSection from './SocialProofSection';
 import DataValueSection from './DataValueSection';
@@ -159,6 +160,35 @@ const landingStructuredData = [
   payrollCalculationHowTo,
   {
     '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'PayTools 상황별 급여 계산 경로',
+    description: '급여 실수령액 계산, 목표 실수령액 역산, 급여 기준 학습 중 사용자 상황에 맞는 공개 페이지를 안내합니다.',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '월급·알바 실수령액 계산',
+        url: 'https://paytools.work/calculator',
+        description: '기본급, 시급, 수당, 근무시간을 입력해 4대보험·소득세·주휴수당이 반영된 예상 실수령액을 계산합니다.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: '목표 실수령액 역산',
+        url: 'https://paytools.work/reverse-calculator',
+        description: '원하는 월 실수령액을 기준으로 필요한 세전 월급과 공제액을 역산합니다.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: '급여 계산 기준 가이드',
+        url: 'https://paytools.work/guide',
+        description: '급여유형별 입력법, 4대보험, 소득세, 연장·야간·휴일수당 기준을 확인합니다.',
+      },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
       {
@@ -233,6 +263,7 @@ export default function LandingPage() {
         <PainPointsSection />
         <SolutionSection />
         <HowItWorksSection />
+        <DecisionRouteSection />
         <LiveDemoSection />
         <SocialProofSection />
         <DataValueSection />
