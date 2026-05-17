@@ -46,6 +46,7 @@ export default function DecisionRouteSection() {
             <Link
               key={route.to}
               to={route.to}
+              aria-label={`${route.label}: ${route.title}`}
               className="group rounded-2xl border border-gray-100 bg-background-light p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white hover:shadow-lg"
             >
               <div className={`mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold ${route.tone}`}>

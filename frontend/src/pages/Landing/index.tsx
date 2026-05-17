@@ -81,6 +81,21 @@ const payrollCalculationHowTo = {
   ],
 };
 
+const calculationAssumptions = [
+  {
+    name: '2026년 최저시급',
+    description: 'PayTools 공개 콘텐츠는 2026년 최저시급 10,320원과 209시간 기준 월 환산액 2,156,880원을 기준 정보로 안내합니다.',
+  },
+  {
+    name: '4대보험 근로자 부담 기준',
+    description: '국민연금, 건강보험, 장기요양보험, 고용보험의 근로자 부담액을 계산 흐름에서 분리해 보여줍니다.',
+  },
+  {
+    name: '참고용 급여 추정치',
+    description: '실제 지급액은 비과세 수당, 회사별 공제, 고용형태, 사업장 규모에 따라 달라질 수 있어 전문가 검토가 필요합니다.',
+  },
+];
+
 const landingStructuredData = [
   {
     '@context': 'https://schema.org',
@@ -127,6 +142,18 @@ const landingStructuredData = [
       target: 'https://paytools.work/calculator',
       name: '무료 급여 계산기 사용',
     },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTermSet',
+    name: 'PayTools 2026 급여 계산 기준',
+    description: 'PayTools가 공개 페이지에서 반복 안내하는 2026년 급여 계산 전제와 주의사항입니다.',
+    inLanguage: 'ko-KR',
+    hasDefinedTerm: calculationAssumptions.map((item) => ({
+      '@type': 'DefinedTerm',
+      name: item.name,
+      description: item.description,
+    })),
   },
   {
     '@context': 'https://schema.org',
