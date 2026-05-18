@@ -22,6 +22,7 @@ import PainPointsSection from './PainPointsSection';
 import SolutionSection from './SolutionSection';
 import HowItWorksSection from './HowItWorksSection';
 import DecisionRouteSection from './DecisionRouteSection';
+import CalculationBasisSection from './CalculationBasisSection';
 import LiveDemoSection from './LiveDemoSection';
 import SocialProofSection from './SocialProofSection';
 import DataValueSection from './DataValueSection';
@@ -291,6 +292,7 @@ export default function LandingPage() {
         <SolutionSection />
         <HowItWorksSection />
         <DecisionRouteSection />
+        <CalculationBasisSection />
         <LiveDemoSection />
         <SocialProofSection />
         <DataValueSection />
