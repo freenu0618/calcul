@@ -71,6 +71,7 @@ const Register = () => {
     <>
       <Helmet>
         <title>회원가입 | 급여 계산기</title>
+        <meta name="robots" content="noindex, nofollow" />
         <meta name="description" content="급여 계산기에 가입하여 급여 이력을 저장하고 관리하세요. 무료로 시작하세요." />
       </Helmet>
 
@@ -90,6 +91,7 @@ const Register = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="example@email.com"
+                autoComplete="email"
                 required
               />
 
@@ -99,6 +101,7 @@ const Register = () => {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="홍길동"
+                autoComplete="name"
                 required
               />
 
@@ -109,6 +112,7 @@ const Register = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="최소 8자 이상"
+                  autoComplete="new-password"
                   required
                 />
                 {password && (() => {
@@ -132,6 +136,7 @@ const Register = () => {
                 value={passwordConfirm}
                 onChange={(e) => setPasswordConfirm(e.target.value)}
                 placeholder="비밀번호를 다시 입력하세요"
+                autoComplete="new-password"
                 required
               />
 

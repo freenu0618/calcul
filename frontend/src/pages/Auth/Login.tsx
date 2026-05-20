@@ -46,6 +46,7 @@ const Login = () => {
     <>
       <Helmet>
         <title>로그인 | 급여 계산기</title>
+        <meta name="robots" content="noindex, nofollow" />
         <meta name="description" content="급여 계산기에 로그인하여 급여 이력을 저장하고 관리하세요." />
       </Helmet>
 
@@ -65,6 +66,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="example@email.com"
+                autoComplete="email"
                 required
               />
 
@@ -74,6 +76,7 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="비밀번호를 입력하세요"
+                autoComplete="current-password"
                 required
               />
 
