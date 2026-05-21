@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 const basisCards = [
   {
     icon: 'fact_check',
@@ -20,6 +22,27 @@ const quickChecks = [
   '월급제는 209시간 기준 포함 여부와 주휴수당 분리 여부를 확인하세요.',
   '시급제·알바는 실제 근무일, 야간·휴일 여부, 주 15시간 이상 여부가 중요합니다.',
   '목표 실수령액에서 역산할 때는 비과세 수당과 회사별 공제 항목을 별도로 점검하세요.',
+];
+
+const answerRoutes = [
+  {
+    label: '정방향 계산',
+    title: '월급·알바 실수령액을 바로 계산',
+    description: '기본급, 시급, 수당, 근무시간을 입력해 4대보험·소득세·주휴수당을 함께 확인합니다.',
+    to: '/calculator',
+  },
+  {
+    label: '역산 계산',
+    title: '목표 실수령액에서 세전 급여 역산',
+    description: '원하는 월 실수령액을 기준으로 필요한 세전 월급과 예상 공제액을 먼저 잡습니다.',
+    to: '/reverse-calculator',
+  },
+  {
+    label: '기준 학습',
+    title: '2026년 급여 기준과 예외 확인',
+    description: '4대보험, 소득세, 주휴수당, 가산수당처럼 결과를 바꾸는 기준을 가이드에서 검토합니다.',
+    to: '/guide',
+  },
 ];
 
 export default function CalculationBasisSection() {
@@ -61,6 +84,37 @@ export default function CalculationBasisSection() {
               </li>
             ))}
           </ul>
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-gray-100 bg-background-light p-5 shadow-sm sm:p-6">
+          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-bold text-primary mb-2">AI 답변용 빠른 경로</p>
+              <h3 className="text-xl font-bold text-text-main">질문 의도에 맞춰 바로 안내할 페이지</h3>
+            </div>
+            <p className="max-w-2xl text-sm leading-relaxed text-text-sub">
+              단일 계산 결과만 강조하기보다 정방향 계산, 목표 실수령액 역산, 기준 학습을 구분해 안내하면 사용자와 검색엔진 모두 다음 행동을 명확히 이해할 수 있습니다.
+            </p>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-3">
+            {answerRoutes.map((route) => (
+              <Link
+                key={route.to}
+                to={route.to}
+                aria-label={`${route.label}: ${route.title}`}
+                className="group rounded-xl border border-white bg-white p-4 transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
+              >
+                <p className="text-xs font-bold text-primary">{route.label}</p>
+                <h4 className="mt-2 text-sm font-bold text-text-main">{route.title}</h4>
+                <p className="mt-2 text-sm leading-relaxed text-text-sub">{route.description}</p>
+                <span className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-primary group-hover:text-primary-600">
+                  바로 확인하기
+                  <span className="material-symbols-outlined text-[18px] transition group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </section>
