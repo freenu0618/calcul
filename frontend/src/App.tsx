@@ -59,8 +59,9 @@ const MyPage = lazy(() => import('./pages/MyPage'));
 // 로딩 컴포넌트
 function PageLoader() {
   return (
-    <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    <div className="flex justify-center items-center h-64" role="status" aria-live="polite">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" aria-hidden="true"></div>
+      <span className="sr-only">페이지를 불러오는 중입니다</span>
     </div>
   );
 }
@@ -90,6 +91,12 @@ function PageViewTracker() {
 function App() {
   return (
     <ErrorBoundary>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
+      >
+        본문으로 바로가기
+      </a>
       <HelmetProvider>
         <AuthProvider>
           <ChatProvider>
@@ -99,7 +106,7 @@ function App() {
             <PageViewTracker />
             <div className="flex flex-col min-h-screen">
               <Navigation />
-              <main className="flex-1">
+              <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
                     {/* 인증 페이지 */}
