@@ -4,13 +4,18 @@ https://calcul-1b9.pages.dev/* https://paytools.work/:splat 301
 # robots.txt와 페이지별 noindex 메타로 검색 노출 대상에서는 제외합니다.
 /login /index.html 200
 /register /index.html 200
+/oauth/callback /index.html 200
 /oauth/* /index.html 200
 /dashboard /index.html 200
 /employees /index.html 200
+/employees/new /index.html 200
+/employees/:id/edit /index.html 200
 /employees/* /index.html 200
 /payroll /index.html 200
+/payroll/:id /index.html 200
 /payroll/* /index.html 200
 /mypage /index.html 200
+/payment/success /index.html 200
 /payment/* /index.html 200
 
 /about/ /about 301
