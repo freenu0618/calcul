@@ -5,7 +5,7 @@
 
 import { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { HelmetProvider } from 'react-helmet-async';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ChatProvider } from './contexts/ChatContext';
 import { ToastProvider } from './components/common/Toast';
@@ -70,7 +70,17 @@ function PageLoader() {
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
   if (isLoading) return <PageLoader />;
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+
+  return isAuthenticated ? (
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow, noarchive" />
+      </Helmet>
+      {children}
+    </>
+  ) : (
+    <Navigate to="/login" replace />
+  );
 }
 
 // GA4 페이지뷰 추적
@@ -121,7 +131,7 @@ function App() {
                     {/* Lazy Loading 페이지 */}
                     <Route path="/reverse-calculator" element={<ReverseCalculator />} />
                     <Route path="/simulation" element={<SalarySimulation />} />
-                    <Route path="/dashboard" element={<DashboardPage />} />
+                    <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
 
                     {/* 가이드 페이지 */}
                     <Route path="/guide" element={<GuidePage />} />
