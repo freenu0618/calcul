@@ -1,5 +1,18 @@
 https://calcul-1b9.pages.dev/* https://paytools.work/:splat 301
 
+# React Router가 처리해야 하는 앱 전용 경로는 직접 진입/새로고침 시 index.html로 전달합니다.
+# robots.txt와 페이지별 noindex 메타로 검색 노출 대상에서는 제외합니다.
+/login /index.html 200
+/register /index.html 200
+/oauth/* /index.html 200
+/dashboard /index.html 200
+/employees /index.html 200
+/employees/* /index.html 200
+/payroll /index.html 200
+/payroll/* /index.html 200
+/mypage /index.html 200
+/payment/* /index.html 200
+
 /about/ /about 301
 /blog/ /blog 301
 /calculator/ /calculator 301
