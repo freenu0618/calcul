@@ -31,6 +31,8 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
+const dateModified = '2026-05-26';
+
 const payrollCalculationHowTo = {
   '@context': 'https://schema.org',
   '@type': 'HowTo',
@@ -39,6 +41,7 @@ const payrollCalculationHowTo = {
     '급여유형을 선택하고 근무시간, 수당, 4대보험 조건을 입력해 월급·알바 실수령액을 확인하는 3분 계산 흐름입니다.',
   totalTime: 'PT3M',
   inLanguage: 'ko-KR',
+  dateModified,
   tool: [
     {
       '@type': 'HowToTool',
@@ -104,6 +107,13 @@ const landingStructuredData = [
     name: 'PayTools 2026 급여 계산기 랜딩 페이지',
     url: 'https://paytools.work',
     inLanguage: 'ko-KR',
+    dateModified,
+    significantLink: [
+      'https://paytools.work/calculator',
+      'https://paytools.work/reverse-calculator',
+      'https://paytools.work/guide',
+      'https://paytools.work/faq',
+    ],
     description:
       '2026년 최저임금, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 함께 확인하려는 사업장과 근로자를 위한 PayTools 대표 페이지입니다.',
     isPartOf: {
@@ -138,6 +148,7 @@ const landingStructuredData = [
     inLanguage: 'ko-KR',
     description:
       '2026년 한국 급여 계산, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 계산하는 웹 기반 급여 계산 서비스입니다.',
+    dateModified,
     potentialAction: {
       '@type': 'UseAction',
       target: 'https://paytools.work/calculator',
@@ -150,6 +161,7 @@ const landingStructuredData = [
     name: 'PayTools 2026 급여 계산 기준',
     description: 'PayTools가 공개 페이지에서 반복 안내하는 2026년 급여 계산 전제와 주의사항입니다.',
     inLanguage: 'ko-KR',
+    dateModified,
     hasDefinedTerm: calculationAssumptions.map((item) => ({
       '@type': 'DefinedTerm',
       name: item.name,
@@ -164,8 +176,14 @@ const landingStructuredData = [
     operatingSystem: 'Web',
     url: 'https://paytools.work/calculator',
     inLanguage: 'ko-KR',
+    dateModified,
     description:
       '월급, 알바 시급, 4대보험, 소득세, 주휴수당과 연장·야간·휴일수당을 2026년 기준으로 계산하는 무료 급여 계산기입니다.',
+    publisher: {
+      '@type': 'Organization',
+      name: 'PayTools',
+      url: 'https://paytools.work',
+    },
     offers: {
       '@type': 'Offer',
       price: '0',
@@ -191,6 +209,7 @@ const landingStructuredData = [
     '@type': 'ItemList',
     name: 'PayTools 상황별 급여 계산 경로',
     description: '급여 실수령액 계산, 목표 실수령액 역산, 급여 기준 학습 중 사용자 상황에 맞는 공개 페이지를 안내합니다.',
+    dateModified,
     itemListElement: [
       {
         '@type': 'ListItem',
@@ -218,6 +237,8 @@ const landingStructuredData = [
   {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
+    inLanguage: 'ko-KR',
+    dateModified,
     mainEntity: [
       {
         '@type': 'Question',
