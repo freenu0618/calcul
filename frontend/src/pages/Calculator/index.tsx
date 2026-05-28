@@ -34,6 +34,17 @@ const WIZARD_STEPS: WizardStep[] = [
   { id: 'shift', title: '근무시프트', description: '근무시간 입력' },
 ];
 
+const dateModified = '2026-05-29';
+const calculatorInputChecklist = [
+  ['급여유형', '월급제, 시급제, 시급기반 월급제 중 실제 계약 방식에 맞는 유형'],
+  ['사업장 규모와 고용형태', '5인 이상 여부, 정규직·파트타임·외국인 근로자 여부 등 공제와 가산수당에 영향을 주는 조건'],
+  ['기본급 또는 시급', '월 고정급, 통상시급, 계약 월급처럼 지급 총액 계산의 기준이 되는 금액'],
+  ['근무일과 근무시간', '소정근로일, 일 근무시간, 정산 기간, 실제 시프트와 주 15시간 이상 여부'],
+  ['과세·비과세 수당', '식대, 교통비, 직책수당 등 과세 여부에 따라 실수령액을 바꾸는 수당'],
+  ['4대보험과 부양가족', '국민연금·건강보험·고용보험 적용 여부, 부양가족 수, 20세 이하 자녀 수'],
+  ['연장·야간·휴일근로', '가산수당과 휴일연장 계산에 필요한 시간대와 사업장 규모 조건'],
+];
+
 const calculatorStructuredData = [
   {
     '@context': 'https://schema.org',
@@ -45,6 +56,7 @@ const calculatorStructuredData = [
     operatingSystem: 'Web',
     inLanguage: 'ko-KR',
     isAccessibleForFree: true,
+    dateModified,
     description:
       '2026년 최저임금, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 반영해 월급과 알바 급여 실수령액을 계산하는 무료 급여 계산기입니다.',
     keywords:
@@ -79,6 +91,7 @@ const calculatorStructuredData = [
       '근로자 정보, 급여와 수당, 근무시간을 입력해 2026년 기준 공제액과 실수령액을 확인하는 3단계 계산 흐름입니다.',
     totalTime: 'PT3M',
     inLanguage: 'ko-KR',
+    dateModified,
     tool: [{ '@type': 'HowToTool', name: 'PayTools 급여 계산기' }],
     step: [
       {
@@ -106,7 +119,24 @@ const calculatorStructuredData = [
   },
   {
     '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'PayTools 급여 실수령액 계산 입력 체크리스트',
+    description:
+      '월급·알바 실수령액, 4대보험, 주휴수당, 연장·야간·휴일수당 계산 전에 확인해야 하는 핵심 입력값입니다.',
+    inLanguage: 'ko-KR',
+    dateModified,
+    numberOfItems: calculatorInputChecklist.length,
+    itemListElement: calculatorInputChecklist.map(([name, description], index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      description,
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
     '@type': 'FAQPage',
+    dateModified,
     mainEntity: [
       {
         '@type': 'Question',
