@@ -43,6 +43,8 @@ const categorySummaries: CategorySummary[] = [
   },
 ];
 
+const dateModified = '2026-05-31';
+
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
@@ -234,18 +236,74 @@ const FAQ = () => {
   const getItemId = (index: number) => `faq-answer-${selectedCategory.replace(/\s+/g, '-')}-${index}`;
 
   // FAQPage 구조화된 데이터 (schema.org)
-  const faqSchemaData = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": faqData.map(item => ({
-      "@type": "Question",
-      "name": item.question,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": item.answer
-      }
-    }))
-  };
+  const faqStructuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "2026년 급여 계산 FAQ",
+      "url": "https://paytools.work/faq",
+      "inLanguage": "ko-KR",
+      "dateModified": dateModified,
+      "description": "2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 연장·야간·휴일수당, 근로자 권리 질문을 정리한 PayTools FAQ입니다.",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "PayTools",
+        "url": "https://paytools.work"
+      },
+      "significantLink": [
+        "https://paytools.work/calculator",
+        "https://paytools.work/reverse-calculator",
+        "https://paytools.work/guide",
+        "https://paytools.work/examples"
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "PayTools FAQ 핵심 주제",
+      "inLanguage": "ko-KR",
+      "dateModified": dateModified,
+      "numberOfItems": categorySummaries.length,
+      "itemListElement": categorySummaries.map((summary, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "name": summary.title,
+        "description": summary.description
+      }))
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "inLanguage": "ko-KR",
+      "dateModified": dateModified,
+      "mainEntity": faqData.map(item => ({
+        "@type": "Question",
+        "name": item.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": item.answer
+        }
+      }))
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "홈",
+          "item": "https://paytools.work"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "FAQ",
+          "item": "https://paytools.work/faq"
+        }
+      ]
+    }
+  ];
 
   return (
     <>
@@ -260,7 +318,7 @@ const FAQ = () => {
         <meta name="twitter:title" content="2026년 급여 계산 FAQ | PayTools" />
         <meta name="twitter:description" content="실수령액, 4대보험, 주휴수당, 최저임금 관련 질문을 한 번에 확인하세요." />
         <script type="application/ld+json">
-          {JSON.stringify(faqSchemaData)}
+          {JSON.stringify(faqStructuredData)}
         </script>
       </Helmet>
 
