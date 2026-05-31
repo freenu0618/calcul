@@ -226,7 +226,7 @@
   <!-- AI answer resource -->
   <url>
     <loc>https://paytools.work/llms.txt</loc>
-    <lastmod>2026-05-31</lastmod>
+    <lastmod>2026-06-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
