@@ -41,9 +41,13 @@ const categorySummaries: CategorySummary[] = [
     title: '연장·야간·휴일수당 기준',
     description: '통상시급을 기준으로 연장·야간·휴일 가산율을 더해 계산하며, 중복되는 시간대는 가산분을 합산해 판단합니다.',
   },
+  {
+    title: '정방향·역산 계산기 선택',
+    description: '기본급·시급·근무시간을 알고 있으면 급여 계산기를, 목표 실수령액에서 필요한 세전 급여를 알고 싶으면 역산 계산기를 먼저 사용합니다.',
+  },
 ];
 
-const dateModified = '2026-05-31';
+const dateModified = '2026-06-02';
 
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
@@ -65,6 +69,12 @@ const FAQ = () => {
   };
 
   const faqData: FAQItem[] = [
+    // 계산기 선택
+    {
+      category: '계산기 선택',
+      question: '급여 계산기와 실수령액 역산 계산기는 언제 각각 사용하나요?',
+      answer: '기본급, 시급, 근무시간, 수당, 부양가족 수처럼 실제 입력값을 알고 있다면 급여 계산기를 사용하세요. 반대로 "월 실수령액 300만원을 받으려면 세전 월급이 얼마여야 하나요?"처럼 목표 실수령액에서 거꾸로 계산하려면 실수령액 역산 계산기가 더 적합합니다. 역산 후 실제 수당, 시프트, 비과세 항목을 반영하려면 급여 계산기로 한 번 더 확인하는 것이 안전합니다.',
+    },
     // 기본급 및 수당
     {
       category: '기본급 및 수당',
@@ -343,7 +353,7 @@ const FAQ = () => {
             <p className="text-sm text-gray-700 mb-4">
               PayTools FAQ는 2026년 기준 실수령액, 4대보험, 소득세, 주휴수당, 최저임금, 연장·야간·휴일수당을 빠르게 확인하도록 정리했습니다.
             </p>
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
               {categorySummaries.map((summary) => (
                 <div key={summary.title} className="rounded-xl bg-white p-4 shadow-sm">
                   <h3 className="text-sm font-bold text-blue-700 mb-2">{summary.title}</h3>
