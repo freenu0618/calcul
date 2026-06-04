@@ -34,7 +34,7 @@ const WIZARD_STEPS: WizardStep[] = [
   { id: 'shift', title: '근무시프트', description: '근무시간 입력' },
 ];
 
-const dateModified = '2026-06-04';
+const dateModified = '2026-06-05';
 const calculatorInputChecklist = [
   ['급여유형', '월급제, 시급제, 시급기반 월급제 중 실제 계약 방식에 맞는 유형'],
   ['사업장 규모와 고용형태', '5인 이상 여부, 정규직·파트타임·외국인 근로자 여부 등 공제와 가산수당에 영향을 주는 조건'],
@@ -57,6 +57,10 @@ const calculatorAnswerGuidance = [
   {
     title: '결과를 해석할 때',
     body: '계산값은 2026년 기준 참고용 추정치입니다. 비과세 수당, 회사별 공제, 분쟁 판단은 전문가 검토가 필요합니다.',
+  },
+  {
+    title: '최저임금·체불이 의심될 때',
+    body: '환산시급, 주휴수당, 가산수당을 따로 확인하되 실제 위반 판단은 근로시간·휴게시간·계약 조건을 함께 검토해야 합니다.',
   },
 ];
 
@@ -183,6 +187,14 @@ const calculatorStructuredData = [
         acceptedAnswer: {
           '@type': 'Answer',
           text: '대략적인 추정은 가능하지만 급여유형, 사업장 규모, 근무시간, 부양가족 수, 4대보험 적용 여부, 과세·비과세 수당을 함께 입력해야 실수령액 차이를 줄일 수 있습니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '최저임금 위반 여부도 바로 판단할 수 있나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'PayTools는 2026년 최저시급과 입력값을 기준으로 환산시급과 수당을 점검하는 참고용 계산을 제공합니다. 실제 위반 판단은 근로시간, 휴게시간, 수당 산입 범위, 사업장 조건을 함께 확인하고 전문가 검토가 필요합니다.',
         },
       },
     ],
@@ -453,7 +465,7 @@ export default function CalculatorPage() {
             <h2 id="calculator-answer-guidance" className="mb-3 text-sm font-semibold text-blue-900">
               계산 전 확인하면 좋은 기준
             </h2>
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid gap-3 md:grid-cols-4">
               {calculatorAnswerGuidance.map((item) => (
                 <div key={item.title} className="rounded-md bg-white p-3 text-sm">
                   <p className="font-medium text-gray-900">{item.title}</p>
