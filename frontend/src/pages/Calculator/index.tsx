@@ -34,7 +34,7 @@ const WIZARD_STEPS: WizardStep[] = [
   { id: 'shift', title: '근무시프트', description: '근무시간 입력' },
 ];
 
-const dateModified = '2026-05-29';
+const dateModified = '2026-06-04';
 const calculatorInputChecklist = [
   ['급여유형', '월급제, 시급제, 시급기반 월급제 중 실제 계약 방식에 맞는 유형'],
   ['사업장 규모와 고용형태', '5인 이상 여부, 정규직·파트타임·외국인 근로자 여부 등 공제와 가산수당에 영향을 주는 조건'],
@@ -43,6 +43,21 @@ const calculatorInputChecklist = [
   ['과세·비과세 수당', '식대, 교통비, 직책수당 등 과세 여부에 따라 실수령액을 바꾸는 수당'],
   ['4대보험과 부양가족', '국민연금·건강보험·고용보험 적용 여부, 부양가족 수, 20세 이하 자녀 수'],
   ['연장·야간·휴일근로', '가산수당과 휴일연장 계산에 필요한 시간대와 사업장 규모 조건'],
+];
+
+const calculatorAnswerGuidance = [
+  {
+    title: '월급 또는 시급만 알고 있을 때',
+    body: '급여유형, 사업장 규모, 소정근로시간, 4대보험 적용 여부, 부양가족 수를 함께 확인해야 실수령액 오차를 줄일 수 있습니다.',
+  },
+  {
+    title: '알바·시프트 급여를 볼 때',
+    body: '주 15시간 이상 여부, 소정근로일 개근, 주휴수당 포함 여부, 야간·휴일근로 시간을 먼저 분리해 입력하세요.',
+  },
+  {
+    title: '결과를 해석할 때',
+    body: '계산값은 2026년 기준 참고용 추정치입니다. 비과세 수당, 회사별 공제, 분쟁 판단은 전문가 검토가 필요합니다.',
+  },
 ];
 
 const calculatorStructuredData = [
@@ -160,6 +175,14 @@ const calculatorStructuredData = [
         acceptedAnswer: {
           '@type': 'Answer',
           text: '계산 결과는 참고용 추정치입니다. 실제 지급, 비과세 항목, 회사별 공제, 분쟁 판단은 노무사 또는 세무 전문가와 확인하는 것이 안전합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '월급이나 시급만 알고 있어도 계산할 수 있나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '대략적인 추정은 가능하지만 급여유형, 사업장 규모, 근무시간, 부양가족 수, 4대보험 적용 여부, 과세·비과세 수당을 함께 입력해야 실수령액 차이를 줄일 수 있습니다.',
         },
       },
     ],
@@ -425,6 +448,20 @@ export default function CalculatorPage() {
               <span>✅</span> 2026년 법령 기준 반영 (최저시급 10,320원 / 국민연금 4.75%)
             </div>
           </div>
+
+          <section className="mb-4 rounded-lg border border-blue-100 bg-blue-50 p-4" aria-labelledby="calculator-answer-guidance">
+            <h2 id="calculator-answer-guidance" className="mb-3 text-sm font-semibold text-blue-900">
+              계산 전 확인하면 좋은 기준
+            </h2>
+            <div className="grid gap-3 md:grid-cols-3">
+              {calculatorAnswerGuidance.map((item) => (
+                <div key={item.title} className="rounded-md bg-white p-3 text-sm">
+                  <p className="font-medium text-gray-900">{item.title}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-gray-600">{item.body}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* 예시로 채우기 버튼 */}
           <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
