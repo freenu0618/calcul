@@ -10,6 +10,23 @@ import { ReverseIcon, EmptyState } from '../components/illustrations';
 import { salaryApi } from '../api';
 import type { ReverseSalaryResponse, EmploymentType, CompanySize } from '../types/salary';
 
+const reverseDateModified = '2026-06-07';
+
+const reverseAssumptionCards = [
+  {
+    title: '역산에 꼭 필요한 값',
+    body: '목표 실수령액, 본인 포함 부양가족 수, 20세 이하 자녀 수, 사업장 규모와 고용형태를 먼저 입력합니다.',
+  },
+  {
+    title: '결과에 아직 빠진 항목',
+    body: '비과세 수당, 상여, 회사별 공제, 실제 시프트와 연장·야간·휴일근로는 상세 급여 계산기에서 다시 확인하는 것이 안전합니다.',
+  },
+  {
+    title: '활용하기 좋은 상황',
+    body: '연봉 협상, 이직 제안 검토, 목표 저축액 기준 월급 기준선을 잡을 때 빠른 참고값으로 사용하세요.',
+  },
+];
+
 function ReverseCalculator() {
   const [targetNetPay, setTargetNetPay] = useState<number>(3000000);
   const [dependentsCount, setDependentsCount] = useState<number>(1);
@@ -32,6 +49,7 @@ function ReverseCalculator() {
       operatingSystem: 'Web',
       inLanguage: 'ko-KR',
       isAccessibleForFree: true,
+      dateModified: reverseDateModified,
       description:
         '목표 월 실수령액을 입력하면 2026년 4대보험, 소득세, 지방소득세를 반영해 필요한 세전 월급과 기본급을 추정하는 무료 역산 계산기입니다.',
       keywords:
@@ -61,6 +79,7 @@ function ReverseCalculator() {
         '원하는 월 실수령액, 부양가족 수, 사업장 규모를 입력해 4대보험과 세금을 반영한 필요 세전 급여를 확인하는 방법입니다.',
       totalTime: 'PT2M',
       inLanguage: 'ko-KR',
+      dateModified: reverseDateModified,
       tool: [{ '@type': 'HowToTool', name: 'PayTools 실수령액 역산 계산기' }],
       step: [
         {
@@ -89,6 +108,7 @@ function ReverseCalculator() {
     {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
+      dateModified: reverseDateModified,
       mainEntity: [
         {
           '@type': 'Question',
@@ -112,6 +132,14 @@ function ReverseCalculator() {
           acceptedAnswer: {
             '@type': 'Answer',
             text: '계산 결과는 참고용 추정치입니다. 실제 급여 계약, 비과세 수당, 공제 예외, 회사 정책은 노무사 또는 세무 전문가와 확인하는 것이 안전합니다.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '목표 실수령액만 알면 정확한 세전 월급을 바로 알 수 있나요?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: '목표 실수령액만으로는 빠른 기준선은 잡을 수 있지만 비과세 수당, 상여, 실제 근무시간, 회사별 공제는 결과를 바꿀 수 있습니다. 역산 결과 확인 후 상세 급여 계산기에서 수당과 시프트를 다시 검토하는 것이 안전합니다.',
           },
         },
       ],
@@ -195,6 +223,27 @@ function ReverseCalculator() {
               </div>
             </div>
           </div>
+
+          <section className="mb-6 rounded-lg border border-purple-100 bg-purple-50 p-4" aria-labelledby="reverse-assumptions-title">
+            <h2 id="reverse-assumptions-title" className="mb-3 text-sm font-semibold text-purple-900">
+              역산 전 확인하면 좋은 기준
+            </h2>
+            <div className="grid gap-3 md:grid-cols-3">
+              {reverseAssumptionCards.map((item) => (
+                <div key={item.title} className="rounded-md bg-white p-3 text-sm">
+                  <p className="font-medium text-gray-900">{item.title}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-gray-600">{item.body}</p>
+                </div>
+              ))}
+            </div>
+            <Link
+              to="/calculator"
+              className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-purple-700 hover:text-purple-900"
+            >
+              수당과 시프트까지 상세 계산하기
+              <span className="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_forward</span>
+            </Link>
+          </section>
 
           <Card>
             <div className="space-y-4">
