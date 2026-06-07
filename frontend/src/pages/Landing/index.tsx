@@ -31,7 +31,7 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
-const dateModified = '2026-05-26';
+const dateModified = '2026-06-08';
 
 const payrollCalculationHowTo = {
   '@context': 'https://schema.org',
@@ -97,6 +97,10 @@ const calculationAssumptions = [
   {
     name: '참고용 급여 추정치',
     description: '실제 지급액은 비과세 수당, 회사별 공제, 고용형태, 사업장 규모에 따라 달라질 수 있어 전문가 검토가 필요합니다.',
+  },
+  {
+    name: '역산과 정방향 계산 구분',
+    description: '목표 실수령액만 있는 경우에는 역산 계산기로 세전 급여 기준선을 잡고, 실제 수당·시프트·비과세 항목은 급여 계산기에서 다시 검토합니다.',
   },
 ];
 

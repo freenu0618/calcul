@@ -6,7 +6,7 @@
   <!-- 메인 페이지 -->
   <url>
     <loc>https://paytools.work</loc>
-    <lastmod>2026-05-26</lastmod>
+    <lastmod>2026-06-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -226,7 +226,7 @@
   <!-- AI answer resource -->
   <url>
     <loc>https://paytools.work/llms.txt</loc>
-    <lastmod>2026-06-07</lastmod>
+    <lastmod>2026-06-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
