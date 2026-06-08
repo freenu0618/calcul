@@ -5,6 +5,82 @@
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
 import PageHelmet from '../components/common/PageHelmet';
+import { Helmet } from 'react-helmet-async';
+
+const contactTopics = [
+  {
+    title: '계산 결과 문의',
+    description: '급여유형, 기본급 또는 시급, 근무시간, 수당, 4대보험 적용 여부를 함께 보내 주세요.',
+  },
+  {
+    title: '버그 리포트',
+    description: '발생한 페이지, 입력값, 브라우저, 기대한 결과와 실제 결과를 적어 주시면 확인이 빠릅니다.',
+  },
+  {
+    title: '법령·기준 확인',
+    description: '최저임금, 주휴수당, 4대보험, 가산수당처럼 확인하려는 기준과 적용 상황을 알려 주세요.',
+  },
+  {
+    title: '도입·기능 제안',
+    description: '직원 수, 급여유형 혼합 여부, 필요한 급여명세서·급여대장 흐름을 함께 남겨 주세요.',
+  },
+];
+
+const contactStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    name: 'PayTools 문의하기',
+    url: 'https://paytools.work/contact',
+    inLanguage: 'ko-KR',
+    dateModified: '2026-06-09',
+    description: 'PayTools 급여 계산기 문의, 버그 리포트, 기능 제안, 계산 기준 확인을 위한 공식 연락처 페이지입니다.',
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'PayTools',
+      url: 'https://paytools.work',
+    },
+    contactPoint: {
+      '@type': 'ContactPoint',
+      email: 'contact@salary-calculator.kr',
+      contactType: 'customer support',
+      availableLanguage: ['Korean'],
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'PayTools 문의 전 확인 항목',
+    url: 'https://paytools.work/contact',
+    inLanguage: 'ko-KR',
+    dateModified: '2026-06-09',
+    numberOfItems: contactTopics.length,
+    itemListElement: contactTopics.map((topic, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: topic.title,
+      description: topic.description,
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '홈',
+        item: 'https://paytools.work',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: '연락처',
+        item: 'https://paytools.work/contact',
+      },
+    ],
+  },
+];
 
 const Contact = () => {
   return (
@@ -14,6 +90,11 @@ const Contact = () => {
       description="PayTools 급여 계산기에 대한 문의사항, 버그 리포트, 개선 제안은 이메일로 연락해 주세요."
       path="/contact"
     />
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify(contactStructuredData)}
+      </script>
+    </Helmet>
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">연락처</h1>
@@ -36,6 +117,23 @@ const Contact = () => {
             </div>
           </div>
         </Card>
+
+        <section className="mt-6 rounded-lg border border-blue-100 bg-blue-50/70 p-5" aria-labelledby="contact-topics-title">
+          <h2 id="contact-topics-title" className="text-xl font-bold text-gray-900 mb-3">
+            문의 전 정리하면 좋은 내용
+          </h2>
+          <p className="text-sm text-gray-700 mb-4">
+            계산 기준이나 버그 상황을 함께 보내 주시면 반복 확인 없이 더 정확히 답변할 수 있습니다.
+          </p>
+          <div className="grid gap-3 md:grid-cols-2">
+            {contactTopics.map((topic) => (
+              <article key={topic.title} className="rounded-md bg-white p-4 shadow-sm">
+                <h3 className="text-sm font-bold text-blue-700 mb-2">{topic.title}</h3>
+                <p className="text-sm leading-relaxed text-gray-600">{topic.description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
 
         <Card title="문의 시 포함 사항" className="mt-6">
           <p className="text-gray-700 mb-3">
