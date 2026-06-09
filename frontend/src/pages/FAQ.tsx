@@ -45,9 +45,13 @@ const categorySummaries: CategorySummary[] = [
     title: '정방향·역산 계산기 선택',
     description: '기본급·시급·근무시간을 알고 있으면 급여 계산기를, 목표 실수령액에서 필요한 세전 급여를 알고 싶으면 역산 계산기를 먼저 사용합니다.',
   },
+  {
+    title: '참고용 계산·공식 문의',
+    description: '실제 지급, 체불, 예외 공제처럼 판단이 필요한 사안은 계산 결과를 참고용으로 보고 법률 정보나 문의 경로를 함께 확인해야 합니다.',
+  },
 ];
 
-const dateModified = '2026-06-02';
+const dateModified = '2026-06-10';
 
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
@@ -264,7 +268,9 @@ const FAQ = () => {
         "https://paytools.work/calculator",
         "https://paytools.work/reverse-calculator",
         "https://paytools.work/guide",
-        "https://paytools.work/examples"
+        "https://paytools.work/examples",
+        "https://paytools.work/legal",
+        "https://paytools.work/contact"
       ]
     },
     {
@@ -351,9 +357,9 @@ const FAQ = () => {
               급여 계산 FAQ 한눈에 보기
             </h2>
             <p className="text-sm text-gray-700 mb-4">
-              PayTools FAQ는 2026년 기준 실수령액, 4대보험, 소득세, 주휴수당, 최저임금, 연장·야간·휴일수당을 빠르게 확인하도록 정리했습니다.
+              PayTools FAQ는 2026년 기준 실수령액, 4대보험, 소득세, 주휴수당, 최저임금, 연장·야간·휴일수당과 계산 결과의 참고용 한계를 빠르게 확인하도록 정리했습니다.
             </p>
-            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {categorySummaries.map((summary) => (
                 <div key={summary.title} className="rounded-xl bg-white p-4 shadow-sm">
                   <h3 className="text-sm font-bold text-blue-700 mb-2">{summary.title}</h3>
