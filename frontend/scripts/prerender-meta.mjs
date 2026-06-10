@@ -52,7 +52,7 @@ const ROUTES = [
 
   // 기타
   { path: '/about', title: '서비스 소개 - 급여 계산 자동화 | PayTools', description: 'PayTools는 한국 근로기준법에 따른 정확한 실수령액 계산 서비스입니다.' },
-  { path: '/privacy', title: '개인정보처리방침 | PayTools', description: 'PayTools 급여 계산기의 개인정보처리방침입니다. 개인정보 수집, 쿠키 사용, 데이터 보관 정책.' },
+  { path: '/privacy', title: '개인정보처리방침 | PayTools', description: 'PayTools 급여 계산기의 개인정보처리방침입니다. 공개 계산 입력값, 계정 기능 데이터, 쿠키 사용, 데이터 보관 정책.' },
   { path: '/terms', title: '이용약관 | PayTools', description: 'PayTools 급여 계산기 이용약관. 서비스 이용, 면책 조항, 저작권 등의 권리와 의무 안내.' },
   { path: '/contact', title: '연락처 - 문의하기 | PayTools', description: 'PayTools 급여 계산기에 대한 문의사항, 버그 리포트, 개선 제안은 이메일로 연락해 주세요.' },
 ];
