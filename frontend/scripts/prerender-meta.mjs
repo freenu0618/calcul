@@ -17,7 +17,7 @@ const ROUTES = [
   // 핵심 기능
   { path: '/calculator', title: '급여 계산기 | PayTools - 4대보험, 소득세 자동 계산', description: '기본급, 수당, 4대보험, 소득세를 자동 계산. 2026년 최신 세율 적용. 연장·야간·휴일 수당, 주휴수당 자동 계산.' },
   { path: '/reverse-calculator', title: '실수령액 역산 계산기 | 월급 역산 | PayTools', description: '원하는 실수령액을 입력하면 필요한 기본급을 역산합니다. 4대보험, 소득세를 고려한 정확한 역산 계산.' },
-  { path: '/simulation', title: '급여 구조 시뮬레이션 | PayTools', description: '같은 총 급여액에서 기본급과 수당 배분에 따른 인건비 차이를 비교 시뮬레이션합니다.' },
+  { path: '/simulation', title: '급여 구조 시뮬레이션 - 기본급·수당 배분 인건비 비교 | PayTools', description: '같은 월 총 급여액에서 기본급과 수당 배분을 바꿨을 때 통상시급, 연장·야간·휴일수당, 퇴직금 기준, 연간 인건비 차이를 비교합니다.' },
 
   // 가이드
   { path: '/guide', title: '급여 계산 가이드 - 사용법, 4대보험, 소득세, 수당 | PayTools', description: 'PayTools 사용법과 한국 근로기준법에 따른 급여 계산의 모든 것을 알아보세요.' },

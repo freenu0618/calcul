@@ -62,6 +62,132 @@ const STRUCTURE_PRESETS = [
 ];
 
 const currency = new Intl.NumberFormat('ko-KR');
+const simulationDateModified = '2026-06-14';
+
+const simulationStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'PayTools 급여 구조 시뮬레이션',
+    alternateName: '기본급 수당 배분 인건비 비교 시뮬레이션',
+    url: 'https://paytools.work/simulation',
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Web',
+    inLanguage: 'ko-KR',
+    isAccessibleForFree: true,
+    dateModified: simulationDateModified,
+    description:
+      '같은 월 총 급여액에서 기본급과 수당 배분을 바꿨을 때 통상시급, 연장·야간·휴일수당, 퇴직금 기준, 연간 인건비 차이를 비교하는 무료 시뮬레이션입니다.',
+    keywords:
+      '급여 구조 시뮬레이션, 기본급 수당 배분, 통상시급 계산, 연장수당 비교, 퇴직금 기준, 인건비 시뮬레이션',
+    featureList: [
+      '기본급 비율별 통상시급 비교',
+      '연장·야간·휴일수당 차이 비교',
+      '퇴직금과 연차수당 기준 차이 확인',
+      '연간 사업주 인건비 차이 추정',
+      '사무직·서비스직·교대근무 빠른 시나리오',
+    ],
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'KRW',
+    },
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'PayTools',
+      url: 'https://paytools.work',
+    },
+    potentialAction: {
+      '@type': 'UseAction',
+      name: '급여 구조 비교 시뮬레이션 실행',
+      target: 'https://paytools.work/simulation',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: '기본급과 수당 배분에 따른 인건비 차이 비교 방법',
+    description:
+      '월 총 급여액, 주 소정근로시간, 예상 연장·야간·휴일근로시간, 기본급 비율을 입력해 두 급여 구조의 비용 차이를 비교하는 방법입니다.',
+    totalTime: 'PT3M',
+    inLanguage: 'ko-KR',
+    dateModified: simulationDateModified,
+    tool: [{ '@type': 'HowToTool', name: 'PayTools 급여 구조 시뮬레이션' }],
+    step: [
+      {
+        '@type': 'HowToStep',
+        position: 1,
+        name: '월 총 급여와 근무시간 입력',
+        text: '비교하려는 월 총 급여액, 주 소정근로시간, 예상 연장·야간·휴일근로시간을 입력합니다.',
+        url: 'https://paytools.work/simulation',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 2,
+        name: 'A안과 B안 기본급 비율 설정',
+        text: '두 급여 구조의 기본급 비율을 다르게 지정해 통상시급과 수당 기준이 어떻게 달라지는지 비교합니다.',
+        url: 'https://paytools.work/simulation',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 3,
+        name: '인건비와 리스크 차이 확인',
+        text: '연간 인건비, 퇴직금 기준, 연장수당 차이를 확인하되 실제 지급·노무 판단은 전문가 검토와 함께 진행합니다.',
+        url: 'https://paytools.work/simulation',
+      },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    inLanguage: 'ko-KR',
+    dateModified: simulationDateModified,
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: '급여 구조 시뮬레이션은 무엇을 비교하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '같은 월 총 급여액에서 기본급 비율을 다르게 둘 때 통상시급, 연장·야간·휴일수당, 퇴직금 기준, 연간 사업주 인건비가 어떻게 달라지는지 비교합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '어떤 상황에서 사용하면 좋나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '신규 채용 제안, 임금 구조 개편, 연장근로가 많은 매장·서비스직·교대근무의 인건비 차이를 사전에 검토할 때 유용합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '시뮬레이션 결과만으로 급여 구조를 확정해도 되나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '아니요. 결과는 참고용 추정치입니다. 실제 임금 구성, 통상임금성, 수당 산입 범위, 회사 규정은 노무사 또는 세무 전문가와 확인하는 것이 안전합니다.',
+        },
+      },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '홈',
+        item: 'https://paytools.work',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: '급여 구조 시뮬레이션',
+        item: 'https://paytools.work/simulation',
+      },
+    ],
+  },
+];
 
 export default function SalarySimulation() {
   const [request, setRequest] = useState<SimulationCompareRequest>(DEFAULT_SIMULATION_REQUEST);
@@ -123,12 +249,20 @@ export default function SalarySimulation() {
   return (
     <>
       <Helmet>
-        <title>급여 구조 시뮬레이션 | PayTools</title>
-        <meta name="description" content="같은 총 급여액에서 기본급과 수당 배분에 따른 인건비 차이를 비교 시뮬레이션합니다." />
+        <title>급여 구조 시뮬레이션 - 기본급·수당 배분 인건비 비교 | PayTools</title>
+        <meta name="description" content="같은 월 총 급여액에서 기본급과 수당 배분을 바꿨을 때 통상시급, 연장·야간·휴일수당, 퇴직금 기준, 연간 인건비 차이를 비교합니다." />
+        <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
         <link rel="canonical" href="https://paytools.work/simulation" />
-        <meta property="og:title" content="급여 구조 시뮬레이션" />
-        <meta property="og:description" content="기본급·수당 배분에 따른 인건비 차이 비교 시뮬레이션." />
+        <meta property="og:title" content="급여 구조 시뮬레이션 - 기본급·수당 배분 인건비 비교 | PayTools" />
+        <meta property="og:description" content="기본급·수당 배분에 따른 통상시급, 수당, 퇴직금 기준, 연간 인건비 차이를 비교하세요." />
         <meta property="og:url" content="https://paytools.work/simulation" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://paytools.work/og-image.svg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="급여 구조 시뮬레이션 - 기본급·수당 배분 인건비 비교 | PayTools" />
+        <meta name="twitter:description" content="월 총 급여는 같아도 기본급 비율에 따라 통상시급, 가산수당, 퇴직금 기준이 달라집니다." />
+        <meta name="twitter:image" content="https://paytools.work/og-image.svg" />
+        <script type="application/ld+json">{JSON.stringify(simulationStructuredData)}</script>
       </Helmet>
       <MainLayout>
         <div className="max-w-6xl mx-auto px-4 py-8">
