@@ -31,7 +31,7 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
-const dateModified = '2026-06-08';
+const dateModified = '2026-06-15';
 
 const payrollCalculationHowTo = {
   '@context': 'https://schema.org',
@@ -115,6 +115,7 @@ const landingStructuredData = [
     significantLink: [
       'https://paytools.work/calculator',
       'https://paytools.work/reverse-calculator',
+      'https://paytools.work/simulation',
       'https://paytools.work/guide',
       'https://paytools.work/faq',
     ],
@@ -232,6 +233,13 @@ const landingStructuredData = [
       {
         '@type': 'ListItem',
         position: 3,
+        name: '복수 급여안 시뮬레이션',
+        url: 'https://paytools.work/simulation',
+        description: '기본급 비율, 수당 배분, 인상률, 고용형태 변화가 실수령액과 회사 부담에 주는 차이를 비교합니다.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
         name: '급여 계산 기준 가이드',
         url: 'https://paytools.work/guide',
         description: '급여유형별 입력법, 4대보험, 소득세, 연장·야간·휴일수당 기준을 확인합니다.',

@@ -25,6 +25,14 @@ const routes = [
     icon: 'menu_book',
     tone: 'bg-emerald-50 text-emerald-700 border-emerald-100',
   },
+  {
+    label: '비교 시뮬레이션',
+    title: '인상안·수당 구조를 여러 개 비교하고 싶어요',
+    description: '기본급 비율, 수당 배분, 인상률, 고용형태 변화가 실수령액과 회사 부담에 주는 차이를 비교합니다.',
+    to: '/simulation',
+    icon: 'compare_arrows',
+    tone: 'bg-amber-50 text-amber-700 border-amber-100',
+  },
 ];
 
 export default function DecisionRouteSection() {
@@ -41,7 +49,7 @@ export default function DecisionRouteSection() {
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {routes.map((route) => (
             <Link
               key={route.to}

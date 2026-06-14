@@ -43,6 +43,12 @@ const answerRoutes = [
     description: '4대보험, 소득세, 주휴수당, 가산수당처럼 결과를 바꾸는 기준을 가이드에서 검토합니다.',
     to: '/guide',
   },
+  {
+    label: '시뮬레이션',
+    title: '복수 급여안과 수당 구조 비교',
+    description: '인상 전후, 기본급 비율, 수당 배분, 고용형태 차이를 나눠 예상 결과를 비교합니다.',
+    to: '/simulation',
+  },
 ];
 
 export default function CalculationBasisSection() {
@@ -97,7 +103,7 @@ export default function CalculationBasisSection() {
             </p>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             {answerRoutes.map((route) => (
               <Link
                 key={route.to}
