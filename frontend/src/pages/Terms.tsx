@@ -5,6 +5,48 @@
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
 import PageHelmet from '../components/common/PageHelmet';
+import { Helmet } from 'react-helmet-async';
+
+const termsStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'PayTools 이용약관',
+    url: 'https://paytools.work/terms',
+    inLanguage: 'ko-KR',
+    dateModified: '2026-06-16',
+    description: 'PayTools 급여 계산기 서비스 이용, 면책 조항, 저작권, 약관 개정 기준을 안내하는 이용약관 페이지입니다.',
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'PayTools',
+      url: 'https://paytools.work',
+    },
+    about: [
+      '급여 계산 참고용 한계',
+      '서비스 이용 조건',
+      '계산 결과 면책',
+      '저작권 및 콘텐츠 이용',
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '홈',
+        item: 'https://paytools.work',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: '이용약관',
+        item: 'https://paytools.work/terms',
+      },
+    ],
+  },
+];
 
 const Terms = () => {
   return (
@@ -14,10 +56,15 @@ const Terms = () => {
       description="PayTools 급여 계산기 이용약관입니다. 서비스 이용, 면책 조항, 저작권 등의 권리와 의무를 안내합니다."
       path="/terms"
     />
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify(termsStructuredData)}
+      </script>
+    </Helmet>
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">이용약관</h1>
-        <p className="text-sm text-gray-600 mb-8">최종 수정일: 2026년 1월 20일</p>
+        <p className="text-sm text-gray-600 mb-8">최종 수정일: 2026년 6월 16일</p>
 
         <Card title="제1조 (목적)">
           <p className="text-gray-700">
