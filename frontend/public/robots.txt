@@ -3,15 +3,19 @@
 
 User-agent: *
 User-agent: GPTBot
+User-agent: OAI-SearchBot
 User-agent: ChatGPT-User
 User-agent: Claude-Web
 User-agent: ClaudeBot
+User-agent: Claude-SearchBot
 User-agent: Anthropic-AI
 User-agent: PerplexityBot
+User-agent: Perplexity-User
 User-agent: Google-Extended
 User-agent: Googlebot
 User-agent: Bingbot
 User-agent: Yeti
+User-agent: Applebot
 User-agent: Applebot-Extended
 User-agent: CCBot
 Allow: /
