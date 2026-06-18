@@ -10,7 +10,7 @@ import { ReverseIcon, EmptyState } from '../components/illustrations';
 import { salaryApi } from '../api';
 import type { ReverseSalaryResponse, EmploymentType, CompanySize } from '../types/salary';
 
-const reverseDateModified = '2026-06-07';
+const reverseDateModified = '2026-06-19';
 
 const reverseAssumptionCards = [
   {
@@ -25,6 +25,14 @@ const reverseAssumptionCards = [
     title: '활용하기 좋은 상황',
     body: '연봉 협상, 이직 제안 검토, 목표 저축액 기준 월급 기준선을 잡을 때 빠른 참고값으로 사용하세요.',
   },
+];
+
+const reverseInputChecklist = [
+  ['목표 월 실수령액', '매달 실제로 받고 싶은 금액을 원 단위로 입력합니다.'],
+  ['부양가족 수', '본인을 포함한 부양가족 수와 20세 이하 자녀 수를 소득세 조건으로 반영합니다.'],
+  ['사업장 규모', '5인 이상 여부처럼 일부 수당과 계산 전제에 영향을 줄 수 있는 조건을 구분합니다.'],
+  ['고용형태', '정규직, 파트타임, 계약직처럼 4대보험과 급여 조건 검토에 필요한 유형을 선택합니다.'],
+  ['상세 재검토 항목', '비과세 수당, 상여, 회사별 공제, 실제 시프트는 계산기에서 다시 확인합니다.'],
 ];
 
 function ReverseCalculator() {
@@ -146,6 +154,22 @@ function ReverseCalculator() {
     },
     {
       '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: '실수령액 역산 계산 입력 체크리스트',
+      description:
+        '목표 월 실수령액에서 필요한 세전 급여를 역산하기 전에 확인해야 하는 핵심 입력값입니다.',
+      inLanguage: 'ko-KR',
+      dateModified: reverseDateModified,
+      numberOfItems: reverseInputChecklist.length,
+      itemListElement: reverseInputChecklist.map(([name, description], index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name,
+        description,
+      })),
+    },
+    {
+      '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
         {
@@ -199,6 +223,7 @@ function ReverseCalculator() {
       <Helmet>
         <title>실수령액 역산 계산기 - 목표 월급에 맞는 세전 급여 계산 | PayTools</title>
         <meta name="description" content="원하는 실수령액을 입력하면 필요한 세전 월급과 기본급을 역산합니다. 4대보험, 소득세, 지방소득세를 반영한 2026년 기준 월급 역산 계산기입니다." />
+        <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
         <link rel="canonical" href="https://paytools.work/reverse-calculator" />
         <meta property="og:title" content="실수령액 역산 계산기 - 목표 월급에 맞는 세전 급여 계산 | PayTools" />
         <meta property="og:description" content="목표 실수령액에 맞춰 필요한 세전 월급을 역산하세요. 4대보험과 소득세를 반영한 무료 월급 역산 계산기입니다." />
@@ -206,6 +231,9 @@ function ReverseCalculator() {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://paytools.work/og-image.svg" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="실수령액 역산 계산기 - 목표 월급에 맞는 세전 급여 계산 | PayTools" />
+        <meta name="twitter:description" content="원하는 월 실수령액을 기준으로 필요한 세전 월급과 예상 공제액을 빠르게 확인하세요." />
+        <meta name="twitter:image" content="https://paytools.work/og-image.svg" />
         <script type="application/ld+json">
           {JSON.stringify(reverseCalculatorStructuredData)}
         </script>
