@@ -55,6 +55,25 @@ const ROUTES = [
   '/contact',
 ];
 
+const FALLBACK_META = new Map([
+  ['/', {
+    title: '급여계산기 - 4대보험 주휴수당 자동계산 | PayTools',
+    description: '4대보험, 소득세, 주휴수당, 연장·야간·휴일 수당 자동 계산. 2026년 최신 법령 반영.',
+  }],
+  ['/guide/severance', {
+    title: '퇴직금 계산 가이드 | 2026년 기준 퇴직금 계산법 | PayTools',
+    description: '2026년 기준 퇴직금 계산법, 평균임금 산정 방법, 퇴직금 계산 공식, 계산 예시와 주의사항을 안내합니다.',
+  }],
+  ['/guide/annual-leave', {
+    title: '연차수당 완벽 가이드 | 2026년 연차 발생 기준 및 계산법 | PayTools',
+    description: '2026년 기준 연차 발생 조건, 연차수당 계산법, 미사용 연차수당 지급 기준을 상세히 안내합니다.',
+  }],
+  ['/guide/weekly-holiday', {
+    title: '주휴수당 완벽 가이드 | 2026년 기준 주휴수당 계산법 | PayTools',
+    description: '2026년 기준 주휴수당 개념, 발생 조건, 파트타임·아르바이트 계산 예시와 최저임금 포함 여부를 정리했습니다.',
+  }],
+]);
+
 // MIME 타입 매핑
 const MIME = {
   '.html': 'text/html',
@@ -220,8 +239,12 @@ async function main() {
 function fallbackMetaOnly() {
   console.log('⚠️ Puppeteer 사용 불가 - meta 태그 프리렌더링으로 대체');
   const META_ROUTES = [
-    { path: '', title: '급여계산기 - 4대보험 주휴수당 자동계산 | PayTools', description: '4대보험, 소득세, 주휴수당, 연장·야간·휴일 수당 자동 계산. 2026년 최신 법령 반영.' },
-    ...ROUTES.map(r => ({ path: r, title: `PayTools`, description: '급여 계산 자동화 서비스' })),
+    { path: '', ...FALLBACK_META.get('/') },
+    ...ROUTES.map(r => ({
+      path: r,
+      title: FALLBACK_META.get(r)?.title ?? 'PayTools',
+      description: FALLBACK_META.get(r)?.description ?? '급여 계산 자동화 서비스',
+    })),
   ];
   const template = readFileSync(join(DIST, 'index.html'), 'utf-8');
   const BASE_URL = 'https://paytools.work';

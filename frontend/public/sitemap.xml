@@ -64,19 +64,19 @@
   </url>
   <url>
     <loc>https://paytools.work/guide/severance</loc>
-    <lastmod>2026-05-11</lastmod>
+    <lastmod>2026-06-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://paytools.work/guide/annual-leave</loc>
-    <lastmod>2026-05-11</lastmod>
+    <lastmod>2026-06-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://paytools.work/guide/weekly-holiday</loc>
-    <lastmod>2026-05-11</lastmod>
+    <lastmod>2026-06-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -226,7 +226,7 @@
   <!-- AI answer resource -->
   <url>
     <loc>https://paytools.work/llms.txt</loc>
-    <lastmod>2026-06-18</lastmod>
+    <lastmod>2026-06-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
