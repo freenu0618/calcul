@@ -11,6 +11,8 @@ interface FAQItem {
   icon: string;
   question: string;
   answer: string;
+  relatedPath: string;
+  relatedLabel: string;
 }
 
 const FAQ_ITEMS: FAQItem[] = [
@@ -19,7 +21,9 @@ const FAQ_ITEMS: FAQItem[] = [
     icon: '💰',
     question: '2026년 최저임금은 얼마인가요?',
     answer:
-      '2026년 최저임금은 시급 10,320원입니다.\n\n월 환산액(209시간 기준): 2,156,880원\n\n주 40시간 근무, 주휴수당 포함 기준이며, 이보다 적게 지급하면 최저임금법 위반입니다.',
+      '2026년 최저임금은 시급 10,320원입니다.\n\n월 환산액(209시간 기준): 2,156,880원\n\n주 40시간 근무, 주휴수당 포함 기준이며, 이보다 적게 지급되는지 보려면 근로시간, 수당 산입 범위, 휴게시간을 함께 확인해야 합니다.',
+    relatedPath: '/guide',
+    relatedLabel: '최저임금 기준 더 보기',
   },
   {
     keyword: '4대보험',
@@ -27,6 +31,8 @@ const FAQ_ITEMS: FAQItem[] = [
     question: '4대보험 요율이 어떻게 되나요?',
     answer:
       '2026년 4대보험 근로자 부담률:\n\n• 국민연금: 4.75% (연금개혁 반영)\n• 건강보험: 3.595%\n• 장기요양보험: 건강보험료 × 13.14%\n• 고용보험: 0.9%\n\n예) 월급 300만원 → 약 30만원 공제',
+    relatedPath: '/guide/insurance',
+    relatedLabel: '4대보험 가이드 보기',
   },
   {
     keyword: '주휴수당',
@@ -34,6 +40,8 @@ const FAQ_ITEMS: FAQItem[] = [
     question: '주휴수당은 어떻게 계산하나요?',
     answer:
       '주휴수당 = (1주 소정근로시간 ÷ 40) × 8 × 시급\n\n• 주 40시간 근무: 시급 × 8시간\n• 주 24시간 근무: 시급 × 4.8시간 (비례)\n• 조건: 주 15시간 이상, 소정근로일 개근\n• 5인 미만 사업장도 의무 적용',
+    relatedPath: '/guide/weekly-holiday',
+    relatedLabel: '주휴수당 가이드 보기',
   },
   {
     keyword: '연장근로',
@@ -41,6 +49,8 @@ const FAQ_ITEMS: FAQItem[] = [
     question: '연장·야간·휴일 수당 계산법은?',
     answer:
       '가산수당 (통상시급 기준):\n\n• 연장근로: 1.5배 (주 40시간 초과)\n• 야간근로: 0.5배 가산 (22:00~06:00)\n• 휴일근로: 1.5배 (8시간 이하)\n• 휴일 8시간 초과: 2.0배 (5인 이상)\n\n주 52시간(연장 12시간) 한도 주의',
+    relatedPath: '/guide/overtime',
+    relatedLabel: '연장·야간·휴일 가이드 보기',
   },
   {
     keyword: '소득세',
@@ -48,6 +58,26 @@ const FAQ_ITEMS: FAQItem[] = [
     question: '소득세는 어떻게 계산되나요?',
     answer:
       '근로소득 간이세액표에 따라 원천징수합니다.\n\n• 월급·부양가족 수에 따라 달라짐\n• 지방소득세: 소득세의 10% 별도\n• 연말정산 시 과부족 정산\n\n정확한 계산은 급여계산기를 이용해보세요!',
+    relatedPath: '/guide/tax',
+    relatedLabel: '소득세 가이드 보기',
+  },
+  {
+    keyword: '개인정보',
+    icon: '🔒',
+    question: '계산 전에 개인정보가 필요한가요?',
+    answer:
+      '아니요. 공개 FAQ와 계산기에서는 이름, 주민등록번호, 계좌번호, 회사 내부 급여대장 같은 민감정보가 필요하지 않습니다.\n\n급여유형, 기본급 또는 시급, 근무시간, 수당, 부양가족 수, 4대보험 적용 여부처럼 계산 조건만 분리해 입력하세요.',
+    relatedPath: '/faq',
+    relatedLabel: 'FAQ에서 안전 입력 원칙 보기',
+  },
+  {
+    keyword: '체불판단',
+    icon: '⚖️',
+    question: '체불이나 최저임금 위반인지 바로 판단할 수 있나요?',
+    answer:
+      'PayTools 계산 결과는 참고용 추정치입니다.\n\n체불, 최저임금 위반, 예외 공제처럼 판단이 필요한 사안은 계약서, 근무기록, 휴게시간, 수당 산입 범위, 사업장 규모를 함께 확인해야 합니다.\n\n분쟁 가능성이 있으면 계산 결과만으로 단정하지 말고 법률 정보와 공식 상담 경로를 함께 확인하세요.',
+    relatedPath: '/legal',
+    relatedLabel: '법률 정보와 한계 보기',
   },
 ];
 
@@ -146,6 +176,13 @@ export default function QuickFAQPanel({ onClose }: Props) {
                 {selected.answer}
               </div>
             </div>
+            <Link
+              to={selected.relatedPath}
+              className="flex items-center justify-center gap-1 text-sm text-primary hover:underline mx-auto"
+            >
+              {selected.relatedLabel}
+              <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+            </Link>
             {/* 뒤로가기 */}
             <button
               onClick={() => setSelected(null)}
