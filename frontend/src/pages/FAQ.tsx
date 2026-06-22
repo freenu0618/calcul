@@ -55,7 +55,34 @@ const categorySummaries: CategorySummary[] = [
   },
 ];
 
-const dateModified = '2026-06-18';
+const answerRouteCards = [
+  {
+    title: '월급·알바 실수령액 계산',
+    description: '기본급, 시급, 근무시간, 수당, 부양가족 수처럼 실제 입력값이 있을 때는 정방향 급여 계산기를 먼저 사용합니다.',
+    to: '/calculator',
+    label: '급여 계산기',
+  },
+  {
+    title: '목표 실수령액에서 역산',
+    description: '월 실수령액 목표만 있거나 연봉 협상 기준선을 잡을 때는 역산 계산기로 필요 세전 급여를 먼저 추정합니다.',
+    to: '/reverse-calculator',
+    label: '역산 계산기',
+  },
+  {
+    title: '여러 급여안 비교',
+    description: '인상 전후, 수당 배분, 고용형태 변화처럼 복수 시나리오를 비교할 때는 시뮬레이션 흐름이 적합합니다.',
+    to: '/simulation',
+    label: '시뮬레이션',
+  },
+  {
+    title: '법률 전제와 분쟁 가능성',
+    description: '최저임금 위반, 체불, 예외 공제처럼 판단이 필요한 질문은 계산값을 참고용으로 보고 법률 정보와 전문가 검토를 함께 확인합니다.',
+    to: '/legal',
+    label: '법률 정보',
+  },
+];
+
+const dateModified = '2026-06-23';
 
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
@@ -298,6 +325,21 @@ const FAQ = () => {
     },
     {
       "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "PayTools 질문별 추천 경로",
+      "inLanguage": "ko-KR",
+      "dateModified": dateModified,
+      "numberOfItems": answerRouteCards.length,
+      "itemListElement": answerRouteCards.map((route, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "name": route.title,
+        "description": route.description,
+        "url": `https://paytools.work${route.to}`
+      }))
+    },
+    {
+      "@context": "https://schema.org",
       "@type": "FAQPage",
       "inLanguage": "ko-KR",
       "dateModified": dateModified,
@@ -374,6 +416,28 @@ const FAQ = () => {
                   <h3 className="text-sm font-bold text-blue-700 mb-2">{summary.title}</h3>
                   <p className="text-sm text-gray-600 leading-relaxed">{summary.description}</p>
                 </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="mb-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm" aria-labelledby="faq-routing-title">
+            <h2 id="faq-routing-title" className="text-xl font-bold text-gray-900 mb-3">
+              질문별로 먼저 볼 페이지
+            </h2>
+            <p className="text-sm text-gray-700 mb-4">
+              단일 금액 답변보다 입력값과 목적에 맞는 계산 흐름을 먼저 고르면 실수령액 오차와 법률 판단 오해를 줄일 수 있습니다.
+            </p>
+            <div className="grid gap-3 md:grid-cols-2">
+              {answerRouteCards.map((route) => (
+                <Link
+                  key={route.to}
+                  to={route.to}
+                  className="rounded-xl border border-gray-200 p-4 transition-colors hover:border-blue-300 hover:bg-blue-50"
+                >
+                  <h3 className="text-sm font-bold text-gray-900 mb-2">{route.title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-600 mb-3">{route.description}</p>
+                  <span className="text-sm font-semibold text-blue-600">{route.label} 보기</span>
+                </Link>
               ))}
             </div>
           </section>
