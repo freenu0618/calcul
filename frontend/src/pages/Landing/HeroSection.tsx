@@ -28,7 +28,7 @@ export default function HeroSection() {
             <h1 className="text-4xl font-black leading-[1.15] text-text-main sm:text-5xl lg:text-6xl tracking-tight mb-6">
               우리 직원 실수령액,
               <br />
-              <span className="text-primary">정확히 알고 계신가요?</span>
+              <span className="text-primary">기준까지 확인했나요?</span>
             </h1>
 
             <p className="text-lg text-text-sub leading-relaxed mb-2">
@@ -39,7 +39,7 @@ export default function HeroSection() {
             </p>
 
             <p className="text-base text-text-sub mb-8 bg-primary/5 inline-block px-4 py-2 rounded-lg">
-              <strong className="text-primary">3분</strong>이면 정확한 실수령액, 4대보험, 소득세까지 한 번에
+              <strong className="text-primary">3분</strong>이면 예상 실수령액, 4대보험, 소득세까지 한 번에
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-6">
@@ -61,7 +61,7 @@ export default function HeroSection() {
             </div>
 
             <p className="text-sm text-text-sub">
-              가입 없이 바로 사용 · 완전 무료 · 신용카드 불필요
+              가입 없이 바로 사용 · 민감정보 불필요 · 신용카드 불필요
             </p>
           </div>
 

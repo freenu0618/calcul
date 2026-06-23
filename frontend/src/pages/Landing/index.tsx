@@ -31,7 +31,7 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
-const dateModified = '2026-06-15';
+const dateModified = '2026-06-24';
 
 const payrollCalculationHowTo = {
   '@context': 'https://schema.org',
@@ -118,6 +118,7 @@ const landingStructuredData = [
       'https://paytools.work/simulation',
       'https://paytools.work/guide',
       'https://paytools.work/faq',
+      'https://paytools.work/legal',
     ],
     description:
       '2026년 최저임금, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 함께 확인하려는 사업장과 근로자를 위한 PayTools 대표 페이지입니다.',
@@ -152,7 +153,7 @@ const landingStructuredData = [
     url: 'https://paytools.work',
     inLanguage: 'ko-KR',
     description:
-      '2026년 한국 급여 계산, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 계산하는 웹 기반 급여 계산 서비스입니다.',
+      '2026년 한국 급여 계산, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 참고용 예상액으로 계산하는 웹 기반 급여 계산 서비스입니다.',
     dateModified,
     potentialAction: {
       '@type': 'UseAction',
@@ -201,12 +202,15 @@ const landingStructuredData = [
       '주휴수당 계산',
       '연장·야간·휴일수당 계산',
       '실수령액 역산 계산',
+      '민감정보 없이 공개 계산 조건 확인',
       '급여명세서 및 급여대장 관리',
     ],
     audience: {
       '@type': 'Audience',
       audienceType: '소규모 사업장, HR 담당자, 노무사, 근로자',
     },
+    usageInfo:
+      '공개 계산에는 이름, 주민등록번호, 계좌번호 같은 민감정보 대신 급여유형, 금액, 근무시간, 부양가족 수 등 계산 조건만 입력합니다.',
   },
   payrollCalculationHowTo,
   {

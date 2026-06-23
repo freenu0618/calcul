@@ -58,7 +58,7 @@ const ROUTES = [
 const FALLBACK_META = new Map([
   ['/', {
     title: '급여계산기 - 4대보험 주휴수당 자동계산 | PayTools',
-    description: '4대보험, 소득세, 주휴수당, 연장·야간·휴일 수당 자동 계산. 2026년 최신 법령 반영.',
+    description: '4대보험, 소득세, 주휴수당, 연장·야간·휴일 수당 자동 계산. 2026년 최신 법령 기준 참고용 예상액.',
   }],
   ['/guide/severance', {
     title: '퇴직금 계산 가이드 | 2026년 기준 퇴직금 계산법 | PayTools',

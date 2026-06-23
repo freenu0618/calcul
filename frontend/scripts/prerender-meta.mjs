@@ -15,8 +15,8 @@ const BASE_URL = 'https://paytools.work';
 
 const ROUTES = [
   // 핵심 기능
-  { path: '/calculator', title: '급여 계산기 | PayTools - 4대보험, 소득세 자동 계산', description: '기본급, 수당, 4대보험, 소득세를 자동 계산. 2026년 최신 세율 적용. 연장·야간·휴일 수당, 주휴수당 자동 계산.' },
-  { path: '/reverse-calculator', title: '실수령액 역산 계산기 | 월급 역산 | PayTools', description: '원하는 실수령액을 입력하면 필요한 기본급을 역산합니다. 4대보험, 소득세를 고려한 정확한 역산 계산.' },
+  { path: '/calculator', title: '급여 계산기 | PayTools - 4대보험, 소득세 자동 계산', description: '기본급, 수당, 4대보험, 소득세를 자동 계산. 2026년 최신 세율 적용. 연장·야간·휴일 수당, 주휴수당 예상액 계산.' },
+  { path: '/reverse-calculator', title: '실수령액 역산 계산기 | 월급 역산 | PayTools', description: '원하는 실수령액을 입력하면 필요한 기본급을 역산합니다. 4대보험, 소득세를 고려한 참고용 역산 계산.' },
   { path: '/simulation', title: '급여 구조 시뮬레이션 - 기본급·수당 배분 인건비 비교 | PayTools', description: '같은 월 총 급여액에서 기본급과 수당 배분을 바꿨을 때 통상시급, 연장·야간·휴일수당, 퇴직금 기준, 연간 인건비 차이를 비교합니다.' },
 
   // 가이드
@@ -54,7 +54,7 @@ const ROUTES = [
   { path: '/blog/payslip-requirements', title: '급여명세서 필수 기재사항 완벽 가이드 | PayTools', description: '2021년 11월부터 의무화된 급여명세서 교부제도의 필수 기재사항과 위반 시 과태료.' },
 
   // 기타
-  { path: '/about', title: '서비스 소개 - 급여 계산 자동화 | PayTools', description: 'PayTools는 한국 근로기준법에 따른 정확한 실수령액 계산 서비스입니다.' },
+  { path: '/about', title: '서비스 소개 - 급여 계산 자동화 | PayTools', description: 'PayTools는 한국 근로기준법 기준을 참고해 예상 실수령액을 계산하는 서비스입니다.' },
   { path: '/privacy', title: '개인정보처리방침 | PayTools', description: 'PayTools 급여 계산기의 개인정보처리방침입니다. 공개 계산 입력값, 계정 기능 데이터, 쿠키 사용, 데이터 보관 정책.' },
   { path: '/terms', title: '이용약관 | PayTools', description: 'PayTools 급여 계산기 이용약관. 서비스 이용, 면책 조항, 저작권 등의 권리와 의무 안내.' },
   { path: '/contact', title: '연락처 - 문의하기 | PayTools', description: 'PayTools 급여 계산기에 대한 문의사항, 버그 리포트, 개선 제안은 이메일로 연락해 주세요.' },
@@ -110,7 +110,7 @@ const template = readFileSync(templatePath, 'utf-8');
 const rootHtml = generatePageHtml(template, {
   path: '',
   title: '급여계산기 - 4대보험 주휴수당 자동계산 | PayTools',
-  description: '4대보험, 소득세, 주휴수당, 연장·야간·휴일 수당 자동 계산. 2026년 최신 법령 반영. 8개 법률 기반 정확한 계산. 직원 5명까지 무료.',
+  description: '4대보험, 소득세, 주휴수당, 연장·야간·휴일 수당 자동 계산. 2026년 최신 법령 기준 참고용 예상액. 직원 5명까지 무료.',
 });
 writeFileSync(templatePath, rootHtml);
 

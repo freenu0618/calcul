@@ -34,7 +34,7 @@ const WIZARD_STEPS: WizardStep[] = [
   { id: 'shift', title: '근무시프트', description: '근무시간 입력' },
 ];
 
-const dateModified = '2026-06-05';
+const dateModified = '2026-06-24';
 const calculatorInputChecklist = [
   ['급여유형', '월급제, 시급제, 시급기반 월급제 중 실제 계약 방식에 맞는 유형'],
   ['사업장 규모와 고용형태', '5인 이상 여부, 정규직·파트타임·외국인 근로자 여부 등 공제와 가산수당에 영향을 주는 조건'],
@@ -43,6 +43,7 @@ const calculatorInputChecklist = [
   ['과세·비과세 수당', '식대, 교통비, 직책수당 등 과세 여부에 따라 실수령액을 바꾸는 수당'],
   ['4대보험과 부양가족', '국민연금·건강보험·고용보험 적용 여부, 부양가족 수, 20세 이하 자녀 수'],
   ['연장·야간·휴일근로', '가산수당과 휴일연장 계산에 필요한 시간대와 사업장 규모 조건'],
+  ['민감정보 제외', '공개 계산에는 이름, 주민등록번호, 계좌번호, 급여명세서 원본 대신 계산 조건만 입력'],
 ];
 
 const calculatorAnswerGuidance = [
@@ -57,6 +58,10 @@ const calculatorAnswerGuidance = [
   {
     title: '결과를 해석할 때',
     body: '계산값은 2026년 기준 참고용 추정치입니다. 비과세 수당, 회사별 공제, 분쟁 판단은 전문가 검토가 필요합니다.',
+  },
+  {
+    title: '개인정보를 줄이고 싶을 때',
+    body: '공개 계산에는 실명·주민등록번호·계좌번호가 필요하지 않습니다. 계산 조건만 분리해 입력하세요.',
   },
   {
     title: '최저임금·체불이 의심될 때',
@@ -77,7 +82,7 @@ const calculatorStructuredData = [
     isAccessibleForFree: true,
     dateModified,
     description:
-      '2026년 최저임금, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 반영해 월급과 알바 급여 실수령액을 계산하는 무료 급여 계산기입니다.',
+      '2026년 최저임금, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 반영해 월급과 알바 급여의 예상 실수령액을 계산하는 무료 급여 계산기입니다.',
     keywords:
       '급여 계산기, 월급 실수령액 계산기, 알바 급여 계산기, 4대보험 계산기, 주휴수당 계산, 연장근로수당, 2026년 최저임금',
     featureList: [
@@ -420,7 +425,7 @@ export default function CalculatorPage() {
     <>
       <Helmet>
         <title>급여 계산기 - 2026년 실수령액·4대보험·주휴수당 자동 계산 | PayTools</title>
-        <meta name="description" content="기본급, 각종 수당, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당까지 자동 계산하세요. 2026년 최저임금 10,320원과 최신 요율을 반영한 무료 실수령액 계산기입니다." />
+        <meta name="description" content="기본급, 각종 수당, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당까지 계산하세요. 2026년 최저임금 10,320원과 최신 요율을 반영한 무료 예상 실수령액 계산기입니다." />
         <link rel="canonical" href="https://paytools.work/calculator" />
         <meta property="og:title" content="급여 계산기 - 2026년 실수령액·4대보험 자동 계산 | PayTools" />
         <meta property="og:description" content="기본급, 수당, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 한 번에 계산하는 2026년 기준 급여 계산기입니다." />
@@ -449,7 +454,7 @@ export default function CalculatorPage() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 mb-1">급여 계산기</h1>
               <p className="text-gray-600">
-                4대 보험, 소득세, 가산수당을 자동 계산하여 정확한 실수령액을 확인하세요
+                4대 보험, 소득세, 가산수당을 자동 계산하여 예상 실수령액과 공제 기준을 확인하세요
               </p>
             </div>
           </div>
@@ -465,7 +470,7 @@ export default function CalculatorPage() {
             <h2 id="calculator-answer-guidance" className="mb-3 text-sm font-semibold text-blue-900">
               계산 전 확인하면 좋은 기준
             </h2>
-            <div className="grid gap-3 md:grid-cols-4">
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-5">
               {calculatorAnswerGuidance.map((item) => (
                 <div key={item.title} className="rounded-md bg-white p-3 text-sm">
                   <p className="font-medium text-gray-900">{item.title}</p>
