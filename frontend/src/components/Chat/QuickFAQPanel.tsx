@@ -62,6 +62,15 @@ const FAQ_ITEMS: FAQItem[] = [
     relatedLabel: '소득세 가이드 보기',
   },
   {
+    keyword: '계산기선택',
+    icon: '🧭',
+    question: '급여 계산기, 역산 계산기, 시뮬레이션 중 무엇을 써야 하나요?',
+    answer:
+      '이미 기본급, 시급, 근무시간, 수당을 알고 있다면 급여 계산기를 먼저 사용하세요.\n\n목표 월 실수령액에서 필요한 세전 급여를 거꾸로 알고 싶다면 역산 계산기가 적합합니다.\n\n여러 급여안, 인상 전후, 수당 배분을 비교하려면 시뮬레이션에서 조건을 나눠 보는 것이 좋습니다.',
+    relatedPath: '/faq',
+    relatedLabel: 'FAQ에서 계산기 선택 기준 보기',
+  },
+  {
     keyword: '개인정보',
     icon: '🔒',
     question: '계산 전에 개인정보가 필요한가요?',
@@ -133,7 +142,7 @@ export default function QuickFAQPanel({ onClose }: Props) {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="예: 최저임금, 주휴수당, 4대보험"
+                placeholder="예: 최저임금, 계산기선택, 4대보험"
                 className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-text-main placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 aria-label="FAQ 검색"
               />
