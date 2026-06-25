@@ -24,7 +24,7 @@ const ROUTES = [
   { path: '/guide/insurance', title: '4대 보험 이해하기 | 2026년 요율 및 계산 방법 | PayTools', description: '국민연금, 건강보험, 장기요양보험, 고용보험의 2026년 요율과 계산 방법을 상세히 안내합니다.' },
   { path: '/guide/tax', title: '소득세 계산법 | 간이세액표 활용 가이드 | PayTools', description: '근로소득세 간이세액표와 부양가족 공제를 활용한 소득세 계산 방법. 2026년 세율 안내.' },
   { path: '/guide/overtime', title: '연장·야간·휴일 수당 계산법 | 가산수당 가이드 | PayTools', description: '근로기준법에 따른 연장·야간·휴일 수당 계산 방법. 통상시급 산정, 가산율 적용을 안내합니다.' },
-  { path: '/guide/how-to-use', title: '서비스 사용법 - PayTools 급여 계산기', description: 'PayTools 급여 계산기를 급여유형별로 어떻게 사용하는지 안내합니다. 월급제, 시급제, 시급기반 월급제.' },
+  { path: '/guide/how-to-use', title: '서비스 사용법 - PayTools 급여 계산기', description: 'PayTools 급여 계산기를 급여유형별로 어떻게 사용하는지 안내합니다. 월급제, 시급제, 시급기반 월급제와 174시간/209시간 기준 선택법.' },
   { path: '/guide/severance', title: '퇴직금 계산 가이드 | 2026년 기준 퇴직금 계산법 | PayTools', description: '2026년 기준 퇴직금 계산법, 평균임금 산정 방법, 퇴직금 계산 공식, 계산 예시와 주의사항을 안내합니다.' },
   { path: '/guide/annual-leave', title: '연차수당 완벽 가이드 | 2026년 연차 발생 기준 및 계산법 | PayTools', description: '2026년 기준 연차 발생 조건, 연차수당 계산법, 미사용 연차수당 지급 기준을 상세히 안내합니다.' },
   { path: '/guide/weekly-holiday', title: '주휴수당 완벽 가이드 | 2026년 기준 주휴수당 계산법 | PayTools', description: '2026년 기준 주휴수당 개념, 발생 조건, 파트타임·아르바이트 계산 예시와 최저임금 포함 여부를 정리했습니다.' },

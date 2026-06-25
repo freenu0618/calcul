@@ -17,12 +17,14 @@ const HOW_TO_SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'HowTo',
   name: 'PayTools 급여 계산기 사용법',
-  description: '월급제, 시급제, 시급기반 월급제 중 내 상황에 맞는 급여유형을 선택하고 실수령액을 계산하는 절차입니다.',
+  description: '월급제, 시급제, 시급기반 월급제 중 내 상황에 맞는 급여유형과 174시간/209시간 기준을 선택하고 실수령액을 계산하는 절차입니다.',
   totalTime: 'PT3M',
+  dateModified: '2026-06-26',
   supply: [
     { '@type': 'HowToSupply', name: '기본급 또는 시급' },
     { '@type': 'HowToSupply', name: '근무일·근무시간 또는 시프트 정보' },
     { '@type': 'HowToSupply', name: '부양가족 수와 4대보험 적용 여부' },
+    { '@type': 'HowToSupply', name: '174시간 또는 209시간 월 기준시간 선택' },
   ],
   step: [
     {
@@ -35,8 +37,8 @@ const HOW_TO_SCHEMA = {
     {
       '@type': 'HowToStep',
       position: 2,
-      name: '근무시간 입력',
-      text: '월급제는 월 기준시간을 확인하고, 시급제는 시프트 또는 월간 템플릿으로 실제 근무시간을 입력합니다.',
+      name: '근무시간과 월 기준시간 입력',
+      text: '월급제는 주휴수당을 별도 계산할지에 따라 174시간 또는 209시간 기준을 확인하고, 시급제는 시프트 또는 월간 템플릿으로 실제 근무시간을 입력합니다.',
       url: 'https://paytools.work/guide/how-to-use#wage-type-guides',
     },
     {
@@ -61,7 +63,7 @@ export default function HowToUseGuide() {
     <>
       <PageHelmet
         title="서비스 사용법 - PayTools 급여 계산기"
-        description="PayTools 급여 계산기를 급여유형별로 어떻게 사용하는지 안내합니다. 월급제, 시급제, 시급기반 월급제 사용법."
+        description="PayTools 급여 계산기를 급여유형별로 어떻게 사용하는지 안내합니다. 월급제, 시급제, 시급기반 월급제와 174시간/209시간 기준 선택법."
         path="/guide/how-to-use"
       />
       <Helmet>
