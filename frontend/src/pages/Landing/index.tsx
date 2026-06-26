@@ -31,7 +31,7 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
-const dateModified = '2026-06-24';
+const dateModified = '2026-06-27';
 
 const payrollCalculationHowTo = {
   '@context': 'https://schema.org',
@@ -101,6 +101,10 @@ const calculationAssumptions = [
   {
     name: '역산과 정방향 계산 구분',
     description: '목표 실수령액만 있는 경우에는 역산 계산기로 세전 급여 기준선을 잡고, 실제 수당·시프트·비과세 항목은 급여 계산기에서 다시 검토합니다.',
+  },
+  {
+    name: '민감정보 없는 공개 계산',
+    description: '공개 계산과 FAQ 확인에는 이름, 주민등록번호, 계좌번호, 급여명세서 원본 대신 급여유형, 금액, 근무시간, 부양가족 수처럼 계산 조건만 사용합니다.',
   },
 ];
 

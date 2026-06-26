@@ -16,6 +16,11 @@ const basisCards = [
     title: '안전한 활용 범위',
     description: '계산 결과는 급여 협의와 사전 검토용 추정치입니다. 최종 지급, 분쟁, 세무 신고는 노무·세무 전문가 검토가 필요합니다.',
   },
+  {
+    icon: 'privacy_tip',
+    title: '민감정보 불필요',
+    description: '공개 계산에는 이름, 주민등록번호, 계좌번호, 급여명세서 원본 대신 급여유형, 금액, 근무시간 같은 조건만 입력합니다.',
+  },
 ];
 
 const quickChecks = [
@@ -65,7 +70,7 @@ export default function CalculationBasisSection() {
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3 mb-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
           {basisCards.map((card) => (
             <article key={card.title} className="rounded-2xl border border-gray-100 bg-background-light p-6 shadow-sm">
               <span className="material-symbols-outlined mb-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary" aria-hidden="true">
