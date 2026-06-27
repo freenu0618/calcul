@@ -54,6 +54,18 @@ const answerRoutes = [
     description: '인상 전후, 기본급 비율, 수당 배분, 고용형태 차이를 나눠 예상 결과를 비교합니다.',
     to: '/simulation',
   },
+  {
+    label: '법률 전제',
+    title: '분쟁·체불 판단 전 기준 확인',
+    description: '최저임금, 임금명세서, 주휴수당처럼 법률 전제가 필요한 질문은 법률 정보에서 먼저 분리해 봅니다.',
+    to: '/legal',
+  },
+  {
+    label: '공식 문의',
+    title: '오류·도입·기준 문의 연결',
+    description: '계산 결과 오류, 도입 상담, 공식 기준 확인처럼 운영 답변이 필요한 경우 문의 경로로 연결합니다.',
+    to: '/contact',
+  },
 ];
 
 export default function CalculationBasisSection() {
@@ -108,7 +120,7 @@ export default function CalculationBasisSection() {
             </p>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {answerRoutes.map((route) => (
               <Link
                 key={route.to}

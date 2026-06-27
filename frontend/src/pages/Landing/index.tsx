@@ -31,7 +31,7 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
-const dateModified = '2026-06-27';
+const dateModified = '2026-06-28';
 
 const payrollCalculationHowTo = {
   '@context': 'https://schema.org',
@@ -123,6 +123,7 @@ const landingStructuredData = [
       'https://paytools.work/guide',
       'https://paytools.work/faq',
       'https://paytools.work/legal',
+      'https://paytools.work/contact',
     ],
     description:
       '2026년 최저임금, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 함께 확인하려는 사업장과 근로자를 위한 PayTools 대표 페이지입니다.',
@@ -251,6 +252,20 @@ const landingStructuredData = [
         name: '급여 계산 기준 가이드',
         url: 'https://paytools.work/guide',
         description: '급여유형별 입력법, 4대보험, 소득세, 연장·야간·휴일수당 기준을 확인합니다.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 5,
+        name: '법률 전제 확인',
+        url: 'https://paytools.work/legal',
+        description: '최저임금 위반, 체불, 임금명세서, 법정 수당처럼 판단형 질문은 계산 결과와 분리해 기준을 확인합니다.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 6,
+        name: '공식 문의 연결',
+        url: 'https://paytools.work/contact',
+        description: '계산 결과 오류, 도입 상담, 법령 기준 확인, 기능 제안처럼 공식 답변이 필요한 질문을 문의 경로로 연결합니다.',
       },
     ],
   },
