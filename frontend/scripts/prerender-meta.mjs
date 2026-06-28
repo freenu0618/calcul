@@ -33,7 +33,7 @@ const ROUTES = [
   { path: '/faq', title: '자주 묻는 질문 (FAQ) | PayTools 급여 계산기', description: '급여 계산, 4대 보험, 소득세, 연장수당, 최저임금에 대한 30개의 자주 묻는 질문과 답변.' },
 
   // 계산 사례
-  { path: '/examples', title: '급여 계산 사례 - 풀타임·파트타임·교대근무 | PayTools', description: '다양한 근무 형태별 실제 급여 계산 사례. 4대보험, 소득세, 실수령액 계산 과정을 확인하세요.' },
+  { path: '/examples', title: '급여 계산 사례 - 풀타임·파트타임·교대근무 | PayTools', description: '풀타임, 파트타임, 교대근무 사례별 입력값과 2026년 기준 4대보험, 소득세, 주휴수당, 실수령액 계산 흐름을 확인하세요.' },
   { path: '/examples/fulltime', title: '풀타임 근로자 급여 계산 사례 (주 5일) | PayTools', description: '월급 250만원, 주 5일 정규직 근로자의 실수령액 계산 사례. 4대 보험, 소득세, 주휴수당 포함.' },
   { path: '/examples/parttime', title: '파트타임 근로자 급여 계산 사례 (주 3일) | PayTools', description: '시급 10,320원, 주 3일 단시간 근로자의 실수령액 계산. 주휴수당 비례 계산과 4대 보험 기준.' },
   { path: '/examples/shift-work', title: '교대근무 근로자 급여 계산 사례 (3교대) | PayTools', description: '야간근무 포함 3교대 근로자의 연장·야간·휴일 수당 계산 사례. 복합 가산수당 계산 방법.' },
