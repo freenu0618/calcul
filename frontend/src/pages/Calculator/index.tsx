@@ -34,7 +34,7 @@ const WIZARD_STEPS: WizardStep[] = [
   { id: 'shift', title: '근무시프트', description: '근무시간 입력' },
 ];
 
-const dateModified = '2026-06-24';
+const dateModified = '2026-06-30';
 const calculatorInputChecklist = [
   ['급여유형', '월급제, 시급제, 시급기반 월급제 중 실제 계약 방식에 맞는 유형'],
   ['사업장 규모와 고용형태', '5인 이상 여부, 정규직·파트타임·외국인 근로자 여부 등 공제와 가산수당에 영향을 주는 조건'],
@@ -44,6 +44,25 @@ const calculatorInputChecklist = [
   ['4대보험과 부양가족', '국민연금·건강보험·고용보험 적용 여부, 부양가족 수, 20세 이하 자녀 수'],
   ['연장·야간·휴일근로', '가산수당과 휴일연장 계산에 필요한 시간대와 사업장 규모 조건'],
   ['민감정보 제외', '공개 계산에는 이름, 주민등록번호, 계좌번호, 급여명세서 원본 대신 계산 조건만 입력'],
+];
+
+const resultReviewChecklist = [
+  {
+    title: '실수령액 차이 원인',
+    body: '비과세 수당, 회사별 공제, 상여·식대·교통비 처리 방식이 실제 지급액을 바꿀 수 있습니다.',
+  },
+  {
+    title: '주휴·가산수당 조건',
+    body: '주 15시간, 소정근로일 개근, 야간·휴일근로 시간, 5인 이상 여부를 결과 해석 전에 다시 확인하세요.',
+  },
+  {
+    title: '급여대장 저장 전',
+    body: '정산 기간, 귀속월, 급여유형, 174/209시간 기준이 실제 계약서와 같은지 확인한 뒤 저장하는 것이 안전합니다.',
+  },
+  {
+    title: '분쟁·최종 지급 판단',
+    body: '체불, 최저임금 위반, 예외 공제처럼 판단이 필요한 사안은 계산 결과만으로 단정하지 말고 전문가 검토로 분리하세요.',
+  },
 ];
 
 const calculatorAnswerGuidance = [
@@ -200,6 +219,14 @@ const calculatorStructuredData = [
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'PayTools는 2026년 최저시급과 입력값을 기준으로 환산시급과 수당을 점검하는 참고용 계산을 제공합니다. 실제 위반 판단은 근로시간, 휴게시간, 수당 산입 범위, 사업장 조건을 함께 확인하고 전문가 검토가 필요합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '계산 결과와 실제 급여명세서가 다르면 무엇을 확인해야 하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '비과세 수당, 회사별 공제, 상여·식대·교통비 처리 방식, 정산 기간, 급여유형, 주휴·가산수당 조건이 입력값과 실제 지급 기준에서 같은지 먼저 확인해야 합니다.',
         },
       },
     ],
@@ -472,6 +499,20 @@ export default function CalculatorPage() {
             </h2>
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-5">
               {calculatorAnswerGuidance.map((item) => (
+                <div key={item.title} className="rounded-md bg-white p-3 text-sm">
+                  <p className="font-medium text-gray-900">{item.title}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-gray-600">{item.body}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="mb-4 rounded-lg border border-amber-100 bg-amber-50 p-4" aria-labelledby="calculator-result-review">
+            <h2 id="calculator-result-review" className="mb-3 text-sm font-semibold text-amber-900">
+              계산 결과를 저장·지급 기준으로 보기 전 확인할 항목
+            </h2>
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              {resultReviewChecklist.map((item) => (
                 <div key={item.title} className="rounded-md bg-white p-3 text-sm">
                   <p className="font-medium text-gray-900">{item.title}</p>
                   <p className="mt-1 text-xs leading-relaxed text-gray-600">{item.body}</p>
