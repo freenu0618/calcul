@@ -56,6 +56,8 @@ const wageTypes = [
   { label: '시급기반 월급제', desc: '시급 + 월급 보장', icon: 'verified', color: 'bg-purple-50 border-purple-200' },
 ];
 
+const dateModified = '2026-07-01';
+
 const guideStructuredData = [
   {
     '@context': 'https://schema.org',
@@ -63,6 +65,7 @@ const guideStructuredData = [
     name: 'PayTools 급여 계산 가이드',
     url: 'https://paytools.work/guide',
     inLanguage: 'ko-KR',
+    dateModified,
     description:
       'PayTools 사용법, 급여유형 선택, 4대보험, 소득세, 연장·야간·휴일수당, 퇴직금, 연차수당, 주휴수당 계산 가이드를 모은 허브 페이지입니다.',
     isPartOf: {
@@ -95,6 +98,7 @@ const guideStructuredData = [
   {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
+    dateModified,
     mainEntity: [
       {
         '@type': 'Question',
@@ -179,7 +183,7 @@ const GuidePage = () => (
               <span className="text-sm font-bold text-primary">사용법 보기 →</span>
             </div>
           </Link>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid gap-3 sm:grid-cols-3">
             {wageTypes.map((w) => (
               <Link key={w.label} to="/guide/how-to-use" className={`${w.color} border rounded-xl p-4 hover:shadow-md transition-shadow`}>
                 <span className="material-symbols-outlined text-[24px] mb-2">{w.icon}</span>
@@ -219,7 +223,7 @@ const GuidePage = () => (
         {/* 다음 단계 */}
         <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
           <h3 className="font-semibold text-blue-900 mb-2">바로 시작하기</h3>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <Link to="/calculator" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
               급여 계산기 →
             </Link>
