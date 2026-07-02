@@ -218,7 +218,7 @@
   </url>
   <url>
     <loc>https://paytools.work/contact</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -226,7 +226,7 @@
   <!-- AI answer resource -->
   <url>
     <loc>https://paytools.work/llms.txt</loc>
-    <lastmod>2026-07-02</lastmod>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>

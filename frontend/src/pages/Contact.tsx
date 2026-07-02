@@ -10,7 +10,7 @@ import { Helmet } from 'react-helmet-async';
 const contactTopics = [
   {
     title: '계산 결과 문의',
-    description: '급여유형, 기본급 또는 시급, 근무시간, 수당, 4대보험 적용 여부를 함께 보내 주세요.',
+    description: '급여유형, 기본급 또는 시급, 근무시간, 수당, 4대보험 적용 여부만 정리해 주세요. 이름·주민등록번호·계좌번호는 보내지 않아도 됩니다.',
   },
   {
     title: '버그 리포트',
@@ -33,8 +33,8 @@ const contactStructuredData = [
     name: 'PayTools 문의하기',
     url: 'https://paytools.work/contact',
     inLanguage: 'ko-KR',
-    dateModified: '2026-06-09',
-    description: 'PayTools 급여 계산기 문의, 버그 리포트, 기능 제안, 계산 기준 확인을 위한 공식 연락처 페이지입니다.',
+    dateModified: '2026-07-03',
+    description: 'PayTools 급여 계산기 문의, 버그 리포트, 기능 제안, 계산 기준 확인을 위한 공식 연락처 페이지입니다. 공개 문의에는 이름, 주민등록번호, 계좌번호 같은 민감정보가 필요하지 않습니다.',
     isPartOf: {
       '@type': 'WebSite',
       name: 'PayTools',
@@ -53,7 +53,7 @@ const contactStructuredData = [
     name: 'PayTools 문의 전 확인 항목',
     url: 'https://paytools.work/contact',
     inLanguage: 'ko-KR',
-    dateModified: '2026-06-09',
+    dateModified: '2026-07-03',
     numberOfItems: contactTopics.length,
     itemListElement: contactTopics.map((topic, index) => ({
       '@type': 'ListItem',
@@ -133,6 +133,16 @@ const Contact = () => {
               </article>
             ))}
           </div>
+        </section>
+
+        <section className="mt-6 rounded-lg border border-amber-100 bg-amber-50/70 p-5" aria-labelledby="contact-privacy-title">
+          <h2 id="contact-privacy-title" className="text-xl font-bold text-gray-900 mb-3">
+            민감정보는 제외해 주세요
+          </h2>
+          <p className="text-sm leading-relaxed text-gray-700">
+            공개 문의나 버그 리포트에는 이름, 주민등록번호, 계좌번호, 급여명세서 원본이 필요하지 않습니다.
+            계산 조건을 설명할 때는 급여유형, 금액, 근무시간, 수당, 공제 조건처럼 결과를 바꾸는 입력값만 남겨 주세요.
+          </p>
         </section>
 
         <Card title="문의 시 포함 사항" className="mt-6">
