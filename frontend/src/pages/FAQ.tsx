@@ -46,6 +46,10 @@ const categorySummaries: CategorySummary[] = [
     description: '기본급·시급·근무시간을 알고 있으면 급여 계산기를, 목표 실수령액에서 필요한 세전 급여를 알고 싶으면 역산 계산기를 먼저 사용합니다.',
   },
   {
+    title: '급여명세서 차이 점검',
+    description: '계산 결과와 실제 명세서가 다르면 비과세 수당, 상여, 회사별 공제, 정산 기간, 주휴·가산수당 조건을 같은 순서로 다시 확인합니다.',
+  },
+  {
     title: '참고용 계산·공식 문의',
     description: '실제 지급, 체불, 예외 공제처럼 판단이 필요한 사안은 계산 결과를 참고용으로 보고 법률 정보나 문의 경로를 함께 확인해야 합니다.',
   },
@@ -75,6 +79,12 @@ const answerRouteCards = [
     label: '시뮬레이션',
   },
   {
+    title: '계산 결과와 명세서 차이',
+    description: '실제 급여명세서와 다르면 같은 입력값으로 다시 계산하고 비과세 수당, 회사별 공제, 정산 기간을 분리해 확인합니다.',
+    to: '/calculator',
+    label: '결과 재검토',
+  },
+  {
     title: '법률 전제와 분쟁 가능성',
     description: '최저임금 위반, 체불, 예외 공제처럼 판단이 필요한 질문은 계산값을 참고용으로 보고 법률 정보와 전문가 검토를 함께 확인합니다.',
     to: '/legal',
@@ -82,7 +92,7 @@ const answerRouteCards = [
   },
 ];
 
-const dateModified = '2026-07-04';
+const dateModified = '2026-07-05';
 
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
@@ -114,6 +124,11 @@ const FAQ = () => {
       category: '계산기 선택',
       question: '계산 전에 개인정보를 입력해야 하나요?',
       answer: '아니요. 공개 급여 계산과 FAQ 확인에는 이름, 주민등록번호, 계좌번호, 회사 내부 급여대장 같은 민감정보가 필요하지 않습니다. 급여유형, 기본급 또는 시급, 근무시간, 수당, 부양가족 수, 4대보험 적용 여부처럼 계산 조건만 분리해 입력하는 것이 안전합니다.',
+    },
+    {
+      category: '계산기 선택',
+      question: 'PayTools 계산 결과와 실제 급여명세서가 다르면 무엇부터 확인해야 하나요?',
+      answer: '먼저 급여유형, 정산 기간, 기본급 또는 시급, 174시간/209시간 기준이 실제 계약서와 같은지 확인하세요. 다음으로 비과세 수당, 상여, 회사별 공제, 4대보험 적용 여부, 부양가족 수, 주휴수당·연장·야간·휴일수당 조건을 분리해 다시 점검하는 것이 좋습니다. 그래도 차이가 크면 계산 결과는 참고용으로 두고 회사 담당자나 전문가 검토로 연결하세요.',
     },
     // 기본급 및 수당
     {
@@ -299,7 +314,7 @@ const FAQ = () => {
       "url": "https://paytools.work/faq",
       "inLanguage": "ko-KR",
       "dateModified": dateModified,
-      "description": "2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 연장·야간·휴일수당, 근로자 권리 질문을 정리한 PayTools FAQ입니다.",
+      "description": "2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 급여명세서 차이, 연장·야간·휴일수당, 근로자 권리 질문을 정리한 PayTools FAQ입니다.",
       "isPartOf": {
         "@type": "WebSite",
         "name": "PayTools",
@@ -381,14 +396,14 @@ const FAQ = () => {
     <>
       <Helmet>
         <title>2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 질문 모음 | PayTools</title>
-        <meta name="description" content="2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 연장·야간·휴일수당, 근로자 권리에 대한 자주 묻는 질문을 한 번에 확인하세요." />
+        <meta name="description" content="2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 급여명세서 차이, 연장·야간·휴일수당, 근로자 권리에 대한 자주 묻는 질문을 한 번에 확인하세요." />
         <link rel="canonical" href="https://paytools.work/faq" />
         <meta property="og:title" content="2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 | PayTools" />
-        <meta property="og:description" content="2026년 급여 계산과 4대보험, 주휴수당, 최저임금, 근로자 권리까지 자주 묻는 질문을 정리한 FAQ 페이지입니다." />
+        <meta property="og:description" content="2026년 급여 계산과 4대보험, 주휴수당, 최저임금, 급여명세서 차이, 근로자 권리까지 자주 묻는 질문을 정리한 FAQ 페이지입니다." />
         <meta property="og:url" content="https://paytools.work/faq" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="2026년 급여 계산 FAQ | PayTools" />
-        <meta name="twitter:description" content="실수령액, 4대보험, 주휴수당, 최저임금 관련 질문을 한 번에 확인하세요." />
+        <meta name="twitter:description" content="실수령액, 4대보험, 주휴수당, 최저임금, 급여명세서 차이 관련 질문을 한 번에 확인하세요." />
         <script type="application/ld+json">
           {JSON.stringify(faqStructuredData)}
         </script>
@@ -413,7 +428,7 @@ const FAQ = () => {
               급여 계산 FAQ 한눈에 보기
             </h2>
             <p className="text-sm text-gray-700 mb-4">
-              PayTools FAQ는 2026년 기준 실수령액, 4대보험, 소득세, 주휴수당, 최저임금, 연장·야간·휴일수당, 개인정보 최소 입력 원칙과 계산 결과의 참고용 한계를 빠르게 확인하도록 정리했습니다.
+              PayTools FAQ는 2026년 기준 실수령액, 4대보험, 소득세, 주휴수당, 최저임금, 급여명세서 차이, 연장·야간·휴일수당, 개인정보 최소 입력 원칙과 계산 결과의 참고용 한계를 빠르게 확인하도록 정리했습니다.
             </p>
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {categorySummaries.map((summary) => (
