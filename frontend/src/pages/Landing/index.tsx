@@ -31,7 +31,7 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
-const dateModified = '2026-06-28';
+const dateModified = '2026-07-10';
 
 const payrollCalculationHowTo = {
   '@context': 'https://schema.org',
@@ -297,6 +297,14 @@ const landingStructuredData = [
         acceptedAnswer: {
           '@type': 'Answer',
           text: '아니요. 계산 결과는 참고용 추정치이며, 실제 지급, 분쟁, 예외 공제, 회사별 정책은 노무사 또는 세무 전문가 검토가 필요합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '계산 결과를 급여 지급 근거로 바로 써도 되나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'PayTools 결과는 급여 조건을 점검하는 참고용 예상액입니다. 실제 지급 전에는 근로계약서, 근무기록, 비과세 수당, 회사별 공제, 정산 기간이 같은지 확인하고 분쟁 가능성이 있으면 노무사 또는 세무 전문가 검토를 함께 진행하는 것이 안전합니다.',
         },
       },
     ],
