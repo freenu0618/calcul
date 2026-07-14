@@ -56,7 +56,25 @@ const wageTypes = [
   { label: '시급기반 월급제', desc: '시급 + 월급 보장', icon: 'verified', color: 'bg-purple-50 border-purple-200' },
 ];
 
-const dateModified = '2026-07-01';
+const preCalculationChecks = [
+  {
+    label: '급여유형과 기준시간',
+    detail: '월급제, 시급제, 시급기반 월급제와 174시간/209시간 기준을 먼저 맞춥니다.',
+    path: '/guide/how-to-use',
+  },
+  {
+    label: '사업장 규모와 근무시간',
+    detail: '5인 이상 여부, 주 소정근로시간, 야간·휴일·연장근로 시간을 분리합니다.',
+    path: '/guide/overtime',
+  },
+  {
+    label: '공제와 참고용 한계',
+    detail: '4대보험, 소득세, 비과세 수당, 회사별 공제는 실제 실수령액을 바꿀 수 있습니다.',
+    path: '/guide/insurance',
+  },
+];
+
+const dateModified = '2026-07-15';
 
 const guideStructuredData = [
   {
@@ -67,7 +85,7 @@ const guideStructuredData = [
     inLanguage: 'ko-KR',
     dateModified,
     description:
-      'PayTools 사용법, 급여유형 선택, 4대보험, 소득세, 연장·야간·휴일수당, 퇴직금, 연차수당, 주휴수당 계산 가이드를 모은 허브 페이지입니다.',
+      'PayTools 사용법, 계산 전 확인 체크리스트, 급여유형 선택, 4대보험, 소득세, 연장·야간·휴일수당, 퇴직금, 연차수당, 주휴수당 계산 가이드를 모은 허브 페이지입니다.',
     isPartOf: {
       '@type': 'WebSite',
       name: 'PayTools',
@@ -76,7 +94,7 @@ const guideStructuredData = [
     mainEntity: {
       '@type': 'ItemList',
       name: '급여 계산 가이드 목록',
-      numberOfItems: lawGuides.length + 1,
+      numberOfItems: lawGuides.length + 2,
       itemListElement: [
         {
           '@type': 'ListItem',
@@ -85,9 +103,16 @@ const guideStructuredData = [
           url: 'https://paytools.work/guide/how-to-use',
           description: '월급제, 시급제, 시급기반 월급제 중 어떤 입력 흐름을 선택해야 하는지 안내합니다.',
         },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: '계산 전 확인 체크리스트',
+          url: 'https://paytools.work/guide',
+          description: '급여유형, 기준시간, 사업장 규모, 근무시간, 공제 조건을 계산 전에 확인합니다.',
+        },
         ...lawGuides.map((guide, index) => ({
           '@type': 'ListItem',
-          position: index + 2,
+          position: index + 3,
           name: guide.title,
           url: `https://paytools.work${guide.path}`,
           description: guide.description,
@@ -100,6 +125,14 @@ const guideStructuredData = [
     '@type': 'FAQPage',
     dateModified,
     mainEntity: [
+      {
+        '@type': 'Question',
+        name: '급여 계산 전에 무엇을 먼저 확인해야 하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '급여유형, 174시간/209시간 기준, 사업장 규모, 근무시간, 과세·비과세 수당, 4대보험 적용 여부를 먼저 맞춘 뒤 계산기로 이동하는 것이 좋습니다.',
+        },
+      },
       {
         '@type': 'Question',
         name: '처음 급여를 계산할 때 어떤 가이드부터 보면 되나요?',
@@ -189,6 +222,31 @@ const GuidePage = () => (
                 <span className="material-symbols-outlined text-[24px] mb-2">{w.icon}</span>
                 <p className="font-medium text-sm">{w.label}</p>
                 <p className="text-xs text-gray-500">{w.desc}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* 계산 전 확인 체크리스트 */}
+        <section className="mb-10">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <span className="material-symbols-outlined text-emerald-600">fact_check</span>
+            계산 전 확인 체크리스트
+          </h2>
+          <div className="grid gap-3">
+            {preCalculationChecks.map((item, index) => (
+              <Link key={item.label} to={item.path}>
+                <Card className="border border-emerald-100 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-start gap-4">
+                    <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-emerald-50 text-sm font-bold text-emerald-700">
+                      {index + 1}
+                    </span>
+                    <div>
+                      <h3 className="text-base font-bold text-gray-900">{item.label}</h3>
+                      <p className="mt-1 text-sm text-gray-600">{item.detail}</p>
+                    </div>
+                  </div>
+                </Card>
               </Link>
             ))}
           </div>
