@@ -84,7 +84,7 @@
   <!-- FAQ -->
   <url>
     <loc>https://paytools.work/faq</loc>
-    <lastmod>2026-07-16</lastmod>
+    <lastmod>2026-07-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -226,7 +226,7 @@
   <!-- AI answer resource -->
   <url>
     <loc>https://paytools.work/llms.txt</loc>
-    <lastmod>2026-07-16</lastmod>
+    <lastmod>2026-07-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
