@@ -134,7 +134,7 @@ const answerRouteCards = [
   },
 ];
 
-const dateModified = '2026-07-17';
+const dateModified = '2026-07-18';
 
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
@@ -339,7 +339,7 @@ const FAQ = () => {
     {
       category: '최저임금',
       question: '수습 기간에도 최저임금을 받나요?',
-      answer: '수습 기간(3개월 이내)에는 최저임금의 90%까지 감액할 수 있습니다. 단, 1년 미만 단기 근로계약이나 5인 미만 사업장 제외 등 일부 제한이 있습니다.',
+      answer: '수습 기간에도 원칙적으로 최저임금 이상을 받아야 합니다. 다만 1년 이상 근로계약을 체결했고 수습 시작일부터 3개월 이내이며 단순노무업무가 아니라면 최저임금의 90%까지 적용될 수 있습니다. 1년 미만 계약, 3개월 초과 수습, 단순노무업무는 감액 대상에서 제외되므로 실제 판단은 계약서와 직무를 함께 확인하세요.',
     },
     {
       category: '최저임금',
