@@ -342,15 +342,14 @@ const ShiftWorkExample = () => {
             <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4">
               <h5 className="font-semibold text-gray-900 mb-2">예시: 일요일 야간 근무 (22:00 ~ 06:00, 8시간)</h5>
               <div className="space-y-2 text-sm">
-                <p className="text-gray-700">1. 기본 시급: 17,241원 × 8시간 = 137,928원</p>
-                <p className="text-gray-700">2. 휴일 가산 (1.5배): 17,241원 × 1.5 × 8시간 = 206,892원</p>
-                <p className="text-gray-700">3. 야간 가산 (0.5배): 17,241원 × 0.5 × 7시간 = 60,343원</p>
-                <p className="font-bold text-gray-900">총 급여: 137,928 + 206,892 + 60,343 = <span className="text-blue-600">405,163원</span></p>
+                <p className="text-gray-700">1. 휴일근로 임금(1.5배 총액): 17,241원 × 1.5 × 8시간 = 206,892원</p>
+                <p className="text-gray-700">2. 야간 가산 (0.5배): 17,241원 × 0.5 × 7시간 = 60,344원</p>
+                <p className="font-bold text-gray-900">총 급여: 206,892 + 60,344 = <span className="text-blue-600">267,236원</span></p>
               </div>
             </div>
 
             <p className="text-sm text-gray-600">
-              💡 휴일근로와 야간근로가 중복되면 통상시급의 <strong>3배</strong> (1.0 + 1.5 + 0.5)를 받을 수 있습니다.
+              💡 5인 이상 사업장에서 휴일근로와 야간근로가 중복되면 8시간 이하 구간은 통상시급의 <strong>2배</strong> (기본 1.0 + 휴일 가산 0.5 + 야간 가산 0.5)를 기준으로 봅니다.
             </p>
           </div>
         </Card>
@@ -360,9 +359,9 @@ const ShiftWorkExample = () => {
           <div className="prose max-w-none">
             <ul className="space-y-2 text-gray-700">
               <li>• <strong>야간수당 계산</strong>: 22:00~06:00 구간만 가산 (0.5배 추가)</li>
-              <li>• <strong>휴일근로 8시간 초과</strong>: 5인 이상 사업장만 2.0배 적용 (5인 미만은 1.5배)</li>
+              <li>• <strong>휴일근로 8시간 초과</strong>: 5인 이상 사업장에서 2.0배 적용, 5인 미만은 제56조 적용 제외 여부 확인</li>
               <li>• <strong>가산수당 중복</strong>: 야간 + 휴일 동시 발생 시 가산율 중복 적용 ✅</li>
-              <li>• <strong>주 52시간 제한</strong>: 연장근로는 주 12시간까지만 가능 (기본 40시간 + 연장 12시간)</li>
+              <li>• <strong>주 52시간 제한</strong>: 5인 이상 사업장은 연장근로 주 12시간 한도 확인 (기본 40시간 + 연장 12시간)</li>
               <li>• <strong>교대제 근무</strong>: 통상임금에 교대제 수당이 포함되어 있는지 확인 필요</li>
               <li>• <strong>보건 조치</strong>: 야간근로자에게 건강진단 실시 의무 (연 1회)</li>
             </ul>
@@ -381,7 +380,8 @@ const ShiftWorkExample = () => {
             <div>
               <h4 className="font-semibold text-gray-900 mb-2">Q: 일요일 야간 근무 시 가산율은?</h4>
               <p className="text-gray-700">
-                A: 휴일 가산(1.5배) + 야간 가산(0.5배) = 총 3배 (기본 1.0 + 1.5 + 0.5)를 받습니다.
+                A: 5인 이상 사업장의 8시간 이하 휴일 야간근로는 기본 임금 1.0에 휴일 가산 0.5와 야간 가산 0.5가 더해져 총 2.0배 기준으로 봅니다.
+                8시간을 초과한 휴일근로 구간은 별도 가산율을 확인해야 합니다.
               </p>
             </div>
             <div>

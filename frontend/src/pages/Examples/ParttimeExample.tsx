@@ -297,7 +297,7 @@ const ParttimeExample = () => {
               <li>• <strong>4대 보험 가입</strong>: 주 15시간 이상 근무 시 의무 가입 대상</li>
               <li>• <strong>주 14시간 이하</strong>: 주휴수당 및 4대 보험 의무 없음</li>
               <li>• <strong>개근 필수</strong>: 소정근로일(월/수/금)에 모두 출근해야 주휴수당 지급</li>
-              <li>• <strong>5인 미만 사업장</strong>: 연차휴가는 1년 근무 후부터 발생 (5인 이상은 즉시)</li>
+              <li>• <strong>5인 미만 사업장</strong>: 근로기준법상 연차유급휴가 규정은 일반적으로 적용 제외</li>
             </ul>
           </div>
         </Card>
@@ -332,7 +332,7 @@ const ParttimeExample = () => {
                 <tr>
                   <td className="px-4 py-2">연차휴가</td>
                   <td className="px-4 py-2 text-right">즉시 발생 (비례)</td>
-                  <td className="px-4 py-2 text-right">1년 후 (5인 미만)</td>
+                  <td className="px-4 py-2 text-right">법정 연차 일반 적용 제외</td>
                 </tr>
                 <tr className="bg-blue-50 font-bold">
                   <td className="px-4 py-2">실수령액</td>
@@ -362,7 +362,8 @@ const ParttimeExample = () => {
             <div>
               <h4 className="font-semibold text-gray-900 mb-2">Q: 파트타임도 연차휴가가 있나요?</h4>
               <p className="text-gray-700">
-                A: 네, 주 15시간 이상 근무하면 연차휴가가 발생합니다. 단, 5인 미만 사업장은 1년 근무 후부터 발생합니다.
+                A: 5인 이상 사업장에서는 주 15시간 이상 등 요건을 충족하면 연차휴가가 비례 발생할 수 있습니다.
+                5인 미만 사업장은 근로기준법상 연차유급휴가 규정이 일반적으로 적용되지 않아 계약상 휴가 약정을 따로 확인해야 합니다.
               </p>
             </div>
           </div>

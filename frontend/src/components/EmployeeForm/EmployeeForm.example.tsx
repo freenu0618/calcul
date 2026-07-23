@@ -66,7 +66,7 @@ const EmployeeFormExample: React.FC = () => {
             <li>• <strong>부양가족 수</strong>: 본인을 제외한 부양가족 수를 입력하세요.</li>
             <li>• <strong>20세 이하 자녀 수</strong>: 부양가족 수를 초과할 수 없습니다.</li>
             <li>• <strong>고용 형태</strong>: 정규직/비정규직을 선택하세요.</li>
-            <li>• <strong>사업장 규모</strong>: 5인 미만/5인 이상을 선택하세요. (휴일근로 가산율에 영향)</li>
+            <li>• <strong>사업장 규모</strong>: 5인 미만/5인 이상을 선택하세요. (법정 가산수당 적용 여부에 영향)</li>
           </ul>
         </section>
       </div>

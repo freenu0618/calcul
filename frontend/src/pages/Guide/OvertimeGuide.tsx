@@ -31,8 +31,8 @@ const OvertimeGuide = () => {
   return (
     <>
     <PageHelmet
-      title="연장·야간·휴일 수당 계산법 | 가산수당 가이드"
-      description="근로기준법에 따른 연장·야간·휴일 수당 계산 방법. 통상시급 산정, 가산율 적용, 중복 가산 등을 상세히 안내합니다."
+      title="연장·야간·휴일 수당 계산법 | 5인 이상 가산수당 가이드"
+      description="근로기준법 제56조 기준의 연장·야간·휴일 수당 계산 방법. 통상시급, 5인 이상 여부, 가산율 적용, 중복 가산을 안내합니다."
       path="/guide/overtime"
     />
     <MainLayout>
@@ -47,7 +47,7 @@ const OvertimeGuide = () => {
             연장·야간·휴일 수당
           </h1>
           <p className="text-lg text-gray-600">
-            근로기준법에 따른 가산수당 계산 방법과 통상시급의 개념을 이해합니다.
+            근로기준법상 5인 이상 사업장 가산수당 계산 방법과 통상시급의 개념을 이해합니다.
           </p>
         </div>
 
@@ -85,7 +85,7 @@ const OvertimeGuide = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-3">연장근로란?</h3>
             <p className="text-gray-700 mb-4">
               연장근로는 법정 근로시간(주 40시간)을 초과하여 근무한 시간을 의미합니다.
-              근로기준법 제56조에 따라 통상시급의 <strong>1.5배</strong>를 지급해야 합니다.
+              상시근로자 5인 이상 사업장의 법정 가산수당 기준에서는 통상시급의 <strong>1.5배</strong>를 지급합니다.
             </p>
 
             <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">계산 방법</h3>
@@ -111,8 +111,8 @@ const OvertimeGuide = () => {
             </p>
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
               <p className="text-sm text-yellow-800">
-                ⚠️ <strong>주의:</strong> 5인 미만 사업장은 2024년까지 주 52시간 적용이 유예되었으나,
-                2024년 이후에는 모든 사업장에 적용됩니다.
+                ⚠️ <strong>주의:</strong> 주 52시간 한도와 가산수당 적용 여부는 상시근로자 수, 업종,
+                근로자 유형, 특례·예외 여부에 따라 달라질 수 있으므로 실제 분쟁 판단은 근무기록과 전문가 검토를 함께 확인하세요.
               </p>
             </div>
           </div>
@@ -123,7 +123,7 @@ const OvertimeGuide = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-3">야간근로란?</h3>
             <p className="text-gray-700 mb-4">
               야간근로는 22:00부터 익일 06:00까지의 근무를 의미합니다.
-              근로기준법 제56조에 따라 통상시급의 <strong>0.5배 (50%)</strong>를 가산하여 지급합니다.
+              상시근로자 5인 이상 사업장의 법정 가산수당 기준에서는 통상시급의 <strong>0.5배 (50%)</strong>를 가산하여 지급합니다.
             </p>
 
             <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">계산 방법</h3>
@@ -158,7 +158,7 @@ const OvertimeGuide = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-3">휴일근로란?</h3>
             <p className="text-gray-700 mb-4">
               휴일근로는 주휴일이나 법정 공휴일에 근무하는 것을 의미합니다.
-              근로기준법 제56조에 따라 가산 수당을 지급해야 합니다.
+              상시근로자 5인 이상 사업장의 법정 가산수당 기준에서는 근로기준법 제56조에 따라 가산 수당을 지급합니다.
             </p>
 
             <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">계산 방법</h3>
@@ -182,12 +182,14 @@ const OvertimeGuide = () => {
 
             <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">5인 미만 사업장</h3>
             <p className="text-gray-700 mb-4">
-              5인 미만 사업장은 휴일근로 8시간 초과 시 가산율이 2.0배가 아닌 1.5배로 적용됩니다.
+              상시근로자 5인 미만 사업장은 근로기준법 제56조의 연장·야간·휴일 가산수당 규정이 일반적으로 적용되지 않습니다.
+              다만 실제 근로한 시간에 대한 기본 임금, 최저임금, 주휴수당, 근로계약이나 취업규칙으로 정한 약정 수당은 별도로 확인해야 합니다.
             </p>
             <div className="bg-gray-50 p-4 rounded-lg">
               <ul className="space-y-2 text-sm">
                 <li>일요일 근무: 10시간</li>
-                <li>전체: 15,517 × 1.5 × 10 = 232,755원</li>
+                <li>법정 가산수당: 일반적으로 적용 제외</li>
+                <li>확인 필요: 실제 근로시간 기본 임금, 최저임금 충족 여부, 계약상 휴일수당 약정</li>
               </ul>
             </div>
           </div>
@@ -295,8 +297,9 @@ const OvertimeGuide = () => {
                   Q. 5인 미만 사업장도 가산수당을 받나요?
                 </h4>
                 <p className="text-gray-700">
-                  A. 네, 5인 미만 사업장도 연장·야간·휴일 수당을 모두 받습니다.
-                  단, 휴일근로 8시간 초과 시 가산율이 1.5배로 제한됩니다 (5인 이상은 2.0배).
+                  A. 근로기준법 제56조의 법정 연장·야간·휴일 가산수당은 일반적으로 5인 이상 사업장 기준입니다.
+                  5인 미만 사업장은 법정 가산수당 적용이 제외될 수 있지만, 실제 일한 시간의 기본 임금과 최저임금,
+                  근로계약·취업규칙상 약정 수당은 따로 확인해야 합니다.
                 </p>
               </div>
             </div>
@@ -317,6 +320,11 @@ const OvertimeGuide = () => {
             <li>
               <Link to="/guide/tax" className="text-blue-600 hover:text-blue-700">
                 💰 소득세 계산법
+              </Link>
+            </li>
+            <li>
+              <Link to="/legal" className="text-blue-600 hover:text-blue-700">
+                ⚖️ 법률 정보와 참고용 계산 한계
               </Link>
             </li>
             <li>

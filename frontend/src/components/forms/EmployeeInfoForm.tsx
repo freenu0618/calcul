@@ -146,7 +146,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
             사업장 규모
           </label>
           <Tooltip
-            content="5인 이상: 휴일근로 8시간 초과 시 2배 가산. 5인 미만: 1.5배 가산. 근로기준법 적용 범위가 다릅니다."
+            content="5인 이상: 법정 연장·야간·휴일 가산수당 기준 적용. 5인 미만: 제56조 가산수당은 일반적으로 적용 제외되며 계약상 수당은 별도 확인합니다."
             position="right"
           >
             <span aria-label="사업장 규모 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
