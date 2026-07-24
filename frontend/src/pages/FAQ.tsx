@@ -158,7 +158,7 @@ const answerRouteCards = [
   },
 ];
 
-const dateModified = '2026-07-23';
+const dateModified = '2026-07-25';
 
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
@@ -424,6 +424,11 @@ const FAQ = () => {
     ? faqData
     : faqData.filter(item => item.category === selectedCategory);
 
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    setExpandedIndex(null);
+  };
+
   const getItemId = (index: number) => `faq-answer-${selectedCategory.replace(/\s+/g, '-')}-${index}`;
 
   // FAQPage 구조화된 데이터 (schema.org)
@@ -588,7 +593,7 @@ const FAQ = () => {
           {categories.map((category) => (
             <button
               key={category}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => handleCategoryChange(category)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 selectedCategory === category
                   ? 'bg-blue-600 text-white'
@@ -607,7 +612,7 @@ const FAQ = () => {
             const isExpanded = expandedIndex === index;
 
             return (
-              <Card key={index}>
+              <Card key={item.question}>
                 <button
                   onClick={() => handleToggle(index, item.question)}
                   className="w-full text-left"
