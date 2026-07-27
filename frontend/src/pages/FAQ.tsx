@@ -39,7 +39,7 @@ const categorySummaries: CategorySummary[] = [
   },
   {
     title: '주휴수당·최저임금 확인',
-    description: '주 15시간 이상 근무하고 소정근로일을 개근했다면 주휴수당 대상이며, 2026년 최저임금과 월 환산액 기준도 같이 점검해야 합니다.',
+    description: '주 15시간 이상 근무하고 소정근로일을 개근했다면 주휴수당 대상이며, 2026년 최저임금, 월 환산액, 수습기간 감액 가능 조건도 같이 점검해야 합니다.',
   },
   {
     title: '연장·야간·휴일수당 기준',
@@ -97,6 +97,10 @@ const categorySummaries: CategorySummary[] = [
     title: '여러 직원 급여 비교',
     description: '정규직, 파트타임, 시프트 근무자가 섞여 있으면 직원별 급여유형, 정산 기간, 근무시간, 수당, 공제 조건을 같은 표로 맞춘 뒤 계산해야 합니다.',
   },
+  {
+    title: '수습기간 최저임금 감액',
+    description: '수습기간에도 최저임금 이상 지급이 원칙이며, 감액 가능 여부는 계약기간, 수습 시작일부터의 기간, 단순노무업무 여부를 함께 확인해야 합니다.',
+  },
 ];
 
 const answerRouteCards = [
@@ -149,6 +153,12 @@ const answerRouteCards = [
     label: '법률 정보',
   },
   {
+    title: '수습기간 최저임금 확인',
+    description: '수습 중 최저임금 90% 적용 가능 여부는 계약기간, 수습 시작일부터 3개월 이내인지, 단순노무업무 여부를 먼저 나눠 확인합니다.',
+    to: '/blog/2026-minimum-wage',
+    label: '최저임금 기준',
+  },
+  {
     title: '소규모 사업장 첫 급여 설정',
     description: '직원 수가 적은 사업장은 5인 이상 여부와 주휴·가산수당 조건을 먼저 나누고 사용 가이드에서 입력 흐름을 확인합니다.',
     to: '/guide/how-to-use',
@@ -162,7 +172,7 @@ const answerRouteCards = [
   },
 ];
 
-const dateModified = '2026-07-27';
+const dateModified = '2026-07-28';
 
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
@@ -454,7 +464,7 @@ const FAQ = () => {
       "url": "https://paytools.work/faq",
       "inLanguage": "ko-KR",
       "dateModified": dateModified,
-      "description": "2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 급여명세서 차이, 연장·야간·휴일수당, 근로자 권리 질문을 정리한 PayTools FAQ입니다.",
+      "description": "2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 급여명세서 차이, 연장·야간·휴일수당, 근로자 권리 질문을 정리한 PayTools FAQ입니다.",
       "isPartOf": {
         "@type": "WebSite",
         "name": "PayTools",
@@ -536,14 +546,14 @@ const FAQ = () => {
     <>
       <Helmet>
         <title>2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 질문 모음 | PayTools</title>
-        <meta name="description" content="2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 급여명세서 차이, 연장·야간·휴일수당, 근로자 권리에 대한 자주 묻는 질문을 한 번에 확인하세요." />
+        <meta name="description" content="2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 급여명세서 차이, 연장·야간·휴일수당, 근로자 권리에 대한 자주 묻는 질문을 한 번에 확인하세요." />
         <link rel="canonical" href="https://paytools.work/faq" />
         <meta property="og:title" content="2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 | PayTools" />
-        <meta property="og:description" content="2026년 급여 계산과 4대보험, 주휴수당, 최저임금, 급여명세서 차이, 근로자 권리까지 자주 묻는 질문을 정리한 FAQ 페이지입니다." />
+        <meta property="og:description" content="2026년 급여 계산과 4대보험, 주휴수당, 최저임금, 수습기간 감액, 급여명세서 차이, 근로자 권리까지 자주 묻는 질문을 정리한 FAQ 페이지입니다." />
         <meta property="og:url" content="https://paytools.work/faq" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="2026년 급여 계산 FAQ | PayTools" />
-        <meta name="twitter:description" content="실수령액, 4대보험, 주휴수당, 최저임금, 급여명세서 차이 관련 질문을 한 번에 확인하세요." />
+        <meta name="twitter:description" content="실수령액, 4대보험, 주휴수당, 최저임금, 수습기간 감액, 급여명세서 차이 관련 질문을 한 번에 확인하세요." />
         <script type="application/ld+json">
           {JSON.stringify(faqStructuredData)}
         </script>
@@ -568,7 +578,7 @@ const FAQ = () => {
               급여 계산 FAQ 한눈에 보기
             </h2>
             <p className="text-sm text-gray-700 mb-4">
-              PayTools FAQ는 2026년 기준 실수령액, 4대보험, 소득세, 주휴수당, 최저임금, 급여명세서 차이, 연장·야간·휴일수당, 개인정보 최소 입력 원칙과 계산 결과의 참고용 한계를 빠르게 확인하도록 정리했습니다.
+              PayTools FAQ는 2026년 기준 실수령액, 4대보험, 소득세, 주휴수당, 최저임금, 수습기간 감액 조건, 급여명세서 차이, 연장·야간·휴일수당, 개인정보 최소 입력 원칙과 계산 결과의 참고용 한계를 빠르게 확인하도록 정리했습니다.
             </p>
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {categorySummaries.map((summary) => (
