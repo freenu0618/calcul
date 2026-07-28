@@ -74,7 +74,40 @@ const preCalculationChecks = [
   },
 ];
 
-const dateModified = '2026-07-15';
+const scenarioRoutes = [
+  {
+    label: '급여유형을 모르겠어요',
+    detail: '월급제, 시급제, 시급기반 월급제와 174시간/209시간 기준을 먼저 고릅니다.',
+    path: '/guide/how-to-use',
+  },
+  {
+    label: '알바·시프트 급여가 궁금해요',
+    detail: '주휴수당 대상 여부와 야간·휴일·연장근로 시간을 분리한 뒤 계산기로 이어갑니다.',
+    path: '/guide/weekly-holiday',
+  },
+  {
+    label: '명세서와 계산 결과가 달라요',
+    detail: '비과세 수당, 상여, 회사별 공제, 정산 기간처럼 차이를 만드는 항목을 FAQ에서 점검합니다.',
+    path: '/faq',
+  },
+  {
+    label: '여러 급여안을 비교하고 싶어요',
+    detail: '인상 전후, 수당 배분, 고용형태 변화는 시뮬레이션에서 같은 기준으로 비교합니다.',
+    path: '/simulation',
+  },
+  {
+    label: '퇴사월·연차수당을 확인해요',
+    detail: '마지막 급여, 미사용 연차수당, 퇴직금, 4대보험 상실 시점을 항목별로 나눕니다.',
+    path: '/guide/annual-leave',
+  },
+  {
+    label: '분쟁·체불 판단이 필요해요',
+    detail: '계산값만으로 단정하지 않고 법률 전제와 공식 문의 경로를 함께 확인합니다.',
+    path: '/legal',
+  },
+];
+
+const dateModified = '2026-07-29';
 
 const guideStructuredData = [
   {
@@ -94,7 +127,7 @@ const guideStructuredData = [
     mainEntity: {
       '@type': 'ItemList',
       name: '급여 계산 가이드 목록',
-      numberOfItems: lawGuides.length + 2,
+      numberOfItems: lawGuides.length + scenarioRoutes.length + 2,
       itemListElement: [
         {
           '@type': 'ListItem',
@@ -116,6 +149,13 @@ const guideStructuredData = [
           name: guide.title,
           url: `https://paytools.work${guide.path}`,
           description: guide.description,
+        })),
+        ...scenarioRoutes.map((route, index) => ({
+          '@type': 'ListItem',
+          position: lawGuides.length + index + 3,
+          name: route.label,
+          url: `https://paytools.work${route.path}`,
+          description: route.detail,
         })),
       ],
     },
@@ -183,7 +223,7 @@ const GuidePage = () => (
   <>
     <PageHelmet
       title="급여 계산 가이드 - 사용법, 4대보험, 소득세, 수당"
-      description="PayTools 사용법과 한국 근로기준법에 따른 급여 계산의 모든 것을 알아보세요."
+      description="급여유형 선택, 계산 전 체크리스트, 2026년 4대보험·소득세·주휴수당·가산수당 기준과 상황별 추천 경로를 한곳에서 확인하세요."
       path="/guide"
     />
     <Helmet>
@@ -246,6 +286,27 @@ const GuidePage = () => (
                       <p className="mt-1 text-sm text-gray-600">{item.detail}</p>
                     </div>
                   </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* 상황별 추천 경로 */}
+        <section className="mb-10">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary">route</span>
+            질문 유형별 추천 경로
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {scenarioRoutes.map((route) => (
+              <Link key={route.label} to={route.path}>
+                <Card className="h-full border border-primary/10 hover:shadow-md transition-shadow">
+                  <h3 className="text-base font-bold text-gray-900">{route.label}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-gray-600">{route.detail}</p>
+                  <span className="mt-3 inline-flex items-center text-sm font-medium text-blue-600">
+                    경로 확인 →
+                  </span>
                 </Card>
               </Link>
             ))}

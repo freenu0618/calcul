@@ -20,7 +20,7 @@ const ROUTES = [
   { path: '/simulation', title: '급여 구조 시뮬레이션 - 기본급·수당 배분 인건비 비교 | PayTools', description: '같은 월 총 급여액에서 기본급과 수당 배분을 바꿨을 때 통상시급, 연장·야간·휴일수당, 퇴직금 기준, 연간 인건비 차이를 비교합니다.' },
 
   // 가이드
-  { path: '/guide', title: '급여 계산 가이드 - 사용법, 4대보험, 소득세, 수당 | PayTools', description: 'PayTools 사용법과 한국 근로기준법에 따른 급여 계산의 모든 것을 알아보세요.' },
+  { path: '/guide', title: '급여 계산 가이드 - 사용법, 4대보험, 소득세, 수당 | PayTools', description: '급여유형 선택, 계산 전 체크리스트, 2026년 4대보험·소득세·주휴수당·가산수당 기준과 상황별 추천 경로를 한곳에서 확인하세요.' },
   { path: '/guide/insurance', title: '4대 보험 이해하기 | 2026년 요율 및 계산 방법 | PayTools', description: '국민연금, 건강보험, 장기요양보험, 고용보험의 2026년 요율과 계산 방법을 상세히 안내합니다.' },
   { path: '/guide/tax', title: '소득세 계산법 | 간이세액표 활용 가이드 | PayTools', description: '근로소득세 간이세액표와 부양가족 공제를 활용한 소득세 계산 방법. 2026년 세율 안내.' },
   { path: '/guide/overtime', title: '연장·야간·휴일 수당 계산법 | 가산수당 가이드 | PayTools', description: '근로기준법에 따른 연장·야간·휴일 수당 계산 방법. 통상시급 산정, 가산율 적용을 안내합니다.' },
@@ -30,7 +30,7 @@ const ROUTES = [
   { path: '/guide/weekly-holiday', title: '주휴수당 완벽 가이드 | 2026년 기준 주휴수당 계산법 | PayTools', description: '2026년 기준 주휴수당 개념, 발생 조건, 파트타임·아르바이트 계산 예시와 최저임금 포함 여부를 정리했습니다.' },
 
   // FAQ
-  { path: '/faq', title: '자주 묻는 질문 (FAQ) | PayTools 급여 계산기', description: '급여 계산, 4대 보험, 소득세, 연장수당, 최저임금에 대한 30개의 자주 묻는 질문과 답변.' },
+  { path: '/faq', title: '2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 질문 모음 | PayTools', description: '2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 급여명세서 차이, 근로자 권리를 한 번에 확인하세요.' },
 
   // 계산 사례
   { path: '/examples', title: '급여 계산 사례 - 풀타임·파트타임·교대근무 | PayTools', description: '풀타임, 파트타임, 교대근무 사례별 입력값과 2026년 기준 4대보험, 소득세, 주휴수당, 실수령액 계산 흐름을 확인하세요.' },
