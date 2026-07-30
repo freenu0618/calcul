@@ -31,7 +31,7 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
-const dateModified = '2026-07-10';
+const dateModified = '2026-07-31';
 
 const payrollCalculationHowTo = {
   '@context': 'https://schema.org',
@@ -263,6 +263,13 @@ const landingStructuredData = [
       {
         '@type': 'ListItem',
         position: 6,
+        name: '단기 알바·일용직 계산 전 구분',
+        url: 'https://paytools.work/faq',
+        description: '단기 근로자 급여는 근로자성, 실제 근무시간, 휴게시간, 주휴수당 대상, 4대보험 적용 기간을 먼저 나눠 확인합니다.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 7,
         name: '공식 문의 연결',
         url: 'https://paytools.work/contact',
         description: '계산 결과 오류, 도입 상담, 법령 기준 확인, 기능 제안처럼 공식 답변이 필요한 질문을 문의 경로로 연결합니다.',
@@ -305,6 +312,14 @@ const landingStructuredData = [
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'PayTools 결과는 급여 조건을 점검하는 참고용 예상액입니다. 실제 지급 전에는 근로계약서, 근무기록, 비과세 수당, 회사별 공제, 정산 기간이 같은지 확인하고 분쟁 가능성이 있으면 노무사 또는 세무 전문가 검토를 함께 진행하는 것이 안전합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '단기 알바나 일용직도 PayTools로 계산할 수 있나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '단기 근로자는 먼저 근로자인지 용역·사업소득 지급인지 구분해야 합니다. 근로자라면 시급, 실제 근무일·근무시간, 휴게시간, 주휴수당 대상 여부, 4대보험 적용 기간과 사업장 규모를 나눠 예상액을 확인하세요. 일용근로소득세, 고용보험, 산재보험처럼 별도 판단이 필요한 항목은 계산 결과를 참고용으로 보고 실제 지급 전 전문가 검토를 함께 진행하는 것이 안전합니다.',
         },
       },
     ],
