@@ -149,6 +149,12 @@ const answerRouteCards = [
     label: '수당 반영',
   },
   {
+    title: '포괄임금·고정OT 확인',
+    description: '기본급, 고정 연장수당, 포함 시간, 실제 초과근로를 분리한 뒤 연장·야간·휴일수당 가이드와 계산기를 함께 확인합니다.',
+    to: '/guide/overtime',
+    label: '고정OT 기준',
+  },
+  {
     title: '지급 전 최종 검토',
     description: '사업주가 지급액을 확정하기 전에는 근로계약서, 출퇴근 기록, 휴게시간, 4대보험 취득·상실 시점, 부양가족 조건을 입력값과 맞춰 봅니다.',
     to: '/legal',
@@ -186,7 +192,7 @@ const answerRouteCards = [
   },
 ];
 
-const dateModified = '2026-07-30';
+const dateModified = '2026-08-01';
 
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
@@ -570,14 +576,14 @@ const FAQ = () => {
     <>
       <Helmet>
         <title>2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 질문 모음 | PayTools</title>
-        <meta name="description" content="2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 급여명세서 차이, 연장·야간·휴일수당, 근로자 권리에 대한 자주 묻는 질문을 한 번에 확인하세요." />
+        <meta name="description" content="2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이, 근로자 권리에 대한 자주 묻는 질문을 확인하세요." />
         <link rel="canonical" href="https://paytools.work/faq" />
         <meta property="og:title" content="2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 | PayTools" />
-        <meta property="og:description" content="2026년 급여 계산과 4대보험, 주휴수당, 최저임금, 수습기간 감액, 급여명세서 차이, 근로자 권리까지 자주 묻는 질문을 정리한 FAQ 페이지입니다." />
+        <meta property="og:description" content="2026년 급여 계산과 4대보험, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이, 근로자 권리까지 정리한 FAQ 페이지입니다." />
         <meta property="og:url" content="https://paytools.work/faq" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="2026년 급여 계산 FAQ | PayTools" />
-        <meta name="twitter:description" content="실수령액, 4대보험, 주휴수당, 최저임금, 수습기간 감액, 급여명세서 차이 관련 질문을 한 번에 확인하세요." />
+        <meta name="twitter:description" content="실수령액, 4대보험, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이 관련 질문을 확인하세요." />
         <script type="application/ld+json">
           {JSON.stringify(faqStructuredData)}
         </script>
