@@ -630,7 +630,7 @@ const FAQ = () => {
             <div className="grid gap-3 md:grid-cols-2">
               {answerRouteCards.map((route) => (
                 <Link
-                  key={route.to}
+                  key={`${route.to}-${route.title}`}
                   to={route.to}
                   className="rounded-xl border border-gray-200 p-4 transition-colors hover:border-blue-300 hover:bg-blue-50"
                 >
