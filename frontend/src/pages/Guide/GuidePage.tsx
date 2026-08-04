@@ -86,6 +86,11 @@ const scenarioRoutes = [
     path: '/guide/weekly-holiday',
   },
   {
+    label: '목표 실수령액에서 세전 급여를 찾고 싶어요',
+    detail: '연봉 협상이나 이직 제안 검토처럼 세후 목표 금액만 있을 때는 역산 계산기로 기준선을 잡습니다.',
+    path: '/reverse-calculator',
+  },
+  {
     label: '명세서와 계산 결과가 달라요',
     detail: '비과세 수당, 상여, 회사별 공제, 정산 기간처럼 차이를 만드는 항목을 FAQ에서 점검합니다.',
     path: '/faq',
@@ -107,7 +112,7 @@ const scenarioRoutes = [
   },
 ];
 
-const dateModified = '2026-07-29';
+const dateModified = '2026-08-05';
 
 const guideStructuredData = [
   {
@@ -223,7 +228,7 @@ const GuidePage = () => (
   <>
     <PageHelmet
       title="급여 계산 가이드 - 사용법, 4대보험, 소득세, 수당"
-      description="급여유형 선택, 계산 전 체크리스트, 2026년 4대보험·소득세·주휴수당·가산수당 기준과 상황별 추천 경로를 한곳에서 확인하세요."
+      description="급여유형 선택, 계산 전 체크리스트, 실수령액 역산, 2026년 4대보험·소득세·주휴수당·가산수당 기준과 상황별 추천 경로를 한곳에서 확인하세요."
       path="/guide"
     />
     <Helmet>
