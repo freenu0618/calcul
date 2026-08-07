@@ -4,6 +4,7 @@
 
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
 import PageHelmet from '../../components/common/PageHelmet';
@@ -15,6 +16,94 @@ declare global {
     gtag: (command: string, ...args: unknown[]) => void;
   }
 }
+
+const dateModified = '2026-08-08';
+
+const TAX_GUIDE_SCHEMA = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: '소득세 계산법',
+    description: '근로소득세 간이세액표, 부양가족 공제, 지방소득세를 활용해 월급 실수령액을 검토하는 방법입니다.',
+    inLanguage: 'ko-KR',
+    dateModified,
+    datePublished: '2026-01-28',
+    author: {
+      '@type': 'Organization',
+      name: 'PayTools',
+      url: 'https://paytools.work',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'PayTools',
+      url: 'https://paytools.work',
+    },
+    mainEntityOfPage: 'https://paytools.work/guide/tax',
+    about: [
+      '근로소득세',
+      '간이세액표',
+      '부양가족 공제',
+      '지방소득세',
+      '월급 실수령액',
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    dateModified,
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: '왜 매월 세금을 내는데 연말정산을 해야 하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: "매월 원천징수되는 세금은 간이세액표를 기반으로 한 예상 세금입니다. 연말정산을 통해 실제 소득과 공제 항목을 반영하여 정확한 세금을 계산하고 정산합니다.",
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '연말정산에서 환급을 많이 받으려면?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '신용카드 사용, 의료비 지출, 교육비, 기부금 등 공제 가능한 항목을 확인하세요. 특히 신용카드는 총 급여의 25% 이상 사용해야 공제가 시작됩니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '부양가족을 잘못 신고하면 어떻게 되나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '부양가족 요건을 충족하지 않는데 공제를 받은 경우 연말정산에서 추가 세금을 납부해야 할 수 있으며, 고의적인 경우 가산세가 부과될 수 있습니다.',
+        },
+      },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    dateModified,
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '홈',
+        item: 'https://paytools.work',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: '가이드',
+        item: 'https://paytools.work/guide',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: '소득세 계산법',
+        item: 'https://paytools.work/guide/tax',
+      },
+    ],
+  },
+];
 
 const TaxGuide = () => {
   // GA4 이벤트 전송
@@ -35,6 +124,13 @@ const TaxGuide = () => {
       description="근로소득세 간이세액표와 부양가족 공제를 활용한 소득세 계산 방법. 2026년 세율, 원천징수 방법을 상세히 안내합니다."
       path="/guide/tax"
     />
+    <Helmet>
+      {TAX_GUIDE_SCHEMA.map((schema, index) => (
+        <script key={index} type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      ))}
+    </Helmet>
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
