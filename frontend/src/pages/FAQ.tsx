@@ -38,6 +38,10 @@ const categorySummaries: CategorySummary[] = [
     description: '근로자 부담 보험료와 간이세액표 원천징수를 함께 계산해야 월급에서 실제로 받는 실수령액을 확인할 수 있습니다.',
   },
   {
+    title: '보험료·공제액 변동',
+    description: '지난달과 공제액이 다르면 과세 급여, 비과세 수당, 상여, 취득·상실 시점, 보수월액 변경 여부를 같은 순서로 확인해야 합니다.',
+  },
+  {
     title: '주휴수당·최저임금 확인',
     description: '주 15시간 이상 근무하고 소정근로일을 개근했다면 주휴수당 대상이며, 2026년 최저임금, 월 환산액, 수습기간 감액 가능 조건도 같이 점검해야 합니다.',
   },
@@ -163,6 +167,12 @@ const answerRouteCards = [
     label: '수당 반영',
   },
   {
+    title: '공제액이 갑자기 늘어난 달',
+    description: '과세 급여 증가, 비과세 수당 변경, 상여, 부양가족 수, 4대보험 취득·상실 시점, 보수월액 변경 여부를 나눠 확인합니다.',
+    to: '/guide/insurance',
+    label: '보험료 기준',
+  },
+  {
     title: '결근·무급휴가 공제 확인',
     description: '월급제라도 결근, 무급휴가, 병가, 조퇴가 있으면 정산 기간, 소정근로일, 실제 근무일, 회사 공제 기준을 나눠 계산 결과를 참고용으로 봅니다.',
     to: '/calculator',
@@ -212,7 +222,7 @@ const answerRouteCards = [
   },
 ];
 
-const dateModified = '2026-08-07';
+const dateModified = '2026-08-10';
 
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
@@ -385,6 +395,11 @@ const FAQ = () => {
     },
     {
       category: '4대 보험',
+      question: '지난달보다 4대보험 공제액이 갑자기 늘어난 이유는 무엇인가요?',
+      answer: '먼저 과세 대상 급여가 늘었는지, 상여나 비정기 수당이 포함됐는지, 비과세 수당 한도나 항목이 바뀌었는지 확인하세요. 입사·퇴사, 휴직, 4대보험 취득·상실 시점, 보수월액 변경, 건강보험 정산처럼 월별 공제액을 바꾸는 이벤트도 분리해야 합니다. PayTools 계산값은 참고용 기준선이므로 실제 명세서 차이는 회사 공제 기준과 공단·세무 처리 기준을 함께 확인하는 것이 안전합니다.',
+    },
+    {
+      category: '4대 보험',
       question: '프리랜서도 4대 보험에 가입할 수 있나요?',
       answer: '프리랜서는 지역가입자로 국민연금과 건강보험에 가입할 수 있으나, 직장 가입자와는 보험료 산정 방식이 다릅니다. 고용보험은 예술인·노무제공자 고용보험을 별도로 신청할 수 있습니다.',
     },
@@ -529,7 +544,7 @@ const FAQ = () => {
       "url": "https://paytools.work/faq",
       "inLanguage": "ko-KR",
       "dateModified": dateModified,
-      "description": "2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 급여명세서 차이, 연장·야간·휴일수당, 근로자 권리 질문을 정리한 PayTools FAQ입니다.",
+      "description": "2026년 급여 계산, 4대보험, 공제액 변동, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 급여명세서 차이, 연장·야간·휴일수당, 근로자 권리 질문을 정리한 PayTools FAQ입니다.",
       "isPartOf": {
         "@type": "WebSite",
         "name": "PayTools",
@@ -611,14 +626,14 @@ const FAQ = () => {
     <>
       <Helmet>
         <title>2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 질문 모음 | PayTools</title>
-        <meta name="description" content="2026년 급여 계산, 4대보험, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이, 근로자 권리에 대한 자주 묻는 질문을 확인하세요." />
+        <meta name="description" content="2026년 급여 계산, 4대보험 공제액 변동, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이, 근로자 권리에 대한 자주 묻는 질문을 확인하세요." />
         <link rel="canonical" href="https://paytools.work/faq" />
         <meta property="og:title" content="2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 | PayTools" />
-        <meta property="og:description" content="2026년 급여 계산과 4대보험, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이, 근로자 권리까지 정리한 FAQ 페이지입니다." />
+        <meta property="og:description" content="2026년 급여 계산과 4대보험 공제액 변동, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이, 근로자 권리까지 정리한 FAQ 페이지입니다." />
         <meta property="og:url" content="https://paytools.work/faq" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="2026년 급여 계산 FAQ | PayTools" />
-        <meta name="twitter:description" content="실수령액, 4대보험, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이 관련 질문을 확인하세요." />
+        <meta name="twitter:description" content="실수령액, 4대보험 공제액 변동, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이 관련 질문을 확인하세요." />
         <script type="application/ld+json">
           {JSON.stringify(faqStructuredData)}
         </script>
@@ -643,7 +658,7 @@ const FAQ = () => {
               급여 계산 FAQ 한눈에 보기
             </h2>
             <p className="text-sm text-gray-700 mb-4">
-              PayTools FAQ는 2026년 기준 실수령액, 4대보험, 소득세, 주휴수당, 최저임금, 수습기간 감액 조건, 급여명세서 차이, 연장·야간·휴일수당, 개인정보 최소 입력 원칙과 계산 결과의 참고용 한계를 빠르게 확인하도록 정리했습니다.
+              PayTools FAQ는 2026년 기준 실수령액, 4대보험 공제액 변동, 소득세, 주휴수당, 최저임금, 수습기간 감액 조건, 급여명세서 차이, 연장·야간·휴일수당, 개인정보 최소 입력 원칙과 계산 결과의 참고용 한계를 빠르게 확인하도록 정리했습니다.
             </p>
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {categorySummaries.map((summary) => (
