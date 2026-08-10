@@ -3,6 +3,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
@@ -23,6 +24,29 @@ const WIZARD_STEPS: WizardStep[] = [
   { id: 'shift', title: '근무시프트', description: '근무시간 입력' },
 ];
 
+const homeDateModified = '2026-08-11';
+
+const preCalculationChecks = [
+  {
+    title: '급여유형과 기준시간',
+    description: '월급제, 시급제, 시급기반 월급제 중 계약에 맞는 유형을 고르고 174시간/209시간 기준을 먼저 맞춥니다.',
+    path: '/guide/how-to-use',
+    label: '사용 가이드',
+  },
+  {
+    title: '사업장 규모와 가산수당',
+    description: '5인 이상 여부, 주 40시간 초과, 야간·휴일근로 시간을 분리해야 연장·야간·휴일수당 추정이 안정적입니다.',
+    path: '/guide/overtime',
+    label: '가산수당 기준',
+  },
+  {
+    title: '공제와 민감정보',
+    description: '공개 계산에는 주민등록번호나 계좌번호가 필요하지 않습니다. 부양가족 수, 4대보험 적용 여부, 비과세 수당만 익명으로 입력하세요.',
+    path: '/faq',
+    label: 'FAQ 확인',
+  },
+];
+
 const homeStructuredData = [
   {
     '@context': 'https://schema.org',
@@ -34,6 +58,7 @@ const homeStructuredData = [
     applicationCategory: 'FinanceApplication',
     operatingSystem: 'Web',
     isAccessibleForFree: true,
+    dateModified: homeDateModified,
     description:
       '2026년 최저임금, 4대보험, 소득세, 연장·야간·휴일수당을 반영해 월급과 시급제 근로자의 예상 실수령액을 계산하는 무료 웹앱입니다.',
     featureList: [
@@ -64,6 +89,7 @@ const homeStructuredData = [
     name: 'PayTools로 월급 실수령액 계산하는 방법',
     description: '근로자 정보, 급여·수당, 근무시프트를 입력해 예상 실수령액을 확인하는 3단계 흐름입니다.',
     totalTime: 'PT3M',
+    dateModified: homeDateModified,
     tool: [{ '@type': 'HowToTool', name: 'PayTools 급여 계산기' }],
     step: [
       {
@@ -89,6 +115,7 @@ const homeStructuredData = [
   {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
+    dateModified: homeDateModified,
     mainEntity: [
       {
         '@type': 'Question',
@@ -114,7 +141,31 @@ const homeStructuredData = [
           text: '계산 결과는 참고용 추정치입니다. 비과세 수당, 회사별 공제, 예외 정책, 분쟁 가능성이 있는 사안은 노무사 또는 세무 전문가와 검토하는 것이 안전합니다.',
         },
       },
+      {
+        '@type': 'Question',
+        name: '급여 계산 전에 어떤 정보를 먼저 맞춰야 하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '급여유형, 174시간/209시간 기준, 사업장 규모, 실제 근무시간, 과세·비과세 수당, 부양가족 수, 4대보험 적용 여부를 먼저 확인하는 것이 좋습니다.',
+        },
+      },
     ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'PayTools 급여 계산 전 확인 체크리스트',
+    description: '예상 실수령액 계산 전에 맞춰야 하는 급여유형, 기준시간, 사업장 규모, 공제 조건입니다.',
+    inLanguage: 'ko-KR',
+    dateModified: homeDateModified,
+    numberOfItems: preCalculationChecks.length,
+    itemListElement: preCalculationChecks.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.title,
+      description: item.description,
+      url: `https://paytools.work${item.path}`,
+    })),
   },
   {
     '@context': 'https://schema.org',
@@ -279,6 +330,35 @@ function Home() {
               <span className="bg-white/20 px-3 py-1 rounded-full">100% 무료</span>
             </div>
           </div>
+
+          <section className="mb-6 rounded-lg border border-blue-100 bg-blue-50/70 p-5" aria-labelledby="pre-calc-checks-title">
+            <div className="mb-4 flex items-start gap-3">
+              <span className="material-symbols-outlined text-blue-700" aria-hidden="true">fact_check</span>
+              <div>
+                <h2 id="pre-calc-checks-title" className="text-lg font-bold text-gray-900">
+                  계산 전에 3가지만 먼저 맞춰보세요
+                </h2>
+                <p className="mt-1 text-sm leading-relaxed text-gray-600">
+                  입력 기준이 맞으면 4대보험, 소득세, 주휴·가산수당 예상액의 해석 오류를 줄일 수 있습니다.
+                </p>
+              </div>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              {preCalculationChecks.map((item) => (
+                <Link
+                  key={item.title}
+                  to={item.path}
+                  className="rounded-md border border-white/80 bg-white p-4 transition hover:border-blue-200 hover:shadow-sm"
+                >
+                  <h3 className="text-sm font-semibold text-gray-900">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-gray-600">{item.description}</p>
+                  <span className="mt-3 inline-flex text-sm font-semibold text-blue-700">
+                    {item.label}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
 
           {/* Step Wizard Form */}
           <Card>
