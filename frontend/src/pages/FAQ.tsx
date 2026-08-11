@@ -191,6 +191,12 @@ const answerRouteCards = [
     label: '지급 전 확인',
   },
   {
+    title: '퇴사월 마지막 급여·연차수당',
+    description: '마지막 급여, 미사용 연차수당, 퇴직금, 4대보험 상실 시점을 항목별로 나눠 보고 연차수당·퇴직금 가이드를 함께 확인합니다.',
+    to: '/guide/annual-leave',
+    label: '퇴사월 정산',
+  },
+  {
     title: '법률 전제와 분쟁 가능성',
     description: '최저임금 위반, 체불, 예외 공제처럼 판단이 필요한 질문은 계산값을 참고용으로 보고 법률 정보와 전문가 검토를 함께 확인합니다.',
     to: '/legal',
@@ -222,7 +228,7 @@ const answerRouteCards = [
   },
 ];
 
-const dateModified = '2026-08-10';
+const dateModified = '2026-08-12';
 
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
