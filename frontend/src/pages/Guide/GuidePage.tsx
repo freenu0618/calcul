@@ -101,6 +101,11 @@ const scenarioRoutes = [
     path: '/simulation',
   },
   {
+    label: '상여·성과급 지급월 실수령액을 확인해요',
+    detail: '비정기 지급액, 비과세 한도, 원천징수 변동을 분리하고 소득세 가이드와 계산기를 함께 확인합니다.',
+    path: '/guide/tax',
+  },
+  {
     label: '퇴사월·연차수당을 확인해요',
     detail: '마지막 급여, 미사용 연차수당, 퇴직금, 4대보험 상실 시점을 항목별로 나눕니다.',
     path: '/guide/annual-leave',
@@ -112,7 +117,7 @@ const scenarioRoutes = [
   },
 ];
 
-const dateModified = '2026-08-05';
+const dateModified = '2026-08-13';
 
 const guideStructuredData = [
   {
@@ -192,6 +197,14 @@ const guideStructuredData = [
         acceptedAnswer: {
           '@type': 'Answer',
           text: '월급 실수령액은 4대보험과 소득세·지방소득세를 함께 반영해야 하므로, 개념은 각각의 가이드에서 확인하고 실제 금액은 급여 계산기에서 함께 계산하는 것이 좋습니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '상여나 성과급이 있는 달은 어디에서 확인하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '상여·성과급 지급월은 과세 대상 금액, 비과세 한도, 원천징수 세액 변동을 분리해 소득세 가이드에서 기준을 확인하고, 실제 예상 실수령액은 급여 계산기에서 다시 계산하는 흐름이 안전합니다.',
         },
       },
       {
