@@ -121,6 +121,10 @@ const categorySummaries: CategorySummary[] = [
     title: '수습기간 최저임금 감액',
     description: '수습기간에도 최저임금 이상 지급이 원칙이며, 감액 가능 여부는 계약기간, 수습 시작일부터의 기간, 단순노무업무 여부를 함께 확인해야 합니다.',
   },
+  {
+    title: '입사 제안·첫 월급 검토',
+    description: '입사월 급여나 수습 조건을 제안받았다면 기본급, 정산 기간, 수습 감액 여부, 주휴·가산수당, 4대보험 취득 시점을 분리해 예상 실수령액을 확인합니다.',
+  },
 ];
 
 const answerRouteCards = [
@@ -209,6 +213,12 @@ const answerRouteCards = [
     label: '최저임금 기준',
   },
   {
+    title: '입사 제안·첫 월급 확인',
+    description: '채용 제안 금액이나 수습 첫 월급을 검토할 때는 역산 계산기로 목표 실수령액 기준선을 잡고, 입사월 조건은 급여 계산기로 다시 확인합니다.',
+    to: '/reverse-calculator',
+    label: '제안 금액 검토',
+  },
+  {
     title: '소규모 사업장 첫 급여 설정',
     description: '직원 수가 적은 사업장은 5인 이상 여부와 주휴·가산수당 조건을 먼저 나누고 사용 가이드에서 입력 흐름을 확인합니다.',
     to: '/guide/how-to-use',
@@ -228,7 +238,7 @@ const answerRouteCards = [
   },
 ];
 
-const dateModified = '2026-08-12';
+const dateModified = '2026-08-14';
 
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
@@ -492,6 +502,11 @@ const FAQ = () => {
     },
     {
       category: '최저임금',
+      question: '입사 제안 금액이나 수습 첫 월급은 어떻게 확인하나요?',
+      answer: '먼저 제안받은 기본급 또는 시급, 정산 기간, 입사일, 수습 감액 여부, 근무시간, 주휴수당 대상 여부, 4대보험 취득 시점, 비과세 수당을 분리하세요. 목표 실수령액과 비교하려면 역산 계산기로 필요한 세전 급여 기준선을 잡고, 실제 입사월 예상액은 급여 계산기에서 중도 입사·수습 조건을 반영해 다시 확인하는 흐름이 안전합니다. 최저임금 감액 가능 여부나 실제 지급 판단은 계약서와 직무 조건, 전문가 검토를 함께 확인하세요.',
+    },
+    {
+      category: '최저임금',
       question: '파트타임 근로자도 최저임금을 받나요?',
       answer: '네, 파트타임 근로자도 최저임금을 받습니다. 근로시간에 관계없이 모든 근로자는 최저임금 이상의 임금을 받을 권리가 있습니다.',
     },
@@ -550,7 +565,7 @@ const FAQ = () => {
       "url": "https://paytools.work/faq",
       "inLanguage": "ko-KR",
       "dateModified": dateModified,
-      "description": "2026년 급여 계산, 4대보험, 공제액 변동, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 급여명세서 차이, 연장·야간·휴일수당, 근로자 권리 질문을 정리한 PayTools FAQ입니다.",
+      "description": "2026년 급여 계산, 4대보험, 공제액 변동, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 입사월 첫 월급, 급여명세서 차이, 연장·야간·휴일수당, 근로자 권리 질문을 정리한 PayTools FAQ입니다.",
       "isPartOf": {
         "@type": "WebSite",
         "name": "PayTools",
@@ -632,14 +647,14 @@ const FAQ = () => {
     <>
       <Helmet>
         <title>2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 질문 모음 | PayTools</title>
-        <meta name="description" content="2026년 급여 계산, 4대보험 공제액 변동, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이, 근로자 권리에 대한 자주 묻는 질문을 확인하세요." />
+        <meta name="description" content="2026년 급여 계산, 4대보험 공제액 변동, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 입사월 첫 월급, 포괄임금·고정OT, 급여명세서 차이 질문을 확인하세요." />
         <link rel="canonical" href="https://paytools.work/faq" />
         <meta property="og:title" content="2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 | PayTools" />
-        <meta property="og:description" content="2026년 급여 계산과 4대보험 공제액 변동, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이, 근로자 권리까지 정리한 FAQ 페이지입니다." />
+        <meta property="og:description" content="2026년 급여 계산과 4대보험 공제액 변동, 주휴수당, 최저임금, 수습기간 감액, 입사월 첫 월급, 포괄임금·고정OT, 급여명세서 차이를 정리한 FAQ 페이지입니다." />
         <meta property="og:url" content="https://paytools.work/faq" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="2026년 급여 계산 FAQ | PayTools" />
-        <meta name="twitter:description" content="실수령액, 4대보험 공제액 변동, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이 관련 질문을 확인하세요." />
+        <meta name="twitter:description" content="실수령액, 4대보험 공제액 변동, 주휴수당, 최저임금, 수습기간 감액, 입사월 첫 월급, 포괄임금·고정OT 질문을 확인하세요." />
         <script type="application/ld+json">
           {JSON.stringify(faqStructuredData)}
         </script>
@@ -664,7 +679,7 @@ const FAQ = () => {
               급여 계산 FAQ 한눈에 보기
             </h2>
             <p className="text-sm text-gray-700 mb-4">
-              PayTools FAQ는 2026년 기준 실수령액, 4대보험 공제액 변동, 소득세, 주휴수당, 최저임금, 수습기간 감액 조건, 급여명세서 차이, 연장·야간·휴일수당, 개인정보 최소 입력 원칙과 계산 결과의 참고용 한계를 빠르게 확인하도록 정리했습니다.
+              PayTools FAQ는 2026년 기준 실수령액, 4대보험 공제액 변동, 소득세, 주휴수당, 최저임금, 수습기간 감액 조건, 입사월 첫 월급, 급여명세서 차이, 연장·야간·휴일수당, 개인정보 최소 입력 원칙과 계산 결과의 참고용 한계를 빠르게 확인하도록 정리했습니다.
             </p>
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {categorySummaries.map((summary) => (
