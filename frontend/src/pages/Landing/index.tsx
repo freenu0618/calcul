@@ -31,7 +31,7 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
-const dateModified = '2026-07-31';
+const dateModified = '2026-08-21';
 
 const payrollCalculationHowTo = {
   '@context': 'https://schema.org',
@@ -320,6 +320,14 @@ const landingStructuredData = [
         acceptedAnswer: {
           '@type': 'Answer',
           text: '단기 근로자는 먼저 근로자인지 용역·사업소득 지급인지 구분해야 합니다. 근로자라면 시급, 실제 근무일·근무시간, 휴게시간, 주휴수당 대상 여부, 4대보험 적용 기간과 사업장 규모를 나눠 예상액을 확인하세요. 일용근로소득세, 고용보험, 산재보험처럼 별도 판단이 필요한 항목은 계산 결과를 참고용으로 보고 실제 지급 전 전문가 검토를 함께 진행하는 것이 안전합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '상여나 비정기 수당이 있는 달은 어떻게 확인하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '상여, 성과급, 식대, 차량보조금, 연구수당처럼 매월 다르거나 비과세 한도가 있는 항목은 기본급과 분리해 보세요. 지급월에는 과세 대상 금액, 비과세 한도, 원천징수 세액, 회사별 공제 방식이 달라질 수 있으므로 특정 월 예상액은 급여 계산기에서 다시 확인하고 실제 지급 전 전문가 검토로 분리하는 것이 안전합니다.',
         },
       },
     ],
