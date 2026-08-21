@@ -10,7 +10,7 @@ import { ReverseIcon, EmptyState } from '../components/illustrations';
 import { salaryApi } from '../api';
 import type { ReverseSalaryResponse, EmploymentType, CompanySize } from '../types/salary';
 
-const reverseDateModified = '2026-06-19';
+const reverseDateModified = '2026-08-22';
 
 const reverseAssumptionCards = [
   {
@@ -25,6 +25,10 @@ const reverseAssumptionCards = [
     title: '활용하기 좋은 상황',
     body: '연봉 협상, 이직 제안 검토, 목표 저축액 기준 월급 기준선을 잡을 때 빠른 참고값으로 사용하세요.',
   },
+  {
+    title: '야간·휴일근로가 있는 경우',
+    body: '역산 결과는 기본 월급 기준선입니다. 야간·휴일·연장근로가 반복되면 상세 급여 계산기에서 시프트와 가산수당을 다시 넣어야 합니다.',
+  },
 ];
 
 const reverseInputChecklist = [
@@ -32,6 +36,7 @@ const reverseInputChecklist = [
   ['부양가족 수', '본인을 포함한 부양가족 수와 20세 이하 자녀 수를 소득세 조건으로 반영합니다.'],
   ['사업장 규모', '5인 이상 여부처럼 일부 수당과 계산 전제에 영향을 줄 수 있는 조건을 구분합니다.'],
   ['고용형태', '정규직, 파트타임, 계약직처럼 4대보험과 급여 조건 검토에 필요한 유형을 선택합니다.'],
+  ['가산수당 재검토', '야간·휴일·연장근로가 있으면 역산 후 상세 급여 계산기에서 실제 시프트를 다시 반영합니다.'],
   ['상세 재검토 항목', '비과세 수당, 상여, 회사별 공제, 실제 시프트는 계산기에서 다시 확인합니다.'],
 ];
 
@@ -148,6 +153,14 @@ function ReverseCalculator() {
           acceptedAnswer: {
             '@type': 'Answer',
             text: '목표 실수령액만으로는 빠른 기준선은 잡을 수 있지만 비과세 수당, 상여, 실제 근무시간, 회사별 공제는 결과를 바꿀 수 있습니다. 역산 결과 확인 후 상세 급여 계산기에서 수당과 시프트를 다시 검토하는 것이 안전합니다.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '야간·휴일·연장근로가 많은 직무도 역산 계산기만 보면 되나요?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: '아니요. 역산 계산기는 목표 실수령액에 필요한 기본 월급 기준선을 잡는 용도입니다. 야간·휴일·연장근로가 반복되는 직무는 상세 급여 계산기에서 실제 시프트, 통상시급, 가산수당 조건을 다시 넣어 예상 실수령액을 확인하는 것이 안전합니다.',
           },
         },
       ],
@@ -365,6 +378,7 @@ function ReverseCalculator() {
             <ul className="space-y-2 text-sm text-gray-700 list-disc list-inside">
               <li>실수령액은 4대보험, 소득세, 지방소득세를 공제한 뒤의 예상 수령액입니다.</li>
               <li>비과세 식대, 상여, 수당 구조가 있으면 실제 급여명세서와 차이가 날 수 있습니다.</li>
+              <li>야간·휴일·연장근로가 반복되면 역산 결과만 보지 말고 실제 시프트와 가산수당을 다시 계산하세요.</li>
               <li>정방향 계산이 필요하면 <Link to="/calculator" className="text-purple-600 hover:underline font-medium">급여 계산기</Link>에서 지급 항목별 공제 내역을 확인하세요.</li>
               <li>공제 기준이 헷갈리면 <Link to="/guide/insurance" className="text-purple-600 hover:underline font-medium">4대보험 가이드</Link>와 <Link to="/guide/tax" className="text-purple-600 hover:underline font-medium">소득세 가이드</Link>를 함께 참고하세요.</li>
             </ul>
