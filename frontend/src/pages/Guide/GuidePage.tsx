@@ -96,6 +96,11 @@ const scenarioRoutes = [
     path: '/faq',
   },
   {
+    label: '급여일 전 최종 검산이 필요해요',
+    detail: '정산월 예상액을 먼저 계산한 뒤 입퇴사일, 근태, 휴게시간, 수당, 4대보험 취득·상실 시점을 같은 순서로 맞춥니다.',
+    path: '/faq',
+  },
+  {
     label: '여러 급여안을 비교하고 싶어요',
     detail: '인상 전후, 수당 배분, 고용형태 변화는 시뮬레이션에서 같은 기준으로 비교합니다.',
     path: '/simulation',
@@ -117,7 +122,7 @@ const scenarioRoutes = [
   },
 ];
 
-const dateModified = '2026-08-13';
+const dateModified = '2026-08-23';
 
 const guideStructuredData = [
   {
@@ -205,6 +210,14 @@ const guideStructuredData = [
         acceptedAnswer: {
           '@type': 'Answer',
           text: '상여·성과급 지급월은 과세 대상 금액, 비과세 한도, 원천징수 세액 변동을 분리해 소득세 가이드에서 기준을 확인하고, 실제 예상 실수령액은 급여 계산기에서 다시 계산하는 흐름이 안전합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '급여 지급일 직전에는 무엇을 확인해야 하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '먼저 급여 계산기에서 정산월 예상 지급액과 공제액을 확인한 뒤 입퇴사일, 실제 근무일, 휴게시간, 주휴·가산수당, 상여·비과세 수당, 4대보험 취득·상실 시점, 부양가족 수가 입력값과 같은지 순서대로 맞추는 것이 좋습니다.',
         },
       },
       {
