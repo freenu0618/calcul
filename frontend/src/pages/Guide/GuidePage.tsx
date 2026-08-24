@@ -72,6 +72,11 @@ const preCalculationChecks = [
     detail: '4대보험, 소득세, 비과세 수당, 회사별 공제는 실제 실수령액을 바꿀 수 있습니다.',
     path: '/guide/insurance',
   },
+  {
+    label: '외국인 근로자 조건',
+    detail: '체류자격, 근로 가능 시간, 4대보험 적용 여부는 계산 조건과 별도로 확인합니다.',
+    path: '/guide/insurance',
+  },
 ];
 
 const scenarioRoutes = [
@@ -84,6 +89,11 @@ const scenarioRoutes = [
     label: '알바·시프트 급여가 궁금해요',
     detail: '주휴수당 대상 여부와 야간·휴일·연장근로 시간을 분리한 뒤 계산기로 이어갑니다.',
     path: '/guide/weekly-holiday',
+  },
+  {
+    label: '외국인 근로자나 유학생 알바를 계산해요',
+    detail: '체류자격, 근로 가능 시간, 4대보험 적용 여부, 사업장 규모를 나눠 참고용 예상액으로 확인합니다.',
+    path: '/guide/insurance',
   },
   {
     label: '목표 실수령액에서 세전 급여를 찾고 싶어요',
@@ -122,7 +132,7 @@ const scenarioRoutes = [
   },
 ];
 
-const dateModified = '2026-08-23';
+const dateModified = '2026-08-25';
 
 const guideStructuredData = [
   {
@@ -202,6 +212,14 @@ const guideStructuredData = [
         acceptedAnswer: {
           '@type': 'Answer',
           text: '월급 실수령액은 4대보험과 소득세·지방소득세를 함께 반영해야 하므로, 개념은 각각의 가이드에서 확인하고 실제 금액은 급여 계산기에서 함께 계산하는 것이 좋습니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '외국인 근로자나 유학생 아르바이트는 어디에서 확인하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '급여 계산은 월급·시급, 근무시간, 주휴수당, 사업장 규모를 기준으로 계산기에서 참고용으로 확인할 수 있습니다. 다만 체류자격, 근로 가능 시간, 4대보험 적용 여부는 비자와 실제 고용 조건에 따라 달라질 수 있어 보험 가이드와 전문가 검토를 함께 확인하는 것이 안전합니다.',
         },
       },
       {
