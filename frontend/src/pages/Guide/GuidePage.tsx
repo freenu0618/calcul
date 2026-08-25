@@ -73,6 +73,11 @@ const preCalculationChecks = [
     path: '/guide/insurance',
   },
   {
+    label: '입퇴사·급여변경 시점',
+    detail: '월 중간 입퇴사, 급여 인상, 소급 정산은 정산 기간과 적용일을 먼저 나눠야 합니다.',
+    path: '/faq',
+  },
+  {
     label: '외국인 근로자 조건',
     detail: '체류자격, 근로 가능 시간, 4대보험 적용 여부는 계산 조건과 별도로 확인합니다.',
     path: '/guide/insurance',
@@ -121,6 +126,11 @@ const scenarioRoutes = [
     path: '/guide/tax',
   },
   {
+    label: '급여 인상·소급 정산을 검토해요',
+    detail: '기존 급여, 변경 급여, 적용일, 정산월을 나눈 뒤 시뮬레이션과 FAQ로 차이를 확인합니다.',
+    path: '/simulation',
+  },
+  {
     label: '퇴사월·연차수당을 확인해요',
     detail: '마지막 급여, 미사용 연차수당, 퇴직금, 4대보험 상실 시점을 항목별로 나눕니다.',
     path: '/guide/annual-leave',
@@ -132,7 +142,7 @@ const scenarioRoutes = [
   },
 ];
 
-const dateModified = '2026-08-25';
+const dateModified = '2026-08-26';
 
 const guideStructuredData = [
   {
@@ -236,6 +246,14 @@ const guideStructuredData = [
         acceptedAnswer: {
           '@type': 'Answer',
           text: '먼저 급여 계산기에서 정산월 예상 지급액과 공제액을 확인한 뒤 입퇴사일, 실제 근무일, 휴게시간, 주휴·가산수당, 상여·비과세 수당, 4대보험 취득·상실 시점, 부양가족 수가 입력값과 같은지 순서대로 맞추는 것이 좋습니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '급여 인상이나 소급분은 어디서 먼저 확인하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '기존 급여, 변경 급여, 적용일, 정산월을 먼저 나눈 뒤 시뮬레이션에서 구조 차이를 비교하고, 실제 월별 실수령액은 급여 계산기에서 다시 확인하는 흐름이 안전합니다.',
         },
       },
       {
