@@ -697,14 +697,14 @@ const FAQ = () => {
     <>
       <Helmet>
         <title>2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 질문 모음 | PayTools</title>
-        <meta name="description" content="2026년 급여 계산, 4대보험 공제액 변동, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 입사월 첫 월급, 포괄임금·고정OT, 급여명세서 차이 질문을 확인하세요." />
+        <meta name="description" content="2026년 급여 계산, 4대보험 공제액 변동, 퇴사월 상실 시점, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이 질문을 확인하세요." />
         <link rel="canonical" href="https://paytools.work/faq" />
         <meta property="og:title" content="2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 | PayTools" />
-        <meta property="og:description" content="2026년 급여 계산과 4대보험 공제액 변동, 주휴수당, 최저임금, 수습기간 감액, 입사월 첫 월급, 포괄임금·고정OT, 급여명세서 차이를 정리한 FAQ 페이지입니다." />
+        <meta property="og:description" content="2026년 급여 계산과 4대보험 공제액 변동, 퇴사월 상실 시점, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이를 정리한 FAQ 페이지입니다." />
         <meta property="og:url" content="https://paytools.work/faq" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="2026년 급여 계산 FAQ | PayTools" />
-        <meta name="twitter:description" content="실수령액, 4대보험 공제액 변동, 주휴수당, 최저임금, 수습기간 감액, 입사월 첫 월급, 포괄임금·고정OT 질문을 확인하세요." />
+        <meta name="twitter:description" content="실수령액, 4대보험 공제액 변동, 퇴사월 상실 시점, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT 질문을 확인하세요." />
         <script type="application/ld+json">
           {JSON.stringify(faqStructuredData)}
         </script>
