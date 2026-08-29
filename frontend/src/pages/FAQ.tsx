@@ -268,7 +268,7 @@ const answerRouteCards = [
   },
 ];
 
-const dateModified = '2026-08-29';
+const dateModified = '2026-08-30';
 
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
@@ -305,6 +305,11 @@ const FAQ = () => {
       category: '계산기 선택',
       question: '월급을 시급으로, 시급을 월급으로 환산할 때 무엇을 먼저 정해야 하나요?',
       answer: '먼저 급여유형과 기준시간을 정해야 합니다. 월급을 시급처럼 볼 때는 174시간 기준인지, 주휴수당이 포함된 209시간 기준인지에 따라 통상시급이 달라집니다. 시급에서 월 예상액을 볼 때는 실제 시프트, 주 15시간 이상 여부, 소정근로일 개근 여부, 주휴수당 포함 여부를 함께 확인하세요. PayTools에서는 /guide/how-to-use에서 기준을 맞춘 뒤 /calculator에서 실수령액을 다시 계산하는 흐름이 안전합니다.',
+    },
+    {
+      category: '계산기 선택',
+      question: '시급 계약인데 매달 보장 월급이 있으면 어떤 급여유형을 선택하나요?',
+      answer: '시급으로 계약했지만 매달 최소 보장 월급이 정해져 있다면 시급기반 월급제를 먼저 검토하세요. 시급, 계약 월급, 실제 시프트를 함께 입력해 실제 계산액과 보장 월급 중 어떤 기준이 적용되는지 비교하고, 주휴수당·연장·야간·휴일수당 조건은 별도로 확인하는 흐름이 안전합니다. 보장액의 법적 성격이나 추가 지급 여부가 불명확하면 PayTools 결과는 참고용 기준선으로 두고 계약서와 전문가 검토를 함께 확인하세요.',
     },
     {
       category: '계산기 선택',
@@ -615,7 +620,7 @@ const FAQ = () => {
       "url": "https://paytools.work/faq",
       "inLanguage": "ko-KR",
       "dateModified": dateModified,
-      "description": "2026년 급여 계산, 4대보험, 공제액 변동, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 입사월 첫 월급, 급여명세서 차이, 연장·야간·휴일수당, 근로자 권리 질문을 정리한 PayTools FAQ입니다.",
+      "description": "2026년 급여 계산, 급여유형 선택, 4대보험, 공제액 변동, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 입사월 첫 월급, 급여명세서 차이, 연장·야간·휴일수당, 근로자 권리 질문을 정리한 PayTools FAQ입니다.",
       "isPartOf": {
         "@type": "WebSite",
         "name": "PayTools",
@@ -697,14 +702,14 @@ const FAQ = () => {
     <>
       <Helmet>
         <title>2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 질문 모음 | PayTools</title>
-        <meta name="description" content="2026년 급여 계산, 4대보험 공제액 변동, 퇴사월 상실 시점, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이 질문을 확인하세요." />
+        <meta name="description" content="2026년 급여 계산, 급여유형 선택, 4대보험 공제액 변동, 퇴사월 상실 시점, 실수령액, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이 질문을 확인하세요." />
         <link rel="canonical" href="https://paytools.work/faq" />
         <meta property="og:title" content="2026년 급여 계산 FAQ | 4대보험·실수령액·주휴수당 | PayTools" />
-        <meta property="og:description" content="2026년 급여 계산과 4대보험 공제액 변동, 퇴사월 상실 시점, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이를 정리한 FAQ 페이지입니다." />
+        <meta property="og:description" content="2026년 급여 계산과 급여유형 선택, 4대보험 공제액 변동, 퇴사월 상실 시점, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT, 급여명세서 차이를 정리한 FAQ 페이지입니다." />
         <meta property="og:url" content="https://paytools.work/faq" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="2026년 급여 계산 FAQ | PayTools" />
-        <meta name="twitter:description" content="실수령액, 4대보험 공제액 변동, 퇴사월 상실 시점, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT 질문을 확인하세요." />
+        <meta name="twitter:description" content="급여유형 선택, 실수령액, 4대보험 공제액 변동, 퇴사월 상실 시점, 주휴수당, 최저임금, 수습기간 감액, 포괄임금·고정OT 질문을 확인하세요." />
         <script type="application/ld+json">
           {JSON.stringify(faqStructuredData)}
         </script>
@@ -729,7 +734,7 @@ const FAQ = () => {
               급여 계산 FAQ 한눈에 보기
             </h2>
             <p className="text-sm text-gray-700 mb-4">
-              PayTools FAQ는 2026년 기준 실수령액, 4대보험 공제액 변동, 소득세, 주휴수당, 최저임금, 수습기간 감액 조건, 입사월 첫 월급, 급여명세서 차이, 연장·야간·휴일수당, 개인정보 최소 입력 원칙과 계산 결과의 참고용 한계를 빠르게 확인하도록 정리했습니다.
+              PayTools FAQ는 2026년 기준 급여유형 선택, 실수령액, 4대보험 공제액 변동, 소득세, 주휴수당, 최저임금, 수습기간 감액 조건, 입사월 첫 월급, 급여명세서 차이, 연장·야간·휴일수당, 개인정보 최소 입력 원칙과 계산 결과의 참고용 한계를 빠르게 확인하도록 정리했습니다.
             </p>
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {categorySummaries.map((summary) => (
