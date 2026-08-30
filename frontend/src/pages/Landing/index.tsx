@@ -31,7 +31,7 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
-const dateModified = '2026-08-21';
+const dateModified = '2026-08-31';
 
 const payrollCalculationHowTo = {
   '@context': 'https://schema.org',
@@ -273,6 +273,13 @@ const landingStructuredData = [
         name: '공식 문의 연결',
         url: 'https://paytools.work/contact',
         description: '계산 결과 오류, 도입 상담, 법령 기준 확인, 기능 제안처럼 공식 답변이 필요한 질문을 문의 경로로 연결합니다.',
+      },
+      {
+        '@type': 'ListItem',
+        position: 8,
+        name: '입사 제안·첫 월급 검토',
+        url: 'https://paytools.work/reverse-calculator',
+        description: '제안받은 월급이나 목표 실수령액이 있을 때 역산 계산기로 기준선을 잡고, 입사월 정산·수습·4대보험 취득 시점은 계산기에서 다시 확인합니다.',
       },
     ],
   },
