@@ -31,7 +31,7 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
-const dateModified = '2026-08-31';
+const dateModified = '2026-09-01';
 
 const payrollCalculationHowTo = {
   '@context': 'https://schema.org',
@@ -319,6 +319,14 @@ const landingStructuredData = [
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'PayTools 결과는 급여 조건을 점검하는 참고용 예상액입니다. 실제 지급 전에는 근로계약서, 근무기록, 비과세 수당, 회사별 공제, 정산 기간이 같은지 확인하고 분쟁 가능성이 있으면 노무사 또는 세무 전문가 검토를 함께 진행하는 것이 안전합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '급여 지급일 직전에는 무엇부터 검산해야 하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '먼저 정산월, 입사일·퇴사일, 실제 근무일과 휴게시간, 주휴수당 대상 여부를 맞춰 보세요. 이어서 연장·야간·휴일근로, 상여·비과세 수당, 4대보험 취득·상실 시점, 부양가족 수를 같은 순서로 확인하면 실제 명세서와 계산 결과의 차이를 줄일 수 있습니다.',
         },
       },
       {
