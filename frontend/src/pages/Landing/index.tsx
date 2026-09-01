@@ -31,7 +31,7 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
-const dateModified = '2026-09-01';
+const dateModified = '2026-09-02';
 
 const payrollCalculationHowTo = {
   '@context': 'https://schema.org',
@@ -281,6 +281,13 @@ const landingStructuredData = [
         url: 'https://paytools.work/reverse-calculator',
         description: '제안받은 월급이나 목표 실수령액이 있을 때 역산 계산기로 기준선을 잡고, 입사월 정산·수습·4대보험 취득 시점은 계산기에서 다시 확인합니다.',
       },
+      {
+        '@type': 'ListItem',
+        position: 9,
+        name: '지급 후 오류·정정 급여 확인',
+        url: 'https://paytools.work/calculator',
+        description: '이미 지급한 급여에 차이가 보이면 원래 입력값, 실제 지급액, 정정 사유, 다음 지급월 반영 여부를 분리해 기준선을 다시 확인합니다.',
+      },
     ],
   },
   {
@@ -343,6 +350,14 @@ const landingStructuredData = [
         acceptedAnswer: {
           '@type': 'Answer',
           text: '상여, 성과급, 식대, 차량보조금, 연구수당처럼 매월 다르거나 비과세 한도가 있는 항목은 기본급과 분리해 보세요. 지급월에는 과세 대상 금액, 비과세 한도, 원천징수 세액, 회사별 공제 방식이 달라질 수 있으므로 특정 월 예상액은 급여 계산기에서 다시 확인하고 실제 지급 전 전문가 검토로 분리하는 것이 안전합니다.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '이미 지급한 급여에 오류가 보이면 어떻게 확인하나요?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: '정산월, 원래 입력값, 실제 지급액, 차이가 난 항목과 정정 사유를 먼저 분리하세요. 같은 조건을 급여 계산기에 다시 넣어 기준선을 만든 뒤 다음 지급월 반영, 정정 지급, 회사 공제 기준, 근로계약서와 근태기록을 함께 검토하는 것이 안전합니다.',
         },
       },
     ],

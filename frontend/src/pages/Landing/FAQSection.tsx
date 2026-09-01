@@ -79,13 +79,18 @@ const faqs: FAQItem[] = [
     answer:
       '가능하지만 월 전체 급여로 단정하지 말고 정산 기간, 입사일, 실제 근무일과 근무시간, 주휴수당 대상 여부, 연장·야간·휴일근로, 4대보험 취득 시점을 먼저 나눠 입력하세요. 수습 감액이나 회사별 일할 계산 기준이 있으면 PayTools 결과는 참고용 기준선으로 보고 실제 지급 전 계약서와 전문가 검토를 함께 확인하는 것이 안전합니다.',
   },
+  {
+    question: '이미 지급한 급여에 오류가 보이면 어떻게 확인하나요?',
+    answer:
+      '정산월, 원래 입력값, 실제 지급액, 차이가 난 항목과 정정 사유를 먼저 분리하세요. 같은 조건을 급여 계산기에 다시 넣어 예상 지급 총액, 공제 총액, 실수령액 차이를 확인하고, 다음 지급월 반영이나 정정 지급 여부는 회사 기준과 전문가 검토로 분리하는 것이 안전합니다.',
+  },
 ];
 
 const faqSchema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   inLanguage: 'ko-KR',
-  dateModified: '2026-09-01',
+  dateModified: '2026-09-02',
   mainEntity: faqs.map((f) => ({
     '@type': 'Question',
     name: f.question,
