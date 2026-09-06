@@ -6,12 +6,14 @@
   "start_url": "/?utm_source=pwa",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "browser"],
   "background_color": "#ffffff",
   "theme_color": "#1e3fae",
   "lang": "ko-KR",
   "dir": "ltr",
   "orientation": "portrait-primary",
   "categories": ["finance", "business", "productivity"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/favicon.svg",
@@ -46,6 +48,13 @@
       "short_name": "가이드",
       "description": "4대보험, 소득세, 주휴수당, 가산수당 설명을 확인합니다.",
       "url": "/guide?utm_source=pwa_shortcut",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "급여 계산 FAQ",
+      "short_name": "FAQ",
+      "description": "계산 전제, 4대보험, 실수령액, 최저임금 질문을 빠르게 확인합니다.",
+      "url": "/faq?utm_source=pwa_shortcut",
       "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
     }
   ]
