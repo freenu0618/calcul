@@ -4,9 +4,9 @@
 
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
+import PageHelmet from '../../components/common/PageHelmet';
 import AdBanner from '../../components/common/AdBanner';
 
 declare global {
@@ -28,14 +28,11 @@ const AnnualLeaveGuide = () => {
 
   return (
     <>
-      <Helmet>
-        <title>연차수당 완벽 가이드 | 2026년 연차 발생 기준 및 계산법 | 급여 계산기</title>
-        <meta name="description" content="2026년 기준 연차 발생 조건, 연차수당 계산법, 미사용 연차수당 지급 기준을 상세히 안내합니다. 1년 미만 월차부터 80% 이상 출근 기준까지 완벽 정리." />
-        <link rel="canonical" href="https://paytools.work/guide/annual-leave" />
-        <meta property="og:title" content="연차수당 완벽 가이드 | 2026년 연차 발생 기준 및 계산법" />
-        <meta property="og:description" content="연차 발생 조건, 연차수당 계산법, 미사용 연차수당 처리 방법을 상세히 안내합니다." />
-        <meta property="og:url" content="https://paytools.work/guide/annual-leave" />
-      </Helmet>
+      <PageHelmet
+        title="연차수당 완벽 가이드 | 2026년 연차 발생 기준 및 계산법"
+        description="2026년 기준 연차 발생 조건, 연차수당 계산법, 미사용 연차수당 지급 기준을 상세히 안내합니다. 1년 미만 월차부터 80% 이상 출근 기준까지 완벽 정리."
+        path="/guide/annual-leave"
+      />
 
       <MainLayout>
         <div className="max-w-4xl mx-auto">

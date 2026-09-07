@@ -4,9 +4,9 @@
 
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
+import PageHelmet from '../../components/common/PageHelmet';
 import AdBanner from '../../components/common/AdBanner';
 
 declare global {
@@ -28,14 +28,11 @@ const WeeklyHolidayGuide = () => {
 
   return (
     <>
-      <Helmet>
-        <title>주휴수당 완벽 가이드 | 2026년 기준 주휴수당 계산법 | 급여 계산기</title>
-        <meta name="description" content="2026년 기준 주휴수당 개념, 발생 조건, 계산법을 완벽하게 안내합니다. 파트타임·아르바이트 주휴수당 계산 예시, 최저임금 포함 여부까지 상세히 정리." />
-        <link rel="canonical" href="https://paytools.work/guide/weekly-holiday" />
-        <meta property="og:title" content="주휴수당 완벽 가이드 | 2026년 기준 주휴수당 계산법" />
-        <meta property="og:description" content="주휴수당 개념, 발생 조건, 계산법, 파트타임 적용 방법을 상세히 안내합니다." />
-        <meta property="og:url" content="https://paytools.work/guide/weekly-holiday" />
-      </Helmet>
+      <PageHelmet
+        title="주휴수당 완벽 가이드 | 2026년 기준 주휴수당 계산법"
+        description="2026년 기준 주휴수당 개념, 발생 조건, 계산법을 완벽하게 안내합니다. 파트타임·아르바이트 주휴수당 계산 예시, 최저임금 포함 여부까지 상세히 정리."
+        path="/guide/weekly-holiday"
+      />
 
       <MainLayout>
         <div className="max-w-4xl mx-auto">

@@ -4,9 +4,9 @@
 
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
+import PageHelmet from '../../components/common/PageHelmet';
 import AdBanner from '../../components/common/AdBanner';
 
 declare global {
@@ -28,14 +28,11 @@ const SeveranceGuide = () => {
 
   return (
     <>
-      <Helmet>
-        <title>퇴직금 계산 가이드 | 2026년 기준 퇴직금 계산법 완벽 정리 | 급여 계산기</title>
-        <meta name="description" content="2026년 기준 퇴직금 계산법을 완벽하게 안내합니다. 평균임금 산정 방법, 퇴직금 계산 공식, 구체적인 계산 예시와 주의사항을 확인하세요." />
-        <link rel="canonical" href="https://paytools.work/guide/severance" />
-        <meta property="og:title" content="퇴직금 계산 가이드 | 2026년 기준 퇴직금 계산법 완벽 정리" />
-        <meta property="og:description" content="2026년 기준 퇴직금 계산법을 완벽하게 안내합니다. 평균임금 산정, 계산 공식, 예시 포함." />
-        <meta property="og:url" content="https://paytools.work/guide/severance" />
-      </Helmet>
+      <PageHelmet
+        title="퇴직금 계산 가이드 | 2026년 기준 퇴직금 계산법 완벽 정리"
+        description="2026년 기준 퇴직금 계산법을 완벽하게 안내합니다. 평균임금 산정 방법, 퇴직금 계산 공식, 구체적인 계산 예시와 주의사항을 확인하세요."
+        path="/guide/severance"
+      />
 
       <MainLayout>
         <div className="max-w-4xl mx-auto">
