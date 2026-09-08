@@ -3,29 +3,107 @@
  */
 
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/common/Card';
 import PageHelmet from '../components/common/PageHelmet';
+
+const aboutDateModified = '2026-09-09';
+
+const aboutStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: 'PayTools 서비스 소개',
+    url: 'https://paytools.work/about',
+    inLanguage: 'ko-KR',
+    dateModified: aboutDateModified,
+    description:
+      'PayTools는 한국 근로기준법과 2026년 급여 기준을 참고해 실수령액, 4대보험, 소득세, 주휴수당, 가산수당 예상액을 계산하는 웹 서비스입니다.',
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'PayTools',
+      url: 'https://paytools.work',
+    },
+    about: [
+      '급여 계산기',
+      '2026년 최저임금',
+      '4대보험 계산',
+      '소득세 계산',
+      '주휴수당',
+      '연장·야간·휴일수당',
+      '급여명세서 준비',
+    ],
+    audience: {
+      '@type': 'Audience',
+      audienceType: '소규모 사업장, HR 담당자, 급여 담당자, 근로자',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'PayTools',
+    url: 'https://paytools.work',
+    logo: 'https://paytools.work/og-image.svg',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      email: 'contact@salary-calculator.kr',
+      contactType: 'customer support',
+      availableLanguage: ['Korean'],
+    },
+    knowsAbout: [
+      '한국 급여 계산',
+      '4대보험 공제',
+      '근로소득세',
+      '주휴수당',
+      '가산수당',
+      '급여명세서',
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: '홈',
+        item: 'https://paytools.work',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: '서비스 소개',
+        item: 'https://paytools.work/about',
+      },
+    ],
+  },
+];
 
 const About = () => {
   return (
     <>
     <PageHelmet
       title="서비스 소개 - 급여 계산 자동화"
-      description="PayTools는 한국 근로기준법에 따른 정확한 실수령액 계산 서비스입니다. 4대보험, 소득세, 가산수당을 자동 계산합니다."
+      description="PayTools는 한국 근로기준법과 2026년 급여 기준을 참고해 실수령액, 4대보험, 소득세, 주휴수당, 가산수당 예상액을 계산합니다."
       path="/about"
     />
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify(aboutStructuredData)}
+      </script>
+    </Helmet>
     <MainLayout>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">서비스 소개</h1>
         <p className="text-lg text-gray-600 mb-8">
-          한국 근로기준법에 따른 정확한 실수령액 계산 서비스
+          한국 근로기준법과 2026년 급여 기준을 참고한 실수령액 계산 서비스
         </p>
 
         <Card title="급여계산기란?">
           <div className="prose max-w-none">
             <p className="text-gray-700 mb-4">
-              급여계산기는 대한민국 근로기준법 및 세법에 따라 근로자의 실수령액을 정확하게 계산하는 무료 웹 서비스입니다.
+              급여계산기는 대한민국 근로기준법 및 세법 기준을 참고해 근로자의 예상 실수령액을 계산하는 무료 웹 서비스입니다.
               복잡한 4대 보험료, 소득세, 가산수당 계산을 쉽고 빠르게 수행할 수 있습니다.
             </p>
             <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">목표 사용자</h3>
@@ -88,10 +166,11 @@ const About = () => {
         <Card title="개발 원칙" className="mt-6">
           <div className="prose max-w-none">
             <h3 className="text-lg font-bold text-gray-900 mb-3">
-              법적 정확성 &gt; 기능 풍부함
+              검증 가능한 계산 근거 &gt; 기능 풍부함
             </h3>
             <p className="text-gray-700 mb-4">
-              틀린 계산보다 없는 기능이 낫습니다. 모든 계산은 근로기준법과 세법을 철저히 준수합니다.
+              PayTools는 계산 근거, 적용 요율, 입력 조건을 함께 보여주어 사용자가 결과를 검토할 수 있게 합니다.
+              실제 지급·분쟁 판단은 계약서, 근무기록, 회사별 수당 체계와 전문가 검토가 함께 필요합니다.
             </p>
             <ul className="list-disc list-inside space-y-2 text-gray-700">
               <li>모든 계산 로직은 순수 함수로 작성하여 사이드 이펙트 방지</li>

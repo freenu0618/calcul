@@ -54,7 +54,7 @@ const ROUTES = [
   { path: '/blog/payslip-requirements', title: '급여명세서 필수 기재사항 완벽 가이드 | PayTools', description: '2021년 11월부터 의무화된 급여명세서 교부제도의 필수 기재사항과 위반 시 과태료.' },
 
   // 기타
-  { path: '/about', title: '서비스 소개 - 급여 계산 자동화 | PayTools', description: 'PayTools는 한국 근로기준법 기준을 참고해 예상 실수령액을 계산하는 서비스입니다.' },
+  { path: '/about', title: '서비스 소개 - 급여 계산 자동화 | PayTools', description: 'PayTools는 한국 근로기준법과 2026년 급여 기준을 참고해 실수령액, 4대보험, 소득세, 주휴수당, 가산수당 예상액을 계산합니다.' },
   { path: '/privacy', title: '개인정보처리방침 | PayTools', description: 'PayTools 급여 계산기의 개인정보처리방침입니다. 공개 계산 입력값, 계정 기능 데이터, 쿠키 사용, 데이터 보관 정책.' },
   { path: '/terms', title: '이용약관 | PayTools', description: 'PayTools 급여 계산기 이용약관. 서비스 이용, 면책 조항, 저작권 등의 권리와 의무 안내.' },
   { path: '/contact', title: '연락처 - 문의하기 | PayTools', description: 'PayTools 급여 계산기에 대한 문의사항, 버그 리포트, 개선 제안은 이메일로 연락해 주세요.' },
