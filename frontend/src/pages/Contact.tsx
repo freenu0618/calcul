@@ -26,6 +26,8 @@ const contactTopics = [
   },
 ];
 
+const contactDateModified = '2026-09-10';
+
 const contactStructuredData = [
   {
     '@context': 'https://schema.org',
@@ -33,7 +35,7 @@ const contactStructuredData = [
     name: 'PayTools 문의하기',
     url: 'https://paytools.work/contact',
     inLanguage: 'ko-KR',
-    dateModified: '2026-07-03',
+    dateModified: contactDateModified,
     description: 'PayTools 급여 계산기 문의, 버그 리포트, 기능 제안, 계산 기준 확인을 위한 공식 연락처 페이지입니다. 공개 문의에는 이름, 주민등록번호, 계좌번호 같은 민감정보가 필요하지 않습니다.',
     isPartOf: {
       '@type': 'WebSite',
@@ -45,6 +47,7 @@ const contactStructuredData = [
       email: 'contact@salary-calculator.kr',
       contactType: 'customer support',
       availableLanguage: ['Korean'],
+      areaServed: 'KR',
     },
   },
   {
@@ -53,7 +56,7 @@ const contactStructuredData = [
     name: 'PayTools 문의 전 확인 항목',
     url: 'https://paytools.work/contact',
     inLanguage: 'ko-KR',
-    dateModified: '2026-07-03',
+    dateModified: contactDateModified,
     numberOfItems: contactTopics.length,
     itemListElement: contactTopics.map((topic, index) => ({
       '@type': 'ListItem',
@@ -87,7 +90,7 @@ const Contact = () => {
     <>
     <PageHelmet
       title="연락처 - 문의하기"
-      description="PayTools 급여 계산기에 대한 문의사항, 버그 리포트, 개선 제안은 이메일로 연락해 주세요."
+      description="PayTools 급여 계산기 문의, 버그 리포트, 개선 제안은 이름·주민등록번호·계좌번호 없이 계산 조건 중심으로 이메일 접수해 주세요."
       path="/contact"
     />
     <Helmet>
