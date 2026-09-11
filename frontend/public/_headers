@@ -12,6 +12,36 @@
   Content-Type: text/plain; charset=utf-8
   Cache-Control: public, max-age=3600
 
+/login
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/register
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/oauth/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/dashboard
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/employees
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/employees/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/payroll
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/payroll/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/mypage
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/payment/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
