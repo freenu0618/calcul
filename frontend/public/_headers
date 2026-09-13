@@ -21,6 +21,9 @@
 /oauth/*
   X-Robots-Tag: noindex, nofollow, noarchive
 
+/oauth/callback
+  X-Robots-Tag: noindex, nofollow, noarchive
+
 /dashboard
   X-Robots-Tag: noindex, nofollow, noarchive
 
@@ -40,6 +43,12 @@
   X-Robots-Tag: noindex, nofollow, noarchive
 
 /payment/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/payment/success
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/404.html
   X-Robots-Tag: noindex, nofollow, noarchive
 
 /*
