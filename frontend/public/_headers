@@ -15,7 +15,13 @@
 /login
   X-Robots-Tag: noindex, nofollow, noarchive
 
+/login/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+
 /register
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/register/*
   X-Robots-Tag: noindex, nofollow, noarchive
 
 /oauth/*
@@ -25,6 +31,9 @@
   X-Robots-Tag: noindex, nofollow, noarchive
 
 /dashboard
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/dashboard/*
   X-Robots-Tag: noindex, nofollow, noarchive
 
 /employees
@@ -40,6 +49,9 @@
   X-Robots-Tag: noindex, nofollow, noarchive
 
 /mypage
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/mypage/*
   X-Robots-Tag: noindex, nofollow, noarchive
 
 /payment/*
