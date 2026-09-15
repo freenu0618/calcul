@@ -27,6 +27,7 @@ const quickChecks = [
   '월급제는 209시간 기준 포함 여부와 주휴수당 분리 여부를 확인하세요.',
   '시급제·알바는 실제 근무일, 야간·휴일 여부, 주 15시간 이상 여부가 중요합니다.',
   '목표 실수령액에서 역산할 때는 비과세 수당과 회사별 공제 항목을 별도로 점검하세요.',
+  '실제 명세서와 차이가 나면 정산월, 입퇴사일, 4대보험 취득·상실 시점부터 다시 맞춰 보세요.',
 ];
 
 const answerRoutes = [
@@ -99,7 +100,7 @@ export default function CalculationBasisSection() {
             <span className="material-symbols-outlined text-primary" aria-hidden="true">checklist</span>
             계산 전 빠른 점검
           </h3>
-          <ul className="grid gap-3 md:grid-cols-3">
+          <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             {quickChecks.map((check) => (
               <li key={check} className="flex gap-2 text-sm leading-relaxed text-text-sub">
                 <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" aria-hidden="true" />
