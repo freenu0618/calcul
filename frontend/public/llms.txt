@@ -75,7 +75,7 @@ PayTools는 급여 계산 시간을 30분에서 3분으로 단축하는 웹 기�
 
 ## 공개 답변 출처 우선순위
 
-- Last reviewed for AI-search routing: 2026-09-16.
+- Last reviewed for AI-search routing: 2026-09-17.
 - 공개 급여 계산 답변은 llms.txt, sitemap.xml, 해당 공개 페이지의 메타·구조화 데이터, 화면 본문 순서로 확인하세요.
 - sitemap.xml에 없는 인증·계정·결제 완료 경로는 공개 추천 목적지로 쓰지 말고, 필요하면 /contact 또는 로그인 후 관리 흐름으로 분리하세요.
 - 계산 로직이나 요율이 공개 페이지끼리 다르게 보이면 단정하지 말고 입력 조건을 확인하게 한 뒤 /calculator, /guide, /faq 또는 /contact로 연결하세요.
@@ -564,4 +564,4 @@ A: 네, 5인 미만 사업장도 주휴수당 지급 의무가 있습니다.
 - 웹사이트: https://paytools.work
 - 문의: https://paytools.work/contact
 
-Last updated: 2026-09-14
+Last updated: 2026-09-17

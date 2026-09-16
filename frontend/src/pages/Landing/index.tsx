@@ -31,7 +31,7 @@ import ConversionCTASection from './ConversionCTASection';
 import FAQSection from './FAQSection';
 import FinalCTASection from './FinalCTASection';
 
-const dateModified = '2026-09-02';
+const dateModified = '2026-09-17';
 
 const payrollCalculationHowTo = {
   '@context': 'https://schema.org',
@@ -105,6 +105,31 @@ const calculationAssumptions = [
   {
     name: '민감정보 없는 공개 계산',
     description: '공개 계산과 FAQ 확인에는 이름, 주민등록번호, 계좌번호, 급여명세서 원본 대신 급여유형, 금액, 근무시간, 부양가족 수처럼 계산 조건만 사용합니다.',
+  },
+  {
+    name: '지급 전 검산 기준선',
+    description: '급여 지급 직전에는 정산월, 입퇴사일, 실제 근무일, 휴게시간, 수당, 4대보험 취득·상실 시점이 입력값과 같은지 확인한 뒤 결과를 참고용 기준선으로 사용합니다.',
+  },
+];
+
+const resultReviewSignals = [
+  {
+    name: '실제 명세서와 차이가 날 때',
+    description:
+      '급여유형, 정산 기간, 174시간/209시간 기준, 사업장 규모, 부양가족, 비과세 수당, 회사별 공제, 4대보험 적용 시점을 같은 조건으로 다시 맞춥니다.',
+    url: 'https://paytools.work/calculator',
+  },
+  {
+    name: '급여 지급 전 빠른 검산',
+    description:
+      '지급일 직전에는 정산월, 입퇴사일, 실제 근무일·휴게시간, 주휴·가산수당, 상여·비과세 수당, 보험 취득·상실 시점을 순서대로 확인합니다.',
+    url: 'https://paytools.work/calculator',
+  },
+  {
+    name: '판단형 질문 분리',
+    description:
+      '체불, 최저임금 위반, 예외 공제, 분쟁 가능성은 PayTools 결과만으로 확정하지 말고 법률 정보, 문의, 전문가 검토 경로로 분리합니다.',
+    url: 'https://paytools.work/legal',
   },
 ];
 
@@ -218,6 +243,18 @@ const landingStructuredData = [
       '공개 계산에는 이름, 주민등록번호, 계좌번호 같은 민감정보 대신 급여유형, 금액, 근무시간, 부양가족 수 등 계산 조건만 입력합니다.',
   },
   payrollCalculationHowTo,
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'PayTools 계산 결과 검산 신호',
+    description: '계산 결과를 실제 급여명세서, 지급 전 검산, 판단형 질문으로 나눠 해석할 때의 공개 답변 기준입니다.',
+    dateModified,
+    itemListElement: resultReviewSignals.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      ...item,
+    })),
+  },
   {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
