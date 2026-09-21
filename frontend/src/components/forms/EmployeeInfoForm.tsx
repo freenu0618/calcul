@@ -126,7 +126,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
             content="정규직: 주 40시간 이상 근무. 시간제: 주 40시간 미만 단시간 근로자. 4대보험 가입 기준이 다릅니다."
             position="right"
           >
-            <span aria-label="고용 형태 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+            <button type="button" aria-label="고용 형태 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">?</button>
           </Tooltip>
         </div>
         <select
@@ -149,7 +149,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
             content="5인 이상: 법정 연장·야간·휴일 가산수당 기준 적용. 5인 미만: 제56조 가산수당은 일반적으로 적용 제외되며 계약상 수당은 별도 확인합니다."
             position="right"
           >
-            <span aria-label="사업장 규모 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+            <button type="button" aria-label="사업장 규모 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">?</button>
           </Tooltip>
         </div>
         <select
@@ -172,7 +172,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
             content="근로계약서에 명시된 주간 근무일 수. 개근 여부 판단 기준이며, 실제 근무일이 소정근로일 이상이면 주휴수당이 발생합니다."
             position="right"
           >
-            <span aria-label="주 소정근로일 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+            <button type="button" aria-label="주 소정근로일 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">?</button>
           </Tooltip>
         </div>
         <p className="text-xs text-gray-500 mt-0.5 mb-1">(일주일에 일하기로 한 날수, 보통 5일)</p>
@@ -204,7 +204,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
             content="근로계약서에 명시된 하루 근무시간. 주 소정근로시간과 통상시급 계산에 사용됩니다."
             position="right"
           >
-            <span aria-label="1일 소정근로시간 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+            <button type="button" aria-label="1일 소정근로시간 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">?</button>
           </Tooltip>
         </div>
         <p className="text-xs text-gray-500 mt-0.5 mb-1">(하루에 일하기로 약속한 시간, 보통 8시간)</p>
@@ -229,7 +229,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
             content="본인을 포함한 부양가족 수. 소득세 간이세액표 적용에 사용됩니다. 부양가족이 많을수록 세금이 줄어듭니다."
             position="right"
           >
-            <span aria-label="부양가족 수 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+            <button type="button" aria-label="부양가족 수 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">?</button>
           </Tooltip>
         </div>
         <input
@@ -253,7 +253,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
             content="만 20세 이하 자녀 수. 자녀세액공제 적용에 사용됩니다. 부양가족 수를 초과할 수 없습니다."
             position="right"
           >
-            <span aria-label="20세 이하 자녀 수 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+            <button type="button" aria-label="20세 이하 자녀 수 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">?</button>
           </Tooltip>
         </div>
         <input
@@ -277,7 +277,7 @@ export default function EmployeeInfoForm({ employee, onChange }: EmployeeInfoFor
             content="만 60세 이상은 국민연금 의무가입 대상이 아닙니다. 만 18세 미만은 고용보험 가입 제외될 수 있습니다."
             position="right"
           >
-            <span aria-label="만 나이 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300">?</span>
+            <button type="button" aria-label="만 나이 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-gray-200 rounded-full cursor-help hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">?</button>
           </Tooltip>
         </div>
         <input

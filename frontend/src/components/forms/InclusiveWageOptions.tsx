@@ -83,9 +83,9 @@ export default function InclusiveWageOptions({
             position="right"
             maxWidth={350}
           >
-            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-amber-200 rounded-full cursor-help hover:bg-amber-300">
+            <button type="button" aria-label="포괄임금제 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-amber-200 rounded-full cursor-help hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
               ?
-            </span>
+            </button>
           </Tooltip>
         </div>
       </div>

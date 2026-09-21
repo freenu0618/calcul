@@ -4,11 +4,11 @@
  * 모바일에서 화면 밖으로 나가지 않도록 자동 조정
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { cloneElement, useState, useRef, useEffect, useCallback, useId } from 'react';
 
 interface TooltipProps {
   content: React.ReactNode;
-  children: React.ReactNode;
+  children: React.ReactElement<{ 'aria-describedby'?: string }>;
   position?: 'top' | 'bottom' | 'left' | 'right';
   maxWidth?: number;
 }
@@ -23,6 +23,8 @@ export default function Tooltip({
   const [adjustedStyle, setAdjustedStyle] = useState<React.CSSProperties>({});
   const tooltipRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
+  const touchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tooltipId = useId();
 
   // 위치 조정 (화면 밖으로 나가지 않도록)
   const adjustPosition = useCallback(() => {
@@ -63,6 +65,10 @@ export default function Tooltip({
     }
   }, [isVisible, adjustPosition]);
 
+  useEffect(() => () => {
+    if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
+  }, []);
+
   // 터치 디바이스 지원
   const handleTouchStart = () => {
     setIsVisible(true);
@@ -70,8 +76,13 @@ export default function Tooltip({
 
   const handleTouchEnd = () => {
     // 터치 후 2초 뒤 자동 닫힘
-    setTimeout(() => setIsVisible(false), 2000);
+    if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
+    touchTimerRef.current = setTimeout(() => setIsVisible(false), 2000);
   };
+
+  const describedTrigger = cloneElement(children, {
+    'aria-describedby': isVisible ? tooltipId : undefined,
+  });
 
   const positionClasses = {
     top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
@@ -92,13 +103,24 @@ export default function Tooltip({
       ref={triggerRef}
       className="relative inline-flex"
       onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
+      onMouseLeave={() => {
+        if (!triggerRef.current?.contains(document.activeElement)) setIsVisible(false);
+      }}
+      onFocus={() => setIsVisible(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setIsVisible(false);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') setIsVisible(false);
+      }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {children}
+      {describedTrigger}
       {isVisible && (
         <div
+          id={tooltipId}
+          role="tooltip"
           ref={tooltipRef}
           className={`absolute z-50 ${positionClasses[position]}`}
           style={adjustedStyle}

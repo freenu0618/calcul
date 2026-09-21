@@ -90,9 +90,9 @@ export default function InsuranceOptions({
             position="right"
             maxWidth={350}
           >
-            <span className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-purple-200 rounded-full cursor-help hover:bg-purple-300">
+            <button type="button" aria-label="4대 보험 적용 도움말" className="inline-flex items-center justify-center w-5 h-5 text-xs text-gray-500 bg-purple-200 rounded-full cursor-help hover:bg-purple-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500">
               ?
-            </span>
+            </button>
           </Tooltip>
         </div>
         <button
