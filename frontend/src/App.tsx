@@ -108,6 +108,16 @@ function App() {
         본문으로 바로가기
       </a>
       <HelmetProvider>
+        {/* 공통 공유 기본값도 Helmet에서 관리하여 페이지별 메타태그가 덮어쓸 수 있게 합니다. */}
+        <Helmet>
+          <meta property="og:type" content="website" />
+          <meta property="og:site_name" content="PayTools" />
+          <meta property="og:image" content="https://paytools.work/og-image.svg" />
+          <meta property="og:locale" content="ko_KR" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:site" content="@paytools_kr" />
+          <meta name="twitter:image" content="https://paytools.work/og-image.svg" />
+        </Helmet>
         <AuthProvider>
           <ChatProvider>
           <ToastProvider>
