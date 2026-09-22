@@ -5,7 +5,7 @@
  * - 카카오 공유 + 저장 버튼
  */
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import type { SalaryCalculationResponse } from '../../types/salary';
 import { ShareButtons } from '../common/ShareButtons';
 import { DonutChart, type DonutChartData } from '../charts';
@@ -42,11 +42,14 @@ function AccordionSection({
   defaultOpen?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const contentId = useId();
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <button
         type="button"
+        aria-expanded={isOpen}
+        aria-controls={contentId}
         className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition-colors"
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -64,11 +67,13 @@ function AccordionSection({
           />
         </div>
       </button>
-      {isOpen && (
-        <div className="px-5 pb-5 pt-0 flex flex-col gap-3 border-t border-dashed border-gray-100">
-          {children}
-        </div>
-      )}
+      <div id={contentId} hidden={!isOpen}>
+        {isOpen && (
+          <div className="px-5 pb-5 pt-0 flex flex-col gap-3 border-t border-dashed border-gray-100">
+            {children}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
