@@ -3,7 +3,7 @@
  * 접히고 펼쳐지는 콘텐츠 영역
  */
 
-import { useState, useRef, useEffect, type ReactNode } from 'react';
+import { useState, useRef, useEffect, useId, type ReactNode } from 'react';
 
 interface AccordionProps {
   title: string;
@@ -21,6 +21,7 @@ export default function Accordion({
   badge,
 }: AccordionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const contentId = useId();
   const contentRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState<number | undefined>(defaultOpen ? undefined : 0);
 
@@ -41,6 +42,8 @@ export default function Accordion({
     <div className="border border-gray-200 rounded-lg overflow-hidden">
       <button
         type="button"
+        aria-expanded={isOpen}
+        aria-controls={contentId}
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
       >
@@ -54,6 +57,7 @@ export default function Accordion({
           )}
         </div>
         <svg
+          aria-hidden="true"
           className={`w-5 h-5 text-gray-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           viewBox="0 0 24 24"
@@ -65,6 +69,9 @@ export default function Accordion({
 
       <div
         ref={contentRef}
+        id={contentId}
+        aria-hidden={!isOpen}
+        inert={!isOpen}
         style={{ height: height !== undefined ? `${height}px` : 'auto' }}
         className="transition-[height] duration-300 ease-in-out overflow-hidden"
       >
