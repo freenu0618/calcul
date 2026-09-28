@@ -44,7 +44,7 @@ const aboutStructuredData = [
     '@type': 'Organization',
     name: 'PayTools',
     url: 'https://paytools.work',
-    logo: 'https://paytools.work/og-image.svg',
+    logo: 'https://paytools.work/og-image.png',
     contactPoint: {
       '@type': 'ContactPoint',
       email: 'contact@salary-calculator.kr',

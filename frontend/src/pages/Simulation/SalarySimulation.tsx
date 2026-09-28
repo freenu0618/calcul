@@ -257,11 +257,11 @@ export default function SalarySimulation() {
         <meta property="og:description" content="기본급·수당 배분에 따른 통상시급, 수당, 퇴직금 기준, 연간 인건비 차이를 비교하세요." />
         <meta property="og:url" content="https://paytools.work/simulation" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://paytools.work/og-image.svg" />
+        <meta property="og:image" content="https://paytools.work/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="급여 구조 시뮬레이션 - 기본급·수당 배분 인건비 비교 | PayTools" />
         <meta name="twitter:description" content="월 총 급여는 같아도 기본급 비율에 따라 통상시급, 가산수당, 퇴직금 기준이 달라집니다." />
-        <meta name="twitter:image" content="https://paytools.work/og-image.svg" />
+        <meta name="twitter:image" content="https://paytools.work/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(simulationStructuredData)}</script>
       </Helmet>
       <MainLayout>

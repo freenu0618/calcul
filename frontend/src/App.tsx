@@ -112,11 +112,11 @@ function App() {
         <Helmet>
           <meta property="og:type" content="website" />
           <meta property="og:site_name" content="PayTools" />
-          <meta property="og:image" content="https://paytools.work/og-image.svg" />
+          <meta property="og:image" content="https://paytools.work/og-image.png" />
           <meta property="og:locale" content="ko_KR" />
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:site" content="@paytools_kr" />
-          <meta name="twitter:image" content="https://paytools.work/og-image.svg" />
+          <meta name="twitter:image" content="https://paytools.work/og-image.png" />
         </Helmet>
         <AuthProvider>
           <ChatProvider>

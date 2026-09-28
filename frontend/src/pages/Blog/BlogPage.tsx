@@ -24,7 +24,7 @@ const BlogPage = () => {
         '@type': 'Organization',
         name: 'PayTools',
         url: 'https://paytools.work',
-        logo: 'https://paytools.work/og-image.svg',
+        logo: 'https://paytools.work/og-image.png',
       },
       blogPost: posts.map((post) => ({
         '@type': 'BlogPosting',

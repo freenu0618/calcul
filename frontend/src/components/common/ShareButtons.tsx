@@ -110,7 +110,7 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
         content: {
           title,
           description: description || '',
-          imageUrl: 'https://paytools.work/og-image.svg',
+          imageUrl: 'https://paytools.work/og-image.png',
           link: {
             mobileWebUrl: url,
             webUrl: url,

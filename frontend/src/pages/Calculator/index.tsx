@@ -483,12 +483,12 @@ export default function CalculatorPage() {
         <meta property="og:description" content="기본급, 수당, 4대보험, 소득세, 주휴수당, 연장·야간·휴일수당을 한 번에 계산하는 2026년 기준 급여 계산기입니다." />
         <meta property="og:url" content="https://paytools.work/calculator" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://paytools.work/og-image.svg" />
+        <meta property="og:image" content="https://paytools.work/og-image.png" />
         <meta property="og:image:alt" content="PayTools 급여 계산기 결과 미리보기" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="급여 계산기 - 2026년 실수령액 자동 계산 | PayTools" />
         <meta name="twitter:description" content="4대보험, 소득세, 주휴수당, 가산수당을 반영해 월급과 알바 급여 실수령액을 계산하세요." />
-        <meta name="twitter:image" content="https://paytools.work/og-image.svg" />
+        <meta name="twitter:image" content="https://paytools.work/og-image.png" />
         <meta name="twitter:image:alt" content="PayTools 급여 계산기 결과 미리보기" />
         <script type="application/ld+json">
           {JSON.stringify(calculatorStructuredData)}

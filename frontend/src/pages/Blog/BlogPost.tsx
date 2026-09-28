@@ -38,7 +38,7 @@ const BlogPost = () => {
     .slice(0, 3);
 
   const canonicalUrl = `https://paytools.work/blog/${post.id}`;
-  const ogImageUrl = 'https://paytools.work/og-image.svg';
+  const ogImageUrl = 'https://paytools.work/og-image.png';
   const articleStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',

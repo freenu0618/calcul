@@ -6,7 +6,7 @@
 import { Helmet } from 'react-helmet-async';
 
 const BASE_URL = 'https://paytools.work';
-const DEFAULT_IMAGE = `${BASE_URL}/og-image.svg`;
+const DEFAULT_IMAGE = `${BASE_URL}/og-image.png`;
 const TWITTER_SITE = '@paytools_kr';
 
 interface PageHelmetProps {

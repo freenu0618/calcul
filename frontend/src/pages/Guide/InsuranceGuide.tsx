@@ -37,7 +37,7 @@ const insuranceGuideStructuredData = [
       url: 'https://paytools.work',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://paytools.work/og-image.svg',
+        url: 'https://paytools.work/og-image.png',
       },
     },
     about: [

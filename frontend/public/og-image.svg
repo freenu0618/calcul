@@ -15,7 +15,7 @@
   <circle cx="900" cy="150" r="60" fill="white" opacity="0.08"/>
 
   <!-- 중앙 아이콘 영역 -->
-  <g transform="translate(300, 200)">
+  <g transform="translate(90, 190)">
     <!-- 계산기 프레임 -->
     <rect x="0" y="0" width="200" height="250" rx="20" fill="white" opacity="0.15"/>
 
@@ -38,24 +38,24 @@
   </g>
 
   <!-- 텍스트 콘텐츠 -->
-  <text x="600" y="250" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white" text-anchor="middle">
+  <text x="720" y="250" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white" text-anchor="middle">
     한국 근로기준법
   </text>
-  <text x="600" y="330" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white" text-anchor="middle">
+  <text x="720" y="330" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white" text-anchor="middle">
     급여 계산기
   </text>
 
   <!-- 서브 텍스트 -->
-  <text x="600" y="400" font-family="Arial, sans-serif" font-size="28" fill="white" text-anchor="middle" opacity="0.9">
-    4대보험 · 소득세 · 실수령액을 정확히 계산
+  <text x="720" y="400" font-family="Arial, sans-serif" font-size="28" fill="white" text-anchor="middle" opacity="0.9">
+    4대보험 · 소득세 · 예상 실수령액 계산
   </text>
-  <text x="600" y="450" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" opacity="0.8">
+  <text x="720" y="450" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" opacity="0.8">
     연장·야간·휴일 수당 | 주휴수당 | 2026년 최신 세율 적용
   </text>
 
   <!-- 하단 뱃지 -->
-  <rect x="480" y="520" width="240" height="50" rx="25" fill="white" opacity="0.2"/>
-  <text x="600" y="555" font-family="Arial, sans-serif" font-size="24" font-weight="600" fill="white" text-anchor="middle">
-    무료 · 정확 · 간편
+  <rect x="600" y="520" width="240" height="50" rx="25" fill="white" opacity="0.2"/>
+  <text x="720" y="555" font-family="Arial, sans-serif" font-size="24" font-weight="600" fill="white" text-anchor="middle">
+    무료 · 참고용 · 간편
   </text>
 </svg>

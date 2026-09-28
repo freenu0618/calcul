@@ -242,11 +242,11 @@ function ReverseCalculator() {
         <meta property="og:description" content="목표 실수령액에 맞춰 필요한 세전 월급을 역산하세요. 4대보험과 소득세를 반영한 무료 월급 역산 계산기입니다." />
         <meta property="og:url" content="https://paytools.work/reverse-calculator" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://paytools.work/og-image.svg" />
+        <meta property="og:image" content="https://paytools.work/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="실수령액 역산 계산기 - 목표 월급에 맞는 세전 급여 계산 | PayTools" />
         <meta name="twitter:description" content="원하는 월 실수령액을 기준으로 필요한 세전 월급과 예상 공제액을 빠르게 확인하세요." />
-        <meta name="twitter:image" content="https://paytools.work/og-image.svg" />
+        <meta name="twitter:image" content="https://paytools.work/og-image.png" />
         <script type="application/ld+json">
           {JSON.stringify(reverseCalculatorStructuredData)}
         </script>

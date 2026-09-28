@@ -176,21 +176,15 @@ async function main() {
   page.on('console', () => {});
   page.on('pageerror', () => {});
 
-  // 외부 스크립트 차단 (AdSense, GA, Clarity 등 - 프리렌더링에 불필요)
+  // 정적 프리렌더링은 로컬 자산만 사용합니다. 외부 API/분석 요청은 보내지 않습니다.
   await page.setRequestInterception(true);
   page.on('request', (req) => {
     const url = req.url();
-    if (
-      url.includes('googlesyndication') ||
-      url.includes('googletagmanager') ||
-      url.includes('google-analytics') ||
-      url.includes('clarity.ms') ||
-      url.includes('doubleclick.net') ||
-      url.includes('recaptcha')
-    ) {
-      req.abort();
-    } else {
+    const isLocalAsset = new URL(url).origin === BASE && !new URL(url).pathname.startsWith('/api/');
+    if (isLocalAsset || url.startsWith('data:') || url.startsWith('blob:')) {
       req.continue();
+    } else {
+      req.abort();
     }
   });
 

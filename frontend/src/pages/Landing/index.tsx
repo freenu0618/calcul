@@ -429,11 +429,11 @@ export default function LandingPage() {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://paytools.work" />
         <meta property="og:site_name" content="PayTools" />
-        <meta property="og:image" content="https://paytools.work/og-image.svg" />
+        <meta property="og:image" content="https://paytools.work/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="2026 급여 계산기 - 월급·알바 실수령액 | PayTools" />
         <meta name="twitter:description" content="2026년 월급, 알바 시급, 4대보험, 소득세, 주휴수당을 한 번에 계산하세요. 직원 5명까지 무료." />
-        <meta name="twitter:image" content="https://paytools.work/og-image.svg" />
+        <meta name="twitter:image" content="https://paytools.work/og-image.png" />
         <script type="application/ld+json">
           {JSON.stringify(landingStructuredData)}
         </script>
