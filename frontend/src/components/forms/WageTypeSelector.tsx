@@ -66,18 +66,28 @@ export default function WageTypeSelector({
         {WAGE_TYPE_OPTIONS.map((opt) => {
           const isSelected = normalized === opt.value;
           return (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => onWageTypeChange(opt.value)}
-              className={`p-3 rounded-lg border-2 text-left transition-all ${
-                isSelected
-                  ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-200'
-                  : 'border-gray-200 bg-white hover:border-gray-300'
-              }`}
-            >
-              <div className="flex items-start justify-between">
-                <span className="text-lg">{opt.icon}</span>
+            <div key={opt.value} className="relative min-w-0">
+              <button
+                type="button"
+                onClick={() => onWageTypeChange(opt.value)}
+                aria-pressed={isSelected}
+                className={`w-full h-full p-3 rounded-lg border-2 text-left transition-all ${
+                  isSelected
+                    ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-200'
+                    : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-start pr-6">
+                  <span className="text-lg" aria-hidden="true">{opt.icon}</span>
+                </div>
+                <p
+                  className={`text-sm font-semibold mt-1 ${isSelected ? 'text-blue-700' : 'text-gray-800'}`}
+                >
+                  {opt.label}
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">{opt.desc}</p>
+              </button>
+              <div className="absolute top-3 right-3">
                 <WageTypeTooltip
                   wageType={opt.value}
                   isOpen={openTooltip === opt.value}
@@ -86,13 +96,7 @@ export default function WageTypeSelector({
                   }
                 />
               </div>
-              <p
-                className={`text-sm font-semibold mt-1 ${isSelected ? 'text-blue-700' : 'text-gray-800'}`}
-              >
-                {opt.label}
-              </p>
-              <p className="text-xs text-gray-500 mt-0.5">{opt.desc}</p>
-            </button>
+            </div>
           );
         })}
       </div>

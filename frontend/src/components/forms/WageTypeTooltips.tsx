@@ -2,7 +2,7 @@
  * 급여형태 상세 툴팁 컴포넌트
  * 각 급여형태에 대한 설명/예시를 팝오버로 표시
  */
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useId } from 'react';
 import type { WageType } from '../../types/salary';
 
 interface TooltipData {
@@ -62,7 +62,7 @@ export default function WageTypeTooltip({
 }: WageTypeTooltipProps) {
   const ref = useRef<HTMLDivElement>(null);
   const data = WAGE_TYPE_TOOLTIPS[wageType];
-  if (!data) return null;
+  const contentId = useId();
 
   // 외부 클릭 시 닫기
   useEffect(() => {
@@ -70,9 +70,18 @@ export default function WageTypeTooltip({
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) onToggle();
     };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onToggle();
+    };
     document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isOpen, onToggle]);
+
+  if (!data) return null;
 
   return (
     <div className="relative inline-block" ref={ref}>
@@ -81,6 +90,8 @@ export default function WageTypeTooltip({
         onClick={(e) => { e.stopPropagation(); onToggle(); }}
         className="ml-1 text-gray-400 hover:text-blue-500 transition-colors"
         aria-label={`${data.title} 설명`}
+        aria-expanded={isOpen}
+        aria-controls={isOpen ? contentId : undefined}
       >
         <svg className="w-3.5 h-3.5 inline" fill="currentColor" viewBox="0 0 20 20">
           <path
@@ -91,7 +102,7 @@ export default function WageTypeTooltip({
         </svg>
       </button>
       {isOpen && (
-        <div className="absolute z-50 left-0 top-6 w-72 bg-white rounded-lg shadow-xl border border-gray-200 p-4 text-left">
+        <div id={contentId} className="absolute z-50 left-0 top-6 w-72 bg-white rounded-lg shadow-xl border border-gray-200 p-4 text-left">
           <p className="font-semibold text-gray-900 text-sm mb-1">{data.title}</p>
           <p className="text-xs text-gray-600 mb-2">{data.summary}</p>
           <ul className="text-xs text-gray-700 space-y-1 mb-2">

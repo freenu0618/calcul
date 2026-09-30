@@ -50,6 +50,7 @@ export default function HoursModeSelector({
               key={card.mode}
               type="button"
               onClick={() => onHoursModeChange(card.mode)}
+              aria-pressed={isSelected}
               className={`p-4 rounded-xl border-2 text-left transition-all ${
                 isSelected
                   ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-200'
