@@ -3,10 +3,11 @@
  */
 
 import { useEffect } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
+import NotFound from '../NotFound';
 import { blogPosts } from '../../data/blogPosts';
 
 const BlogPost = () => {
@@ -26,9 +27,9 @@ const BlogPost = () => {
     }
   }, [post, postId]);
 
-  // 포스트가 없으면 블로그 목록으로 리다이렉트
+  // 없는 글은 주소를 유지하고 noindex 404 안내를 표시합니다.
   if (!post) {
-    return <Navigate to="/blog" replace />;
+    return <NotFound />;
   }
 
   // 관련 포스트 가져오기
