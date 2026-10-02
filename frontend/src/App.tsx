@@ -15,10 +15,12 @@ import Navigation from './components/layout/Navigation';
 import Footer from './components/layout/Footer';
 import { ChatWidget } from './components/Chat';
 
-// 핵심 페이지는 즉시 로드
+// 랜딩페이지는 즉시 로드
 import LandingPage from './pages/Landing';
-import Login from './pages/Auth/Login';
-import Register from './pages/Auth/Register';
+
+// 인증 화면도 방문할 때만 로드하여 공개 페이지의 초기 번들을 줄입니다.
+const Login = lazy(() => import('./pages/Auth/Login'));
+const Register = lazy(() => import('./pages/Auth/Register'));
 
 // 나머지 페이지는 Lazy Loading
 const CalculatorPage = lazy(() => import('./pages/Calculator'));
