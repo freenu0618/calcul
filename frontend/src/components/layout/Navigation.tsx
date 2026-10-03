@@ -3,13 +3,14 @@
  */
 
 import { Link, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import ChatWindow from '../Chat/ChatWindow';
 
 const Navigation = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
 
@@ -42,6 +43,13 @@ const Navigation = () => {
 
   return (
     <nav
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && isMenuOpen) {
+          event.preventDefault();
+          setIsMenuOpen(false);
+          mobileMenuButtonRef.current?.focus();
+        }
+      }}
       className={`${isLandingPage ? 'bg-white/90 backdrop-blur-sm shadow-sm fixed top-0 left-0 right-0 z-50' : 'bg-white shadow-md'}`}
       aria-label="주요 메뉴"
     >
@@ -124,9 +132,10 @@ const Navigation = () => {
           {/* 모바일 메뉴 버튼 */}
           <div className="md:hidden flex items-center">
             <button
+              ref={mobileMenuButtonRef}
               type="button"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md focus:outline-none text-gray-700 hover:bg-gray-100"
+              className="inline-flex items-center justify-center p-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 text-gray-700 hover:bg-gray-100"
               aria-label={isMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
               aria-expanded={isMenuOpen}
               aria-controls="mobile-navigation"
