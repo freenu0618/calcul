@@ -21,6 +21,7 @@ interface FAQItem {
   category: string;
   question: string;
   answer: string;
+  sourceUrl?: string;
 }
 
 interface CategorySummary {
@@ -278,7 +279,7 @@ const answerRouteCards = [
   },
 ];
 
-const dateModified = '2026-09-03';
+const dateModified = '2026-10-05';
 
 const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
@@ -445,7 +446,8 @@ const FAQ = () => {
     {
       category: '기본급 및 수당',
       question: '식대는 최저임금에 포함되나요?',
-      answer: '식대는 월 20만원까지는 최저임금 산입 범위에 제외되며, 20만원을 초과하는 금액만 최저임금 계산에 포함됩니다. 예를 들어 식대가 25만원이면 5만원만 최저임금 계산에 포함됩니다.',
+      answer: '2026년 기준, 매월 1회 이상 정기적으로 현금으로 지급하는 식대가 근로기준법상 임금에 해당하면 전액 최저임금에 산입됩니다. 예를 들어 이런 식대가 25만원이면 25만원 전액을 포함합니다. 식대의 월 20만원 비과세 한도는 소득세 기준으로, 최저임금 산입 여부와는 별개입니다. 현물로 제공하는 식사나 실제 지출을 정산하는 실비변상 금품은 구분해야 합니다.',
+      sourceUrl: 'https://www.minimumwage.go.kr/customer/promotion/view.do?bultnId=4650',
     },
     {
       category: '기본급 및 수당',
@@ -558,7 +560,8 @@ const FAQ = () => {
     {
       category: '최저임금',
       question: '최저임금 계산에 포함되는 수당은 무엇인가요?',
-      answer: '기본급과 고정 수당(직책수당 등)은 최저임금 계산에 포함됩니다. 연장·야간·휴일 가산분, 식대(20만원 한도), 실비변상 수당(교통비 등)은 제외됩니다.',
+      answer: '근로기준법상 임금으로서 매월 1회 이상 정기적으로 지급하는 기본급, 고정 수당, 상여금과 현금성 식비·숙박비·교통비 등은 전액 산입됩니다. 연장·휴일근로에 대한 임금, 연장·야간·휴일 가산수당, 연차 미사용수당, 현물 급여 등은 제외됩니다. 실제 지출을 정산하는 실비변상 금품과 매월 정액으로 지급하는 임금은 구분하고, 소득세 비과세 여부만으로 산입 여부를 판단하지 마세요.',
+      sourceUrl: 'https://www.minimumwage.go.kr/customer/promotion/view.do?bultnId=4650',
     },
     {
       category: '최저임금',
@@ -844,6 +847,11 @@ const FAQ = () => {
                   <p className="text-gray-700 leading-relaxed">
                     A. {item.answer}
                   </p>
+                  {item.sourceUrl && (
+                    <a href={item.sourceUrl} className="mt-3 inline-block text-sm text-blue-700 underline underline-offset-2">
+                      근거: 최저임금위원회 2026년 최저임금 안내문
+                    </a>
+                  )}
                 </div>
               </Card>
             );

@@ -52,7 +52,7 @@ const BlogPost = () => {
       '@id': canonicalUrl,
     },
     datePublished: post.date,
-    dateModified: post.date,
+    dateModified: post.dateModified ?? post.date,
     inLanguage: 'ko-KR',
     articleSection: post.category,
     keywords: post.keywords.join(', '),
@@ -121,7 +121,7 @@ const BlogPost = () => {
 
         {/* Article Meta */}
         <meta property="article:published_time" content={post.date} />
-        <meta property="article:modified_time" content={post.date} />
+        <meta property="article:modified_time" content={post.dateModified ?? post.date} />
         <meta property="article:author" content={post.author} />
         <meta property="article:section" content={post.category} />
         {post.keywords.map(keyword => (
