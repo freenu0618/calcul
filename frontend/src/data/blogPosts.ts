@@ -2549,5 +2549,6 @@ export const blogPostPreviews = Object.values(blogPosts).map(post => ({
   title: post.title,
   excerpt: post.excerpt,
   date: post.date,
+  dateModified: post.dateModified ?? post.date,
   category: post.category,
 }));

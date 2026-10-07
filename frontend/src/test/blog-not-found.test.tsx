@@ -42,6 +42,8 @@ describe('blog article recovery', () => {
     renderArticle(`/blog/${post.id}`);
 
     expect(screen.getByRole('heading', { level: 1, name: post.title })).toHaveTextContent(post.title);
+    expect(screen.getByText(post.date, { selector: 'time' })).toHaveAttribute('datetime', post.date);
+    expect(screen.getByText(post.dateModified!, { selector: 'time' })).toHaveAttribute('datetime', post.dateModified);
     await waitFor(() => {
       expect(document.querySelector('link[rel="canonical"]')).toHaveAttribute('href', `https://paytools.work/blog/${post.id}`);
       expect(document.querySelector('meta[name="robots"]')?.getAttribute('content') ?? '').not.toContain('noindex');

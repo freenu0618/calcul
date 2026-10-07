@@ -32,7 +32,7 @@ const BlogPage = () => {
         description: post.excerpt,
         url: `https://paytools.work/blog/${post.id}`,
         datePublished: post.date,
-        dateModified: post.date,
+        dateModified: post.dateModified,
         inLanguage: 'ko-KR',
         author: {
           '@type': 'Organization',
@@ -128,7 +128,10 @@ const BlogPage = () => {
                     <span className="inline-block px-3 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded">
                       {post.category}
                     </span>
-                    <span className="text-sm text-gray-500">{post.date}</span>
+                    <span className="text-sm text-gray-500">
+                      {post.dateModified !== post.date ? '수정 ' : '작성 '}
+                      <time dateTime={post.dateModified}>{post.dateModified}</time>
+                    </span>
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
                     {post.title}

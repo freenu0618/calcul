@@ -151,7 +151,12 @@ const BlogPost = () => {
             <span className="inline-block px-3 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded">
               {post.category}
             </span>
-            <span className="text-sm text-gray-500">{post.date}</span>
+            <span className="text-sm text-gray-500">
+              작성 <time dateTime={post.date}>{post.date}</time>
+              {post.dateModified && post.dateModified !== post.date && (
+                <> · 수정 <time dateTime={post.dateModified}>{post.dateModified}</time></>
+              )}
+            </span>
           </div>
 
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
