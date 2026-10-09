@@ -2,8 +2,6 @@
  * 결과 영역 이미지 캡처 유틸리티
  */
 
-import html2canvas from 'html2canvas';
-
 interface CaptureOptions {
   filename?: string;
   backgroundColor?: string;
@@ -23,6 +21,7 @@ export async function captureAndDownload(
     scale = 2, // 고해상도
   } = options;
 
+  const { default: html2canvas } = await import('html2canvas');
   const canvas = await html2canvas(element, {
     backgroundColor,
     scale,
@@ -51,6 +50,7 @@ export async function captureToBlob(
 ): Promise<Blob | null> {
   const { backgroundColor = '#ffffff', scale = 2 } = options;
 
+  const { default: html2canvas } = await import('html2canvas');
   const canvas = await html2canvas(element, {
     backgroundColor,
     scale,
