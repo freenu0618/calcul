@@ -21,24 +21,20 @@ export async function captureAndDownload(
     scale = 2, // 고해상도
   } = options;
 
-  const { default: html2canvas } = await import('html2canvas');
-  const canvas = await html2canvas(element, {
-    backgroundColor,
-    scale,
-    useCORS: true,
-    logging: false,
-  });
+  const blob = await captureToBlob(element, { backgroundColor, scale });
+  if (!blob) {
+    throw new Error('이미지 생성에 실패했습니다');
+  }
 
-  // Blob 생성 및 다운로드
-  canvas.toBlob((blob) => {
-    if (!blob) return;
-    const url = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
+  try {
     const link = document.createElement('a');
     link.href = url;
     link.download = `${filename}_${new Date().toISOString().slice(0, 10)}.png`;
     link.click();
+  } finally {
     URL.revokeObjectURL(url);
-  }, 'image/png');
+  }
 }
 
 /**
@@ -77,7 +73,7 @@ export async function shareImage(
   }
 
   const blob = await captureToBlob(element);
-  if (!blob) return false;
+  if (!blob) throw new Error('이미지 생성에 실패했습니다');
 
   const file = new File([blob], '급여계산결과.png', { type: 'image/png' });
 
@@ -86,14 +82,11 @@ export async function shareImage(
     return false;
   }
 
-  try {
-    await navigator.share({
-      title,
-      text,
-      files: [file],
-    });
-    return true;
-  } catch {
-    return false;
-  }
+  // false means unsupported only. Let the caller distinguish cancellation from errors.
+  await navigator.share({
+    title,
+    text,
+    files: [file],
+  });
+  return true;
 }

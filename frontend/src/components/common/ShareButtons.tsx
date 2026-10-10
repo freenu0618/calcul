@@ -94,7 +94,9 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
         await captureAndDownload(element, { filename: '급여계산결과' });
         showToastMessage('이미지가 저장되었습니다');
       }
-    } catch {
+    } catch (error) {
+      // Closing the native share sheet is not a failure or a download request.
+      if (error instanceof DOMException && error.name === 'AbortError') return;
       showToastMessage('공유에 실패했습니다');
     } finally {
       setIsCapturing(false);
