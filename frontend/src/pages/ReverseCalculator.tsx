@@ -290,10 +290,11 @@ function ReverseCalculator() {
             <div className="space-y-4">
               {/* 목표 실수령액 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="reverse-targetNetPay" className="block text-sm font-medium text-gray-700 mb-1">
                   목표 실수령액 (원)
                 </label>
-                <input
+                <input id="reverse-targetNetPay"
+                  aria-describedby="reverse-target-help"
                   type="number"
                   value={targetNetPay}
                   onChange={(e) => setTargetNetPay(Number(e.target.value))}
@@ -301,7 +302,7 @@ function ReverseCalculator() {
                   min={0}
                   step={10000}
                 />
-                <p className="mt-1 text-xs text-gray-500">
+                <p id="reverse-target-help" className="mt-1 text-xs text-gray-500">
                   {targetNetPay.toLocaleString()}원
                 </p>
               </div>
@@ -309,10 +310,10 @@ function ReverseCalculator() {
               {/* 부양가족 수 */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="reverse-dependentsCount" className="block text-sm font-medium text-gray-700 mb-1">
                     부양가족 수 (본인 포함)
                   </label>
-                  <input
+                  <input id="reverse-dependentsCount"
                     type="number"
                     value={dependentsCount}
                     onChange={(e) => setDependentsCount(Number(e.target.value))}
@@ -321,10 +322,10 @@ function ReverseCalculator() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="reverse-childrenUnder20" className="block text-sm font-medium text-gray-700 mb-1">
                     20세 이하 자녀 수
                   </label>
-                  <input
+                  <input id="reverse-childrenUnder20"
                     type="number"
                     value={childrenUnder20}
                     onChange={(e) => setChildrenUnder20(Number(e.target.value))}
@@ -337,10 +338,10 @@ function ReverseCalculator() {
               {/* 사업장/고용형태 */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="reverse-companySize" className="block text-sm font-medium text-gray-700 mb-1">
                     사업장 규모
                   </label>
-                  <select
+                  <select id="reverse-companySize"
                     value={companySize}
                     onChange={(e) => setCompanySize(e.target.value as CompanySize)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -350,10 +351,10 @@ function ReverseCalculator() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="reverse-employmentType" className="block text-sm font-medium text-gray-700 mb-1">
                     고용형태
                   </label>
-                  <select
+                  <select id="reverse-employmentType"
                     value={employmentType}
                     onChange={(e) => setEmploymentType(e.target.value as EmploymentType)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -385,7 +386,7 @@ function ReverseCalculator() {
           </Card>
 
           {error && (
-            <div className="mt-4 bg-red-50 border-l-4 border-red-400 p-4 text-red-700">
+            <div role="alert" className="mt-4 bg-red-50 border-l-4 border-red-400 p-4 text-red-700">
               <p className="text-sm">{error}</p>
             </div>
           )}
