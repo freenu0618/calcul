@@ -169,7 +169,7 @@ const Navigation = () => {
 
       {/* 모바일 메뉴 */}
       {isMenuOpen && (
-        <div id="mobile-navigation" className="md:hidden">
+        <div id="mobile-navigation" className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain md:hidden">
           <div className="px-2 pt-2 pb-3 bg-white border-t">
             {/* 내 서비스 */}
             {isAuthenticated && (
