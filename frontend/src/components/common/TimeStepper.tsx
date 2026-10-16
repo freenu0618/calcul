@@ -4,7 +4,7 @@
  * - 분: 10분 단위 증감 (0~50, 자동 올림/내림)
  */
 
-import { useEffect, useState } from 'react';
+import { useId } from 'react';
 
 interface TimeStepperProps {
   value: string;
@@ -15,20 +15,14 @@ interface TimeStepperProps {
 const pad = (n: number) => String(n).padStart(2, '0');
 
 export default function TimeStepper({ value, onChange, label }: TimeStepperProps) {
+  const labelId = useId();
+  const timeLabel = label || '시간';
   const [h, m] = (value || '09:00').split(':').map(Number);
-  const [hours, setHours] = useState(isNaN(h) ? 9 : h);
-  const [minutes, setMinutes] = useState(isNaN(m) ? 0 : m);
-
-  // 외부 value 변경 시 동기화
-  useEffect(() => {
-    const [nh, nm] = (value || '09:00').split(':').map(Number);
-    if (!isNaN(nh)) setHours(nh);
-    if (!isNaN(nm)) setMinutes(nm);
-  }, [value]);
+  // 부모의 입력값을 그대로 사용해 프리셋 변경도 추가 렌더링 없이 반영합니다.
+  const hours = isNaN(h) ? 9 : h;
+  const minutes = isNaN(m) ? 0 : m;
 
   const emit = (newH: number, newM: number) => {
-    setHours(newH);
-    setMinutes(newM);
     onChange(`${pad(newH)}:${pad(newM)}`);
   };
 
@@ -49,26 +43,29 @@ export default function TimeStepper({ value, onChange, label }: TimeStepperProps
     'w-9 h-9 flex items-center justify-center rounded-md bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-bold text-lg select-none transition-colors';
 
   return (
-    <div>
-      {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      )}
+    <div role="group" aria-labelledby={labelId}>
+      <div id={labelId} className={label ? "block text-sm font-medium text-gray-700 mb-1" : "sr-only"}>
+        {timeLabel}
+      </div>
+      <span role="status" aria-atomic="true" className="sr-only">
+        {timeLabel} {hours}시 {minutes}분
+      </span>
       <div className="flex items-center gap-1">
         {/* 시간 */}
-        <button type="button" onClick={() => adjustHour(-1)} className={btnClass}>-</button>
+        <button type="button" aria-label={`${timeLabel} 1시간 줄이기`} onClick={() => adjustHour(-1)} className={btnClass}>-</button>
         <span className="w-8 text-center text-lg font-mono font-bold text-gray-900">
           {pad(hours)}
         </span>
-        <button type="button" onClick={() => adjustHour(1)} className={btnClass}>+</button>
+        <button type="button" aria-label={`${timeLabel} 1시간 늘리기`} onClick={() => adjustHour(1)} className={btnClass}>+</button>
 
         <span className="text-lg font-bold text-gray-500 mx-0.5">:</span>
 
         {/* 분 */}
-        <button type="button" onClick={() => adjustMinute(-10)} className={btnClass}>-</button>
+        <button type="button" aria-label={`${timeLabel} 10분 줄이기`} onClick={() => adjustMinute(-10)} className={btnClass}>-</button>
         <span className="w-8 text-center text-lg font-mono font-bold text-gray-900">
           {pad(minutes)}
         </span>
-        <button type="button" onClick={() => adjustMinute(10)} className={btnClass}>+</button>
+        <button type="button" aria-label={`${timeLabel} 10분 늘리기`} onClick={() => adjustMinute(10)} className={btnClass}>+</button>
       </div>
     </div>
   );
