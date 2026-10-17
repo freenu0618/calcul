@@ -55,25 +55,6 @@ const ROUTES = [
   '/contact',
 ];
 
-const FALLBACK_META = new Map([
-  ['/', {
-    title: '급여계산기 - 4대보험 주휴수당 자동계산 | PayTools',
-    description: '4대보험, 소득세, 주휴수당, 연장·야간·휴일 수당 자동 계산. 2026년 최신 법령 기준 참고용 예상액.',
-  }],
-  ['/guide/severance', {
-    title: '퇴직금 계산 가이드 | 2026년 기준 퇴직금 계산법 | PayTools',
-    description: '2026년 기준 퇴직금 계산법, 평균임금 산정 방법, 퇴직금 계산 공식, 계산 예시와 주의사항을 안내합니다.',
-  }],
-  ['/guide/annual-leave', {
-    title: '연차수당 완벽 가이드 | 2026년 연차 발생 기준 및 계산법 | PayTools',
-    description: '2026년 기준 연차 발생 조건, 연차수당 계산법, 미사용 연차수당 지급 기준을 상세히 안내합니다.',
-  }],
-  ['/guide/weekly-holiday', {
-    title: '주휴수당 완벽 가이드 | 2026년 기준 주휴수당 계산법 | PayTools',
-    description: '2026년 기준 주휴수당 개념, 발생 조건, 파트타임·아르바이트 계산 예시와 최저임금 포함 여부를 정리했습니다.',
-  }],
-]);
-
 // MIME 타입 매핑
 const MIME = {
   '.html': 'text/html',
@@ -90,7 +71,7 @@ const MIME = {
 
 /** 간단한 정적 파일 서버 */
 function startServer() {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const fallback = readFileSync(join(DIST, 'index.html'));
 
     const server = createServer((req, res) => {
@@ -125,6 +106,7 @@ function startServer() {
       }
     });
 
+    server.once('error', reject);
     server.listen(PORT, () => {
       console.log(`  Static server on ${BASE}`);
       resolve(server);
@@ -141,6 +123,13 @@ async function renderRoute(page, route) {
   await page.waitForSelector('#root > *', { timeout: 10000 });
   // 추가 렌더링 안정화 대기
   await new Promise(r => setTimeout(r, 500));
+
+  // A mounted loading shell is not a successfully rendered public page.
+  await page.waitForFunction(() => {
+    const root = document.querySelector('#root');
+    const heading = root?.querySelector('h1');
+    return heading?.textContent?.trim() && (root?.textContent?.trim().length ?? 0) > 100;
+  }, { timeout: 10000 });
 
   // 전체 HTML 추출
   const html = await page.content();
@@ -166,103 +155,79 @@ async function main() {
 
   const server = await startServer();
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
+  let browser;
+  try {
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
 
-  const page = await browser.newPage();
-  // 콘솔 에러 무시 (AdSense 등 외부 스크립트)
-  page.on('console', () => {});
-  page.on('pageerror', () => {});
+    const page = await browser.newPage();
+    // 콘솔 에러 무시 (AdSense 등 외부 스크립트)
+    page.on('console', () => {});
+    page.on('pageerror', () => {});
 
-  // 정적 프리렌더링은 로컬 자산만 사용합니다. 외부 API/분석 요청은 보내지 않습니다.
-  await page.setRequestInterception(true);
-  page.on('request', (req) => {
-    const url = req.url();
-    const isLocalAsset = new URL(url).origin === BASE && !new URL(url).pathname.startsWith('/api/');
-    if (isLocalAsset || url.startsWith('data:') || url.startsWith('blob:')) {
-      req.continue();
-    } else {
-      req.abort();
+    // 정적 프리렌더링은 로컬 자산만 사용합니다. 외부 API/분석 요청은 보내지 않습니다.
+    await page.setRequestInterception(true);
+    page.on('request', (req) => {
+      const url = req.url();
+      const isLocalAsset = new URL(url).origin === BASE && !new URL(url).pathname.startsWith('/api/');
+      if (isLocalAsset || url.startsWith('data:') || url.startsWith('blob:')) {
+        req.continue();
+      } else {
+        req.abort();
+      }
+    });
+
+    let success = 0;
+    let failed = 0;
+
+    for (const route of ROUTES) {
+      try {
+        const html = await renderRoute(page, route);
+        const processed = postProcess(html);
+
+        // 저장 경로 결정
+        // Cloudflare Pages는 /path/index.html만 있으면 /path → /path/로 308 리다이렉트합니다.
+        // SEO canonical과 _redirects의 non-trailing-slash 정책을 맞추기 위해 /path.html로 저장합니다.
+        const filePath = route === '/'
+          ? join(DIST, 'index.html')
+          : join(DIST, `${route}.html`);
+
+        mkdirSync(dirname(filePath), { recursive: true });
+        writeFileSync(filePath, processed, 'utf-8');
+
+        // 콘텐츠 크기 확인 (body 전체에서 root div 내부 텍스트 추출)
+        const bodyMatch = processed.match(/<body\b[^>]*>([\s\S]*)<\/body>/);
+        const contentLen = bodyMatch ? bodyMatch[1].replace(/<[^>]+>/g, '').trim().length : 0;
+        const status = contentLen > 100 ? '✅' : '⚠️';
+        console.log(`  ${status} ${route} (body: ${(contentLen / 1024).toFixed(1)}KB)`);
+
+        success++;
+      } catch (err) {
+        console.log(`  ❌ ${route} - ${err.message}`);
+        failed++;
+      }
     }
-  });
 
-  let success = 0;
-  let failed = 0;
+    console.log(`\n🏁 프리렌더링 완료: ${success}/${ROUTES.length} 성공, ${failed} 실패`);
 
-  for (const route of ROUTES) {
+    if (failed > 0) {
+      throw new Error(`${failed} public routes failed to prerender`);
+    }
+  } finally {
     try {
-      const html = await renderRoute(page, route);
-      const processed = postProcess(html);
-
-      // 저장 경로 결정
-      // Cloudflare Pages는 /path/index.html만 있으면 /path → /path/로 308 리다이렉트합니다.
-      // SEO canonical과 _redirects의 non-trailing-slash 정책을 맞추기 위해 /path.html로 저장합니다.
-      const filePath = route === '/'
-        ? join(DIST, 'index.html')
-        : join(DIST, `${route}.html`);
-
-      mkdirSync(dirname(filePath), { recursive: true });
-      writeFileSync(filePath, processed, 'utf-8');
-
-      // 콘텐츠 크기 확인 (body 전체에서 root div 내부 텍스트 추출)
-      const bodyMatch = processed.match(/<body>([\s\S]*)<\/body>/);
-      const contentLen = bodyMatch ? bodyMatch[1].replace(/<[^>]+>/g, '').trim().length : 0;
-      const status = contentLen > 100 ? '✅' : '⚠️';
-      console.log(`  ${status} ${route} (body: ${(contentLen / 1024).toFixed(1)}KB)`);
-
-      success++;
-    } catch (err) {
-      console.log(`  ❌ ${route} - ${err.message}`);
-      failed++;
+      await browser?.close();
+    } finally {
+      await new Promise((resolve, reject) => {
+        server.close((err) => err ? reject(err) : resolve());
+      });
     }
   }
-
-  await browser.close();
-  server.close();
-
-  console.log(`\n🏁 프리렌더링 완료: ${success}/${ROUTES.length} 성공, ${failed} 실패`);
-
-  if (failed > 0) {
-    process.exit(1);
-  }
 }
 
-/** Fallback: meta 태그만 교체 (Puppeteer 사용 불가 시) */
-function fallbackMetaOnly() {
-  console.log('⚠️ Puppeteer 사용 불가 - meta 태그 프리렌더링으로 대체');
-  const META_ROUTES = [
-    { path: '', ...FALLBACK_META.get('/') },
-    ...ROUTES.map(r => ({
-      path: r,
-      title: FALLBACK_META.get(r)?.title ?? 'PayTools',
-      description: FALLBACK_META.get(r)?.description ?? '급여 계산 자동화 서비스',
-    })),
-  ];
-  const template = readFileSync(join(DIST, 'index.html'), 'utf-8');
-  const BASE_URL = 'https://paytools.work';
-  let count = 0;
-  for (const route of META_ROUTES) {
-    const url = `${BASE_URL}${route.path}`;
-    let html = template
-      .replace(/<title>[^<]*<\/title>/, `<title>${route.title}</title>`)
-      .replace(/<meta name="description" content="[^"]*"/, `<meta name="description" content="${route.description}"`)
-      .replace(/<!-- canonical[^>]*-->/, `<link rel="canonical" href="${url}" />`);
-    const dir = route.path ? join(DIST, route.path) : DIST;
-    mkdirSync(dir, { recursive: true });
-    writeFileSync(join(dir, 'index.html'), html);
-    count++;
-  }
-  console.log(`✅ Meta 프리렌더링 완료: ${count}개 페이지`);
-}
-
+// Never publish generic metadata-only pages after a failed render.
 main().catch((err) => {
   console.error('Puppeteer 프리렌더링 실패:', err.message);
-  try {
-    fallbackMetaOnly();
-  } catch (fbErr) {
-    console.error('Fallback도 실패:', fbErr.message);
-    process.exit(1);
-  }
+  process.exitCode = 1;
 });
