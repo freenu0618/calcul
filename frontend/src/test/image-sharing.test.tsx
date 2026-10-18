@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import html2canvas from 'html2canvas';
 import { captureAndDownload, shareImage } from '../utils/captureImage';
 import { ShareButtons } from '../components/common/ShareButtons';
@@ -30,6 +30,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
@@ -111,5 +112,40 @@ describe('native image sharing', () => {
     await completeEncoding();
     expect(await screen.findByText('이미지가 저장되었습니다')).toBeInTheDocument();
     expect(HTMLAnchorElement.prototype.click).toHaveBeenCalledOnce();
+  });
+});
+
+describe.each(['default', 'stitch'] as const)('%s sharing feedback', (variant) => {
+  it('announces copy results without submitting an enclosing form', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { clipboard: { writeText } });
+    const onSubmit = vi.fn((event) => event.preventDefault());
+    render(<form onSubmit={onSubmit}>
+      <ShareButtons url="https://paytools.work" title="급여 결과" variant={variant} />
+    </form>);
+    const status = screen.getByRole('status');
+    expect(status).toBeEmptyDOMElement();
+    fireEvent.click(screen.getByRole('button', { name: variant === 'stitch' ? '카카오톡 링크 복사' : '링크 복사' }));
+    await waitFor(() => expect(status).toHaveTextContent('링크가 복사되었습니다'));
+    expect(writeText).toHaveBeenCalledWith('https://paytools.work');
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('gives the latest feedback a full lifetime and clears its timer on unmount', async () => {
+    vi.useFakeTimers();
+    const writeText = vi.fn().mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error('Denied'));
+    vi.stubGlobal('navigator', { clipboard: { writeText } });
+    const { unmount } = render(<ShareButtons url="https://paytools.work" title="급여 결과" variant={variant} />);
+    const button = screen.getByRole('button', { name: variant === 'stitch' ? '카카오톡 링크 복사' : '링크 복사' });
+    await act(async () => { fireEvent.click(button); });
+    await act(async () => { vi.advanceTimersByTime(2000); });
+    await act(async () => { fireEvent.click(button); });
+    await act(async () => { vi.advanceTimersByTime(1000); });
+    expect(screen.getByRole('status')).toHaveTextContent('복사에 실패했습니다');
+    await act(async () => { vi.advanceTimersByTime(2000); });
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+    await act(async () => { fireEvent.click(button); });
+    unmount();
+    expect(vi.getTimerCount()).toBe(0);
   });
 });

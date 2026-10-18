@@ -2,7 +2,7 @@
  * SNS 공유 버튼 컴포넌트
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { captureAndDownload, shareImage } from '../../utils/captureImage';
 
 interface ShareButtonsProps {
@@ -43,11 +43,18 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
   const [toastMessage, setToastMessage] = useState('');
   const [isCapturing, setIsCapturing] = useState(false);
 
-  const showToastMessage = (message: string) => {
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (toastTimer.current !== null) clearTimeout(toastTimer.current);
+  }, []);
+
+  const showToastMessage = useCallback((message: string) => {
+    if (toastTimer.current !== null) clearTimeout(toastTimer.current);
     setToastMessage(message);
     setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
-  };
+    toastTimer.current = setTimeout(() => setShowToast(false), 3000);
+  }, []);
 
   // 이미지 다운로드
   const handleDownloadImage = useCallback(async () => {
@@ -71,7 +78,7 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
     } finally {
       setIsCapturing(false);
     }
-  }, [captureTargetId]);
+  }, [captureTargetId, showToastMessage]);
 
   // 이미지 공유 (모바일)
   const handleShareImage = useCallback(async () => {
@@ -101,7 +108,7 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
     } finally {
       setIsCapturing(false);
     }
-  }, [captureTargetId, title, description]);
+  }, [captureTargetId, title, description, showToastMessage]);
 
   const handleKakaoShare = () => {
     // KakaoTalk 공유 (Kakao SDK 필요)
@@ -185,27 +192,31 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
       <>
         {/* 카카오톡 공유 버튼 */}
         <button
+          type="button"
           onClick={handleKakaoShare}
           className="flex items-center justify-center gap-2 h-14 rounded-xl bg-[#FEE500] text-[#191919] text-base font-bold hover:bg-[#FEE500]/90 transition-colors shadow-lg shadow-yellow-500/10"
         >
-          <span className="material-symbols-outlined text-[20px]">chat_bubble</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[20px]">chat_bubble</span>
           {kakaoAvailable ? '카카오톡 공유' : '카카오톡 링크 복사'}
         </button>
         {/* 저장 버튼 */}
         <button
+          type="button"
           onClick={handleDownloadImage}
           disabled={isCapturing}
           className="flex items-center justify-center gap-2 h-14 rounded-xl bg-primary text-white text-base font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 disabled:opacity-50"
         >
-          <span className="material-symbols-outlined text-[20px]">download</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[20px]">download</span>
           {isCapturing ? '처리 중...' : '결과 저장하기'}
         </button>
-        {/* Toast 알림 */}
-        {showToast && (
-          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg z-50">
-            {toastMessage}
-          </div>
-        )}
+        {/* Keep the live region mounted before a feedback message arrives. */}
+        <div role="status" aria-atomic="true" className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50">
+          {showToast && (
+            <div className="bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg">
+              {toastMessage}
+            </div>
+          )}
+        </div>
       </>
     );
   }
@@ -218,6 +229,7 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
       {captureTargetId && (
         <div className="flex gap-2 mb-3">
           <button
+            type="button"
             onClick={handleDownloadImage}
             disabled={isCapturing}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg transition-colors disabled:opacity-50"
@@ -230,6 +242,7 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
           </button>
 
           <button
+            type="button"
             onClick={handleShareImage}
             disabled={isCapturing}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50"
@@ -246,6 +259,7 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
       {/* SNS 공유 버튼 */}
       <div className="flex flex-wrap gap-2">
         <button
+          type="button"
           onClick={handleKakaoShare}
           className="flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 rounded-lg transition-colors"
           aria-label={kakaoAvailable ? '카카오톡으로 공유' : '카카오톡 링크 복사'}
@@ -257,6 +271,7 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
         </button>
 
         <button
+          type="button"
           onClick={handleFacebookShare}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
           aria-label="페이스북으로 공유"
@@ -268,6 +283,7 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
         </button>
 
         <button
+          type="button"
           onClick={handleTwitterShare}
           className="flex items-center gap-2 px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition-colors"
           aria-label="트위터로 공유"
@@ -279,6 +295,7 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
         </button>
 
         <button
+          type="button"
           onClick={handleCopyLink}
           className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
           aria-label="링크 복사"
@@ -290,12 +307,14 @@ export function ShareButtons({ url, title, description, captureTargetId, variant
         </button>
       </div>
 
-      {/* Toast 알림 */}
-      {showToast && (
-        <div className="fixed bottom-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in">
-          {toastMessage}
-        </div>
-      )}
+      {/* Keep the live region mounted before a feedback message arrives. */}
+      <div role="status" aria-atomic="true" className="fixed bottom-4 right-4 z-50">
+        {showToast && (
+          <div className="bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in">
+            {toastMessage}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
