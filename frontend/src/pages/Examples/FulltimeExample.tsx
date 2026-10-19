@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
+import PageHelmet from '../../components/common/PageHelmet';
 
 // GA 타입 선언
 declare global {
@@ -29,14 +30,13 @@ const FulltimeExample = () => {
 
   return (
     <MainLayout>
+      <PageHelmet
+        title="풀타임 근로자 급여 계산 사례 (주 5일)"
+        description="월급 250만원, 주 5일 근무하는 정규직 근로자의 실수령액 계산 사례. 4대 보험, 소득세, 주휴수당을 포함한 상세한 급여 계산 방법을 확인하세요."
+        path="/examples/fulltime"
+      />
       <Helmet>
-        <title>풀타임 근로자 급여 계산 사례 (주 5일) | 급여계산기</title>
-        <meta name="description" content="월급 250만원, 주 5일 근무하는 정규직 근로자의 실수령액 계산 사례. 4대 보험, 소득세, 주휴수당을 포함한 상세한 급여 계산 방법을 확인하세요." />
         <meta name="keywords" content="풀타임 급여, 정규직 실수령액, 월급 계산, 주 5일 근무, 4대 보험" />
-        <link rel="canonical" href="https://paytools.work/examples/fulltime" />
-        <meta property="og:title" content="풀타임 근로자 급여 계산 사례" />
-        <meta property="og:description" content="월급 250만원, 주 5일 근무하는 정규직 근로자의 실수령액 계산 사례." />
-        <meta property="og:url" content="https://paytools.work/examples/fulltime" />
       </Helmet>
 
       <div className="max-w-4xl mx-auto">

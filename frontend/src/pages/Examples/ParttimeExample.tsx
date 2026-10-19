@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
 import Card from '../../components/common/Card';
+import PageHelmet from '../../components/common/PageHelmet';
 
 // GA 타입 선언
 declare global {
@@ -29,14 +30,13 @@ const ParttimeExample = () => {
 
   return (
     <MainLayout>
+      <PageHelmet
+        title="파트타임 근로자 급여 계산 사례 (주 3일)"
+        description="시급 10,320원, 주 3일 근무하는 단시간 근로자의 실수령액 계산 사례. 주휴수당 비례 계산과 4대 보험 적용 기준을 확인하세요."
+        path="/examples/parttime"
+      />
       <Helmet>
-        <title>파트타임 근로자 급여 계산 사례 (주 3일) | 급여계산기</title>
-        <meta name="description" content="시급 10,320원, 주 3일 근무하는 단시간 근로자의 실수령액 계산 사례. 주휴수당 비례 계산과 4대 보험 적용 기준을 확인하세요." />
         <meta name="keywords" content="파트타임 급여, 단시간 근로, 주휴수당, 시급 계산, 알바 실수령액" />
-        <link rel="canonical" href="https://paytools.work/examples/parttime" />
-        <meta property="og:title" content="파트타임 근로자 급여 계산 사례" />
-        <meta property="og:description" content="시급 10,320원, 주 3일 근무하는 단시간 근로자의 실수령액 계산 사례." />
-        <meta property="og:url" content="https://paytools.work/examples/parttime" />
       </Helmet>
 
       <div className="max-w-4xl mx-auto">
