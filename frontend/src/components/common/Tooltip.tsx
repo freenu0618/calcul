@@ -80,8 +80,12 @@ export default function Tooltip({
     touchTimerRef.current = setTimeout(() => setIsVisible(false), 2000);
   };
 
+  // Keep field help/error descriptions whether the tooltip is open or closed.
+  const describedBy = [children.props['aria-describedby'], isVisible ? tooltipId : undefined]
+    .filter(Boolean)
+    .join(' ') || undefined;
   const describedTrigger = cloneElement(children, {
-    'aria-describedby': isVisible ? tooltipId : undefined,
+    'aria-describedby': describedBy,
   });
 
   const positionClasses = {
