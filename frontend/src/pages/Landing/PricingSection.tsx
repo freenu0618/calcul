@@ -94,7 +94,7 @@ export default function PricingSection() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
   const handlePayment = async (plan: Plan) => {
-    if (!isAuthenticated) { window.location.href = '/register'; return; }
+    if (!isAuthenticated) { window.location.assign('/register'); return; }
     const id = billing === 'annual' ? plan.annualPlanId : plan.planId;
     if (!id) return;
     setLoadingPlan(plan.name);
@@ -111,7 +111,7 @@ export default function PricingSection() {
   };
 
   return (
-    <section className="py-20 lg:py-28 bg-white" id="pricing">
+    <section className="scroll-mt-16 py-20 lg:py-28 bg-white" id="pricing">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-4">
           <h2 className="text-3xl font-bold text-text-main sm:text-4xl mb-4">
