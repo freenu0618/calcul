@@ -787,12 +787,15 @@ const FAQ = () => {
           </section>
 
         {/* 카테고리 필터 */}
-        <div className="mb-6 flex flex-wrap gap-2">
+        <div role="group" aria-label="FAQ 카테고리" className="mb-4 flex flex-wrap gap-2">
           {categories.map((category) => (
             <button
               key={category}
+              type="button"
+              aria-pressed={selectedCategory === category}
+              aria-controls="faq-results"
               onClick={() => handleCategoryChange(category)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`min-h-11 px-4 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
                 selectedCategory === category
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -803,8 +806,12 @@ const FAQ = () => {
           ))}
         </div>
 
+        <p role="status" aria-atomic="true" className="mb-6 text-sm text-gray-600">
+          {selectedCategory} · 질문 {filteredFAQ.length}개
+        </p>
+
         {/* FAQ 목록 (아코디언) */}
-        <div className="space-y-4">
+        <div id="faq-results" className="space-y-4">
           {filteredFAQ.map((item, index) => {
             const answerId = getItemId(index);
             const isExpanded = expandedIndex === index;
