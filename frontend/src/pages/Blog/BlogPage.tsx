@@ -2,6 +2,7 @@
  * 블로그 메인 페이지
  */
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import MainLayout from '../../components/layout/MainLayout';
@@ -11,6 +12,10 @@ import { blogPosts, blogPostPreviews } from '../../data/blogPosts';
 
 const BlogPage = () => {
   const posts = blogPostPreviews;
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const filteredPosts = selectedCategory === null
+    ? posts
+    : posts.filter((post) => post.category === selectedCategory);
   const categories = Array.from(new Set(posts.map(post => post.category)));
   const blogStructuredData = [
     {
@@ -104,23 +109,31 @@ const BlogPage = () => {
         </div>
 
         {/* 카테고리 */}
-        <div className="mb-6 flex flex-wrap gap-2">
-          <span className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">
-            전체
-          </span>
-          {categories.map((category) => (
-            <span
-              key={category}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium cursor-pointer hover:bg-gray-200"
+        <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="블로그 카테고리">
+          {[null, ...categories].map((category) => (
+            <button
+              key={category ?? 'all'}
+              type="button"
+              aria-pressed={selectedCategory === category}
+              aria-controls="blog-post-list"
+              onClick={() => setSelectedCategory(category)}
+              className={`min-h-11 px-4 py-2 rounded-lg text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
+                selectedCategory === category
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
             >
-              {category}
-            </span>
+              {category ?? '전체'}
+            </button>
           ))}
         </div>
+        <p className="mb-6 text-sm text-gray-600" role="status" aria-live="polite" aria-atomic="true">
+          {selectedCategory ?? '전체'} 글 {filteredPosts.length}개
+        </p>
 
         {/* 블로그 포스트 목록 */}
-        <div className="space-y-6">
-          {posts.map((post) => (
+        <div id="blog-post-list" className="space-y-6">
+          {filteredPosts.map((post) => (
             <Link key={post.id} to={`/blog/${post.id}`}>
               <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                 <div className="space-y-3">
